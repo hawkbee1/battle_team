@@ -1,0 +1,16 @@
+# Default battle settings. All numbers are PLACEHOLDERS to be tuned.
+# These are settings of a battle (chosen when an admin creates it); these values are the defaults.
+version: 0
+
+# Commander death (decision 80): no respawn delay; the commander respawns at the HQ at once.
+# All units of his section on the field (carried ones included) go instantly to storage.
+commander_death:
+  xp_loss_share: 0.25        # share of the commander's own UNSPENT XP lost; his level is never lost
+  ap_loss_share: 1.0         # share of ap_max removed from each stored unit (1.0 = AP to 0)
+  morale_loss: 20            # morale points removed from each stored unit
+
+# Start of every battle of a war (decision 83)
+battle_start:
+  restore_ap: full
+  restore_hp: full
+  restore_morale: base       # data/combat.yaml morale.base

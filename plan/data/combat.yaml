@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 2
+version: 5
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -21,14 +21,18 @@ armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 #   move_while_loaded  true: the unit can move with the weapon loaded
 #                      false: the weapon must be unloaded before the unit moves
 #   airborne_factor    damage multiplier against a flying target (0 = cannot hit it)
-#   range_m is a cap: a unit only fires at targets it sees itself (decision 59).
+#   base_accuracy      starting hit chance under orders/AI, before factors (decision 65)
+#   indirect_fire      true: may target a ground position its section sees or a radio relays (decision 62)
+#   range_m is a cap: a unit only fires at targets it sees itself (decision 59),
+#   except indirect_fire weapons.
+# Values are the accepted starting point for milestone 1 (decision 69).
 weapon_types:
-  rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
-  machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
-  anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
-  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true }   # see Q-CBT-11 (indirect fire)
-  anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
-  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
+  rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  base_accuracy: 0.70, rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
+  machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  base_accuracy: 0.50, rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
+  anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, base_accuracy: 0.60, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
+  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, base_accuracy: 0.40, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
+  anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  base_accuracy: 0.60, rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
+  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, base_accuracy: 0.90, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
 # Weapon prices: see Q-ECO-01 (the default weapon is included in the unit price).
 
 multipliers:
@@ -41,17 +45,62 @@ multipliers:
 
 friendly_fire: { enabled: true, damage_factor: 1.0 }
 
+# Units carried by a transport (decision 81): each takes this share of every hit on the
+# transport, recomputed with its own armor type. Ejection damage at transport death: 37e.
+transport:
+  carried_damage_share: 0.25
+  ejection_damage_share_of_hp: 0.5   # placeholder, explosion damage when ejected
+
+# Morale (decision 70): 0..100, starts at base, changes only through events, no drift.
+morale:
+  range: [0, 100]
+  base: 50                         # value of a newly bought unit
+  events:                          # placeholders
+    commander_aura_per_min: +2     # while inside its own commander's aura_radius
+    nearby_enemy_killed: +5        # within nearby_radius_m
+    nearby_ally_killed: -8
+    outnumbered_per_min: -3        # local enemy/ally ratio above outnumbered_ratio
+  nearby_radius_m: 50
+  outnumbered_ratio: 1.5
+
+# 0 HP with the final blow from a commander (decisions 37f, 72)
+# p_spared = k * ((100 - morale)/100 + (1 - ap/ap_max)) / 2
+# spared -> defection or prisoner by defection_share; defection needs room in the
+# attacking section, otherwise prisoner. Not spared -> death.
+zero_hp:
+  k: 0.6
+  defection_share: 0.5
+  only_when_final_blow_by: commander
+
+# Prisoners (decision 73): stored instantly in the captor section's storage.
+prisoners:
+  held_in: captor_storage
+  can_escape: false
+  ransom_fee: 0                    # ransom goes entirely to the captor section
+  at_war_end: lost
+
 # Ammo (decision 54): unlimited. Only the loaded magazine is limited.
 # A reload always gives a full magazine; rounds left in it are discarded.
 ammo:
   unlimited: true
   reload_discards_remaining: true
 
-# Hit chance under orders / AI (decision 58). Formula: Q-CBT-12.
-# Inputs: attacker.attack (accuracy), target.defense (evasion), distance / range_m,
-#         cover, target size and speed.
+# Hit chance under orders / AI (decisions 58, 65)
+# chance = weapon.base_accuracy
+#          * (1 + (attacker.attack - target.defense) / 100)
+#          * distance_factor * cover_factor * size_factor * speed_factor
+#          * indirect_factor (indirect fire only)
+#          * morale_factor   (attacker morale, decision 71)
+#          clamped to [min, max]
+# Cover only lowers hit chance; it never reduces damage (decision 65).
 hit_chance:
-  inputs: [attacker_attack, target_defense, distance_ratio, cover, target_size, target_speed]
+  clamp: { min: 0.05, max: 0.95 }
+  distance_factor: { at_zero: 1.0, at_max_range: 0.5 }   # linear between 0 and range_m
+  cover_factor: { none: 1.0, partial: 0.5, full: 0.0 }
+  size_factor:  { infantry: 0.8, light_vehicle: 1.0, heavy_vehicle: 1.2, structure: 1.5, hq: 2.0, relic: 2.0 }  # by target armor_type
+  speed_factor: { per_mps: 0.02, min: 0.5 }   # 1 - per_mps * target speed, not below min
+  indirect_factor: 0.5
+  morale_factor: { at_0: 0.9, at_100: 1.1 }   # linear in attacker morale
 
 # First-person aim (decision 58): attack tightens spread and sway.
 aim:
@@ -59,13 +108,28 @@ aim:
   spread_reduction_per_attack: 0.01   # fraction of spread removed per attack point (placeholder)
   min_spread_deg: 0.2                 # placeholder
 
-# Dropped weapons (decision 53)
+# Dropped weapons (decisions 53, 63)
 dropped_weapons:
-  pickup_ap: 5                  # AP to pick up a dropped weapon
+  pickup_ap: 5                  # AP to pick up a dropped weapon (exception to time-only handling)
   despawn_after_s: 600          # placeholder
 
 ap:
   regen_mode: constant          # same rate whatever the unit does (decision 37b)
-  at_zero: act_at_regen_rate    # decision 56: never frozen, acts as fast as AP come back
-  costs_ap: [shot, move, pickup_weapon, role_actions]
-  time_only: [reload, unload, swap_weapon]   # decision 55
+  at_zero: act_at_regen_rate    # decision 56: movement slows to regen speed; paid actions wait for enough AP
+  costs_ap: [shot, move, push, pickup_weapon, role_actions]
+  time_only: [reload, unload, swap_weapon, land, take_off]   # decisions 55, 68
+
+# Role actions (decision 66): fixed AP paid up front, then a duration.
+# A unit must have the AP to start. Interrupted: AP lost, progress kept; resuming
+# costs the AP of the remaining part (decision 67).
+# Constructions (build) have their own AP/time per structure: Q-ECO-04.
+actions:
+  heal:    { ap: 10, duration_s: 5,  hp_restored: 20 }   # placeholder
+  repair:  { ap: 10, duration_s: 10, hp_restored: 50 }   # placeholder, per repair action
+  capture: { ap: 30, duration_s: 60 }                    # placeholder (Q-REL-02)
+  interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining }
+
+# Pushing a relic or the HQ (decision 66): AP per metre for each pusher, like movement,
+# multiplied by the slope factor of the pusher's movement class (data/terrain.yaml).
+push:
+  ap_per_m: 2.0                 # placeholder (Q-REL-04)

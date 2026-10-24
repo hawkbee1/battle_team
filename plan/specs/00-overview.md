@@ -13,6 +13,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 - `specs/70-combat-and-ap.md` with `data/combat.yaml`: AP, hit resolution, damage, friendly fire, morale, prisoners.
 - `specs/90-research-topic-priority.md`: research (industry and academic) on what matters most for success.
 - `specs/95-open-questions.md`: master list of open questions (to-do / done of the spec phase).
+- `data/battle.yaml`: default values of battle settings.
 - Markdown files explain the rules (they teach the game). YAML files hold the numbers (code loads them).
 
 ## Decisions so far
@@ -39,7 +40,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 ### Commander and sections
 15. A commander and his units form a **section**.
 16. The commander always resurrects at the HQ after death.
-17. The more XP the commander has, the more troops he can command (section size cap grows with commander XP).
+17. The higher the commander level, the more troops he can command and store. (Revised by decision 79: the level comes from section XP, not from the commander's own XP.)
 18. A commander gives bonuses to nearby troops of his section: his aura raises their morale.
 19. A commander can spend money to buy more troops.
 
@@ -82,7 +83,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 37b. AP regenerate at a constant rate, whatever the unit does.
 37c. Hits are hybrid: aim-based when a player is inside a unit, hit chance when units act under orders or AI.
 37d. Damage uses a weapon-type vs armor-type table. Friendly fire is on, full damage.
-37e. Cover blocks shots and gives damage reduction when partial. Units in a destroyed transport are ejected with heavy damage.
+37e. Cover blocks shots; partial cover lowers the chance of being hit (revised by decision 65: no damage reduction). Units in a destroyed transport are ejected with heavy damage.
 37f. At 0 HP a unit normally dies. Only when a commander deals the final blow himself, low morale and low AP raise the odds that it is taken prisoner, or switches side into the attacker's section if it has room (keeping its XP and evolution). Prisoners can be exchanged or ransomed.
 37h. Each weapon has a firing speed, a cartridge (magazine) capacity, a loading speed, an unloading speed, and says whether the unit can move with it loaded.
 37g. Morale is changed by the commander aura, nearby kills and ally deaths, and being outnumbered.
@@ -109,7 +110,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 46g. HQ manager powers: team-wide orders and map markers, and moving the HQ. The manager is the player with the most medal points (delegation possible).
 46h. The HQ is pushed by units like a relic, with the same obstacles. The manager is fixed at battle start (delegation only).
 46h1. A pushed HQ does not crush units, it pushes them sideways. No fallback if the manager is offline: he must delegate.
-46h3. A section in a guild stores its units in its guild encampment; a section without guild stores them in the HQ. A unit next to its storage place is stored immediately; elsewhere it can be recalled after a long delay that nothing stops. Stored units deploy instantly next to their storage place, except while an enemy is next to it. Storage capacity is limited per section and grows with commander XP.
+46h3. A section in a guild stores its units in its guild encampment; a section without guild stores them in the HQ. A unit next to its storage place is stored immediately; elsewhere it can be recalled after a long delay that nothing stops. Stored units deploy instantly next to their storage place, except while an enemy is next to it. Storage capacity is limited per section and grows with the commander level (decision 79).
 46h4. A guild without encampment uses the HQ. A blocked encampment does not allow deploying from the HQ instead. An encampment is destroyed like any other unit and can be bought again at any time.
 46h5. Lore: storage is the homeland. HQs and encampments hold teleportation portals usable only by authorized units. Destroying an HQ or encampment never affects stored units.
 46h2. Engineers can build ordinary walls near the HQ. Eliminated players can join another running battle with another commander.
@@ -137,12 +138,39 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 53. Weapons are equipped or swapped only while the unit is stored or next to its storage place. A killed unit drops its weapon; any unit of any team whose allowed list includes it can pick it up on the spot for an AP cost, dropping its own weapon in its place. Dropped weapons vanish after a delay.
 54. Ammo is unlimited; only the loaded magazine is limited. A reload always gives a full magazine and discards the rounds left in it.
 55. Reloading, unloading and swapping weapons cost time only, no AP. Shots, movement, weapon pick-up and role actions cost AP.
-56. A unit with 0 AP is never frozen: it keeps moving or acting as fast as its AP regenerate.
+56. A unit with 0 AP is never frozen: it keeps moving as fast as its AP regenerate; a shot or role action waits until it has enough AP.
 57. Damage = weapon base damage × weapon-vs-armor multiplier (× airborne_factor against a flying target). Every unit has an armor type. The airborne_factor rule is confirmed (0 = cannot hit flying units).
 58. `attack` is accuracy (hit chance under orders/AI, tighter spread in first-person aim). `defense` is evasion (lowers the chance of being hit). Neither changes damage.
 59. A unit fires only at targets it sees itself, up to weapon range. Effective vision = vision range × weather factor × terrain factor of the observer's position + height bonus, then hard line-of-sight blockers apply. Weather is a battle state that changes over time.
 60. A medic is a soldier with a heal role (category soldier).
 61. Roster v1 adds jeep (vehicle, wheeled), tank (vehicle, tracked), truck (transport, wheeled), helicopter (flying capability) and boat (boat capability, water only) to commander, soldier, medic, engineer, scout, artillery and radio. Stats are placeholders.
+
+62. Indirect fire: weapons flagged `indirect_fire` (artillery) may target a ground position that a unit of their section sees, or that a scout reports through a radio in range, with a lower hit chance. All other weapons need their unit's own sight.
+63. Picking up a dropped weapon costs AP (the only weapon handling that does; see 55).
+64. Prisoners and defectors keep their weapon. Units with no weapon (radio, truck) cannot attack.
+65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage.
+66. Build, repair, heal and capture cost a fixed AP amount paid up front, then take a duration; a unit needs the AP to start. Pushing a relic or the HQ costs each pusher AP per metre, like movement, with the slope factor.
+67. An interrupted action loses the AP paid but keeps its progress; resuming costs the AP of the remaining part. This includes a capture blocked by an arriving enemy.
+68. Flying units can land and take off (time, no AP). Landed, they move with their ground class, are hit as ground targets and can load/unload troops. Each map sets a maximum flying altitude.
+69. Weapon values in `data/combat.yaml` are the accepted starting point for the first milestone; they are tuned with headless simulations and playtests.
+
+### Morale, prisoners, defectors, radio (see combat spec)
+70. Morale goes from 0 to 100, starts at a base value (50) and changes only through events (commander aura, nearby kills and ally deaths, being outnumbered). No drift.
+71. Morale slightly scales the attacker's hit chance (factor 0.9 at morale 0 to 1.1 at 100).
+72. 0-HP odds when a commander deals the final blow: p(spared) = 0.6 × ((100 − morale)/100 + (1 − AP/ap_max)) / 2. A spared unit defects or becomes a prisoner, 50/50; defection needs room in the attacking section, else prisoner.
+73. A prisoner goes instantly to the captor section's storage and cannot fight or escape. Exchanges and ransoms are negotiated in game between section owners; a ransom goes entirely to the captor section. Prisoners never released are lost at war end.
+74. A defector is an ordinary unit of its new section (it can be killed, captured or defect again). Statistics count a defection for the captor and a loss for the previous owner.
+75. No extra limit on defections beyond the commander-only rule; watch the snowball effect in playtests.
+76. A radio is a normal unit: bought with money, destructible, can be taken prisoner or defect, stored like any unit; unarmed. Its relay range starts at its base value and grows through its skill tree.
+
+### Progression, commander death, between battles (see unit spec)
+77. Hit and kill XP is multiplied by 1 + target XP / attacker XP (capped at ×3). Repeated XP from the same target or build spot within a time window shrinks. Hitting allies gives no XP.
+78. Each unit spends its own XP on its own skill tree, the commander included. Nodes are permanent (no respec) and never exclude each other.
+79. A share of every XP point earned by a unit moves to its section's XP. Section XP sets the commander level, which sets section size cap and storage capacity. Section XP cannot be spent on stats.
+80. A dead commander respawns at the HQ at once. He loses a share of his unspent XP, never his level. All units of his section on the field go instantly to storage and lose AP and morale. These losses are battle settings.
+81. Units in a transport take a share of every hit on it (with their own armor type) and explosion damage when ejected at its destruction. Stored units can never be harmed.
+82. No catch-up mechanism for late joiners in a war; placement in the weakest team is the only compensation.
+83. Within a war, sections keep everything from battle to battle; each battle starts with full AP and HP and morale at base. At war end everything is lost; logs, statistics and medals stay available for consultation.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`.

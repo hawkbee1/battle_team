@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 1
+version: 4
 
 common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
@@ -16,7 +16,7 @@ common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, 
 # weapons (decision 52): one slot. `default` comes with the unit (included in its price);
 #   `allowed` lists the weapon types it may equip at storage or pick up on the field.
 #   Allowed lists are placeholders.
-# morale: 0..100, base 50 for all units (placeholder). See specs/70-combat-and-ap.md.
+# morale: 0..100, starts at data/combat.yaml morale.base. See specs/70-combat-and-ap.md.
 
 units:
   commander:
@@ -25,8 +25,8 @@ units:
     armor_type: infantry
     base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun] }
-    role: { aura_radius: 30, section_size_cap_base: 4 }
-    permadeath: false          # always resurrects at HQ
+    role: { aura_radius: 30 }  # section size cap and storage: progression.commander_levels
+    permadeath: false          # always resurrects at HQ, no delay (decision 80)
   soldier:
     category: soldier
     movement_class: foot
@@ -65,9 +65,9 @@ units:
     movement_class: tracked
     armor_type: structure
     base: { hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 80 }
-    weapons: { default: null, allowed: [] }
-    role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }
-    purchasable_by: commander
+    weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
+    role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }   # starting range, evolves via tree
+    purchasable_by: commander   # normal unit: destructible, can be captured, stored (decision 76)
 
   # Roster v1 additions (decision 61)
   jeep:
@@ -87,12 +87,13 @@ units:
     movement_class: wheeled
     armor_type: light_vehicle
     base: { hp: 250, ap_max: 120, ap_regen: 2.0, attack: 0, defense: 3, move_speed: 12, vision_range: 100 }
-    weapons: { default: null, allowed: [] }
+    weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
     role: { capacity: 6, carries: [foot] }
   helicopter:
     category: vehicle
-    movement_class: foot        # unused while flying; ground class if landing is allowed (Q-MAP-04)
+    movement_class: wheeled     # ground class used while landed (decision 68)
     capabilities: [flying]
+    flying: { land_time_s: 8, take_off_time_s: 8 }   # placeholder; max altitude is set by the map
     armor_type: light_vehicle
     base: { hp: 200, ap_max: 120, ap_regen: 2.0, attack: 10, defense: 10, move_speed: 20, vision_range: 300 }
     weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
@@ -105,7 +106,32 @@ units:
     weapons: { default: machine_gun, allowed: [machine_gun] }
     role: { capacity: 4, carries: [foot] }
 
-# Evolution trees (skill-point trees with prerequisites)
+# Progression (decisions 77-79)
+progression:
+  xp_sources:                     # placeholders
+    hit: 2
+    kill: 20
+    role_action: 5                # per completed build, repair, heal, spotting report
+    capture: 50
+    near_commander_per_min: 1
+  target_scaling:                 # hit/kill XP x min(cap, 1 + target_xp / max(attacker_xp, 1))
+    cap: 3.0
+  diminishing:                    # same target or same build spot, within the window
+    window_s: 600
+    factor_per_repeat: 0.5
+  friendly_hits_give_xp: false
+  section_xp_share: 0.2           # share of each XP point earned by a unit, moved to section XP
+  # Section XP sets the commander level. It cannot be spent on stats.
+  commander_levels:               # placeholders; storage capacity: Q-HQ-04
+    - { level: 1, section_xp: 0,     section_size_cap: 4,  storage_capacity: 8 }
+    - { level: 2, section_xp: 500,   section_size_cap: 6,  storage_capacity: 12 }
+    - { level: 3, section_xp: 1500,  section_size_cap: 8,  storage_capacity: 16 }
+    - { level: 4, section_xp: 4000,  section_size_cap: 11, storage_capacity: 22 }
+    - { level: 5, section_xp: 10000, section_size_cap: 15, storage_capacity: 30 }
+
+# Evolution trees (skill-point trees with prerequisites).
+# Each unit spends its OWN XP on its own tree, commander included (decision 78).
+# Nodes are permanent (no respec) and never exclude each other; XP cost is the only cap.
 trees:
   soldier:
     nodes:

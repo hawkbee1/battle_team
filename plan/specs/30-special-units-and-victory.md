@@ -17,7 +17,7 @@ Status: draft. Decisions come from the Q&A with the game designer.
 
 Open:
 - Capture duration and AP cost; "near" radius.
-- Does a capture in progress stop if an enemy arrives, and is progress lost or kept?
+- ~~Does a capture in progress stop if an enemy arrives, and is progress lost or kept?~~ It stops; the AP paid are lost and the progress is kept (decision 67).
 - Do stored units or units inside transports count as "near"? Do flying units count?
 - Can a relic be captured if its current owner has units near it but they are offline/passive?
 
@@ -40,7 +40,7 @@ Open:
 - A relic **can fall from a floating island** when pushed over its edge.
 - A relic **crushes units in its path if it is pushed hard enough**.
 
-- **Push**: a minimum number of pushers is needed; the relic then moves at a **fixed slow speed**. Pushing **costs AP** to each pushing unit.
+- **Push**: a minimum number of pushers is needed; the relic then moves at a **fixed slow speed**. Pushing **costs AP per metre** to each pushing unit, like movement (decision 66).
 - **Crushing**: units in the path take **heavy damage** (they may survive), whatever their team.
 - **Falling** from a floating island: the relic **lands on the ground below, intact, keeps its owner**, and crushes (heavy damage) what is under it.
 - **Water**: relics cross water only on **reinforced bridges**, a special heavy bridge built by engineers (more cost and time than a normal bridge).
@@ -51,7 +51,7 @@ Open:
 - A relic with no possible path (e.g. walled in) **stays stuck**. Destroying the walls frees it. It can still be captured where it stands.
 
 Open:
-- Minimum number of pushers; AP cost per second of pushing; how much the slope changes the effort (formula, data file).
+- Minimum number of pushers; AP cost per metre of pushing (placeholder in `data/combat.yaml`); how much the slope changes the effort (formula, data file).
 - Number of extra pushers needed to crush.
 - Reinforced bridge: cost, build time, hit points; can enemies destroy it while a relic is on it (relic falls into the water? stays stuck in the river?).
 

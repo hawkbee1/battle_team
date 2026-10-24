@@ -37,7 +37,7 @@ Rules:
 - For each (movement class, terrain type) pair the data file gives either an AP cost per metre or `impassable`.
 - A **slope factor** multiplies the cost: the steeper the slope, the higher the cost; above a per-class maximum slope the terrain is impassable.
 - **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain but may have altitude limits (open).
-- Open: is flying permanent for such a unit, or can it land and take off (and then move with its ground class)? (Q-MAP-04)
+- **Flying units can land and take off** (decision 68). Both take time, no AP. A landed unit moves with its ground movement class, is hit as a ground target, and can load or unload troops if it carries any. Each map sets a **maximum flying altitude**.
 - **Boat is a capability too.** A unit with the `boat` capability moves only on rivers and lakes, with the `boat` profile of the data file. (Decision 61)
 - **Out of AP:** a moving unit is never frozen; once its AP are empty it moves only as fast as its regen allows (decision 56, combat spec).
 - The numeric tables live in `data/terrain.yaml`.

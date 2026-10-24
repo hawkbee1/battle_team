@@ -1,10 +1,12 @@
 # Draft terrain table. All numbers are PLACEHOLDERS to be tuned.
 # ap_cost_per_m: AP spent per metre moved (before the slope factor).
 # null means impassable for that movement class or profile.
-version: 1
+version: 2
 movement_classes: [foot, wheeled, tracked]
 # The `flying` and `boat` entries below are movement PROFILES, used by units that have the
 # flying or boat capability (data/units.yaml). They are not movement classes.
+# A landed flying unit uses its ground movement_class (decision 68).
+# Maximum flying altitude is a per-map setting in the map file, not here.
 
 slope:
   # cost multiplier = 1 + slope_degrees * factor ; impassable above max_degrees
