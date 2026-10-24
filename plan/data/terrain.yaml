@@ -1,0 +1,62 @@
+# Draft terrain table. All numbers are PLACEHOLDERS to be tuned.
+# ap_cost_per_m: AP spent per metre moved (before the slope factor).
+# null means impassable for that movement class.
+version: 0
+movement_classes: [foot, wheeled, tracked]
+# The `flying` entries below are a movement PROFILE, used by units that have the
+# flying capability (data/units.yaml). Flying is not a movement class.
+
+slope:
+  # cost multiplier = 1 + slope_degrees * factor ; impassable above max_degrees
+  foot:    { factor: 0.05, max_degrees: 45 }
+  wheeled: { factor: 0.10, max_degrees: 25 }
+  tracked: { factor: 0.07, max_degrees: 35 }
+  flying:  { factor: 0.0,  max_degrees: 90 }
+
+terrain:
+  grass:
+    blocks_los: false
+    ap_cost_per_m: { foot: 1.0, wheeled: 1.0, tracked: 1.0, flying: 0.5 }
+  forest_floor:           # ground under trees
+    blocks_los: true      # trees block line of sight
+    ap_cost_per_m: { foot: 1.5, wheeled: 3.0, tracked: 2.5, flying: 0.5 }
+  sand:
+    blocks_los: false
+    ap_cost_per_m: { foot: 1.5, wheeled: 2.0, tracked: 1.5, flying: 0.5 }
+  mud:
+    blocks_los: false
+    ap_cost_per_m: { foot: 2.0, wheeled: 4.0, tracked: 2.0, flying: 0.5 }
+  rock:
+    blocks_los: false
+    ap_cost_per_m: { foot: 1.5, wheeled: 2.0, tracked: 1.5, flying: 0.5 }
+  road:
+    blocks_los: false
+    ap_cost_per_m: { foot: 0.7, wheeled: 0.4, tracked: 0.5, flying: 0.5 }
+  town_street:
+    blocks_los: false
+    ap_cost_per_m: { foot: 0.8, wheeled: 0.6, tracked: 0.7, flying: 0.5 }
+  mountain:
+    blocks_los: true
+    ap_cost_per_m: { foot: 3.0, wheeled: null, tracked: null, flying: 0.5 }
+  river:
+    blocks_los: false
+    ap_cost_per_m: { foot: null, wheeled: null, tracked: null, flying: 0.5 }
+    crossable_by_flags: [boat, amphibious]
+  lake:
+    blocks_los: false
+    ap_cost_per_m: { foot: null, wheeled: null, tracked: null, flying: 0.5 }
+    crossable_by_flags: [boat, amphibious]
+  floating_island_ground:
+    blocks_los: false
+    ap_cost_per_m: { foot: 1.0, wheeled: 1.0, tracked: 1.0, flying: 0.5 }
+    access: [flying, bridge, ladder]
+
+objects:
+  tree:      { blocks_los: true,  destructible: true,  placeholder_hp: 100 }
+  building:  { blocks_los: true,  destructible: true,  placeholder_hp: 500 }
+  wall:      { blocks_los: true,  destructible: true,  built_by: engineer }
+  bridge:    { blocks_los: false, destructible: true,  built_by: engineer, relic_crossable: false }
+  reinforced_bridge: { blocks_los: false, destructible: true, built_by: engineer, relic_crossable: true }  # heavier: more cost and build time
+  ladder:    { blocks_los: false, destructible: true,  built_by: engineer }
+  road_segment: { blocks_los: false, destructible: true, built_by: engineer }
+  trap:      { blocks_los: false, destructible: true,  built_by: engineer, hidden_from_enemies: true }

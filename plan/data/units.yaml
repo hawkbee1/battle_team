@@ -1,0 +1,62 @@
+# Draft units table. All numbers are PLACEHOLDERS to be tuned.
+version: 0
+
+common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, morale]
+# movement_class: foot | wheeled | tracked
+# capabilities (optional list): abilities a unit has on top of its category and movement class.
+#   flying: the unit moves with the `flying` profile of data/terrain.yaml and is hit as a
+#           flying target (weapon airborne_factor, data/combat.yaml). Flying is not a unit
+#           category, not a movement class and not an armor type.
+# morale: 0..100, base 50 for all units (placeholder). See specs/70-combat-and-ap.md.
+
+units:
+  commander:
+    category: commander
+    movement_class: foot
+    base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 40 }
+    role: { aura_radius: 30, section_size_cap_base: 4 }
+    permadeath: false          # always resurrects at HQ
+  soldier:
+    category: soldier
+    movement_class: foot
+    base: { hp: 100, ap_max: 60, ap_regen: 1.5, attack: 12, defense: 5, move_speed: 5, vision_range: 35 }
+  engineer:
+    category: engineer
+    movement_class: foot
+    base: { hp: 90, ap_max: 80, ap_regen: 1.5, attack: 6, defense: 4, move_speed: 4, vision_range: 35 }
+    role: { build: [bridge, ladder, wall, road_segment, trap], repair: true }
+  scout:
+    category: scout
+    movement_class: foot
+    base: { hp: 70, ap_max: 70, ap_regen: 2.0, attack: 5, defense: 2, move_speed: 7, vision_range: 70 }
+    role: { reports_to_radio: true }
+  medic:
+    category: soldier
+    movement_class: foot
+    base: { hp: 80, ap_max: 70, ap_regen: 1.5, attack: 4, defense: 3, move_speed: 5, vision_range: 35 }
+    role: { heal: true, earns_money_when_healing: true }
+  artillery:
+    category: artillery
+    movement_class: tracked
+    base: { hp: 150, ap_max: 80, ap_regen: 1.0, attack: 40, defense: 8, move_speed: 2, vision_range: 30 }
+    role: { range: 120, splash_radius: 8, deforms_terrain: true }
+  radio:
+    category: radio
+    movement_class: tracked
+    base: { hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 12, move_speed: 0.3, vision_range: 25 }
+    role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }
+    purchasable_by: commander
+
+# Evolution trees (skill-point trees with prerequisites)
+trees:
+  soldier:
+    nodes:
+      tough_1:  { cost: 100, requires: [],                effects: { hp: +10 } }
+      tough_2:  { cost: 250, requires: [tough_1],         effects: { hp: +20 } }
+      sprint:   { cost: 200, requires: [],                effects: { move_speed: +10% } }
+      sharp_1:  { cost: 150, requires: [],                effects: { attack: +5 } }
+      breacher: { cost: 400, requires: [sharp_1, tough_1], ability: breach_wall }
+  radio:
+    nodes:
+      antenna_1: { cost: 200, requires: [],          effects: { relay_range: +25 } }
+      antenna_2: { cost: 400, requires: [antenna_1], effects: { relay_range: +50 } }

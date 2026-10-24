@@ -1,0 +1,38 @@
+# Draft combat table. All numbers are PLACEHOLDERS to be tuned.
+# damage = weapon.base_damage * multipliers[weapon_type][armor_type]
+#          * weapon.airborne_factor   (only when the target is flying)
+version: 1
+
+armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
+# Flying is NOT an armor type: it is a unit capability (see data/units.yaml).
+# A flying unit keeps a normal armor type; weapons apply their airborne_factor on top.
+
+# Weapon characteristics
+#   base_damage, range_m, ap_per_shot
+#   rate_of_fire_rpm   firing speed: shots per minute while the magazine is not empty
+#   magazine_capacity  cartridge capacity: shots before a reload is needed
+#   reload_time_s      loading speed: seconds to load a full magazine
+#   unload_time_s      unloading speed: seconds to unload the weapon
+#   move_while_loaded  true: the unit can move with the weapon loaded
+#                      false: the weapon must be unloaded before the unit moves
+#   airborne_factor    damage multiplier against a flying target (0 = cannot hit it). PROPOSAL, to confirm.
+weapon_types:
+  rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
+  machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
+  anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
+  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true }
+  anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
+  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
+
+multipliers:
+  rifle:       { infantry: 1.0, light_vehicle: 0.3, heavy_vehicle: 0.05, structure: 0.1, hq: 0.05, relic: 0 }
+  machine_gun: { infantry: 1.2, light_vehicle: 0.4, heavy_vehicle: 0.05, structure: 0.1, hq: 0.05, relic: 0 }
+  anti_tank:   { infantry: 0.5, light_vehicle: 1.5, heavy_vehicle: 1.2,  structure: 0.8, hq: 0.6,  relic: 0 }
+  artillery:   { infantry: 1.0, light_vehicle: 1.0, heavy_vehicle: 0.7,  structure: 1.2, hq: 1.0,  relic: 0 }
+  anti_air:    { infantry: 0.3, light_vehicle: 0.3, heavy_vehicle: 0.1,  structure: 0.1, hq: 0.05, relic: 0 }
+  explosive:   { infantry: 1.5, light_vehicle: 1.2, heavy_vehicle: 1.0,  structure: 2.0, hq: 1.5,  relic: 0 }
+
+friendly_fire: { enabled: true, damage_factor: 1.0 }
+
+ap:
+  regen_mode: constant   # same rate whatever the unit does
