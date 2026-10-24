@@ -1,0 +1,46 @@
+name: battle_team
+description: Battle Team, a Flame game backed by the shared Hawkbee Appwrite project.
+version: 1.0.0+1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ^3.47.0
+
+dependencies:
+  appwrite_api_client: ^0.1.0
+  audioplayers: ^6.8.1
+  backend_status_repository: ^0.1.0
+  bloc: ^9.2.1
+  equatable: ^3.0.0
+  flame: ^1.38.2
+  flame_audio: ^2.12.2
+  flame_behaviors: ^1.4.0
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  flutter_localizations:
+    sdk: flutter
+  google_fonts: ^8.2.1
+  intl: ^0.20.2
+  material_ui: ^1.1.1
+
+dev_dependencies:
+  bloc_lint: ^0.4.2
+  bloc_test: ^10.0.0
+  bloc_tools: ^0.1.0-dev.24
+  flame_test: ^2.3.1
+  flutter_test:
+    sdk: flutter
+  mockingjay: ^2.1.0
+  mocktail: ^1.0.5
+  very_good_analysis: ^11.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/audio/
+    - assets/images/
+    - assets/licenses/poppins/
