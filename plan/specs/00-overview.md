@@ -1,6 +1,6 @@
 # BattleTeam: Game Overview (working draft)
 
-Status: draft, built through Q&A. Open questions are listed at the end.
+Status: draft, built through Q&A. Open questions live in `specs/95-open-questions.md`.
 
 ## Spec index
 - `specs/00-overview.md`: this file, index and record of decisions.
@@ -30,8 +30,8 @@ Status: draft, built through Q&A. Open questions are listed at the end.
 8. XP: each unit earns XP from hits/kills, role actions, objectives, and time survived near the commander.
 9. Evolution: a **skill-point tree** per unit type, nodes bought in any order subject to prerequisites.
 10. Permanence: units and their XP/evolution persist across the battles of a war, and are lost at the end of the war. Permadeath: a killed unit is lost for good (commander excepted). (Revised: earlier versions said "permanent across battles" without the war limit.)
-11. Common stats: HP, AP max and regen, attack, defense, move speed, vision range, movement class, morale.
-12. Unit categories: commanders, engineers, scouts, artillery, transports, vehicles, soldiers (plus medics and radios).
+11. Common stats: HP, AP max and regen, attack, defense, move speed, vision range, movement class, armor type, morale. (Revised by decisions 57-58: armor type added; attack and defense act on hit chance, not damage.)
+12. Unit categories: commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus radios. (Revised by decision 60: a medic is a soldier with a heal role.)
 12b. **Flying is a capability** of some units, not a unit category, a movement class or an armor type.
 13. Engineers build or repair: bridges, ladders, walls, roads, traps.
 14. Scouts share positions of spotted enemies.
@@ -132,21 +132,17 @@ Status: draft, built through Q&A. Open questions are listed at the end.
 50. Team, guild and direct player communication are fundamental features.
 51. A section is owned by one commander only. A player can have several sections (commanders), but only one commander per battle; several battles run at the same time.
 
+### Weapons, AP and vision (rules core, see combat and map specs)
+52. Weapons are items. A unit has one weapon slot and a per-type list of allowed weapon types. A newly bought unit comes with its type's default weapon (included in its price); other weapons are bought with section money.
+53. Weapons are equipped or swapped only while the unit is stored or next to its storage place. A killed unit drops its weapon; any unit of any team whose allowed list includes it can pick it up on the spot for an AP cost, dropping its own weapon in its place. Dropped weapons vanish after a delay.
+54. Ammo is unlimited; only the loaded magazine is limited. A reload always gives a full magazine and discards the rounds left in it.
+55. Reloading, unloading and swapping weapons cost time only, no AP. Shots, movement, weapon pick-up and role actions cost AP.
+56. A unit with 0 AP is never frozen: it keeps moving or acting as fast as its AP regenerate.
+57. Damage = weapon base damage × weapon-vs-armor multiplier (× airborne_factor against a flying target). Every unit has an armor type. The airborne_factor rule is confirmed (0 = cannot hit flying units).
+58. `attack` is accuracy (hit chance under orders/AI, tighter spread in first-person aim). `defense` is evasion (lowers the chance of being hit). Neither changes damage.
+59. A unit fires only at targets it sees itself, up to weapon range. Effective vision = vision range × weather factor × terrain factor of the observer's position + height bonus, then hard line-of-sight blockers apply. Weather is a battle state that changes over time.
+60. A medic is a soldier with a heal role (category soldier).
+61. Roster v1 adds jeep (vehicle, wheeled), tank (vehicle, tracked), truck (transport, wheeled), helicopter (flying capability) and boat (boat capability, water only) to commander, soldier, medic, engineer, scout, artillery and radio. Stats are placeholders.
+
 ## Open questions
-- Rule for automatic team creation at each battle (balance by power? keep previous teams?).
-- War result: is there a war winner, and how is it decided?
-- Medals: list and criteria for war medals and game medals.
-- Cosmetics: confirm purely visual (no gameplay advantage).
-- Team power formula: weights of active players vs total XP.
-- Discord: integration level (account linking, automatic team/guild channels, bot) vs minimal in-game chat.
-- Map special units (the 8): name, what they are, what "control" means for the 24h timer (capture action? presence? who moves them and how?), can they be destroyed, movement on varied terrain (rivers, mountains, floating islands).
-- Radio: cost, whether radios can be destroyed, start range and evolution, how scouts' info is relayed.
-- Guild: how a guild commander is chosen, relation guild commander vs highest-ranking commander (team commander), guild size, what a player outside a guild is.
-- Storage: recall delay value; capacity formula; "next to" radius; encampment price and hit points.
-- HQ: hit points; who can push it.
-- Money: prices, earning amounts, fee rates, transfer + safety-net loop (see economy spec).
-- Catch-up for late joiners within a war; fairness vs veterans with evolved units.
-- AP costs per action (shot, reload, unload); weapon values; confirm the airborne_factor rule for hitting flying units.
-- Morale formula and 0-HP odds; prisoner holding, exchange and ransom flow; defection snowball risk.
-- Concrete unit list with stats; XP formulas; evolution trees per unit type.
-- Tech/stack targets (engine, server architecture) for the build.
+All open questions are tracked in `specs/95-open-questions.md`.

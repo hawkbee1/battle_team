@@ -8,16 +8,16 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 ## Map and terrain (10)
 - [ ] **Q-MAP-01** Typical map sizes and range of team counts per map.
 - [ ] **Q-MAP-02** Craters: can engineers fill them? Do trees and structures regrow? Deformation depth limits?
-- [ ] **Q-MAP-03** Boats and amphibious units: vehicle type, class or flag? Ports or docks? Can engineers build on water other than bridges?
+- [ ] **Q-MAP-03** Boats and amphibious units: ~~vehicle type, class or flag?~~ boat is a capability (→ decision 61). Still open: amphibious units, ports or docks, boarding and leaving a boat, can engineers build on water other than bridges?
 - [ ] **Q-MAP-04** Flying units: altitude limits; is flying permanent or can a unit land and take off?
-- [ ] **Q-MAP-05** Line of sight: partial blocking by forests, height bonus, vision of flying units, destroyed objects stop blocking.
+- [ ] **Q-MAP-05** Line of sight: ~~height bonus, terrain and weather factors~~ (→ decision 59). Still open: concealment of a target inside a forest, vision of and from flying units, destroyed objects stop blocking.
 - [ ] **Q-MAP-06** Floating islands: ladder height limits, stranded ground units, can they host radios, encampments or relics?
 - [ ] **Q-MAP-07** Hit points of trees, buildings, walls, bridges.
-- [ ] **Q-MAP-08** Day/night and weather.
+- [ ] **Q-MAP-08** Day/night and weather. Weather exists and reduces vision (→ decision 59). Still open: how weather changes (random, scripted, per region), other effects (movement, hit chance), day/night.
 - [ ] **Q-MAP-09** Performance budget for persistent world changes in a 100+ player battle.
 
 ## Units and progression (20)
-- [ ] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities.
+- [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
 - [ ] **Q-UNIT-02** Role-specific stats: engineer build speed, medic heal rate, scout spotting range, transport capacity.
 - [ ] **Q-UNIT-03** XP formulas, victoryXp value, kills worth more against higher-level units, anti-farming rules.
 - [ ] **Q-UNIT-04** Skill trees: respec, cap on nodes per unit, mutually exclusive nodes; full tree per unit type.
@@ -25,7 +25,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [ ] **Q-UNIT-06** Death rules for units carried by transports and for stored units.
 - [ ] **Q-UNIT-07** Catch-up for late joiners inside a war versus veterans with evolved units.
 - [ ] **Q-UNIT-08** What carries over from one war to the next at account level (cosmetics, ranks, commander slots).
-- [ ] **Q-UNIT-09** How a unit gets its weapons; can a unit carry several weapons? (link between `units.yaml` and `combat.yaml`)
+- [x] **Q-UNIT-09** How a unit gets its weapons; can a unit carry several weapons? (link between `units.yaml` and `combat.yaml`) → decisions 52, 53
 
 ## Relics and victory (30)
 - [ ] **Q-REL-01** Name and lore of the relics.
@@ -67,13 +67,17 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [ ] **Q-ECO-06** Limits against "build and destroy" money farming by engineers.
 
 ## Combat and AP (70)
-- [ ] **Q-CBT-01** AP cost per action: shot, reload, unload, build, heal, push, capture.
-- [ ] **Q-CBT-02** Flying targets: confirm the `airborne_factor` proposal.
+- [ ] **Q-CBT-01** AP cost per action: ~~shot, reload, unload~~ (→ decisions 55, 56). Still open: AP of build, heal, push, capture.
+- [x] **Q-CBT-02** Flying targets: confirm the `airborne_factor` proposal. → decision 57
 - [ ] **Q-CBT-03** Weapon values: rate of fire, magazine, reload and unload times, ranges; artillery splash and terrain deformation.
-- [ ] **Q-CBT-04** Reloading: is a partly used magazine kept or lost?
+- [x] **Q-CBT-04** Reloading: is a partly used magazine kept or lost? → decision 54 (lost; ammo unlimited)
 - [ ] **Q-CBT-05** Morale: range, recovery over time, formula.
 - [ ] **Q-CBT-06** 0-HP outcome odds (morale, AP → death / prisoner / defection).
 - [ ] **Q-CBT-07** Prisoners: where they are held, what happens at the end of a battle or war, exchange and ransom flow (who negotiates, who is paid).
 - [ ] **Q-CBT-08** Defectors: can the previous owner recapture them; do defections count in statistics and medals?
 - [ ] **Q-CBT-09** Snowball risk of defections giving evolved units to strong teams.
 - [ ] **Q-CBT-10** Radio: cost, can it be destroyed, starting range and evolution, how scout information is relayed.
+- [ ] **Q-CBT-11** Artillery and indirect fire: with "fire only at what you see" (decision 59), artillery (1200 m range) needs its own sight. Should artillery be an exception that fires at positions spotted by its section, a scout or a radio?
+- [ ] **Q-CBT-12** Hit-chance formula under orders/AI: weights of attack vs defense, distance, cover, target size and speed. Does partial cover lower hit chance, damage, or both?
+- [ ] **Q-CBT-13** Weapon of a prisoner or a defector: kept, dropped, or taken by the captor? Can a unit fight unarmed (radio, truck have no weapon)?
+- [ ] **Q-CBT-14** Confirm that picking up a dropped weapon costs AP (decision 53) while swapping at storage costs only time (decision 55).

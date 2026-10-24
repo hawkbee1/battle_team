@@ -1,28 +1,35 @@
 # Draft combat table. All numbers are PLACEHOLDERS to be tuned.
-# damage = weapon.base_damage * multipliers[weapon_type][armor_type]
+# damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
-version: 1
+# Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
+version: 2
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
+# Every unit declares one armor_type (data/units.yaml).
 # Flying is NOT an armor type: it is a unit capability (see data/units.yaml).
 # A flying unit keeps a normal armor type; weapons apply their airborne_factor on top.
 
+# Weapons are items (decision 52). A unit has ONE weapon slot. Each unit type lists the
+# weapon types it may use and comes with a default weapon (data/units.yaml).
+#
 # Weapon characteristics
 #   base_damage, range_m, ap_per_shot
 #   rate_of_fire_rpm   firing speed: shots per minute while the magazine is not empty
 #   magazine_capacity  cartridge capacity: shots before a reload is needed
-#   reload_time_s      loading speed: seconds to load a full magazine
-#   unload_time_s      unloading speed: seconds to unload the weapon
+#   reload_time_s      loading speed: seconds to load a full magazine (no AP cost)
+#   unload_time_s      unloading speed: seconds to unload the weapon (no AP cost)
 #   move_while_loaded  true: the unit can move with the weapon loaded
 #                      false: the weapon must be unloaded before the unit moves
-#   airborne_factor    damage multiplier against a flying target (0 = cannot hit it). PROPOSAL, to confirm.
+#   airborne_factor    damage multiplier against a flying target (0 = cannot hit it)
+#   range_m is a cap: a unit only fires at targets it sees itself (decision 59).
 weapon_types:
   rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
   machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
   anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
-  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true }
+  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true }   # see Q-CBT-11 (indirect fire)
   anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
   explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
+# Weapon prices: see Q-ECO-01 (the default weapon is included in the unit price).
 
 multipliers:
   rifle:       { infantry: 1.0, light_vehicle: 0.3, heavy_vehicle: 0.05, structure: 0.1, hq: 0.05, relic: 0 }
@@ -34,5 +41,31 @@ multipliers:
 
 friendly_fire: { enabled: true, damage_factor: 1.0 }
 
+# Ammo (decision 54): unlimited. Only the loaded magazine is limited.
+# A reload always gives a full magazine; rounds left in it are discarded.
+ammo:
+  unlimited: true
+  reload_discards_remaining: true
+
+# Hit chance under orders / AI (decision 58). Formula: Q-CBT-12.
+# Inputs: attacker.attack (accuracy), target.defense (evasion), distance / range_m,
+#         cover, target size and speed.
+hit_chance:
+  inputs: [attacker_attack, target_defense, distance_ratio, cover, target_size, target_speed]
+
+# First-person aim (decision 58): attack tightens spread and sway.
+aim:
+  base_spread_deg: 2.0                # placeholder
+  spread_reduction_per_attack: 0.01   # fraction of spread removed per attack point (placeholder)
+  min_spread_deg: 0.2                 # placeholder
+
+# Dropped weapons (decision 53)
+dropped_weapons:
+  pickup_ap: 5                  # AP to pick up a dropped weapon
+  despawn_after_s: 600          # placeholder
+
 ap:
-  regen_mode: constant   # same rate whatever the unit does
+  regen_mode: constant          # same rate whatever the unit does (decision 37b)
+  at_zero: act_at_regen_rate    # decision 56: never frozen, acts as fast as AP come back
+  costs_ap: [shot, move, pickup_weapon, role_actions]
+  time_only: [reload, unload, swap_weapon]   # decision 55

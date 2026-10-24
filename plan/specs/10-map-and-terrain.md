@@ -37,18 +37,33 @@ Rules:
 - For each (movement class, terrain type) pair the data file gives either an AP cost per metre or `impassable`.
 - A **slope factor** multiplies the cost: the steeper the slope, the higher the cost; above a per-class maximum slope the terrain is impassable.
 - **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain but may have altitude limits (open).
-- Open: is flying permanent for such a unit, or can it land and take off (and then move with its ground class)?
+- Open: is flying permanent for such a unit, or can it land and take off (and then move with its ground class)? (Q-MAP-04)
+- **Boat is a capability too.** A unit with the `boat` capability moves only on rivers and lakes, with the `boat` profile of the data file. (Decision 61)
+- **Out of AP:** a moving unit is never frozen; once its AP are empty it moves only as fast as its regen allows (decision 56, combat spec).
 - The numeric tables live in `data/terrain.yaml`.
 
 ## 4. Water (rivers and lakes)
 - Rivers and lakes are **impassable for most units** (foot, wheeled, tracked).
 - They are crossed by **boats**, **amphibious units**, **flying units**, or over **bridges** built by engineers.
-- Open: boats as a vehicle type? Ports/docks? Can engineers build on water only as bridges?
+- Roster v1 has a **boat** unit (transport category, boat capability, carries foot units).
+- Open: amphibious units, ports/docks, how foot units board and leave a boat, can engineers build on water other than bridges? (Q-MAP-03)
 
 ## 5. Line of sight and fog of war
 - **Mountains, buildings and trees block line of sight.** Vision is computed in 3D, so height matters.
 - Fog of war is shared per section (see overview). A unit's vision contributes to its own section only; radios relay scouts' information to all sections.
-- Open: partial blocking by forests (density), vision bonus from height, vision of flying units, effect of destroyed trees/buildings on vision (they stop blocking).
+- **A unit fires only at what it sees itself** (decision 59). Shared vision is for awareness, not for aiming.
+
+### Effective vision (decision 59)
+Vision is reduced by weather and terrain and extended by height:
+
+`effective vision = vision_range × weather factor × terrain factor + height bonus`
+
+- **Weather factor**: weather is a state of the battle that changes over time (clear, rain, fog, snow). Each state has a vision factor.
+- **Terrain factor**: the terrain where the observer stands (for example a forest lowers it).
+- **Height bonus**: an observer standing higher than the target sees farther, up to a cap.
+- Then hard line-of-sight blockers (mountains, buildings, trees) still block.
+- Values in `data/terrain.yaml` (`vision`, `weather`, `vision_factor` per terrain).
+- Open (Q-MAP-05): does a target inside a forest get concealment, vision of and from flying units, destroyed trees/buildings stop blocking.
 
 ## 6. Terrain types (draft list)
 Ground types, trees, roads, towns, rivers, lakes, mountains, floating islands, plus built structures. The exact list and flags (blocks line of sight, gives cover, can be built on) are in `data/terrain.yaml`.
@@ -60,5 +75,5 @@ Ground types, trees, roads, towns, rivers, lakes, mountains, floating islands, p
 ## 8. Open questions
 - Typical map sizes and the range of team counts per map (to be written by the map author).
 - Destructibility details: hit points for trees, buildings, walls, bridges.
-- Day/night and weather (not discussed).
+- Weather exists and reduces vision (decision 59). Still open: how weather changes (random, scripted per map, per region), other effects (movement, hit chance), and day/night. (Q-MAP-08)
 - Performance budget for persistent craters and modifications on a 100+ player battle.

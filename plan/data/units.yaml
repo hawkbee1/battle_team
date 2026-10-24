@@ -1,51 +1,109 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 0
+version: 1
 
-common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, morale]
+common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
+# attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
+# defense:  evasion. Lowers the chance of being hit. Neither stat changes damage (decision 58).
+# armor_type: one of data/combat.yaml armor_types. Damage = weapon x weapon-vs-armor table.
+# vision_range: metres, before weather, terrain and height modifiers (data/terrain.yaml, decision 59).
 # movement_class: foot | wheeled | tracked
 # capabilities (optional list): abilities a unit has on top of its category and movement class.
 #   flying: the unit moves with the `flying` profile of data/terrain.yaml and is hit as a
 #           flying target (weapon airborne_factor, data/combat.yaml). Flying is not a unit
 #           category, not a movement class and not an armor type.
+#   boat:   the unit moves only on water with the `boat` profile of data/terrain.yaml.
+#           It has no ground movement_class. (Amphibious units: Q-MAP-03.)
+# weapons (decision 52): one slot. `default` comes with the unit (included in its price);
+#   `allowed` lists the weapon types it may equip at storage or pick up on the field.
+#   Allowed lists are placeholders.
 # morale: 0..100, base 50 for all units (placeholder). See specs/70-combat-and-ap.md.
 
 units:
   commander:
     category: commander
     movement_class: foot
-    base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 40 }
+    armor_type: infantry
+    base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 150 }
+    weapons: { default: rifle, allowed: [rifle, machine_gun] }
     role: { aura_radius: 30, section_size_cap_base: 4 }
     permadeath: false          # always resurrects at HQ
   soldier:
     category: soldier
     movement_class: foot
-    base: { hp: 100, ap_max: 60, ap_regen: 1.5, attack: 12, defense: 5, move_speed: 5, vision_range: 35 }
+    armor_type: infantry
+    base: { hp: 100, ap_max: 60, ap_regen: 1.5, attack: 12, defense: 5, move_speed: 5, vision_range: 150 }
+    weapons: { default: rifle, allowed: [rifle, machine_gun, anti_tank, anti_air] }
   engineer:
     category: engineer
     movement_class: foot
-    base: { hp: 90, ap_max: 80, ap_regen: 1.5, attack: 6, defense: 4, move_speed: 4, vision_range: 35 }
-    role: { build: [bridge, ladder, wall, road_segment, trap], repair: true }
+    armor_type: infantry
+    base: { hp: 90, ap_max: 80, ap_regen: 1.5, attack: 6, defense: 4, move_speed: 4, vision_range: 120 }
+    weapons: { default: rifle, allowed: [rifle, explosive] }
+    role: { build: [bridge, reinforced_bridge, ladder, wall, road_segment, trap], repair: true }
   scout:
     category: scout
     movement_class: foot
-    base: { hp: 70, ap_max: 70, ap_regen: 2.0, attack: 5, defense: 2, move_speed: 7, vision_range: 70 }
+    armor_type: infantry
+    base: { hp: 70, ap_max: 70, ap_regen: 2.0, attack: 5, defense: 8, move_speed: 7, vision_range: 300 }
+    weapons: { default: rifle, allowed: [rifle] }
     role: { reports_to_radio: true }
   medic:
-    category: soldier
+    category: soldier          # decision 60: a medic is a soldier with a heal role
     movement_class: foot
-    base: { hp: 80, ap_max: 70, ap_regen: 1.5, attack: 4, defense: 3, move_speed: 5, vision_range: 35 }
+    armor_type: infantry
+    base: { hp: 80, ap_max: 70, ap_regen: 1.5, attack: 4, defense: 3, move_speed: 5, vision_range: 120 }
+    weapons: { default: rifle, allowed: [rifle] }
     role: { heal: true, earns_money_when_healing: true }
   artillery:
     category: artillery
     movement_class: tracked
-    base: { hp: 150, ap_max: 80, ap_regen: 1.0, attack: 40, defense: 8, move_speed: 2, vision_range: 30 }
-    role: { range: 120, splash_radius: 8, deforms_terrain: true }
+    armor_type: light_vehicle
+    base: { hp: 150, ap_max: 80, ap_regen: 1.0, attack: 10, defense: 2, move_speed: 2, vision_range: 100 }
+    weapons: { default: artillery, allowed: [artillery] }   # range, splash, deformation: weapon data
   radio:
     category: radio
     movement_class: tracked
-    base: { hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 12, move_speed: 0.3, vision_range: 25 }
+    armor_type: structure
+    base: { hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 80 }
+    weapons: { default: null, allowed: [] }
     role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }
     purchasable_by: commander
+
+  # Roster v1 additions (decision 61)
+  jeep:
+    category: vehicle
+    movement_class: wheeled
+    armor_type: light_vehicle
+    base: { hp: 180, ap_max: 120, ap_regen: 2.0, attack: 8, defense: 6, move_speed: 15, vision_range: 150 }
+    weapons: { default: machine_gun, allowed: [machine_gun] }
+  tank:
+    category: vehicle
+    movement_class: tracked
+    armor_type: heavy_vehicle
+    base: { hp: 600, ap_max: 100, ap_regen: 1.5, attack: 10, defense: 1, move_speed: 6, vision_range: 120 }
+    weapons: { default: anti_tank, allowed: [anti_tank, machine_gun] }
+  truck:
+    category: transport
+    movement_class: wheeled
+    armor_type: light_vehicle
+    base: { hp: 250, ap_max: 120, ap_regen: 2.0, attack: 0, defense: 3, move_speed: 12, vision_range: 100 }
+    weapons: { default: null, allowed: [] }
+    role: { capacity: 6, carries: [foot] }
+  helicopter:
+    category: vehicle
+    movement_class: foot        # unused while flying; ground class if landing is allowed (Q-MAP-04)
+    capabilities: [flying]
+    armor_type: light_vehicle
+    base: { hp: 200, ap_max: 120, ap_regen: 2.0, attack: 10, defense: 10, move_speed: 20, vision_range: 300 }
+    weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
+  boat:
+    category: transport
+    movement_class: null        # water only
+    capabilities: [boat]
+    armor_type: light_vehicle
+    base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 8, defense: 4, move_speed: 8, vision_range: 150 }
+    weapons: { default: machine_gun, allowed: [machine_gun] }
+    role: { capacity: 4, carries: [foot] }
 
 # Evolution trees (skill-point trees with prerequisites)
 trees:
