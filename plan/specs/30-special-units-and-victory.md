@@ -14,12 +14,13 @@ Status: draft. Decisions come from the Q&A with the game designer.
 - When a relic changes owner, the **previous owner team is alerted** at once.
 - Once captured, the relic is **owned** by the capturing team until another team captures it.
 - No protection time after a capture: a relic can be retaken as soon as no enemy of the attacker is near.
+- All nearby units are taken into account. The radius is a battle parameter.
 
 Open:
 - Capture duration and AP cost; "near" radius.
-- ~~Does a capture in progress stop if an enemy arrives, and is progress lost or kept?~~ It stops; the AP paid are lost and the progress is kept (decision 67).
-- Do stored units or units inside transports count as "near"? Do flying units count?
+A: 30 min and 50 AP (battle parameters)
 - Can a relic be captured if its current owner has units near it but they are offline/passive?
+A: no, offline/passive is not a parameter in the game rules
 
 ## 3. Benefits
 - Owning a relic gives **nothing besides the victory timer**. It is a pure objective: no income, vision or combat bonus.

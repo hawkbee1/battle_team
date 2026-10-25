@@ -120,8 +120,7 @@ ap:
   time_only: [reload, unload, swap_weapon, land, take_off]   # decisions 55, 68
 
 # Role actions (decision 66): fixed AP paid up front, then a duration.
-# A unit must have the AP to start. Interrupted: AP lost, progress kept; resuming
-# costs the AP of the remaining part (decision 67).
+# A unit must have the AP to start. Interrupted: AP lost, progress kept.
 # Constructions (build) have their own AP/time per structure: Q-ECO-04.
 actions:
   heal:    { ap: 10, duration_s: 5,  hp_restored: 20 }   # placeholder

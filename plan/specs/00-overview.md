@@ -150,7 +150,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 64. Prisoners and defectors keep their weapon. Units with no weapon (radio, truck) cannot attack.
 65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage.
 66. Build, repair, heal and capture cost a fixed AP amount paid up front, then take a duration; a unit needs the AP to start. Pushing a relic or the HQ costs each pusher AP per metre, like movement, with the slope factor.
-67. An interrupted action loses the AP paid but keeps its progress; resuming costs the AP of the remaining part. This includes a capture blocked by an arriving enemy.
+67. An interrupted action loses the AP paid but keeps its progress; resuming costs the AP of the remaining part. This does not includes a capture blocked by an arriving enemy.
 68. Flying units can land and take off (time, no AP). Landed, they move with their ground class, are hit as ground targets and can load/unload troops. Each map sets a maximum flying altitude.
 69. Weapon values in `data/combat.yaml` are the accepted starting point for the first milestone; they are tuned with headless simulations and playtests.
 
