@@ -11,10 +11,10 @@ Status: draft. Decisions come from the Q&A with the game designer. Numbers live 
 - **A unit with 0 AP is never frozen.** It keeps moving, but only as fast as its AP come back. Example: a soldier moving at 5 m/s on grass spends 5 AP/s, more than its regen of 1.5 AP/s; once empty it goes on at about 1.5 m/s. A shot or a role action simply waits until the unit has enough AP. (Decision 56)
 
 ### Role actions (decisions 66, 67)
-- **Build, repair, heal and capture** cost a **fixed AP amount paid up front**, then take their **duration**. A unit must have the AP to start.
+- **Build, repair and capture** cost a **fixed AP amount paid up front**, then take their **duration**. A unit must have the AP to start. **Healing is instant** (decision 91). Construction AP and build time per structure: `data/terrain.yaml` (decision 113).
 - **Pushing** a relic or the HQ is movement: each pusher pays **AP per metre** pushed, with the slope factor of its movement class.
-- **Interrupted action** (the unit moves away, an enemy blocks a capture...): the AP already paid are **lost**, the **progress is kept**. Resuming costs the AP of the **remaining part** only.
-- Values in `data/combat.yaml` (`actions`, `push`); construction costs per structure: Q-ECO-04.
+- **Interrupted action** (for example the unit moves away): the AP already paid are **lost**, the **progress is kept**. Resuming costs the AP of the **remaining part** only. **Exception:** a capture interrupted by an enemy entering the capture radius **loses its progress** (decision 97).
+- Values in `data/combat.yaml` (`actions`, `push`); construction AP and build time per structure: `data/terrain.yaml` (decision 113).
 
 ## 2. Seeing and hitting
 ### Targets
@@ -31,7 +31,7 @@ Status: draft. Decisions come from the Q&A with the game designer. Numbers live 
   - cover factor: none, partial or full (full = cannot be hit);
   - size factor: by the target's armor type (a tank is easier to hit than a soldier);
   - speed factor: a fast target is harder to hit;
-  - morale factor: from 0.9 at morale 0 to 1.1 at morale 100 for the attacker (decision 71).
+  - morale factor: from 0.9 at morale 0 to 1.1 at morale 100 for the attacker (decision 71). The same factor scales weapon spread in first-person aim (decision 95).
   All values in `data/combat.yaml` (`hit_chance`).
 - Both modes must give comparable average results, so that controlling a unit directly is a choice, not an obligation. (Balancing target.)
 
@@ -97,7 +97,7 @@ Each weapon has, besides damage, range and AP per shot:
 - **No extra limit on defections** (snowball): limiting them to commanders is considered enough; to watch in playtests. (Decision 75)
 
 ### Prisoners (decision 73)
-- A prisoner keeps its weapon (decision 64) and goes **instantly to the captor section's storage**. It cannot fight or escape.
+- A prisoner keeps its weapon (decision 64) and goes **instantly to the captor section's prisoner storage**: separate from unit storage, **unlimited**, never counted in storage capacity (decision 94). It cannot fight or escape.
 - **Exchange and ransom** are negotiated **in game, between section owners**: the captor's owner posts an offer (an exchange for named prisoners, or a price); the prisoner's original owner accepts or refuses. A ransom goes **entirely to the captor section** (no fee). A released prisoner returns to its owner's storage.
 - A prisoner never released is **lost at the end of the war**, with the rest of the war's units.
 
@@ -122,4 +122,4 @@ Each weapon has, besides damage, range and AP per shot:
 - When a transport is destroyed, carried units are **ejected next to the wreck with heavy damage**.
 
 ## 10. Open questions
-See `specs/95-open-questions.md`: Q-CBT-15 (do prisoners use storage capacity?), Q-CBT-16 (morale in first-person aim).
+None. See `specs/95-open-questions.md`.

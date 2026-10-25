@@ -1,0 +1,12 @@
+# Medals (decision 105). Thresholds are PLACEHOLDERS except the designer's example.
+version: 1
+tiers: [bronze, silver, gold]
+points: { bronze: 1, silver: 3, gold: 10 }   # decision 121; HQ manager = most points, tie -> most commander XP
+
+# One medal track per kind of kill (by target unit type) and per kind of action.
+kills:
+  commander: { bronze: 5, silver: 25, gold: 100 }   # bronze value from the designer's example
+  default:   { bronze: 20, silver: 100, gold: 500 } # every other unit type
+actions:
+  default:   { bronze: 50, silver: 250, gold: 1000 }
+  kinds: [hit, build, repair, heal, capture, observe, push, hq_hit, prisoner_taken, defection_caused]

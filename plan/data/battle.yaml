@@ -1,6 +1,6 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
-version: 0
+version: 2
 
 # Commander death (decision 80): no respawn delay; the commander respawns at the HQ at once.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -14,3 +14,26 @@ battle_start:
   restore_ap: full
   restore_hp: full
   restore_morale: base       # data/combat.yaml morale.base
+
+# Teams (decision 103): balanced by team power at each battle.
+teams:
+  count: 2                   # 2..5 (decision 84)
+
+# Relic capture (decision 97)
+capture:
+  duration_s: 1800
+  ap: 50
+  radius_m: 30               # same radius to capture and to block
+
+# HQ (decision 109)
+hq:
+  hp: 1000                   # armor type: hq (decision 114)
+
+# Weather (decision 90): changes randomly, per map. No day/night.
+weather:
+  mode: random
+  states: [clear, rain, fog, snow]   # data/terrain.yaml weather
+
+# Full section storage (decision 120): once every alive unit of a section is stored,
+# the section cannot deploy again for this long.
+section_redeploy_lock_s: 86400

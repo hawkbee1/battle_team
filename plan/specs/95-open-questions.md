@@ -6,110 +6,72 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-GEN-01** ~~ Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24).
 
 ## Map and terrain (10)
-- [ ] **Q-MAP-01** Typical map sizes and range of team counts per map.
-A: map 10000x50000. Team counts 2 - 5
-- [ ] **Q-MAP-02** Craters: can engineers fill them? Do trees and structures regrow? Deformation depth limits?
-A: engineers can not fill craters. no regrow. -20 depth limit.
-- [ ] **Q-MAP-03** Boats and amphibious units: ~~vehicle type, class or flag?~~ boat is a capability (→ decision 61). Still open: amphibious units, ports or docks, boarding and leaving a boat, can engineers build on water other than bridges?
-A: sail is a capability, boat may be a unit with sailing capability. amphibious units are units with sail and earth capabilities, ports or docks do not exist, boarding and leaving a boat is done when boat transport is next to the shore, engineers can build bridges on water and that's all. 
+- [x] **Q-MAP-01** Typical map sizes and range of team counts per map. → decision 84
+- [x] **Q-MAP-02** Craters: can engineers fill them? Do trees and structures regrow? Deformation depth limits? → decision 85
+- [x] **Q-MAP-03** Boats and amphibious units, ports or docks, boarding, building on water. → decision 86
 - [x] **Q-MAP-04** Flying units: altitude limits; is flying permanent or can a unit land and take off? → decision 68 (max altitude per map)
-- [ ] **Q-MAP-05** Line of sight: ~~height bonus, terrain and weather factors~~ (→ decision 59). Still open: concealment of a target inside a forest, vision of and from flying units, destroyed objects stop blocking.
-A: destroyed objets stop blocking sight. concealment is proportional to forest length empeding vision so a flying unit can see target more easily than ground unit.
-- [ ] **Q-MAP-06** Floating islands: ladder height limits, stranded ground units, can they host radios, encampments or relics?
-A: no ladder height limits, stranded ground units are stranded, radio are units like any others. Relics can not leave floating islands and I don't see how camps could go on floating islands because team HQ won't appear on island. 
-- [ ] **Q-MAP-07** Hit points of trees, buildings, walls, bridges.
-A: tree as 100 HP, building 500, wall 200 and bridge 200.
-- [ ] **Q-MAP-08** Day/night and weather. Weather exists and reduces vision (→ decision 59). Still open: how weather changes (random, scripted, per region), other effects (movement, hit chance), day/night.
-A: Weather exists and can change vision (→ decision 59). Weather changes randomly per map there is no day/night, it's always day.
-- [ ] **Q-MAP-09** Performance budget for persistent world changes in a 100+ player battle.
-A: I don't understand
+- [x] **Q-MAP-05** Line of sight: concealment inside forests, vision of flying units, destroyed objects stop blocking. → decisions 59, 87
+- [x] **Q-MAP-06** Floating islands: ladder height limits, stranded ground units, radios, encampments, relics. → decisions 88, 117
+- [x] **Q-MAP-07** Hit points of trees, buildings, walls, bridges. → decision 89
+- [x] **Q-MAP-08** Day/night and weather. → decisions 59, 90
+- [x] **Q-MAP-09** ~~Performance budget for persistent world changes in a 100+ player battle.~~ Technical: out of scope for the spec phase, like Q-GEN-01.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
-- [ ] **Q-UNIT-02** Role-specific stats: engineer build speed, medic heal rate, scout spotting range, transport capacity.
-A: build is instant but cost AP depending on the HP of the build. heal is instant and x AP heal as much as heal property of the unit. scout have an observe special ation that give temp 30 more sight range. Transport can carry a total weight (each unit has weight) and their is a weight limit for each unit a transport can host.
-- [x] **Q-UNIT-03** XP formulas, victoryXp value, kills worth more against higher-level units, anti-farming rules. → decision 77 (victoryXp value moved to Q-UNIT-10)
-- [ ] **Q-UNIT-04** Skill trees: ~~respec, cap on nodes per unit, mutually exclusive nodes~~ (→ decision 78). Still open: full tree per unit type (content).
-A: just limited evolution of unit stats
+- [x] **Q-UNIT-02** Role-specific stats. → decisions 91, 113, 119
+- [x] **Q-UNIT-03** XP formulas, kills worth more against higher-level units, anti-farming rules. → decision 77
+- [x] **Q-UNIT-04** Skill trees: respec, cap, exclusive nodes, content. → decisions 78, 118 (default stat tree for every unit type in `data/units.yaml`)
 - [x] **Q-UNIT-05** Commander: respawn delay, XP loss on death, what the section does while he is dead. → decision 80
 - [x] **Q-UNIT-06** Death rules for units carried by transports and for stored units. → decision 81
 - [x] **Q-UNIT-07** Catch-up for late joiners inside a war versus veterans with evolved units. → decision 82 (none)
-- [x] **Q-UNIT-08** What carries over from one war to the next at account level (cosmetics, ranks, commander slots). → decision 83 (logs, stats, medals, cosmetics only)
-- [x] **Q-UNIT-09** How a unit gets its weapons; can a unit carry several weapons? (link between `units.yaml` and `combat.yaml`) → decisions 52, 53
-- [ ] **Q-UNIT-10** Value of victoryXp; does it also add to section XP?
-A: 1 xp per unit. It counts for section xp.
-- [ ] **Q-UNIT-11** Team power (decision 47) uses unit XP: does section XP count too?
-A: section xp count
+- [x] **Q-UNIT-08** What carries over from one war to the next at account level. → decision 83 (logs, stats, medals, cosmetics only)
+- [x] **Q-UNIT-09** How a unit gets its weapons; can a unit carry several weapons? → decisions 52, 53
+- [x] **Q-UNIT-10** Value of victoryXp; does it also add to section XP? → decision 92
+- [x] **Q-UNIT-11** Team power: does section XP count too? → decision 93
+- [x] **Q-UNIT-12** "Just limited evolution of unit stats": trees give stat bonuses only (no abilities)? Is each stat capped (e.g. at most +50 % over base)? → decision 118 (stats only, cap 300 % of base)
+- [x] **Q-UNIT-13** Scout observe: +30 m or +30 %? Duration, AP cost, can the scout move while observing? → decision 119
 
 ## Relics and victory (30)
-- [ ] **Q-REL-01** Name and lore of the relics.
-A: big statues of gods of war from different mythologies
-- [ ] **Q-REL-02** Capture: duration, AP cost, "near" radius. ~~Is progress lost or kept when an enemy arrives?~~ Lost.
-A: 30 min and 50 AP (battle parameters)
-- [ ] **Q-REL-03** Who counts as "near": stored units, units in transports, flying units, offline/passive units?
-A: every units in capture radius which is a battle parameter with default 30.
-- [ ] **Q-REL-04** Push: minimum pushers, ~~AP per second~~ AP per metre (→ decision 66), slope effort formula, extra pushers needed to crush.
-A: 10 minimum pusher, one more par unit to crush. slope impact is the same as for other moves
-- [ ] **Q-REL-05** Reinforced bridge: cost, build time, hit points; destroyed while a relic is on it?
-A: 20 AP, 10 min build time, 400 HP, relic or HQ lost if bridge destroyed
-- [ ] **Q-REL-06** Visibility of the 24-hour victory timer (countdown, alerts).
-A: Countdown
-- [ ] **Q-REL-07** Validate in playtests the fairness of the full timer reset across time zones.
-A: NO
+- [x] **Q-REL-01** Name and lore of the relics. → decision 96
+- [x] **Q-REL-02** Capture: duration, AP cost, radius, progress when an enemy arrives. → decision 97
+- [x] **Q-REL-03** Who counts as "near". → decision 97
+- [x] **Q-REL-04** Push: minimum pushers, slope, crush rule. → decisions 98, 115
+- [x] **Q-REL-05** Reinforced bridge: cost, build time, HP, relic or HQ on a destroyed bridge. → decisions 99, 116
+- [x] **Q-REL-06** Visibility of the 24-hour victory timer. → decision 100
+- [x] **Q-REL-07** ~~Validate in playtests the fairness of the full timer reset across time zones.~~ Dropped by the designer. → decision 100
+- [x] **Q-REL-08** Decision 46d says a relic can fall from a floating island; the answer to Q-MAP-06 says relics cannot leave floating islands. Which one? → decision 117 (they fall)
 
 ## Newcomers, wars and social (40)
-- [ ] **Q-SOC-01** Team power formula: weights of active players vs total XP; time window for "active".
-A: no notion of active/inactive player in the rules
-- [ ] **Q-SOC-02** Team with fewer than 4 guilds; is "new player" a new account or anyone joining a battle; is placement re-evaluated on return?
-A: new player is anyone joining. I don't understand "is placement re-evaluated on return"
-- [ ] **Q-SOC-03** Guild opt-in for newcomers: can it be left at any time, is there a reward?
-A: Can be left any time, no reward or penality
-- [ ] **Q-SOC-04** Value of minStartingMoney per war; starting money of a section entering a war.
-A: 500 w€
-- [ ] **Q-SOC-05** Automatic team creation at each battle: balance by power, keep teams stable, number of teams.
-A: balance by power and number of teams is a battle parameter
-- [ ] **Q-SOC-06** War result: is there a war winner and how is it decided?
-A: No war winner
-- [ ] **Q-SOC-07** List and criteria of war medals and game medals (also needed for the HQ manager rule).
-A: bronze, silver and gold medals for every kind of actions and kills (units, commander, jeeps, etc...) based on value (exemple: Commander kill bronze medal after killing 5 commanders)
-- [ ] **Q-SOC-08** Cosmetics: confirm purely visual (no camouflage or other advantage).
-A: purely visual
-- [ ] **Q-SOC-09** Joining a war already running (between battles, during a battle).
-A: What is the question ?
-- [ ] **Q-SOC-10** In-game communication that remains (pings, markers, short orders, chat) and Discord integration level.
-A: history is kept
-- [ ] **Q-SOC-11** Moderation and blocking tools.
-A: To be defined after a few real battles
-- [ ] **Q-SOC-12** Getting extra commanders; several wars at the same time; do a player's commanders share money or units?
-A: No share between player sections exept for cosmetics bought with option for this. 
-- [ ] **Q-SOC-13** Guilds: how the guild commander is chosen, relation with the team commander, guild size, players outside any guild.
-A: Guild creator is the chief and he can pass his role to another guild member. He can disband the guild. Player can't leave guild when chief. Guild max size depends on guild level which increase with tatal xp aquired by sections while inside the guild. min guild size is one section. Section can play without being in a guild (all storage is done with HQ) 
+- [x] **Q-SOC-01** Team power formula. → decision 93 (no notion of active players)
+- [x] **Q-SOC-02** New player, fewer than 4 guilds, return to a battle. → decisions 101, 120 (a player never leaves a battle)
+- [x] **Q-SOC-03** Guild opt-in for newcomers: can it be left at any time, is there a reward? → decision 101
+- [x] **Q-SOC-04** Value of minStartingMoney; starting money of a section entering a war. → decision 102
+- [x] **Q-SOC-05** Automatic team creation at each battle. → decision 103
+- [x] **Q-SOC-06** War result: is there a war winner? → decision 104 (no)
+- [x] **Q-SOC-07** Medals: tiers, thresholds, points. → decisions 105, 121
+- [x] **Q-SOC-08** Cosmetics: purely visual. → decision 106
+- [x] **Q-SOC-09** Can a player enter a war after its first battle has started? If yes, can he enter a battle already running, or only from the next battle? → decision 122
+- [x] **Q-SOC-10** In-game communication tools. → decision 123 (pings and markers only, history kept; the rest on Discord)
+- [ ] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles.
+- [x] **Q-SOC-12** Sharing between a player's sections, extra commanders, several wars. → decisions 107, 124
+- [x] **Q-SOC-13** Guilds. → decision 108
+- [ ] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics?
 
 ## HQ and storage (50)
-- [ ] **Q-HQ-01** Can any team unit push the HQ, or only units chosen by the manager?
-A: any team unit
-- [ ] **Q-HQ-02** HQ hit points and armor.
-A: battle parameter : 1000 HP, 10 armor.
-- [ ] **Q-HQ-03** Recall delay value; does a recall cost AP or prevent attacking?
-A: recall, if it is getting unit out of starage, cost 10 AP and is fully operational. (The AP counter is runing for stored unit until max is reached) 
-- [ ] **Q-HQ-04** ~~Storage capacity formula vs commander XP~~ capacity per commander level (→ decision 79, placeholder table); "next to" radius for storing and for blocking deployment.
-A: blocking deployment radius: 20. Storing radius 10 or 6 hours
-- [ ] **Q-HQ-05** Encampment price and hit points.
-A: camp price: 500 w€ and 300 HP, 10 armor.
+- [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
+- [x] **Q-HQ-02** HQ hit points and armor. → decisions 109, 114
+- [x] **Q-HQ-03** Recall delay value; does a recall cost AP or prevent attacking? → decision 110
+- [x] **Q-HQ-04** Storage capacity per level (decision 79); radii for storing and blocking deployment. → decision 110
+- [x] **Q-HQ-05** Encampment price, HP and armor. → decisions 111, 114
+- [ ] **Q-HQ-06** Does the 24-hour lock (decision 120) also start when a section is stored because its commander died (decision 80)? If yes, every commander death would block the section for 24 hours.
 
 ## Economy (60)
-- [ ] **Q-ECO-01** Prices of each troop type, radio and encampment.
-A: If not specified it's 100 w€, I will adjust over time in the json files
-- [ ] **Q-ECO-02** Money earned per action (hit, kill, construction, heal, HQ hit, HQ destruction).
-A: hit 1, kill 5, construction 5, heal 5, HQ hit 10, HQ destruction 100
-- [ ] **Q-ECO-03** Transfer fee rates (inside / outside guild).
-A: inside 2%, outside 7%
-- [ ] **Q-ECO-04** AP cost and build time per construction type.
-A: 20 w€ and 10 min. Adjustment later in json file
-- [ ] **Q-ECO-05** Can XP be bought? (assumed: earned only)
-A: NO
-- [ ] **Q-ECO-06** Limits against "build and destroy" money farming by engineers.
-A: NO
+- [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)
+- [x] **Q-ECO-02** Money earned per action. → decision 112
+- [x] **Q-ECO-03** Transfer fee rates. → decision 112
+- [x] **Q-ECO-04** Constructions: the answers say "build is instant, AP depends on the HP of the build" (Q-UNIT-02), "20 w€ and 10 min" (Q-ECO-04) and "20 AP, 10 min" for the reinforced bridge. Decision 25d says constructions cost no money. Which is it? → decision 113 (AP + build time, no money)
+- [x] **Q-ECO-05** Can XP be bought? → decision 112 (no)
+- [x] **Q-ECO-06** Limits against build-and-destroy farming. → decision 112 (none)
 
 ## Combat and AP (70)
 - [x] **Q-CBT-01** AP cost per action: shot, reload, unload, build, heal, push, capture. → decisions 55, 56, 66 (values: placeholders; per-structure build costs in Q-ECO-04)
@@ -126,7 +88,6 @@ A: NO
 - [x] **Q-CBT-12** Hit-chance formula under orders/AI: weights of attack vs defense, distance, cover, target size and speed. Does partial cover lower hit chance, damage, or both? → decision 65
 - [x] **Q-CBT-13** Weapon of a prisoner or a defector: kept, dropped, or taken by the captor? Can a unit fight unarmed (radio, truck have no weapon)? → decision 64
 - [x] **Q-CBT-14** Confirm that picking up a dropped weapon costs AP (decision 53) while swapping at storage costs only time (decision 55). → decision 63
-- [ ] **Q-CBT-15** Do prisoners use the captor section's storage capacity? Does a captor with full storage still take prisoners?
-A: no that's another unlimited storage.
-- [ ] **Q-CBT-16** Does morale also affect first-person aim (spread), like `attack` does, to keep both control modes comparable?
-A: yes
+- [x] **Q-CBT-15** Do prisoners use the captor section's storage capacity? Does a captor with full storage still take prisoners? → decision 94
+- [x] **Q-CBT-16** Does morale also affect first-person aim (spread), like `attack` does, to keep both control modes comparable? → decision 95
+- [x] **Q-CBT-17** HQ and encampment "10 armor": armor is a type in the damage table (decision 57), not a number. Is 10 a flat damage reduction per hit for structures, an evasion (`defense`) value, or something else? → decision 114 (no numeric armor)

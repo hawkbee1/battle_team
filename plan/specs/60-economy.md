@@ -11,7 +11,7 @@ Already decided (overview):
 - medics earn money for their section when healing other units.
 
 ## 3. Spending money
-- A commander buys **troops** for his section (within the section size cap, which grows with commander XP).
+- A commander buys **troops** for his section (within the section size cap, which grows with the commander level).
 - A commander can buy **radios**.
 - A guild commander can buy the **guild encampment** (again at any time if destroyed).
 - Newly bought troops **appear in storage (homeland)**, then are deployed through the section's portal (guild encampment, or HQ for sections without guild), following the storage rules.
@@ -30,11 +30,13 @@ Already decided (overview):
 ## 5b. Constructions
 - Engineers' constructions (walls, bridges, reinforced bridges, roads, ladders, traps) **cost no money**, only **AP and time**. Engineers even earn money by building.
 
-## 6. Open questions
-- Prices of each troop type, radio and encampment (data file `data/units.yaml`).
-- Amounts earned per action (hit, kill, construction, heal, HQ hit, HQ destruction).
-- Transfer fee rates (inside guild / outside guild).
-- AP cost and build time per construction type.
-- Can XP be bought, or only earned? (Assumed only earned.)
-- Starting money of a section entering a war (= minStartingMoney?).
-- Engineers earn money by building and building is free: limits needed against "build and destroy" farming?
+## 6. Numbers (decision 112, `data/economy.yaml`)
+- Currency: **w€**.
+- **Prices**: anything not priced costs **100 w€**; guild encampment **500 w€**. The designer adjusts prices over time.
+- **Money earned** by the acting unit's section: hit 1, kill 5, construction 5, heal 5, HQ hit 10, HQ destruction 100.
+- **Transfer fees**: **2 %** inside a guild, **7 %** outside.
+- **Starting money** of a new section = minStartingMoney = **500 w€** (decision 102).
+- **XP cannot be bought.**
+- **No limit** against build-and-destroy farming by engineers.
+
+- **Constructions** cost **AP paid up front plus a build time** per structure, **no money** (decision 113, confirms 25d). Values in `data/terrain.yaml` (`objects`).

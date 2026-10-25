@@ -1,10 +1,10 @@
 # Draft terrain table. All numbers are PLACEHOLDERS to be tuned.
 # ap_cost_per_m: AP spent per metre moved (before the slope factor).
 # null means impassable for that movement class or profile.
-version: 2
+version: 4
 movement_classes: [foot, wheeled, tracked]
-# The `flying` and `boat` entries below are movement PROFILES, used by units that have the
-# flying or boat capability (data/units.yaml). They are not movement classes.
+# The `flying` and `sail` entries below are movement PROFILES, used by units that have the
+# flying or sail capability (data/units.yaml). They are not movement classes.
 # A landed flying unit uses its ground movement_class (decision 68).
 # Maximum flying altitude is a per-map setting in the map file, not here.
 
@@ -14,7 +14,7 @@ slope:
   wheeled: { factor: 0.10, max_degrees: 25 }
   tracked: { factor: 0.07, max_degrees: 35 }
   flying:  { factor: 0.0,  max_degrees: 90 }
-  boat:    { factor: 0.0,  max_degrees: 90 }   # water is flat
+  sail:    { factor: 0.0,  max_degrees: 90 }   # water is flat
 
 # Vision (decision 59)
 # effective_vision = vision_range * weather.vision_factor * terrain[observer].vision_factor
@@ -22,6 +22,11 @@ slope:
 vision:
   height_bonus_m_per_m: 2.0     # extra vision metres per metre the observer stands above the target
   height_bonus_max_m: 150
+  # Forest concealment (decision 87): each metre of forest crossed by the sight line
+  # removes this many metres of the observer's effective vision. A flying observer's
+  # line crosses less forest, so it sees forest targets more easily.
+  forest_vision_cost_per_m: 4.0
+  destroyed_objects_block: false
 
 # Weather is a per-battle state that changes over time (decision 59). Change rules: Q-MAP-08.
 weather:
@@ -34,57 +39,65 @@ terrain:
   grass:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 1.0, wheeled: 1.0, tracked: 1.0, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 1.0, wheeled: 1.0, tracked: 1.0, flying: 0.5, sail: null }
   forest_floor:           # ground under trees
-    blocks_los: true      # trees block line of sight
+    blocks_los: false     # partial: forest concealment, see vision.forest_vision_cost_per_m
     vision_factor: 0.5    # observer standing in a forest sees less far
-    ap_cost_per_m: { foot: 1.5, wheeled: 3.0, tracked: 2.5, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 1.5, wheeled: 3.0, tracked: 2.5, flying: 0.5, sail: null }
   sand:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 1.5, wheeled: 2.0, tracked: 1.5, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 1.5, wheeled: 2.0, tracked: 1.5, flying: 0.5, sail: null }
   mud:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 2.0, wheeled: 4.0, tracked: 2.0, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 2.0, wheeled: 4.0, tracked: 2.0, flying: 0.5, sail: null }
   rock:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 1.5, wheeled: 2.0, tracked: 1.5, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 1.5, wheeled: 2.0, tracked: 1.5, flying: 0.5, sail: null }
   road:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 0.7, wheeled: 0.4, tracked: 0.5, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 0.7, wheeled: 0.4, tracked: 0.5, flying: 0.5, sail: null }
   town_street:
     blocks_los: false
     vision_factor: 0.8
-    ap_cost_per_m: { foot: 0.8, wheeled: 0.6, tracked: 0.7, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 0.8, wheeled: 0.6, tracked: 0.7, flying: 0.5, sail: null }
   mountain:
     blocks_los: true
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 3.0, wheeled: null, tracked: null, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 3.0, wheeled: null, tracked: null, flying: 0.5, sail: null }
   river:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: null, wheeled: null, tracked: null, flying: 0.5, boat: 0.8 }
-    crossable_by_flags: [boat, amphibious]
+    ap_cost_per_m: { foot: null, wheeled: null, tracked: null, flying: 0.5, sail: 0.8 }
+    crossable_by: [sail]   # boats and amphibious units (decision 86)
   lake:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: null, wheeled: null, tracked: null, flying: 0.5, boat: 0.6 }
-    crossable_by_flags: [boat, amphibious]
+    ap_cost_per_m: { foot: null, wheeled: null, tracked: null, flying: 0.5, sail: 0.6 }
+    crossable_by: [sail]   # boats and amphibious units (decision 86)
   floating_island_ground:
     blocks_los: false
     vision_factor: 1.0
-    ap_cost_per_m: { foot: 1.0, wheeled: 1.0, tracked: 1.0, flying: 0.5, boat: null }
+    ap_cost_per_m: { foot: 1.0, wheeled: 1.0, tracked: 1.0, flying: 0.5, sail: null }
     access: [flying, bridge, ladder]
 
+# Craters (decision 85)
+craters:
+  max_depth_m: 20
+  fillable_by_engineers: false
+
+# Objects (decision 89: HP). Destroyed trees and structures never regrow (decision 85).
+# Constructions (decision 113): AP paid up front + build time, no money. Values are placeholders
+# except the reinforced bridge (decision 99).
 objects:
-  tree:      { blocks_los: true,  destructible: true,  placeholder_hp: 100 }
-  building:  { blocks_los: true,  destructible: true,  placeholder_hp: 500 }
-  wall:      { blocks_los: true,  destructible: true,  built_by: engineer }
-  bridge:    { blocks_los: false, destructible: true,  built_by: engineer, relic_crossable: false }
-  reinforced_bridge: { blocks_los: false, destructible: true, built_by: engineer, relic_crossable: true }  # heavier: more cost and build time
-  ladder:    { blocks_los: false, destructible: true,  built_by: engineer }
-  road_segment: { blocks_los: false, destructible: true, built_by: engineer }
-  trap:      { blocks_los: false, destructible: true,  built_by: engineer, hidden_from_enemies: true }
+  tree:      { blocks_los: false, conceals: forest, destructible: true, hp: 100 }
+  building:  { blocks_los: true,  destructible: true, hp: 500 }
+  wall:      { blocks_los: true,  destructible: true, hp: 200, built_by: engineer, ap: 10, build_time_s: 300 }
+  bridge:    { blocks_los: false, destructible: true, hp: 200, built_by: engineer, relic_crossable: false, ap: 10, build_time_s: 300 }
+  reinforced_bridge: { blocks_los: false, destructible: true, hp: 400, built_by: engineer, relic_crossable: true, ap: 20, build_time_s: 600 }  # decision 99
+  ladder:    { blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
+  road_segment: { blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
+  trap:      { blocks_los: false, destructible: true, hp: 50, built_by: engineer, hidden_from_enemies: true, ap: 5, build_time_s: 60 }

@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 5
+version: 7
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -74,7 +74,7 @@ zero_hp:
 
 # Prisoners (decision 73): stored instantly in the captor section's storage.
 prisoners:
-  held_in: captor_storage
+  held_in: captor_prisoner_storage   # separate and unlimited (decision 94)
   can_escape: false
   ransom_fee: 0                    # ransom goes entirely to the captor section
   at_war_end: lost
@@ -107,6 +107,7 @@ aim:
   base_spread_deg: 2.0                # placeholder
   spread_reduction_per_attack: 0.01   # fraction of spread removed per attack point (placeholder)
   min_spread_deg: 0.2                 # placeholder
+  # Morale also scales spread (decision 95): spread / hit_chance.morale_factor
 
 # Dropped weapons (decisions 53, 63)
 dropped_weapons:
@@ -121,14 +122,18 @@ ap:
 
 # Role actions (decision 66): fixed AP paid up front, then a duration.
 # A unit must have the AP to start. Interrupted: AP lost, progress kept.
-# Constructions (build) have their own AP/time per structure: Q-ECO-04.
+# Constructions (build) have their own AP/time per structure: data/terrain.yaml (decision 113).
 actions:
-  heal:    { ap: 10, duration_s: 5,  hp_restored: 20 }   # placeholder
+  heal:    { instant: true }                             # AP and HP from the medic's role (units.yaml, decision 91)
   repair:  { ap: 10, duration_s: 10, hp_restored: 50 }   # placeholder, per repair action
-  capture: { ap: 30, duration_s: 60 }                    # placeholder (Q-REL-02)
-  interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining }
+  capture: { settings: data/battle.yaml }                # decision 97
+  interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining, capture_progress_kept: false }   # decisions 67, 97
 
 # Pushing a relic or the HQ (decision 66): AP per metre for each pusher, like movement,
 # multiplied by the slope factor of the pusher's movement class (data/terrain.yaml).
 push:
-  ap_per_m: 2.0                 # placeholder (Q-REL-04)
+  ap_per_m: 2.0                 # placeholder
+  min_pushers: 10               # decision 98
+  # Crushing (decision 115): with min_pushers + n pushers the relic crushes up to n units
+  # in its path; with more blocking units than n it stops. A pushed HQ never crushes.
+  crush_units_per_extra_pusher: 1

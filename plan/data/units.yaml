@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 4
+version: 6
 
 common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
@@ -11,8 +11,10 @@ common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, 
 #   flying: the unit moves with the `flying` profile of data/terrain.yaml and is hit as a
 #           flying target (weapon airborne_factor, data/combat.yaml). Flying is not a unit
 #           category, not a movement class and not an armor type.
-#   boat:   the unit moves only on water with the `boat` profile of data/terrain.yaml.
-#           It has no ground movement_class. (Amphibious units: Q-MAP-03.)
+#   sail:   the unit moves on water with the `sail` profile of data/terrain.yaml (decision 86).
+#           With no ground movement_class it is water-only (a boat); with a ground
+#           movement_class as well it is amphibious.
+# weight: every unit has a weight; transports carry by weight (decision 91).
 # weapons (decision 52): one slot. `default` comes with the unit (included in its price);
 #   `allowed` lists the weapon types it may equip at storage or pick up on the field.
 #   Allowed lists are placeholders.
@@ -23,7 +25,7 @@ units:
     category: commander
     movement_class: foot
     armor_type: infantry
-    base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 150 }
+    base: { weight: 1, hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun] }
     role: { aura_radius: 30 }  # section size cap and storage: progression.commander_levels
     permadeath: false          # always resurrects at HQ, no delay (decision 80)
@@ -31,80 +33,89 @@ units:
     category: soldier
     movement_class: foot
     armor_type: infantry
-    base: { hp: 100, ap_max: 60, ap_regen: 1.5, attack: 12, defense: 5, move_speed: 5, vision_range: 150 }
+    base: { weight: 1, hp: 100, ap_max: 60, ap_regen: 1.5, attack: 12, defense: 5, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun, anti_tank, anti_air] }
   engineer:
     category: engineer
     movement_class: foot
     armor_type: infantry
-    base: { hp: 90, ap_max: 80, ap_regen: 1.5, attack: 6, defense: 4, move_speed: 4, vision_range: 120 }
+    base: { weight: 1, hp: 90, ap_max: 80, ap_regen: 1.5, attack: 6, defense: 4, move_speed: 4, vision_range: 120 }
     weapons: { default: rifle, allowed: [rifle, explosive] }
     role: { build: [bridge, reinforced_bridge, ladder, wall, road_segment, trap], repair: true }
   scout:
     category: scout
     movement_class: foot
     armor_type: infantry
-    base: { hp: 70, ap_max: 70, ap_regen: 2.0, attack: 5, defense: 8, move_speed: 7, vision_range: 300 }
+    base: { weight: 1, hp: 70, ap_max: 70, ap_regen: 2.0, attack: 5, defense: 8, move_speed: 7, vision_range: 300 }
     weapons: { default: rifle, allowed: [rifle] }
-    role: { reports_to_radio: true }
+    role: { reports_to_radio: true, observe: { vision_bonus_m: 30, duration_s: 1800, ap: 10, can_move: false } }   # decision 119
   medic:
     category: soldier          # decision 60: a medic is a soldier with a heal role
     movement_class: foot
     armor_type: infantry
-    base: { hp: 80, ap_max: 70, ap_regen: 1.5, attack: 4, defense: 3, move_speed: 5, vision_range: 120 }
+    base: { weight: 1, hp: 80, ap_max: 70, ap_regen: 1.5, attack: 4, defense: 3, move_speed: 5, vision_range: 120 }
     weapons: { default: rifle, allowed: [rifle] }
-    role: { heal: true, earns_money_when_healing: true }
+    role: { heal: 20, heal_ap: 10, earns_money_when_healing: true }   # instant heal: 10 AP restores 20 HP (decision 91)
   artillery:
     category: artillery
     movement_class: tracked
     armor_type: light_vehicle
-    base: { hp: 150, ap_max: 80, ap_regen: 1.0, attack: 10, defense: 2, move_speed: 2, vision_range: 100 }
+    base: { weight: 8, hp: 150, ap_max: 80, ap_regen: 1.0, attack: 10, defense: 2, move_speed: 2, vision_range: 100 }
     weapons: { default: artillery, allowed: [artillery] }   # range, splash, deformation: weapon data
   radio:
     category: radio
     movement_class: tracked
     armor_type: structure
-    base: { hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 80 }
+    base: { weight: 10, hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 80 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
     role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }   # starting range, evolves via tree
     purchasable_by: commander   # normal unit: destructible, can be captured, stored (decision 76)
+
+  encampment:
+    category: encampment          # guild storage place with a portal (decisions 28, 46h4)
+    movement_class: tracked
+    armor_type: structure
+    base: { weight: 50, hp: 300, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 50 }
+    weapons: { default: null, allowed: [] }
+    role: { transportable: false }
+    purchasable_by: guild_commander   # price: data/economy.yaml; armor type structure (decision 114)
 
   # Roster v1 additions (decision 61)
   jeep:
     category: vehicle
     movement_class: wheeled
     armor_type: light_vehicle
-    base: { hp: 180, ap_max: 120, ap_regen: 2.0, attack: 8, defense: 6, move_speed: 15, vision_range: 150 }
+    base: { weight: 4, hp: 180, ap_max: 120, ap_regen: 2.0, attack: 8, defense: 6, move_speed: 15, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
   tank:
     category: vehicle
     movement_class: tracked
     armor_type: heavy_vehicle
-    base: { hp: 600, ap_max: 100, ap_regen: 1.5, attack: 10, defense: 1, move_speed: 6, vision_range: 120 }
+    base: { weight: 12, hp: 600, ap_max: 100, ap_regen: 1.5, attack: 10, defense: 1, move_speed: 6, vision_range: 120 }
     weapons: { default: anti_tank, allowed: [anti_tank, machine_gun] }
   truck:
     category: transport
     movement_class: wheeled
     armor_type: light_vehicle
-    base: { hp: 250, ap_max: 120, ap_regen: 2.0, attack: 0, defense: 3, move_speed: 12, vision_range: 100 }
+    base: { weight: 8, hp: 250, ap_max: 120, ap_regen: 2.0, attack: 0, defense: 3, move_speed: 12, vision_range: 100 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
-    role: { capacity: 6, carries: [foot] }
+    role: { max_total_weight: 6, max_unit_weight: 2 }   # decision 91
   helicopter:
     category: vehicle
     movement_class: wheeled     # ground class used while landed (decision 68)
     capabilities: [flying]
     flying: { land_time_s: 8, take_off_time_s: 8 }   # placeholder; max altitude is set by the map
     armor_type: light_vehicle
-    base: { hp: 200, ap_max: 120, ap_regen: 2.0, attack: 10, defense: 10, move_speed: 20, vision_range: 300 }
+    base: { weight: 6, hp: 200, ap_max: 120, ap_regen: 2.0, attack: 10, defense: 10, move_speed: 20, vision_range: 300 }
     weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
   boat:
     category: transport
-    movement_class: null        # water only
-    capabilities: [boat]
+    movement_class: null        # water only (sail without ground class)
+    capabilities: [sail]
     armor_type: light_vehicle
-    base: { hp: 200, ap_max: 100, ap_regen: 2.0, attack: 8, defense: 4, move_speed: 8, vision_range: 150 }
+    base: { weight: 6, hp: 200, ap_max: 100, ap_regen: 2.0, attack: 8, defense: 4, move_speed: 8, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
-    role: { capacity: 4, carries: [foot] }
+    role: { max_total_weight: 4, max_unit_weight: 2 }   # boards/unloads next to the shore (decision 86)
 
 # Progression (decisions 77-79)
 progression:
@@ -120,6 +131,7 @@ progression:
     window_s: 600
     factor_per_repeat: 0.5
   friendly_hits_give_xp: false
+  victory_xp: 1                   # per unit of the winning team; normal section share applies (decision 92)
   section_xp_share: 0.2           # share of each XP point earned by a unit, moved to section XP
   # Section XP sets the commander level. It cannot be spent on stats.
   commander_levels:               # placeholders; storage capacity: Q-HQ-04
@@ -129,18 +141,21 @@ progression:
     - { level: 4, section_xp: 4000,  section_size_cap: 11, storage_capacity: 22 }
     - { level: 5, section_xp: 10000, section_size_cap: 15, storage_capacity: 30 }
 
-# Evolution trees (skill-point trees with prerequisites).
-# Each unit spends its OWN XP on its own tree, commander included (decision 78).
-# Nodes are permanent (no respec) and never exclude each other; XP cost is the only cap.
+# Evolution trees (decisions 78, 118)
+# Each unit spends its OWN XP on its own tree, commander included. Nodes are permanent
+# (no respec) and never exclude each other. Trees give STAT BONUSES ONLY (no abilities).
+# Every evolved stat is capped at 300 % of its base value (x3).
+# Default tree, applied to every unit type: for each listed stat, a chain of steps;
+# step n adds step_bonus of the base value and costs cost_base * n XP; step n requires step n-1.
 trees:
-  soldier:
-    nodes:
-      tough_1:  { cost: 100, requires: [],                effects: { hp: +10 } }
-      tough_2:  { cost: 250, requires: [tough_1],         effects: { hp: +20 } }
-      sprint:   { cost: 200, requires: [],                effects: { move_speed: +10% } }
-      sharp_1:  { cost: 150, requires: [],                effects: { attack: +5 } }
-      breacher: { cost: 400, requires: [sharp_1, tough_1], ability: breach_wall }
-  radio:
-    nodes:
-      antenna_1: { cost: 200, requires: [],          effects: { relay_range: +25 } }
-      antenna_2: { cost: 400, requires: [antenna_1], effects: { relay_range: +50 } }
+  stat_cap_of_base: 3.0
+  default:
+    stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range]
+    step_bonus: 0.10            # +10 % of base per step -> 20 steps to reach the cap
+    cost_base: 100              # placeholder
+  overrides:                    # extra stats for some unit types
+    radio:  { extra_stats: [relay_range] }
+    commander: { extra_stats: [aura_radius] }
+    truck:  { extra_stats: [max_total_weight] }
+    boat:   { extra_stats: [max_total_weight] }
+    medic:  { extra_stats: [heal] }
