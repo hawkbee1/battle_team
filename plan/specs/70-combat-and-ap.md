@@ -1,30 +1,30 @@
-# Combat and Action Points (working draft)
+# Combat and Action Points
 
-Status: draft. Decisions come from the Q&A with the game designer. Numbers live in `data/combat.yaml` and `data/units.yaml`.
+Status: **ready**. Decisions come from the Q&A with the game designer; changes go through `specs/95-open-questions.md`. Each rule has a stable ID (`COMBAT-NN`).
 
 ## 1. Action points (AP)
-- Each unit has a **single AP pool** (`ap_max`). Moving, shooting, building, healing, pushing and capturing all draw from it.
-- AP regenerate at a **constant rate** (`ap_regen` per second), always, whether the unit is idle, moving or fighting, up to `ap_max`.
-- Movement cost depends on movement class, terrain and slope (`data/terrain.yaml`).
-- **What costs AP:** each shot (`ap_per_shot`), each metre moved, each metre pushed (relic or HQ), picking up a weapon from the ground (decision 63), and role actions.
-- **What costs only time:** reloading, unloading and swapping weapons, landing and taking off. They take their duration but no AP. (Decisions 55, 68)
-- **A unit with 0 AP is never frozen.** It keeps moving, but only as fast as its AP come back. Example: a soldier moving at 5 m/s on grass spends 5 AP/s, more than its regen of 1.5 AP/s; once empty it goes on at about 1.5 m/s. A shot or a role action simply waits until the unit has enough AP. (Decision 56)
+- **COMBAT-01** Each unit has a **single AP pool** (`ap_max`). Moving, shooting, building, healing, pushing and capturing all draw from it.
+- **COMBAT-02** AP regenerate at a **constant rate** (`ap_regen` per second), always, whether the unit is idle, moving or fighting, up to `ap_max`.
+- **COMBAT-03** Movement cost depends on movement class, terrain and slope (`data/terrain.yaml`).
+- **COMBAT-04** **What costs AP:** each shot (`ap_per_shot`), each metre moved, each metre pushed (relic or HQ), picking up a weapon from the ground (decision 63), and role actions.
+- **COMBAT-05** **What costs only time:** reloading, unloading and swapping weapons, landing and taking off. They take their duration but no AP. (Decisions 55, 68)
+- **COMBAT-06** **A unit with 0 AP is never frozen.** It keeps moving, but only as fast as its AP come back. Example: a soldier moving at 5 m/s on grass spends 5 AP/s, more than its regen of 1.5 AP/s; once empty it goes on at about 1.5 m/s. A shot or a role action simply waits until the unit has enough AP. (Decision 56)
 
 ### Role actions (decisions 66, 67)
-- **Build, repair and capture** cost a **fixed AP amount paid up front**, then take their **duration**. A unit must have the AP to start. **Healing is instant** (decision 91). Construction AP and build time per structure: `data/terrain.yaml` (decision 113).
-- **Pushing** a relic or the HQ is movement: each pusher pays **AP per metre** pushed, with the slope factor of its movement class.
-- **Interrupted action** (for example the unit moves away): the AP already paid are **lost**, the **progress is kept**. Resuming costs the AP of the **remaining part** only. **Exception:** a capture interrupted by an enemy entering the capture radius **loses its progress** (decision 97).
-- Values in `data/combat.yaml` (`actions`, `push`); construction AP and build time per structure: `data/terrain.yaml` (decision 113).
+- **COMBAT-07** **Build, repair and capture** cost a **fixed AP amount paid up front**, then take their **duration**. A unit must have the AP to start. **Healing is instant** (decision 91). Construction AP and build time per structure: `data/terrain.yaml` (decision 113).
+- **COMBAT-08** **Pushing** a relic or the HQ is movement: each pusher pays **AP per metre** pushed, with the slope factor of its movement class.
+- **COMBAT-09** **Interrupted action** (for example the unit moves away): the AP already paid are **lost**, the **progress is kept**. Resuming costs the AP of the **remaining part** only. **Exception:** a capture interrupted by an enemy entering the capture radius **loses its progress** (decision 97).
+- **COMBAT-10** Values in `data/combat.yaml` (`actions`, `push`); construction AP and build time per structure: `data/terrain.yaml` (decision 113).
 
 ## 2. Seeing and hitting
 ### Targets
-- A unit fires only at targets **it sees itself**, up to its weapon's range. Seeing is limited by vision range, weather, terrain and height (see `specs/10-map-and-terrain.md`, section 5). Scouts and radios share information for awareness, not for aiming. (Decision 59)
-- **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62)
-- A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
+- **COMBAT-11** A unit fires only at targets **it sees itself**, up to its weapon's range. Seeing is limited by vision range, weather, terrain and height (see `specs/10-map-and-terrain.md`, section 5). Scouts and radios share information for awareness, not for aiming. (Decision 59)
+- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62)
+- **COMBAT-13** A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
 
 ### Hit resolution: hybrid
-- When a player is **inside a unit** (first-person control), hits depend on the player's **aim**: projectiles travel in 3D and obstacles block them. The unit's `attack` tightens weapon spread and sway, so an evolved unit still aims better.
-- When a unit acts under **orders or section AI** (top-down control or offline-passive), a **hit chance** is computed (decision 65):
+- **COMBAT-14** When a player is **inside a unit** (first-person control), hits depend on the player's **aim**: projectiles travel in 3D and obstacles block them. The unit's `attack` tightens weapon spread and sway, so an evolved unit still aims better.
+- **COMBAT-15** When a unit acts under **orders or section AI** (top-down control or offline-passive), a **hit chance** is computed (decision 65):
 
   `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors` (× indirect factor), **clamped to 5–95 %**.
   - distance factor: from 1 at point blank down to 0.5 at maximum range;
@@ -33,37 +33,37 @@ Status: draft. Decisions come from the Q&A with the game designer. Numbers live 
   - speed factor: a fast target is harder to hit;
   - morale factor: from 0.9 at morale 0 to 1.1 at morale 100 for the attacker (decision 71). The same factor scales weapon spread in first-person aim (decision 95).
   All values in `data/combat.yaml` (`hit_chance`).
-- Both modes must give comparable average results, so that controlling a unit directly is a choice, not an obligation. (Balancing target.)
+- **COMBAT-16** Both modes must give comparable average results, so that controlling a unit directly is a choice, not an obligation. (Balancing target.)
 
 ### attack and defense
-- `attack` is **accuracy**: it raises the hit chance and tightens spread.
-- `defense` is **evasion**: it lowers the chance of being hit.
-- **Neither changes damage.** (Decision 58)
+- **COMBAT-17** `attack` is **accuracy**: it raises the hit chance and tightens spread.
+- **COMBAT-18** `defense` is **evasion**: it lowers the chance of being hit.
+- **COMBAT-19** **Neither changes damage.** (Decision 58)
 
 ## 3. Damage: weapon vs armor table
-- Each weapon has a **weapon type**; each unit or object has an **armor type** (`armor_type` in `data/units.yaml`).
-- **Damage = weapon base damage × multiplier from the weapon-vs-armor table** (× `airborne_factor` when the target is flying). Nothing else changes it: not unit stats, not cover. (Decisions 57, 65)
-- Armor types: infantry, light vehicle, heavy vehicle, structure, relic (indestructible), HQ.
-- The table lives in `data/combat.yaml`.
+- **COMBAT-20** Each weapon has a **weapon type**; each unit or object has an **armor type** (`armor_type` in `data/units.yaml`).
+- **COMBAT-21** **Damage = weapon base damage × multiplier from the weapon-vs-armor table** (× `airborne_factor` when the target is flying). Nothing else changes it: not unit stats, not cover. (Decisions 57, 65)
+- **COMBAT-22** Armor types: infantry, light vehicle, heavy vehicle, structure, relic (indestructible), HQ.
+- **COMBAT-23** The table lives in `data/combat.yaml`.
 
 ### Flying targets
-- **Flying is a capability, not an armor type.** A flying unit keeps a normal armor type (for example light vehicle).
-- Each weapon has an `airborne_factor` applied when the target is flying. 0 means the weapon cannot hit flying units; anti-air weapons have a high factor. (Decision 57)
+- **COMBAT-24** **Flying is a capability, not an armor type.** A flying unit keeps a normal armor type (for example light vehicle).
+- **COMBAT-25** Each weapon has an `airborne_factor` applied when the target is flying. 0 means the weapon cannot hit flying units; anti-air weapons have a high factor. (Decision 57)
 
 ## 4. Weapons
 ### Weapons are items
-- A unit has **one weapon slot**. Each unit type lists the **weapon types it may use** (`weapons.allowed`). (Decision 52)
-- A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: Q-ECO-01).
-- Weapons are equipped or swapped **only while the unit is stored or next to its storage place**. (Decision 53)
+- **COMBAT-26** A unit has **one weapon slot**. Each unit type lists the **weapon types it may use** (`weapons.allowed`). (Decision 52)
+- **COMBAT-27** A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: Q-ECO-01).
+- **COMBAT-28** Weapons are equipped or swapped **only while the unit is stored or next to its storage place**. (Decision 53)
 
 ### Dropped weapons
-- A **killed unit drops its weapon** on the ground. (Decision 53)
-- **Any unit of any team** whose allowed list includes that weapon type can **pick it up on the spot**, for an **AP cost** (the only weapon handling that costs AP, decision 63). Its current weapon drops in its place.
-- Dropped weapons **vanish after a delay**.
+- **COMBAT-29** A **killed unit drops its weapon** on the ground. (Decision 53)
+- **COMBAT-30** **Any unit of any team** whose allowed list includes that weapon type can **pick it up on the spot**, for an **AP cost** (the only weapon handling that costs AP, decision 63). Its current weapon drops in its place.
+- **COMBAT-31** Dropped weapons **vanish after a delay**.
 
 ### Ammo and reloading
-- **Ammo is unlimited.** Only the loaded magazine is limited. (Decision 54)
-- A **reload always gives a full magazine**; rounds left in it are discarded. The cost of reloading is its time, not lost ammo.
+- **COMBAT-32** **Ammo is unlimited.** Only the loaded magazine is limited. (Decision 54)
+- **COMBAT-33** A **reload always gives a full magazine**; rounds left in it are discarded. The cost of reloading is its time, not lost ammo.
 
 ### Weapon characteristics
 Each weapon has, besides damage, range and AP per shot:
@@ -77,49 +77,49 @@ Each weapon has, besides damage, range and AP per shot:
 | `airborne_factor` | Damage multiplier against flying targets (0 = cannot hit them). |
 
 ## 5. Friendly fire
-- **On, full damage.** Artillery, explosions and crossfire hurt allies exactly like enemies.
-- Consequence with permadeath: careless artillery can kill friendly units for good. Statistics and medals may track friendly kills (to define).
+- **COMBAT-34** **On, full damage.** Artillery, explosions and crossfire hurt allies exactly like enemies.
+- **COMBAT-35** Consequence with permadeath: careless artillery can kill friendly units for good. Statistics and medals may track friendly kills (to define).
 
 ## 6. Reaching 0 HP: death, prisoner or defection
-- Normally a unit at 0 HP **dies** (permadeath; the commander resurrects at the HQ).
-- **Only a commander can take a prisoner or cause a defection**, and only when he **deals the final blow himself**. When any other unit brings the target to 0 HP, it simply dies.
-- When a **commander** brings it to 0 HP, there are **odds of another outcome**:
+- **COMBAT-36** Normally a unit at 0 HP **dies** (permadeath; the commander resurrects in storage).
+- **COMBAT-37** **Only a commander can take a prisoner or cause a defection**, and only when he **deals the final blow himself**. When any other unit brings the target to 0 HP, it simply dies.
+- **COMBAT-38** When a **commander** brings it to 0 HP, there are **odds of another outcome**:
   - the unit is **taken prisoner**;
   - the unit **switches side**: if the attacking section has room (section size cap), the unit **joins the attacker's section**. The owner loses the unit and the attacker gains it.
-- The odds depend on the unit's **morale** and its **AP**: **low morale and low AP raise the odds of surrender (prisoner) or defection**. A fresh, confident unit fights to death. (Decision 72)
+- **COMBAT-39** The odds depend on the unit's **morale** and its **AP**: **low morale and low AP raise the odds of surrender (prisoner) or defection**. A fresh, confident unit fights to death. (Decision 72)
 
   `p(spared) = k × ((100 − morale)/100 + (1 − AP/ap_max)) / 2`, with k = 0.6.
 
   Example: morale 20 and AP at 10 % → 0.6 × (0.8 + 0.9) / 2 = 51 %. Morale 50 and full AP → 15 %.
   A spared unit **defects** or becomes a **prisoner**, 50/50. Defection needs room in the attacking section; without room it becomes a prisoner.
-- A unit that **switches side keeps everything** (XP, evolution and its weapon). The attacker gains an evolved unit.
-- A **defector is an ordinary unit** of its new section: it can be killed, captured, or defect again under the same rules. Statistics count a defection for the captor and a loss for the previous owner. (Decision 74)
-- **No extra limit on defections** (snowball): limiting them to commanders is considered enough; to watch in playtests. (Decision 75)
+- **COMBAT-40** A unit that **switches side keeps everything** (XP, evolution and its weapon). The attacker gains an evolved unit.
+- **COMBAT-41** A **defector is an ordinary unit** of its new section: it can be killed, captured, or defect again under the same rules. Statistics count a defection for the captor and a loss for the previous owner. (Decision 74)
+- **COMBAT-42** **No extra limit on defections** (snowball): limiting them to commanders is considered enough; to watch in playtests. (Decision 75)
 
 ### Prisoners (decision 73)
-- A prisoner keeps its weapon (decision 64) and goes **instantly to the captor section's prisoner storage**: separate from unit storage, **unlimited**, never counted in storage capacity (decision 94). It cannot fight or escape.
-- **Exchange and ransom** are negotiated **in game, between section owners**: the captor's owner posts an offer (an exchange for named prisoners, or a price); the prisoner's original owner accepts or refuses. A ransom goes **entirely to the captor section** (no fee). A released prisoner returns to its owner's storage.
-- A prisoner never released is **lost at the end of the war**, with the rest of the war's units.
+- **COMBAT-43** A prisoner keeps its weapon (decision 64) and goes **instantly to the captor section's prisoner storage**: separate from unit storage, **unlimited**, never counted in storage capacity (decision 94). It cannot fight or escape.
+- **COMBAT-44** **Exchange and ransom** are negotiated **in game, between section owners**: the captor's owner posts an offer (an exchange for named prisoners, or a price); the prisoner's original owner accepts or refuses. A ransom goes **entirely to the captor section** (no fee). A released prisoner returns to its owner's storage.
+- **COMBAT-45** A prisoner never released is **lost at the end of the war**, with the rest of the war's units.
 
 ## 7. Morale
-- **Morale** is a unit stat from **0 to 100**. A new unit starts at the base value (50). (Decision 70)
-- It changes **only through events**; there is no drift back toward the base value.
-- It is changed by:
+- **COMBAT-46** **Morale** is a unit stat from **0 to 100**. A new unit starts at the base value (50). (Decision 70)
+- **COMBAT-47** It changes **only through events**; there is no drift back toward the base value.
+- **COMBAT-48** It is changed by:
   - the **commander aura** (section units near their commander gain morale);
   - **nearby fights**: kills raise it, deaths of nearby allies lower it;
   - **being outnumbered** (local force ratio).
-- Morale slightly scales the unit's **hit chance** (decision 71) and sets the **0-HP odds** (decision 72).
-- Values in `data/combat.yaml` (`morale`).
+- **COMBAT-49** Morale slightly scales the unit's **hit chance** (decision 71) and sets the **0-HP odds** (decision 72).
+- **COMBAT-50** Values in `data/combat.yaml` (`morale`).
 
 ### Radio (decision 76)
-- A radio is a **normal unit**: bought with money, it has HP, can be destroyed, taken prisoner or defect, and is stored like any unit. It has no weapon and cannot attack.
-- Its relay range starts at the `units.yaml` value and grows through its skill tree.
+- **COMBAT-51** A radio is a **normal unit**: bought with money, it has HP, can be destroyed, taken prisoner or defect, and is stored like any unit. It has no weapon and cannot attack.
+- **COMBAT-52** Its relay range starts at the `units.yaml` value and grows through its skill tree.
 
 ## 8. Cover
-- Obstacles **block shots**. **Partial cover** (trees, craters, low walls) **lowers the chance of being hit**; it does not reduce damage. In first person it physically hides part of the target. **Full cover** blocks completely. (Decision 65, revises 37e)
+- **COMBAT-53** Obstacles **block shots**. **Partial cover** (trees, craters, low walls) **lowers the chance of being hit**; it does not reduce damage. In first person it physically hides part of the target. **Full cover** blocks completely. (Decision 65, revises 37e)
 
 ## 9. Transports
-- When a transport is destroyed, carried units are **ejected next to the wreck with heavy damage**.
+- **COMBAT-54** When a transport is destroyed, carried units are **ejected next to the wreck with heavy damage**.
 
 ## 10. Open questions
 None. See `specs/95-open-questions.md`.

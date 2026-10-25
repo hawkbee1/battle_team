@@ -1,6 +1,6 @@
-# BattleTeam: Game Overview (working draft)
+# BattleTeam: Game Overview
 
-Status: draft, built through Q&A. Open questions live in `specs/95-open-questions.md`.
+Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-questions.md`.
 
 ## Spec index
 - `specs/00-overview.md`: this file, index and record of decisions.
@@ -16,6 +16,8 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 - `data/battle.yaml`: default values of battle settings.
 - `data/economy.yaml`: currency, prices, earnings, transfer fees.
 - `data/medals.yaml`: medal tiers and thresholds.
+- `milestones/m1-rules-core.md`: first implementation milestone (headless rules core) and its issues.
+- Rule IDs: each rule in specs 10–70 has a stable ID (see `README.md`, Phase 1 step 4).
 - Markdown files explain the rules (they teach the game). YAML files hold the numbers (code loads them).
 
 ## Decisions so far
@@ -41,7 +43,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 
 ### Commander and sections
 15. A commander and his units form a **section**.
-16. The commander always resurrects at the HQ after death.
+16. The commander always resurrects after death. (Revised by decision 125: he resurrects in storage, with his section.)
 17. The higher the commander level, the more troops he can command and store. (Revised by decision 79: the level comes from section XP, not from the commander's own XP.)
 18. A commander gives bonuses to nearby troops of his section: his aura raises their morale.
 19. A commander can spend money to buy more troops.
@@ -169,7 +171,7 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 77. Hit and kill XP is multiplied by 1 + target XP / attacker XP (capped at ×3). Repeated XP from the same target or build spot within a time window shrinks. Hitting allies gives no XP.
 78. Each unit spends its own XP on its own skill tree, the commander included. Nodes are permanent (no respec) and never exclude each other.
 79. A share of every XP point earned by a unit moves to its section's XP. Section XP sets the commander level, which sets section size cap and storage capacity. Section XP cannot be spent on stats.
-80. A dead commander respawns at the HQ at once. He loses a share of his unspent XP, never his level. All units of his section on the field go instantly to storage and lose AP and morale. These losses are battle settings.
+80. A dead commander respawns at once (revised by decision 125: in storage, not on the field). He loses a share of his unspent XP, never his level. All units of his section on the field go instantly to storage and lose AP and morale. These losses are battle settings.
 81. Units in a transport take a share of every hit on it (with their own armor type) and explosion damage when ejected at its destruction. Stored units can never be harmed.
 82. No catch-up mechanism for late joiners in a war; placement in the weakest team is the only compensation.
 83. Within a war, sections keep everything from battle to battle; each battle starts with full AP and HP and morale at base. At war end everything is lost; logs, statistics and medals stay available for consultation.
@@ -226,6 +228,9 @@ Status: draft, built through Q&A. Open questions live in `specs/95-open-question
 122. A player can join a running war at any time and enters the current battle.
 123. In-game communication is limited to pings and map markers (history kept). Chat and voice happen on Discord.
 124. A player has one commander per war and can take part in several wars at the same time.
+
+125. A dead commander resurrects **in storage**, with his section (stored at once, decision 80), so an inactive player's commander cannot die again and again. A commander's death does **not** start the 24-hour lock of decision 120: the section can deploy again at once, each unit paying 10 AP (decision 110).
+126. Game and Discord accounts are linked. Access to Discord channels depends on the player's sections (their wars, teams and guilds).
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`.

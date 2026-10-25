@@ -55,7 +55,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [ ] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles.
 - [x] **Q-SOC-12** Sharing between a player's sections, extra commanders, several wars. → decisions 107, 124
 - [x] **Q-SOC-13** Guilds. → decision 108
-- [ ] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics?
+- [x] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics? → decision 126 (account linking, channel access by section)
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
@@ -63,7 +63,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-03** Recall delay value; does a recall cost AP or prevent attacking? → decision 110
 - [x] **Q-HQ-04** Storage capacity per level (decision 79); radii for storing and blocking deployment. → decision 110
 - [x] **Q-HQ-05** Encampment price, HP and armor. → decisions 111, 114
-- [ ] **Q-HQ-06** Does the 24-hour lock (decision 120) also start when a section is stored because its commander died (decision 80)? If yes, every commander death would block the section for 24 hours.
+- [x] **Q-HQ-06** Does the 24-hour lock (decision 120) also start when a section is stored because its commander died (decision 80)? If yes, every commander death would block the section for 24 hours. → decision 125 (no; the commander resurrects in storage)
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)

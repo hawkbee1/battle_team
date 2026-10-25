@@ -1,8 +1,8 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
-version: 2
+version: 3
 
-# Commander death (decision 80): no respawn delay; the commander respawns at the HQ at once.
+# Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
 commander_death:
   xp_loss_share: 0.25        # share of the commander's own UNSPENT XP lost; his level is never lost
@@ -34,6 +34,6 @@ weather:
   mode: random
   states: [clear, rain, fog, snow]   # data/terrain.yaml weather
 
-# Full section storage (decision 120): once every alive unit of a section is stored,
-# the section cannot deploy again for this long.
+# Full section storage (decision 120): once every alive unit of a section is stored BY CHOICE,
+# the section cannot deploy again for this long. Not after a commander's death (decision 125).
 section_redeploy_lock_s: 86400
