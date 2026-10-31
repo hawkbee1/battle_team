@@ -1,6 +1,6 @@
 # Design risks
 
-Status: **tracking**. Risks found in reviews that no decision addresses yet. Nothing here is a rule. Each risk keeps its ID (`R-NN`, never renumbered) and has a status:
+Status: **tracking**. Risks found in reviews that no decision addresses yet. Nothing here is a rule. Accepted risks are reviewed after a few real battles (milestone M7). Each risk keeps its ID (`R-NN`, never renumbered) and has a status:
 - **open**: to settle with a decision, or to accept;
 - **accepted for now**: the designer knows it and chose to wait (date);
 - **closed**: settled by a decision in `00-overview.md` (its number is noted).
@@ -58,4 +58,4 @@ The research note (`specs/90-research-topic-priority.md`) ranks it as the topic 
 ## R-08 Tuning notes for the scenario harness (M1 Issue 11)
 - Sustained speed is about `ap_regen ÷ AP per metre`. A soldier empties its 60 AP in about 17 s; after that every ground unit moves at 1 to 2 m/s off-road, so `move_speed` only matters in short bursts.
 - Vision is much shorter than weapon range: a soldier sees 150 m (60 m in fog), while weapon ranges go from 250 to 1,200 m. An anti-air soldier sees a helicopter at 150 m; the helicopter's height bonus lets it see him at 450 m.
-- With a push speed of 5 m/s (decision 138, Q-REL-10) and 2 AP per metre, each pusher spends 10 AP/s against 1.5 to 2 AP/s of regen. A push then moves in short bursts and averages about 0.75 m/s.
+- At 5 m per hour (decision 138), a pushed relic or HQ moves 120 m a day: about 8 days for 1 km, on maps up to 50 km long. Each pusher spends 10 AP per hour, so AP never limits a push, and units in the path can always step aside before being crushed.

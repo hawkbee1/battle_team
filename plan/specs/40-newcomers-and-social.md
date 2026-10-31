@@ -56,7 +56,7 @@ Three channels are core features of the game, not extras:
 - **SOC-36** Communication **history is kept**.
 - **SOC-37** **In game: pings, map markers and team chat.** Team chat is synced between the game and Discord. Guild chat, direct chat and voice happen **on Discord**. (Decision 123)
 - **SOC-38** **Game and Discord accounts are linked.** Access to Discord channels depends on the player's **sections** (their wars, teams and guilds). (Decision 126)
-- **SOC-39** Moderation tools are deferred until after a few real battles (Q-SOC-11).
+- **SOC-39** Moderation tools are deferred until after a few real battles (Q-SOC-11, milestone M7).
 
 ## 4. Players, commanders and sections
 - **SOC-40** A **section** is owned by **one commander only**.
@@ -76,3 +76,5 @@ Confirmed: a player account holds several commanders; each commander leads one s
 - **SOC-49** A section can play **without a guild**; it then stores its units at the HQ.
 - **SOC-50** Guild roles (decision 146): **chief**, **member** and **trainee**. A trainee is a new member that the chief has not accepted yet.
 - **SOC-51** A guild has **two chats**: one for the chief and the members, one for the whole guild, trainees included. Guild chats are on Discord (SOC-37).
+- **SOC-52** When the chief refuses a trainee, nothing else happens to its section: it has no guild, stores its units at the HQ (SOC-49) and can apply to another guild (decision 153).
+- **SOC-53** A guild can be created by any section that is not in a guild and whose commander is **level 10** or more (decision 155, `progression.guild_creation_min_level` in `data/units.yaml`).

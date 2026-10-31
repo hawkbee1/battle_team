@@ -21,6 +21,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 - `milestones/m1-rules-core.md`: headless rules core and its issues.
 - `milestones/m2-technical-stack.md`: choice of the technical stack.
 - `milestones/m3-ai-and-automation.md`: section AI, automatic actions and automation (discussion first).
+- `milestones/m7-revision-after-real-battles.md`: what to review after a few real battles.
 - Rule IDs: each rule in specs 10–70 has a stable ID (see `README.md`, Phase 1 step 4).
 - Markdown files explain the rules (they teach the game). YAML files hold the numbers (code loads them).
 
@@ -153,10 +154,10 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 60. A medic is a soldier with a heal role (category soldier).
 61. Roster v1 adds jeep (vehicle, wheeled), tank (vehicle, tracked), truck (transport, wheeled), helicopter (flying capability) and boat (boat capability, water only) to commander, soldier, medic, engineer, scout, artillery and radio. Stats are placeholders. (Revised by decision 86: `sail` replaces the `boat` capability; decision 141: the guild camp is a unit too.)
 
-62. Indirect fire: weapons flagged `indirect_fire` (artillery) may target a ground position that a unit of their section sees, or that a scout reports through a radio in range, with a lower hit chance. All other weapons need their unit's own sight. (Revised by decision 152: bombard attacks never miss.)
+62. Indirect fire: weapons flagged `indirect_fire` (artillery) may target a ground position that a unit of their section sees, or that a scout reports through a radio in range, with a lower hit chance. All other weapons need their unit's own sight. (Decision 154: where a missed shot lands.)
 63. Picking up a dropped weapon costs AP (the only weapon handling that does; see 55).
 64. Prisoners and defectors keep their weapon. Units with no weapon (radio, truck) cannot attack.
-65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage. (Clarified by decision 135: full cover still leaves the 5 % minimum. Revised by decision 152: no indirect factor, bombard attacks never miss.)
+65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage. (Clarified by decision 135: full cover still leaves the 5 % minimum.)
 66. Build, repair, heal and capture cost a fixed AP amount paid up front, then take a duration (revised by decision 91: heal is instant; building costs per structure: decision 113); a unit needs the AP to start. Pushing a relic or the HQ costs each pusher AP per metre, like movement, with the slope factor.
 67. An interrupted action loses the AP paid but keeps its progress; resuming costs the AP of the remaining part. Exception: a capture interrupted by an arriving enemy loses its progress (decision 97).
 68. Flying units can land and take off (time, no AP). Landed, they move with their ground class, are hit as ground targets and can load/unload troops. Each map sets a maximum flying altitude. (Revised by decision 142: the map's highest terrain + 10 m.)
@@ -211,7 +212,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 105. Medals are bronze, silver and gold for every kind of action and kill (by target type: units, commanders, jeeps...), earned at thresholds (example: bronze for killing 5 commanders).
 106. Cosmetics are purely visual.
 107. A player's sections share nothing, except cosmetics bought with a sharing option.
-108. Guilds: the creator is the chief (guild commander); he can hand the role to another member and can disband the guild, and cannot leave while chief (roles: decision 146). Maximum guild size depends on the guild level, which rises with the total XP earned by its sections while in the guild. A guild can have a single section. A section can play without a guild (storage at the HQ).
+108. Guilds: the creator is the chief (guild commander); he can hand the role to another member and can disband the guild, and cannot leave while chief (roles: decision 146; who can create a guild: decision 155). Maximum guild size depends on the guild level, which rises with the total XP earned by its sections while in the guild. A guild can have a single section. A section can play without a guild (storage at the HQ).
 
 ### HQ, storage, economy (round 3)
 109. Any unit of the team can push the HQ (revised by decision 145: units with the `push` action). HQ hit points: 1000 (battle setting).
@@ -246,9 +247,9 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 133. Slope is **signed**: going uphill costs more AP, going downhill costs less, for moving and for pushing. A slope steeper than the class maximum is impassable both ways.
 134. Swapping a weapon takes **5 s** (time only, no AP).
 135. Full cover gives a cover factor of 0, and the 5–95 % clamp still applies: a unit in full cover keeps a 5 % chance of being hit under orders or AI. In first person, full cover blocks shots completely.
-136. Only **bombard** attacks have splash. Every unit within the splash radius is hit at once, without its own hit roll; damage decreases with the distance from the impact point. (Revised by decision 152: bombard attacks never miss.)
+136. Only **bombard** attacks have splash. Every unit within the splash radius is hit at once, without its own hit roll; damage decreases with the distance from the impact point. (Decision 152: the explosive charge never misses.)
 137. Terrain objects (trees, buildings, constructions) have an armor type, `structure` by default. Ejection damage is a share of the unit's maximum HP. Default values, adjusted later.
-138. A pushed relic or HQ moves at a fixed speed of **5** (`push.speed_mps`; unit to confirm, Q-REL-10). A pusher with no AP left stops and waits for AP; the relic or HQ moves only while at least the minimum number of pushers push. **Crushing kills**: a unit crushed by a pushed or a falling relic dies.
+138. A pushed relic or HQ moves at a fixed speed of **5 m per hour** (`push.speed_m_per_h`). A pusher with no AP left stops and waits for AP; the relic or HQ moves only while at least the minimum number of pushers push. **Crushing kills**: a unit crushed by a pushed or a falling relic dies.
 139. **Heal and repair** work on every friendly unit except the HQ.
 140. **Capture progress belongs to the team.** When the capturing unit leaves or dies, another unit of its team inside the radius can resume, paying the AP of the remaining part. An enemy entering the radius still erases the progress (decision 97).
 141. The **guild camp** (encampment) is a unit of the guild chief's section. It does not count toward his cap and cannot be stored. It moves slowly on its own, cannot fly, and can heal units.
@@ -264,7 +265,10 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 149. An enemy **commander** or a **guild camp** is never taken prisoner and never defects.
 150. A **1-round weapon** fires once per reload: the time between two shots is its reload time.
 151. Bought weapons and swapped-out weapons are kept in the section's **storage** until a unit takes one.
-152. The engineer's explosive charge is a **bombard** attack. Bombard attacks **never miss**: the shot lands on the aimed point and its splash hits every unit around it. They have no hit chance.
+152. The engineer's explosive charge is a **bombard** attack that **never misses**, like a trap: it goes off on the aimed point and its splash hits every unit around it. Artillery shots keep their hit chance (decision 62).
+153. When the chief refuses a trainee, nothing else happens to its section: it has no guild, stores its units at the HQ, and can apply to another guild.
+154. A missed artillery shot lands away from the aimed point, in a random direction, at a distance proportional to how much it missed, never more than the weapon's range.
+155. A guild can be created by any section that is not in a guild and whose commander is **level 10** or more.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 8
+version: 9
 
 common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
@@ -163,6 +163,7 @@ progression:
     cap_at_level_1: 5
     extra_unit_every_levels: 5
     max_units_factor: 2
+  guild_creation_min_level: 10    # commander level a section needs to create a guild (decision 155)
   # Commander levels (decision 144), 1 to max_level. section_xp[i] is the section XP needed to
   # reach level i + 1. Placeholder curve: going from level n to n + 1 costs 500 x n.
   # Cap from section_size: levels 1-5: 5, 6-10: 6, ..., 56-60: 16.

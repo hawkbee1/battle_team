@@ -19,14 +19,14 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 2. Seeing and hitting
 ### Targets
 - **COMBAT-11** A unit fires only at targets **it sees itself**, up to its weapon's range. Seeing is limited by vision range, weather, terrain and height (see `specs/10-map-and-terrain.md`, section 5). Scouts and radios share information for awareness, not for aiming. (Decision 59)
-- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Like every bombard attack it never misses (COMBAT-55). (Decisions 62, 152)
+- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62) Splash: COMBAT-55.
 - **COMBAT-13** A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
 
 ### Hit resolution: hybrid
 - **COMBAT-14** When a player is **inside a unit** (first-person control), hits depend on the player's **aim**: projectiles travel in 3D and obstacles block them. The unit's `attack` tightens weapon spread and sway, so an evolved unit still aims better.
 - **COMBAT-15** When a unit acts under **orders or section AI** (top-down control or offline-passive), a **hit chance** is computed (decision 65):
 
-  `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors`, **clamped to 5–95 %**.
+  `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors` (× indirect factor), **clamped to 5–95 %**.
   - distance factor: from 1 at point blank down to 0.5 at maximum range;
   - cover factor: none, partial or full (0); with full cover the clamp still leaves 5 % (decision 135);
   - size factor: by the target's armor type (a tank is easier to hit than a soldier);
@@ -45,7 +45,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **COMBAT-21** **Damage = weapon base damage × multiplier from the weapon-vs-armor table** (× `airborne_factor` when the target is flying). Nothing else changes it: not unit stats, not cover. (Decisions 57, 65)
 - **COMBAT-22** Armor types: infantry, light vehicle, heavy vehicle, structure, relic (indestructible), HQ.
 - **COMBAT-23** The table lives in `data/combat.yaml`.
-- **COMBAT-55** **Bombard attacks** (decisions 136, 152): weapons with a `splash_radius_m` (artillery, the engineer's explosive charge). They **never miss** and have no hit chance: the shot lands on the aimed point, and every unit within `splash_radius_m` is hit at once, friend or foe; damage decreases with the distance from the impact point (`splash` in `data/combat.yaml`).
+- **COMBAT-55** **Bombard attacks** (decisions 136, 152): weapons with a `splash_radius_m` (artillery, the engineer's explosive charge). Every unit within `splash_radius_m` of the impact point is hit at once, without its own hit roll, friend or foe; damage decreases with the distance from the impact point (`splash` in `data/combat.yaml`). An artillery shot uses the hit chance (COMBAT-12); a missed shot lands away from the aimed point, in a random direction, at a distance proportional to how much it missed (`miss_scatter`), never more than the weapon's range (decision 154). The explosive charge **never misses**, like a trap (decision 152).
 
 ### Flying targets
 - **COMBAT-24** **Flying is a capability, not an armor type.** A flying unit keeps a normal armor type (for example light vehicle).

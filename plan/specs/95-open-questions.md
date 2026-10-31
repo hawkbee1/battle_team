@@ -49,7 +49,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-REL-07** ~~Validate in playtests the fairness of the full timer reset across time zones.~~ Dropped by the designer. → decision 100
 - [x] **Q-REL-08** Decision 46d says a relic can fall from a floating island; the answer to Q-MAP-06 says relics cannot leave floating islands. Which one? → decision 117 (they fall)
 - [x] **Q-REL-09** Push speed, pushers at 0 AP, crush damage and survivors in the path. → decision 138
-- [ ] **Q-REL-10** Push speed "5": `data/*.yaml` uses metres and seconds, and 5 m/s is a running soldier's speed, while relics "move very slowly" (RELIC-03). Is it 5 m/s, or another unit (for example 5 m per minute)?
+- [x] **Q-REL-10** Push speed "5": `data/*.yaml` uses metres and seconds, and 5 m/s is a running soldier's speed, while relics "move very slowly" (RELIC-03). Is it 5 m/s, or another unit (for example 5 m per minute)? → decision 138 (5 m per hour)
 - [x] **Q-REL-11** Capture progress: does it belong to the unit or to the team? → decision 140
 
 ## Newcomers, wars and social (40)
@@ -63,13 +63,13 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-08** Cosmetics: purely visual. → decision 106
 - [x] **Q-SOC-09** Can a player enter a war after its first battle has started? If yes, can he enter a battle already running, or only from the next battle? → decision 122
 - [x] **Q-SOC-10** In-game communication tools. → decision 123
-- [ ] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles.
+- [x] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles. → milestone `milestones/m7-revision-after-real-battles.md`
 - [x] **Q-SOC-12** Sharing between a player's sections, extra commanders, several wars. → decisions 107, 124
 - [x] **Q-SOC-13** Guilds. → decision 108
 - [x] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics? → decision 126 (account linking, channel access by section)
 - [x] **Q-SOC-15** Where a newcomer's units appear (decision 33 said the team's starting point). → decision 129
 - [x] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it. → decision 146 (a member awaiting the chief's acceptance)
-- [ ] **Q-SOC-17** What happens to a trainee's section when the chief refuses it?
+- [x] **Q-SOC-17** What happens to a trainee's section when the chief refuses it? → decision 153
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
@@ -115,6 +115,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-22** Weapon swap time. → decision 134
 - [x] **Q-CBT-23** Full cover (factor 0) versus the 5 % minimum hit chance. → decision 135
 - [x] **Q-CBT-24** Indirect fire: what a hit on a ground position means, and whether splash victims roll separately. → decision 136
-- [x] **Q-CBT-25** Is the engineer's explosive charge a bombard attack (it has a 4 m splash in `data/combat.yaml`)? Where does a missed bombard shot land? → decision 152 (yes; bombard attacks never miss)
+- [x] **Q-CBT-25** Is the engineer's explosive charge a bombard attack (it has a 4 m splash in `data/combat.yaml`)? Where does a missed bombard shot land? → decision 152 (yes; the explosive charge never misses)
+- [x] **Q-CBT-28** Where does a missed artillery shot land? Friendly fire is on (COMBAT-34). → decision 154
 - [x] **Q-CBT-26** Armor type of terrain objects; base of the ejection damage. → decision 137
 - [x] **Q-CBT-27** Heal and repair targets. → decision 139

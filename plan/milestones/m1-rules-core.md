@@ -103,8 +103,9 @@ Label: `combat`
 Rules: COMBAT-12, COMBAT-14, COMBAT-15, COMBAT-16, COMBAT-17, COMBAT-18, COMBAT-19, COMBAT-49, COMBAT-53.
 Depends on: 5, 6.
 
-- `chance = base_accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed × morale factors`, clamped to `[min, max]`; full cover (factor 0) still gets the minimum (decision 135).
-- Indirect fire (artillery) may target a ground position seen by its section or relayed by a radio; other weapons need the unit's own sight. Bombard attacks never miss and have no hit roll (COMBAT-55).
+- `chance = base_accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed × morale factors (× indirect factor)`, clamped to `[min, max]`; full cover (factor 0) still gets the minimum (decision 135).
+- Indirect fire (artillery) may target a ground position seen by its section or relayed by a radio; other weapons need the unit's own sight. The engineer's explosive charge never misses (COMBAT-55).
+- A missed artillery shot lands in a random direction from the aimed point, at `miss_scatter.max_m` × `(roll − chance) / (1 − chance)`, never more than `range_m` (decision 154).
 - First-person: spread from `aim` values, tightened by `attack`, scaled by morale. The rules core only provides the spread value; projectile flight is the client's job.
 - Hit roll uses the injected seeded RNG.
 
@@ -117,7 +118,7 @@ Rules: COMBAT-20, COMBAT-21, COMBAT-24, COMBAT-25, COMBAT-34, COMBAT-36, COMBAT-
 Depends on: 2.
 
 - `damage = base_damage × multipliers[weapon][armor] × airborne_factor (flying target only)`; nothing else changes it.
-- Friendly fire at full damage. Splash (bombard attacks, COMBAT-55): they never miss, and every unit within `splash_radius_m` of the impact point is hit at once, without its own roll, with damage falling off with the distance (`splash`).
+- Friendly fire at full damage. Splash (bombard attacks, COMBAT-55): every unit within `splash_radius_m` of the impact point is hit at once, without its own roll, with damage falling off with the distance (`splash`).
 - Units carried by a transport take `carried_damage_share` of each hit (with their own armor type) and `ejection_damage_share_of_max_hp` of their maximum HP when the transport is destroyed.
 - Relics take no damage (multiplier 0).
 - Terrain objects take damage through their `armor_type` (MAP-40).
@@ -148,11 +149,10 @@ Depends on: 3, 4.
 - Heal is instant: `heal_ap` restores `heal` HP. Heal and repair work on every friendly unit except the HQ (decision 139).
 - Interrupted action: AP lost, progress kept, resuming costs the remaining part; **except** a capture interrupted by an enemy entering the radius, which loses its progress. Capture progress belongs to the team: another unit of the team can resume it (decision 140).
 - Capture radius: every unit inside counts whatever its state; any enemy blocks.
-- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_mps`; each pusher pays `ap_per_m` × the signed slope factor of its class; a pusher with no AP left stops and waits, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
+- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_m_per_h`; each pusher pays `ap_per_m` × the signed slope factor of its class; a pusher with no AP left stops and waits, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
 
 Acceptance criteria:
 - Tests for each action, both interruption cases, the capture block, a capture resumed by another unit of the team, a pusher running out of AP, and the crush rule with 10, 11 and 13 pushers.
-- Open before starting: the unit of the push speed (Q-REL-10).
 
 ## Issue 11: Scenario harness
 Label: `tooling`
@@ -172,3 +172,4 @@ Acceptance criteria:
 - **M4 – Server state and persistence**: battle state on the server, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), statistics and medals computed from the battle logs (decision 143), section AI (rules from M3).
 - **M5 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
 - **M6 – Client**: top-down and first-person control, pings, map markers and team chat (decision 123), Discord account linking (decision 126).
+- **M7 – Revision after real battles**: `milestones/m7-revision-after-real-battles.md`.

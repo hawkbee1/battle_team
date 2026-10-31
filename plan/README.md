@@ -44,3 +44,4 @@ Milestones, in order:
 3. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code.
 4. **M3 – Section AI and automation** (`milestones/m3-ai-and-automation.md`): what units do on their own. A discussion with the designer first.
 5. Then: server-side persistence, networking, then the client (outline at the end of `milestones/m1-rules-core.md`).
+6. **M7 – Revision after real battles** (`milestones/m7-revision-after-real-battles.md`): moderation tools and the points left to watch in real battles.

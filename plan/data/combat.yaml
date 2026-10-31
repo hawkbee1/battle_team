@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 9
+version: 11
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -23,8 +23,9 @@ armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 #                      false: the weapon must be unloaded before the unit moves
 #   airborne_factor    damage multiplier against a flying target (0 = cannot hit it)
 #   base_accuracy      starting hit chance under orders/AI, before factors (decision 65);
-#                      bombard weapons (with splash_radius_m) have none: they never miss (decision 152)
+#                      a weapon with never_misses has none (decision 152)
 #   indirect_fire      true: may target a ground position its section sees or a radio relays (decision 62)
+#   never_misses       true: no hit roll, the charge goes off on the aimed point (decision 152)
 #   range_m is a cap: a unit only fires at targets it sees itself (decision 59),
 #   except indirect_fire weapons.
 # Values are the accepted starting point for milestone 1 (decision 69).
@@ -32,9 +33,9 @@ weapon_types:
   rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  base_accuracy: 0.70, rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
   machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  base_accuracy: 0.50, rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
   anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, base_accuracy: 0.60, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
-  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
+  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, base_accuracy: 0.40, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
   anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  base_accuracy: 0.60, rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
-  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
+  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4, never_misses: true }   # engineer charge (decision 152)
 # Weapon prices: data/economy.yaml (the default weapon is included in the unit price).
 
 multipliers:
@@ -45,14 +46,20 @@ multipliers:
   anti_air:    { infantry: 0.3, light_vehicle: 0.3, heavy_vehicle: 0.1,  structure: 0.1, hq: 0.05, relic: 0 }
   explosive:   { infantry: 1.5, light_vehicle: 1.2, heavy_vehicle: 1.0,  structure: 2.0, hq: 1.5,  relic: 0 }
 
-# Splash (decisions 136, 152): only bombard attacks have splash: weapons with a splash_radius_m
-# (artillery, explosive charge). They never miss: the shot lands on the aimed point.
+# Splash (decision 136): only bombard attacks have splash: weapons with a splash_radius_m
+# (artillery, explosive charge). Artillery rolls its hit chance; the explosive charge never misses (decision 152).
 # Every unit within the weapon's splash_radius_m of the impact point is hit at once, without its
 # own hit roll, friend or foe. Damage falls off linearly with the distance, from 1 at the impact
 # point to damage_factor_at_edge at splash_radius_m.
 splash:
   falloff: linear
   damage_factor_at_edge: 0.0     # placeholder
+
+# Missed artillery shot (decision 154): it lands in a random direction from the aimed point,
+# at miss_importance x max_m, never more than the weapon's range_m.
+# miss_importance = (roll - chance) / (1 - chance): 0 for a near miss, 1 for the worst miss.
+miss_scatter:
+  max_m: 100                     # placeholder
 
 friendly_fire: { enabled: true, damage_factor: 1.0 }
 
@@ -102,9 +109,10 @@ ammo:
 # chance = weapon.base_accuracy
 #          * (1 + (attacker.attack - target.defense) / 100)
 #          * distance_factor * cover_factor * size_factor * speed_factor
+#          * indirect_factor (indirect fire only)
 #          * morale_factor   (attacker morale, decision 71)
 #          clamped to [min, max]
-# Bombard attacks have no hit chance: they never miss (decision 152).
+# A weapon with never_misses (the explosive charge) has no hit chance (decision 152).
 # Cover only lowers hit chance; it never reduces damage (decision 65).
 hit_chance:
   clamp: { min: 0.05, max: 0.95 }
@@ -112,6 +120,7 @@ hit_chance:
   cover_factor: { none: 1.0, partial: 0.5, full: 0.0 }   # full: the clamp still gives 5 % (decision 135)
   size_factor:  { infantry: 0.8, light_vehicle: 1.0, heavy_vehicle: 1.2, structure: 1.5, hq: 2.0, relic: 2.0 }  # by target armor_type
   speed_factor: { per_mps: 0.02, min: 0.5 }   # 1 - per_mps * target speed, not below min
+  indirect_factor: 0.5
   morale_factor: { at_0: 0.9, at_100: 1.1 }   # linear in attacker morale
 
 # First-person aim (decision 58): attack tightens spread and sway.
@@ -148,11 +157,11 @@ actions:
   interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining, capture_progress_kept: false }   # decisions 67, 97
 
 # Pushing a relic or the HQ (decisions 66, 98, 138): at least min_pushers units that can push
-# (units.yaml actions). The relic or HQ moves at speed_mps. Each pusher pays ap_per_m, multiplied
+# (units.yaml actions). The relic or HQ moves at speed_m_per_h. Each pusher pays ap_per_m, multiplied
 # by the signed slope factor of its movement class (data/terrain.yaml). A pusher with no AP left
 # stops and waits for AP; the push stops while fewer than min_pushers push.
 push:
-  speed_mps: 5                  # decision 138; unit to confirm (Q-REL-10)
+  speed_m_per_h: 5              # decision 138
   ap_per_m: 2.0                 # placeholder
   min_pushers: 10               # decision 98
   pusher_without_ap: waits      # decision 138 (a moving unit slows to its regen speed instead, decision 56)
