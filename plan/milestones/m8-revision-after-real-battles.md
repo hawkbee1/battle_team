@@ -1,4 +1,4 @@
-# Milestone 7: revision after real battles
+# Milestone 8: revision after real battles
 
 Goal: after a few real battles, review the rules using what the battle logs and statistics show and what players need. The results are new decisions in `specs/00-overview.md`, changes to `data/*.yaml`, and issues for the changes.
 

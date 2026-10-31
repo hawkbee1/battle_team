@@ -56,7 +56,7 @@ Three channels are core features of the game, not extras:
 - **SOC-36** Communication **history is kept**.
 - **SOC-37** **In game: pings, map markers and team chat.** Team chat is synced between the game and Discord. Guild chat, direct chat and voice happen **on Discord**. (Decision 123)
 - **SOC-38** **Game and Discord accounts are linked.** Access to Discord channels depends on the player's **sections** (their wars, teams and guilds). (Decision 126)
-- **SOC-39** Moderation tools are deferred until after a few real battles (Q-SOC-11, milestone M7).
+- **SOC-39** Moderation tools are deferred until after a few real battles (Q-SOC-11, milestone M8).
 
 ## 4. Players, commanders and sections
 - **SOC-40** A **section** is owned by **one commander only**.

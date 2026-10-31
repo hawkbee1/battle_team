@@ -17,13 +17,13 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 - `data/battle.yaml`: default values of battle settings.
 - `data/economy.yaml`: currency, prices, earnings, transfer fees.
 - `data/medals.yaml`: medal tiers and thresholds.
-- `milestones/m0-pathfinding.md`: pathfinding on an abstract map (before the rules core).
-- `milestones/m1-rules-core.md`: headless rules core and its issues.
-- `milestones/m2-technical-stack.md`: choice of the technical stack.
-- `milestones/m3-ai-and-automation.md`: section AI, automatic actions and automation (discussion first).
-- `milestones/m7-revision-after-real-battles.md`: what to review after a few real battles.
+- `milestones/m1-ai-and-automation.md`: section AI, automatic actions and automation (rules, discussion first).
+- `milestones/m2-technical-stack.md`: choice of the technical stack; no code before it is done.
+- `milestones/m3-pathfinding.md`: pathfinding (before the rules core).
+- `milestones/m4-rules-core.md`: headless rules core and its issues.
+- `milestones/m8-revision-after-real-battles.md`: what to review after a few real battles.
 - Rule IDs: each rule in specs 10–70 has a stable ID (see `README.md`, Phase 1 step 4).
-- Markdown files explain the rules (they teach the game). YAML files hold the numbers (code loads them).
+- Markdown files explain the rules (they teach the game). YAML files hold the numbers (code loads them). Neither depends on the technical stack.
 
 ## Decisions so far
 
@@ -54,7 +54,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 19. A commander can spend money to buy more troops.
 
 ### Controlling units
-20. Both modes coexist: the player gives direct orders from the top-down camera, or enters a unit. Units that are not directly controlled follow simple section AI behaviours (follow commander, hold, patrol...). (To be defined in milestone M3, section AI and automation.)
+20. Both modes coexist: the player gives direct orders from the top-down camera, or enters a unit. Units that are not directly controlled follow simple section AI behaviours (follow commander, hold, patrol...). (To be defined in milestone M1, section AI and automation.)
 
 ### Vision
 21. Fog of war, **shared per section only**: a section sees what its own units see. Radios extend this sharing (see Radio).

@@ -28,7 +28,7 @@ armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 #   never_misses       true: no hit roll, the charge goes off on the aimed point (decision 152)
 #   range_m is a cap: a unit only fires at targets it sees itself (decision 59),
 #   except indirect_fire weapons.
-# Values are the accepted starting point for milestone 1 (decision 69).
+# Values are the accepted starting point for the rules core (decision 69).
 weapon_types:
   rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  base_accuracy: 0.70, rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
   machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  base_accuracy: 0.50, rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }

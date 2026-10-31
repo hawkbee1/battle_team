@@ -1,6 +1,6 @@
 # BattleTeam plan
 
-This folder holds the game specification and the work plan. The Flutter/Flame code lives in the rest of the repository.
+This folder holds the game specification and the work plan. The rest of the repository holds the current app scaffold, which is not a stack decision (see M2).
 
 ## Layout
 | Path | Content |
@@ -37,11 +37,13 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
    - IDs are **stable**: never renumbered, never reused. A new rule takes the next free number of its spec. A removed rule is simply deleted.
    - A rule change is a new decision in `specs/00-overview.md`; the rule text is updated in place and keeps its ID.
 
-### Phase 2: implementation with coding agents
+### Phase 2: milestones
+Specs and data never depend on the technical stack. **No code is written before the stack is chosen (M2).**
+
 Milestones, in order:
-1. **M0 – Pathfinding** (`milestones/m0-pathfinding.md`): paths for every movement class on an abstract map. Headless.
-2. **M1 – Rules core** (`milestones/m1-rules-core.md`): AP, movement cost, vision and combat resolution, loading `data/*.yaml`, covered by unit tests. No rendering, no network.
-3. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code.
-4. **M3 – Section AI and automation** (`milestones/m3-ai-and-automation.md`): what units do on their own. A discussion with the designer first.
-5. Then: server-side persistence, networking, then the client (outline at the end of `milestones/m1-rules-core.md`).
-6. **M7 – Revision after real battles** (`milestones/m7-revision-after-real-battles.md`): moderation tools and the points left to watch in real battles.
+1. **M1 – Section AI and automation** (`milestones/m1-ai-and-automation.md`): rules for what units do on their own. A discussion with the designer; no code.
+2. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code. No code.
+3. **M3 – Pathfinding** (`milestones/m3-pathfinding.md`): paths for every movement class, headless.
+4. **M4 – Rules core** (`milestones/m4-rules-core.md`): AP, movement cost, vision and combat resolution, loading `data/*.yaml`, covered by unit tests. No rendering, no network.
+5. **M5 to M7**: server-side persistence, networking, then the client (outline at the end of `milestones/m4-rules-core.md`).
+6. **M8 – Revision after real battles** (`milestones/m8-revision-after-real-battles.md`): moderation tools and the points left to watch in real battles.

@@ -35,7 +35,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-15** Which 4 units does a new section start with (decision 128)? A fixed list, or chosen by the player? → decision 128 (the player buys them with the starting money)
 - [x] **Q-UNIT-16** An action that costs more AP than the unit's `ap_max` (a radio ordered to capture). → decision 132 (each unit lists the actions it can do)
 - [x] **Q-UNIT-17** Guild camp: owner, cap, storage, movement. → decision 141
-- [x] **Q-UNIT-18** Section AI (decision 20): which behaviours (follow commander, hold, patrol...), do units under AI fire on their own, and what do the units of an offline player do (decision 29 says "passive")? → milestone `milestones/m3-ai-and-automation.md`
+- [x] **Q-UNIT-18** Section AI (decision 20): which behaviours (follow commander, hold, patrol...), do units under AI fire on their own, and what do the units of an offline player do (decision 29 says "passive")? → milestone `milestones/m1-ai-and-automation.md`
 - [x] **Q-UNIT-19** Commander levels: "+1 every 5 levels" is read as a cap of 6 at level 6, 7 at level 11 (decision 127). `commander_levels` stops at level 5, so the cap never grows yet: section XP thresholds beyond level 5, and is there a maximum level? → decision 144 (max level 60)
 - [x] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change. → decision 145 (accepted)
 
@@ -63,7 +63,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-08** Cosmetics: purely visual. → decision 106
 - [x] **Q-SOC-09** Can a player enter a war after its first battle has started? If yes, can he enter a battle already running, or only from the next battle? → decision 122
 - [x] **Q-SOC-10** In-game communication tools. → decision 123
-- [x] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles. → milestone `milestones/m7-revision-after-real-battles.md`
+- [x] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles. → milestone `milestones/m8-revision-after-real-battles.md`
 - [x] **Q-SOC-12** Sharing between a player's sections, extra commanders, several wars. → decisions 107, 124
 - [x] **Q-SOC-13** Guilds. → decision 108
 - [x] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics? → decision 126 (account linking, channel access by section)

@@ -1,28 +1,28 @@
-# Milestone 1: headless rules core
+# Milestone 4: headless rules core
 
-Goal: a pure Dart package that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network, no Flutter.**
+Goal: a headless rules core that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network.** Language and tools come from the technical stack (M2).
 
-Each issue below is ready to be created as a GitHub issue in the milestone "M1 – Rules core". Labels: `rules-core` plus the one listed. Every issue names the spec rules it implements; code and tests cite those IDs in comments and test names (for example `test('COMBAT-06 moves at regen speed at 0 AP', ...)`).
+Each issue below is ready to be created as a GitHub issue in the milestone "M4 – Rules core". Labels: `rules-core` plus the one listed. Every issue names the spec rules it implements; code and tests cite those IDs in comments and test names (for example a test named `COMBAT-06 moves at regen speed at 0 AP`).
 
 ## Conventions for all issues
-- Package: `packages/battle_team_rules/` inside this repository (battle_team), an exception to the hawkbee convention of one repository per package. Pure Dart (`dart test`), `very_good_analysis` lints, 100 % line coverage target.
-- **Numbers only in YAML.** No game number is written in Dart code or tests except inside test fixtures. Tests on real values read them from `plan/data/*.yaml`. When a value is tuned, the tests that use it are updated in the same change.
+- Inside this repository (battle_team), an exception to the hawkbee convention of one repository per package. Language, project layout, test tools and lints: from M2. 100 % line coverage target.
+- **Numbers only in YAML.** No game number is written in code or tests except inside test fixtures. Tests on real values read them from `plan/data/*.yaml`. When a value is tuned, the tests that use it are updated in the same change.
 - **Deterministic.** Time is passed in (no wall clock); randomness comes from an injected seeded RNG.
-- Immutable models (`equatable`), no global state.
+- Immutable models, no global state.
 - A rule that seems unclear or contradictory is not guessed: open a question in `plan/specs/95-open-questions.md` and link it in the issue.
 
 ---
 
-## Issue 1: Package scaffold
+## Issue 1: Project scaffold
 Label: `infra`
 Rules: none (setup).
 
-Create `packages/battle_team_rules/` (pure Dart, no Flutter dependency), register it in the pub workspace root `pubspec.yaml` (`workspace:` list) and in the melos `format` script, add `very_good_analysis`, `test`, `yaml`, `equatable`.
+Create the rules-core project with the language, layout and tools chosen in M2, with no rendering or UI dependency.
 
 Acceptance criteria:
-- `dart test` and `dart analyze` pass in the package with one placeholder test.
-- The app (`battle_team`) can depend on the package (path or workspace dependency) without pulling Flutter into it.
-- README of the package says how to run tests and points to `plan/`.
+- Tests and static analysis pass with one placeholder test.
+- The server and the client can use the rules core without pulling a UI framework into it.
+- Its README says how to run the tests and points to `plan/`.
 
 ## Issue 2: Load and validate the data files
 Label: `data`
@@ -159,7 +159,7 @@ Label: `tooling`
 Rules: all of the above (integration).
 Depends on: 3–10.
 
-A command-line runner (`dart run battle_team_rules:scenario <file>`) that plays a scripted scenario (units, positions as abstract distances, orders, seed, duration) and prints an event log and a summary (shots, hits, damage, deaths, AP used). Used to tune the placeholder numbers (decision 69).
+A command-line runner (`scenario <file>`) that plays a scripted scenario (units, positions as abstract distances, orders, seed, duration) and prints an event log and a summary (shots, hits, damage, deaths, AP used). Used to tune the placeholder numbers (decision 69).
 
 Acceptance criteria:
 - Three committed scenarios with expected summaries checked by tests: rifle squad vs jeep, artillery with radio-relayed target, relic push with crushing.
@@ -167,9 +167,8 @@ Acceptance criteria:
 ---
 
 ## Later milestones (outline)
-- **M2 – Technical stack**: `milestones/m2-technical-stack.md`. The milestones below are rewritten once the stack is chosen.
-- **M3 – Section AI and automation**: `milestones/m3-ai-and-automation.md`.
-- **M4 – Server state and persistence**: battle state on the server, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), statistics and medals computed from the battle logs (decision 143), section AI (rules from M3).
-- **M5 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
-- **M6 – Client**: top-down and first-person control, pings, map markers and team chat (decision 123), Discord account linking (decision 126).
-- **M7 – Revision after real battles**: `milestones/m7-revision-after-real-battles.md`.
+Rewritten once the technical stack is chosen (M2).
+- **M5 – Server state and persistence**: battle state on the server, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), statistics and medals computed from the battle logs (decision 143), section AI (rules from M1).
+- **M6 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
+- **M7 – Client**: top-down and first-person control, pings, map markers and team chat (decision 123), Discord account linking (decision 126).
+- **M8 – Revision after real battles**: `milestones/m8-revision-after-real-battles.md`.

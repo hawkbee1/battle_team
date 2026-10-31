@@ -1,8 +1,8 @@
-# Milestone 3: section AI and automation
+# Milestone 1: section AI and automation
 
 Goal: decide with the game designer what units do when no player controls them directly, which actions happen on their own, and what players can automate. The result is a new spec, `specs/80-ai-and-automation.md` (rule prefix `AI`), with its numbers in `data/*.yaml`, followed by implementation issues added to this file.
 
-The milestone starts as a discussion, like the spec phase: questions get IDs `Q-AI-NN` in `specs/95-open-questions.md`, and answers become numbered decisions in `specs/00-overview.md`.
+This milestone writes rules only (specs and data), so it needs no technical stack and no code. It starts as a discussion, like the spec phase: questions get IDs `Q-AI-NN` in `specs/95-open-questions.md`, and answers become numbered decisions in `specs/00-overview.md`.
 
 ## What the rules already say
 - Units that are not directly controlled follow simple section AI behaviours: follow commander, hold, patrol... (decision 20).
@@ -20,4 +20,4 @@ The milestone starts as a discussion, like the spec phase: questions get IDs `Q-
 
 ## Done when
 - `specs/80-ai-and-automation.md` is **ready**, with rule IDs.
-- Implementation issues for the AI are written in this file. They build on the rules core (M1) and pathfinding (M0), headless.
+- Implementation issues for the AI are written once the stack is chosen (M2). They build on the rules core (M4) and pathfinding (M3).
