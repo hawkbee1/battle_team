@@ -134,7 +134,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 49h. After a war, a player keeps his statistics, war medals and permanent game medals.
 49i. Cosmetics for sections and units are bought with real money during a war and kept after it, to be applied to other units.
 50b. No in-game spying on communications. Most communication may happen on a Discord server.
-50. Team, guild and direct player communication are fundamental features. (Revised by decision 123: in game only pings and map markers; chat and voice happen on Discord.)
+50. Team, guild and direct player communication are fundamental features.
 51. A section is owned by one commander only. A player can have several sections (commanders), but only one commander per battle; several battles run at the same time.
 
 ### Weapons, AP and vision (rules core, see combat and map specs)
@@ -226,7 +226,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 120. A player never leaves a battle and stays in his team for its whole duration. He can store his whole section and deploy again when he wants, but not before 24 hours after his last alive unit was stored.
 121. Medal points: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; ties go to the commander with the most XP.
 122. A player can join a running war at any time and enters the current battle.
-123. In-game communication is limited to pings and map markers (history kept). Chat and voice happen on Discord.
+123. In-game communication is limited to pings, team chat and map markers. Chat and voice happen on Discord, exept team chat which is sync between app and discord.
 124. A player has one commander per war and can take part in several wars at the same time.
 
 125. A dead commander resurrects **in storage**, with his section (stored at once, decision 80), so an inactive player's commander cannot die again and again. A commander's death does **not** start the 24-hour lock of decision 120: the section can deploy again at once, each unit paying 10 AP (decision 110).

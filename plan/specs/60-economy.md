@@ -38,5 +38,3 @@ Already decided (overview):
 - **ECO-20** **Starting money** of a new section = minStartingMoney = **500 w€** (decision 102).
 - **ECO-21** **XP cannot be bought.**
 - **ECO-22** **No limit** against build-and-destroy farming by engineers.
-
-- **ECO-23** **Constructions** cost **AP paid up front plus a build time** per structure, **no money** (decision 113, confirms 25d). Values in `data/terrain.yaml` (`objects`).

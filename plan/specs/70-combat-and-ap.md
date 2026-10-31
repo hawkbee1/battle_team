@@ -78,7 +78,7 @@ Each weapon has, besides damage, range and AP per shot:
 
 ## 5. Friendly fire
 - **COMBAT-34** **On, full damage.** Artillery, explosions and crossfire hurt allies exactly like enemies.
-- **COMBAT-35** Consequence with permadeath: careless artillery can kill friendly units for good. Statistics and medals may track friendly kills (to define).
+- **COMBAT-35** Consequence with permadeath: careless artillery can kill friendly units for good. Statistics and medals tracks friendly kills.
 
 ## 6. Reaching 0 HP: death, prisoner or defection
 - **COMBAT-36** Normally a unit at 0 HP **dies** (permadeath; the commander resurrects in storage).

@@ -36,7 +36,5 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
    - A rule change is a new decision in `specs/00-overview.md`; the rule text is updated in place and keeps its ID.
 
 ### Phase 2: implementation with coding agents
-1. Work is tracked as GitHub issues grouped in milestones. Each issue names the spec rules it implements and its acceptance criteria.
-2. First milestone: a headless rules core (AP, movement cost, combat resolution) that loads `data/*.yaml` and is covered by unit tests. No rendering, no network. Issues: `milestones/m1-rules-core.md`.
-3. Then: server-side persistence and networking, then the client.
-4. `AGENTS.md` (and `CLAUDE.md`, which points to it) at the repository root tells agents where the specs are, the "numbers only in YAML" rule and how to run the tests.
+1. First milestone: a headless rules core (AP, movement cost, combat resolution) that loads `data/*.yaml` and is covered by unit tests. No rendering, no network. Issues: `milestones/m1-rules-core.md`.
+2. Then: server-side persistence and networking, then the client.

@@ -37,13 +37,10 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-22** **War and battle statistics** are available during and after the war.
 
 ### What a player keeps after a war
-- **SOC-23** **War and battle statistics**: the player can consult them during and after the war.
 - **SOC-24** **War medals**: earned during a war, attached to that war.
 - **SOC-25** **Game medals**: permanent, account-level.
 - **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Thresholds in `data/medals.yaml`. (Decision 105)
 - **SOC-27** **Cosmetics** for sections and units: bought with **real money** during a war, **kept after the war** and can be applied to other units later. They are **purely visual**. (Decision 106)
-- **SOC-28** victoryXp: 1 XP per unit of the winning team (decision 92).
-
 - **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; on a tie, the one whose commander has the most XP. (Decision 121)
 - **SOC-30** A player can **join a running war at any time**, entering the **current battle** (commander + 3 units at his team's starting point, decision 33). (Decision 122)
 
@@ -57,7 +54,7 @@ Three channels are core features of the game, not extras:
 - **SOC-35** **Most communication may happen on a Discord server** rather than in the game.
 
 - **SOC-36** Communication **history is kept**.
-- **SOC-37** **In game: pings and map markers only.** Everything else (team, guild and direct chat, voice) happens **on Discord**. (Decision 123)
+- **SOC-37** **In game: pings and map markers.** guild and direct chat, voice happens **on Discord**. Team chat is sync between discord and game.
 - **SOC-38** **Game and Discord accounts are linked.** Access to Discord channels depends on the player's **sections** (their wars, teams and guilds). (Decision 126)
 - **SOC-39** Moderation tools are deferred until after a few real battles (Q-SOC-11).
 

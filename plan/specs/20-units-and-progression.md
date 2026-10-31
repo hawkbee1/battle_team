@@ -78,7 +78,6 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 
 ## 7. Commander
 - **UNIT-24** Commander + units = a **section**.
-- **UNIT-25** Section size cap and storage capacity grow with the **commander level**, which comes from section XP.
 - **UNIT-26** A commander gives bonuses to nearby units of his section (aura).
 - **UNIT-27** The commander buys troops with money.
 - **UNIT-28** The commander always resurrects after death (no permadeath for commanders), **at once, without delay**, **in storage** with his section (decisions 80, 125). This stops an inactive player's commander from dying again and again.

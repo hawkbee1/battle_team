@@ -163,4 +163,4 @@ Acceptance criteria:
 ## Later milestones (outline)
 - **M2 – Server state and persistence**: battle state on the Appwrite backend, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-44), economy (ECO), XP and progression (UNIT-05 to UNIT-32), relic ownership and victory timer (RELIC-10 to RELIC-18).
 - **M3 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
-- **M4 – Client**: top-down and first-person control on Flame, pings and map markers (decision 123), Discord account linking (decision 126).
+- **M4 – Client**: top-down and first-person control, pings and map markers (decision 123), Discord account linking (decision 126).

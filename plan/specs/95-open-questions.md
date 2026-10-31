@@ -3,7 +3,7 @@
 This is the to-do / done list of the spec phase. Tick a question when it is decided and note the decision number from `00-overview.md`, for example `→ decision 52`. The "Open" sections inside each spec file give more context; they will be replaced by these IDs as questions are decided.
 
 ## General and technical
-- [x] **Q-GEN-01** ~~ Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24).
+- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24).
 
 ## Map and terrain (10)
 - [x] **Q-MAP-01** Typical map sizes and range of team counts per map. → decision 84
@@ -51,7 +51,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-07** Medals: tiers, thresholds, points. → decisions 105, 121
 - [x] **Q-SOC-08** Cosmetics: purely visual. → decision 106
 - [x] **Q-SOC-09** Can a player enter a war after its first battle has started? If yes, can he enter a battle already running, or only from the next battle? → decision 122
-- [x] **Q-SOC-10** In-game communication tools. → decision 123 (pings and markers only, history kept; the rest on Discord)
+- [x] **Q-SOC-10** In-game communication tools. → decision 123
 - [ ] **Q-SOC-11** Moderation and blocking tools. Deferred: to be defined after a few real battles.
 - [x] **Q-SOC-12** Sharing between a player's sections, extra commanders, several wars. → decisions 107, 124
 - [x] **Q-SOC-13** Guilds. → decision 108

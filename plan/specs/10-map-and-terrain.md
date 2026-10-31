@@ -38,7 +38,7 @@ Movement classes:
 Rules:
 - **MAP-15** For each (movement class, terrain type) pair the data file gives either an AP cost per metre or `impassable`.
 - **MAP-16** A **slope factor** multiplies the cost: the steeper the slope, the higher the cost; above a per-class maximum slope the terrain is impassable.
-- **MAP-17** **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain but may have altitude limits (open).
+- **MAP-17** **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain and have altitude limit (terrain max altitude + 10).
 - **MAP-18** **Flying units can land and take off** (decision 68). Both take time, no AP. A landed unit moves with its ground movement class, is hit as a ground target, and can load or unload troops if it carries any. Each map sets a **maximum flying altitude**.
 - **MAP-19** **Sail is a capability too** (decision 86). A unit with `sail` moves on rivers and lakes with the `sail` profile of the data file. With no ground movement class it is a **boat** (water only); with a ground class as well it is **amphibious**.
 - **MAP-20** **Out of AP:** a moving unit is never frozen; once its AP are empty it moves only as fast as its regen allows (decision 56, combat spec).
