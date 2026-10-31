@@ -5,7 +5,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 1. Team power and newcomer placement
 - **SOC-01** Each team has a **power** value.
 - **SOC-02** A new player is placed in the **team with the lowest power**.
-- **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** among the guilds that have **opted in to accept new players**. The player chooses one of them. His new section joins it as a **trainee** (decision 129; what a trainee is: Q-SOC-16).
+- **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** among the guilds that have **opted in to accept new players**. The player chooses one of them. His new section joins it as a **trainee** (decision 129; trainee: SOC-50).
 - **SOC-04** Why (research note): early friends and guild membership are the strongest predictors of staying; having a choice supports autonomy; joining the weakest team helps balance battles.
 
 - **SOC-05** **Team power = unit XP + section XP** of the team. The rules have **no notion of active or inactive players**. (Decision 93)
@@ -37,14 +37,12 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-22** **War and battle statistics** are available during and after the war.
 
 ### What a player keeps after a war
-- ~~**SOC-23**~~ Removed: duplicate of SOC-22.
 - **SOC-24** **War medals**: earned during a war, attached to that war.
 - **SOC-25** **Game medals**: permanent, account-level.
 - **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Thresholds in `data/medals.yaml`. (Decision 105)
 - **SOC-27** **Cosmetics** for sections and units: bought with **real money** during a war, **kept after the war** and can be applied to other units later. They are **purely visual**. (Decision 106)
-- ~~**SOC-28**~~ Removed: duplicate of SOC-19.
 - **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; on a tie, the one whose commander has the most XP. (Decision 121)
-- **SOC-30** A player can **join a running war at any time**, entering the **current battle** (commander + 4 units, arriving at the guild camp, or at the HQ if the guild has no camp; decisions 128, 129). (Decision 122)
+- **SOC-30** A player can **join a running war at any time**, entering the **current battle** (his commander arrives at the guild camp, or at the HQ if the guild has no camp, and he buys his units with the starting money; decisions 128, 129). (Decision 122)
 
 ## 3. Communication is fundamental
 Three channels are core features of the game, not extras:
@@ -76,3 +74,5 @@ Confirmed: a player account holds several commanders; each commander leads one s
 - **SOC-47** **Maximum guild size depends on the guild level**, which rises with the **total XP earned by its sections while in the guild**.
 - **SOC-48** A guild can have **a single section**.
 - **SOC-49** A section can play **without a guild**; it then stores its units at the HQ.
+- **SOC-50** Guild roles (decision 146): **chief**, **member** and **trainee**. A trainee is a new member that the chief has not accepted yet.
+- **SOC-51** A guild has **two chats**: one for the chief and the members, one for the whole guild, trainees included. Guild chats are on Discord (SOC-37).

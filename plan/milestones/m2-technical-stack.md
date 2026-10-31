@@ -70,4 +70,4 @@ Acceptance criteria:
 
 ## Done when
 - Every issue has its decision record, and Q-GEN-01 points to them.
-- The outline of M3 to M5 at the end of `milestones/m1-rules-core.md` is rewritten for the chosen stack.
+- The outline of M4 to M6 at the end of `milestones/m1-rules-core.md` is rewritten for the chosen stack.

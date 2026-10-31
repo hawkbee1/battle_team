@@ -35,7 +35,7 @@ Validation (fail with a clear message naming file, key and value):
 - every unit `armor_type` is in `armor_types`; every `weapons.default` is null (unarmed unit, `allowed: []`) or in its `allowed` list; every allowed weapon exists in `weapon_types`;
 - every weapon has a row in `multipliers` with every armor type; `hit_chance.size_factor` covers every armor type;
 - every terrain `ap_cost_per_m` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`; every movement class and profile has a `slope` entry;
-- `commander_levels` are sorted by `section_xp`;
+- `commander_levels.section_xp` has `max_level` values, in increasing order;
 - every terrain object has an `armor_type` in `armor_types`;
 - every action in a unit's `actions` is known (`capture`, `push`, `build`, `repair`, `heal`, `observe`) and its up-front AP is at most the unit's `ap_max` (decision 132).
 
@@ -86,14 +86,14 @@ Acceptance criteria:
 
 ## Issue 6: Weapons and firing cycle
 Label: `combat`
-Rules: COMBAT-04, COMBAT-05, COMBAT-13, COMBAT-26, COMBAT-27, COMBAT-28, COMBAT-29, COMBAT-30, COMBAT-31, COMBAT-32, COMBAT-33, UNIT-03, UNIT-04.
+Rules: COMBAT-04, COMBAT-05, COMBAT-13, COMBAT-26, COMBAT-27, COMBAT-28, COMBAT-29, COMBAT-30, COMBAT-31, COMBAT-32, COMBAT-33, COMBAT-56, UNIT-03, UNIT-04.
 Depends on: 3.
 
 - One weapon slot; equip or swap only while stored or next to the storage place; only allowed weapon types; a swap takes `weapon_swap.time_s`.
 - Firing respects `rate_of_fire_rpm`, `magazine_capacity`, `ap_per_shot`; reload always gives a full magazine and discards what was left; unload; `move_while_loaded: false` forbids moving while loaded.
 - A unit without weapon cannot attack.
 - Killed unit drops its weapon; any unit allowed to use it can pick it up for `pickup_ap`, dropping its own; dropped weapons vanish after `despawn_after_s`.
-- Open before starting: the firing cycle of 1-round weapons (Q-CBT-20) and where weapons are kept (Q-CBT-21).
+- A 1-round weapon fires once per `reload_time_s` (COMBAT-56). Bought and swapped-out weapons wait in the section's storage (decision 151).
 
 Acceptance criteria:
 - Timeline tests (e.g. artillery must unload before moving; MG empties a magazine at its rate of fire).
@@ -103,8 +103,8 @@ Label: `combat`
 Rules: COMBAT-12, COMBAT-14, COMBAT-15, COMBAT-16, COMBAT-17, COMBAT-18, COMBAT-19, COMBAT-49, COMBAT-53.
 Depends on: 5, 6.
 
-- `chance = base_accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed × morale factors (× indirect factor)`, clamped to `[min, max]`. Full cover blocks the shot: no roll, no clamp (decision 135).
-- Indirect fire (artillery) may target a ground position seen by its section or relayed by a radio; other weapons need the unit's own sight.
+- `chance = base_accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed × morale factors`, clamped to `[min, max]`; full cover (factor 0) still gets the minimum (decision 135).
+- Indirect fire (artillery) may target a ground position seen by its section or relayed by a radio; other weapons need the unit's own sight. Bombard attacks never miss and have no hit roll (COMBAT-55).
 - First-person: spread from `aim` values, tightened by `attack`, scaled by morale. The rules core only provides the spread value; projectile flight is the client's job.
 - Hit roll uses the injected seeded RNG.
 
@@ -117,7 +117,7 @@ Rules: COMBAT-20, COMBAT-21, COMBAT-24, COMBAT-25, COMBAT-34, COMBAT-36, COMBAT-
 Depends on: 2.
 
 - `damage = base_damage × multipliers[weapon][armor] × airborne_factor (flying target only)`; nothing else changes it.
-- Friendly fire at full damage. Splash (bombard attacks only, COMBAT-55): every unit within `splash_radius_m` of the impact point is hit at once, without its own roll, with damage falling off with the distance (`splash`).
+- Friendly fire at full damage. Splash (bombard attacks, COMBAT-55): they never miss, and every unit within `splash_radius_m` of the impact point is hit at once, without its own roll, with damage falling off with the distance (`splash`).
 - Units carried by a transport take `carried_damage_share` of each hit (with their own armor type) and `ejection_damage_share_of_max_hp` of their maximum HP when the transport is destroyed.
 - Relics take no damage (multiplier 0).
 - Terrain objects take damage through their `armor_type` (MAP-40).
@@ -137,7 +137,7 @@ Depends on: 8.
 Acceptance criteria:
 - Spec examples: morale 20 and 10 % AP → 51 %; morale 50 and full AP → 15 %.
 - Non-commander final blow always kills; a commander's final blow on an ally always kills.
-- Open before starting: enemy commanders and guild camps as targets (Q-CBT-19).
+- An enemy commander or a guild camp is never spared (decision 149).
 
 ## Issue 10: Role actions, pushing and interruption
 Label: `actions`
@@ -168,6 +168,7 @@ Acceptance criteria:
 
 ## Later milestones (outline)
 - **M2 – Technical stack**: `milestones/m2-technical-stack.md`. The milestones below are rewritten once the stack is chosen.
-- **M3 – Server state and persistence**: battle state on the server, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), statistics and medals computed from the battle logs (decision 143), section AI (once Q-UNIT-18 is decided).
-- **M4 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
-- **M5 – Client**: top-down and first-person control, pings, map markers and team chat (decision 123), Discord account linking (decision 126).
+- **M3 – Section AI and automation**: `milestones/m3-ai-and-automation.md`.
+- **M4 – Server state and persistence**: battle state on the server, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), statistics and medals computed from the battle logs (decision 143), section AI (rules from M3).
+- **M5 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
+- **M6 – Client**: top-down and first-person control, pings, map markers and team chat (decision 123), Discord account linking (decision 126).

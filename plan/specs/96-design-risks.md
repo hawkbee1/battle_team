@@ -36,7 +36,7 @@ The research note (`specs/90-research-topic-priority.md`) ranks it as the topic 
 - There is no protection from veterans, no mentoring and no death recap. The note cites EVE players who quit because they "don't understand what happened" (A3).
 - Decision 77's XP multiplier never goes below ×1, so killing new units pays as well as anything else.
 - With the ×3 stat cap (decision 118), a veteran unit can have 3× HP and 3× AP regen.
-- Decision 129 (a new section joins a guild as a trainee) may become part of the answer, depending on what a trainee is (Q-SOC-16).
+- Decision 129 puts every new section in a guild as a trainee, awaiting the chief's acceptance (decision 146). It gives newcomers a group, not protection.
 
 ## R-04 A newcomer cannot join friends
 - Placement forces the weakest team (SOC-02) and offers 4 random guilds (SOC-03). There is no invitation path, although the research note names friends and guilds as the strongest reason players stay (A2, B2).
@@ -52,7 +52,7 @@ The research note (`specs/90-research-topic-priority.md`) ranks it as the topic 
 
 ## R-07 One player or one unit can block a whole group
 - An absent HQ manager freezes HQ moves and team orders for as long as he is away; there is no fallback (HQ-08).
-- One enemy unit parked within 20 m of a guild camp keeps all the guild's stored units in storage, and they cannot deploy from the HQ instead (HQ-36, HQ-39). Q-HQ-08 asks whether new units arriving at the camp are blocked too.
+- One enemy unit parked within 20 m of a guild camp keeps all the guild's stored units in storage, and they cannot deploy from the HQ instead (HQ-36, HQ-39). New units arriving at the camp are blocked too (decision 147).
 - Logging off safely means walking back within 10 m of the storage place or waiting for a 6-hour recall, and storing everything starts the 24-hour lock (HQ-35). That makes R-01 the easiest way to log off.
 
 ## R-08 Tuning notes for the scenario harness (M1 Issue 11)

@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 7
+version: 8
 
 common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
@@ -21,8 +21,8 @@ common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, 
 # morale: 0..100, starts at data/combat.yaml morale.base. See specs/70-combat-and-ap.md.
 # actions (decision 132): what the unit can do besides moving and shooting:
 #   capture, push, build, repair, heal, observe. An order for any other action is refused.
-#   No listed action costs more AP up front than the unit's ap_max. Lists are placeholders
-#   (Q-UNIT-20). Heal and repair work on every friendly unit except the HQ (decision 139).
+#   No listed action costs more AP up front than the unit's ap_max. Lists: decision 145.
+#   Heal and repair work on every friendly unit except the HQ (decision 139).
 
 units:
   commander:
@@ -78,7 +78,7 @@ units:
     armor_type: structure
     base: { weight: 10, hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 80 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
-    actions: []                 # ap_max 40 < capture AP 50; does not push (Q-UNIT-20)
+    actions: []                 # ap_max 40 < capture AP 50; does not push (decision 145)
     role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }   # starting range, evolves via tree
     purchasable_by: commander   # normal unit: destructible, can be captured, stored (decision 76)
 
@@ -92,7 +92,7 @@ units:
     base: { weight: 50, hp: 300, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 50 }
     weapons: { default: null, allowed: [] }
     actions: [heal]
-    role: { heal: 20, heal_ap: 10, earns_money_when_healing: true, transportable: false }   # placeholders (Q-UNIT-20)
+    role: { heal: 20, heal_ap: 10, earns_money_when_healing: true, transportable: false }   # placeholders (decision 145)
     purchasable_by: guild_commander   # price: data/economy.yaml; armor type structure (decision 114)
 
   # Roster v1 additions (decision 61)
@@ -126,7 +126,7 @@ units:
     armor_type: light_vehicle
     base: { weight: 6, hp: 200, ap_max: 120, ap_regen: 2.0, attack: 10, defense: 10, move_speed: 20, vision_range: 300 }
     weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
-    actions: [capture]          # does not push (Q-UNIT-20)
+    actions: [capture]          # does not push (decision 145)
   boat:
     category: transport
     movement_class: null        # water only (sail without ground class)
@@ -134,7 +134,7 @@ units:
     armor_type: light_vehicle
     base: { weight: 6, hp: 200, ap_max: 100, ap_regen: 2.0, attack: 8, defense: 4, move_speed: 8, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
-    actions: [capture]          # water only: does not push (Q-UNIT-20)
+    actions: [capture]          # water only: does not push (decision 145)
     role: { max_total_weight: 4, max_unit_weight: 2 }   # boards/unloads next to the shore (decision 86)
 
 # Progression (decisions 77-79)
@@ -163,13 +163,19 @@ progression:
     cap_at_level_1: 5
     extra_unit_every_levels: 5
     max_units_factor: 2
-  starting_units: 4               # besides the commander (decision 128); which units: Q-UNIT-15
-  commander_levels:               # placeholders; the cap first grows at level 6 (Q-UNIT-19)
-    - { level: 1, section_xp: 0 }
-    - { level: 2, section_xp: 500 }
-    - { level: 3, section_xp: 1500 }
-    - { level: 4, section_xp: 4000 }
-    - { level: 5, section_xp: 10000 }
+  # Commander levels (decision 144), 1 to max_level. section_xp[i] is the section XP needed to
+  # reach level i + 1. Placeholder curve: going from level n to n + 1 costs 500 x n.
+  # Cap from section_size: levels 1-5: 5, 6-10: 6, ..., 56-60: 16.
+  commander_levels:
+    max_level: 60
+    section_xp: [
+      0, 500, 1500, 3000, 5000, 7500, 10500, 14000, 18000, 22500,   # levels 1-10
+      27500, 33000, 39000, 45500, 52500, 60000, 68000, 76500, 85500, 95000,   # levels 11-20
+      105000, 115500, 126500, 138000, 150000, 162500, 175500, 189000, 203000, 217500,   # levels 21-30
+      232500, 248000, 264000, 280500, 297500, 315000, 333000, 351500, 370500, 390000,   # levels 31-40
+      410000, 430500, 451500, 473000, 495000, 517500, 540500, 564000, 588000, 612500,   # levels 41-50
+      637500, 663000, 689000, 715500, 742500, 770000, 798000, 826500, 855500, 885000,   # levels 51-60
+    ]
 
 # Evolution trees (decisions 78, 118)
 # Each unit spends its OWN XP on its own tree, commander included. Nodes are permanent

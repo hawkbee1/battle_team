@@ -32,12 +32,12 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-12** "Just limited evolution of unit stats": trees give stat bonuses only (no abilities)? Is each stat capped (e.g. at most +50 % over base)? → decision 118 (stats only, cap 300 % of base)
 - [x] **Q-UNIT-13** Scout observe: +30 m or +30 %? Duration, AP cost, can the scout move while observing? → decision 119
 - [x] **Q-UNIT-14** Section size cap: does it count the commander, the camp, stored units? How does storage capacity relate to it? → decision 127
-- [ ] **Q-UNIT-15** Which 4 units does a new section start with (decision 128)? A fixed list, or chosen by the player?
+- [x] **Q-UNIT-15** Which 4 units does a new section start with (decision 128)? A fixed list, or chosen by the player? → decision 128 (the player buys them with the starting money)
 - [x] **Q-UNIT-16** An action that costs more AP than the unit's `ap_max` (a radio ordered to capture). → decision 132 (each unit lists the actions it can do)
 - [x] **Q-UNIT-17** Guild camp: owner, cap, storage, movement. → decision 141
-- [ ] **Q-UNIT-18** Section AI (decision 20): which behaviours (follow commander, hold, patrol...), do units under AI fire on their own, and what do the units of an offline player do (decision 29 says "passive")?
-- [ ] **Q-UNIT-19** Commander levels: "+1 every 5 levels" is read as a cap of 6 at level 6, 7 at level 11 (decision 127). `commander_levels` stops at level 5, so the cap never grows yet: section XP thresholds beyond level 5, and is there a maximum level?
-- [ ] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change.
+- [x] **Q-UNIT-18** Section AI (decision 20): which behaviours (follow commander, hold, patrol...), do units under AI fire on their own, and what do the units of an offline player do (decision 29 says "passive")? → milestone `milestones/m3-ai-and-automation.md`
+- [x] **Q-UNIT-19** Commander levels: "+1 every 5 levels" is read as a cap of 6 at level 6, 7 at level 11 (decision 127). `commander_levels` stops at level 5, so the cap never grows yet: section XP thresholds beyond level 5, and is there a maximum level? → decision 144 (max level 60)
+- [x] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change. → decision 145 (accepted)
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
@@ -68,7 +68,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-13** Guilds. → decision 108
 - [x] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics? → decision 126 (account linking, channel access by section)
 - [x] **Q-SOC-15** Where a newcomer's units appear (decision 33 said the team's starting point). → decision 129
-- [ ] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it.
+- [x] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it. → decision 146 (a member awaiting the chief's acceptance)
+- [ ] **Q-SOC-17** What happens to a trainee's section when the chief refuses it?
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
@@ -78,8 +79,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-05** Encampment price, HP and armor. → decisions 111, 114
 - [x] **Q-HQ-06** Does the 24-hour lock (decision 120) also start when a section is stored because its commander died (decision 80)? If yes, every commander death would block the section for 24 hours. → decision 125 (no; the commander resurrects in storage)
 - [x] **Q-HQ-07** Where a bought unit arrives, and the room it needs. → decision 130
-- [ ] **Q-HQ-08** Is the arrival of new units at the camp or the HQ blocked by an enemy within 20 m, like deployment (HQ-36)?
-- [ ] **Q-HQ-09** Can a pushed HQ go over the edge of a floating island and fall, like a relic (RELIC-22)?
+- [x] **Q-HQ-08** Is the arrival of new units at the camp or the HQ blocked by an enemy within 20 m, like deployment (HQ-36)? → decision 147 (yes)
+- [x] **Q-HQ-09** Can a pushed HQ go over the edge of a floating island and fall, like a relic (RELIC-22)? → decision 148 (yes)
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)
@@ -108,12 +109,12 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-16** Does morale also affect first-person aim (spread), like `attack` does, to keep both control modes comparable? → decision 95
 - [x] **Q-CBT-17** HQ and encampment "10 armor": armor is a type in the damage table (decision 57), not a number. Is 10 a flat damage reduction per hit for structures, an evasion (`defense`) value, or something else? → decision 114 (no numeric armor)
 - [x] **Q-CBT-18** Can friendly fire take prisoners or cause defections? → decision 131
-- [ ] **Q-CBT-19** Can an enemy commander, or a guild camp, be taken prisoner or defect when a commander deals the final blow?
-- [ ] **Q-CBT-20** Firing cycle of 1-round weapons: `rate_of_fire_rpm` applies "while the magazine is not empty". Is the time between two artillery shots the reload time (10 s), the rate of fire (15 s), or both added (25 s)?
-- [ ] **Q-CBT-21** Weapon inventory: where are bought weapons and swapped-out weapons kept, and is there a limit?
+- [x] **Q-CBT-19** Can an enemy commander, or a guild camp, be taken prisoner or defect when a commander deals the final blow? → decision 149 (no)
+- [x] **Q-CBT-20** Firing cycle of 1-round weapons: `rate_of_fire_rpm` applies "while the magazine is not empty". Is the time between two artillery shots the reload time (10 s), the rate of fire (15 s), or both added (25 s)? → decision 150 (the reload time)
+- [x] **Q-CBT-21** Weapon inventory: where are bought weapons and swapped-out weapons kept, and is there a limit? → decision 151 (in storage until a unit takes one)
 - [x] **Q-CBT-22** Weapon swap time. → decision 134
 - [x] **Q-CBT-23** Full cover (factor 0) versus the 5 % minimum hit chance. → decision 135
 - [x] **Q-CBT-24** Indirect fire: what a hit on a ground position means, and whether splash victims roll separately. → decision 136
-- [ ] **Q-CBT-25** Is the engineer's explosive charge a bombard attack (it has a 4 m splash in `data/combat.yaml`)? Where does a missed bombard shot land?
+- [x] **Q-CBT-25** Is the engineer's explosive charge a bombard attack (it has a 4 m splash in `data/combat.yaml`)? Where does a missed bombard shot land? → decision 152 (yes; bombard attacks never miss)
 - [x] **Q-CBT-26** Armor type of terrain objects; base of the ejection damage. → decision 137
 - [x] **Q-CBT-27** Heal and repair targets. → decision 139

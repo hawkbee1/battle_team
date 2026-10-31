@@ -55,16 +55,16 @@ Acceptance criteria:
 
 ## Issue 4: Paths for pushed relics and HQs
 Label: `search`
-Rules: RELIC-19, RELIC-20, RELIC-21, RELIC-22, RELIC-26, RELIC-28, HQ-11.
+Rules: RELIC-19, RELIC-20, RELIC-21, RELIC-22, RELIC-26, RELIC-28, HQ-11, HQ-48.
 Depends on: 3.
 
 - Relics and HQs cannot fly, and cannot cross water (except on reinforced bridges), forests, towns or walls.
-- A relic can go over the edge of a floating island and fall (RELIC-22). For an HQ, see Q-HQ-09 before implementing.
+- A relic or an HQ can go over the edge of a floating island and fall (RELIC-22, HQ-48).
 - A walled-in relic has no path until a wall is destroyed (RELIC-28).
 - The slope cost is the pushers' (signed, decision 133).
 
 Acceptance criteria:
-- A relic crosses a reinforced bridge but not a normal one, avoids forests and towns, has no path when walled in, and falls from an island edge.
+- A relic crosses a reinforced bridge but not a normal one, avoids forests and towns, has no path when walled in, and falls from an island edge; an HQ falls too.
 
 ## Issue 5: World changes
 Label: `delta`

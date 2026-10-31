@@ -19,16 +19,16 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 2. Seeing and hitting
 ### Targets
 - **COMBAT-11** A unit fires only at targets **it sees itself**, up to its weapon's range. Seeing is limited by vision range, weather, terrain and height (see `specs/10-map-and-terrain.md`, section 5). Scouts and radios share information for awareness, not for aiming. (Decision 59)
-- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62) Splash: COMBAT-55.
+- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Like every bombard attack it never misses (COMBAT-55). (Decisions 62, 152)
 - **COMBAT-13** A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
 
 ### Hit resolution: hybrid
 - **COMBAT-14** When a player is **inside a unit** (first-person control), hits depend on the player's **aim**: projectiles travel in 3D and obstacles block them. The unit's `attack` tightens weapon spread and sway, so an evolved unit still aims better.
 - **COMBAT-15** When a unit acts under **orders or section AI** (top-down control or offline-passive), a **hit chance** is computed (decision 65):
 
-  `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors` (× indirect factor), **clamped to 5–95 %**.
+  `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors`, **clamped to 5–95 %**.
   - distance factor: from 1 at point blank down to 0.5 at maximum range;
-  - cover factor: none or partial; **full cover blocks the shot**: no hit roll, and the clamp does not apply (decision 135);
+  - cover factor: none, partial or full (0); with full cover the clamp still leaves 5 % (decision 135);
   - size factor: by the target's armor type (a tank is easier to hit than a soldier);
   - speed factor: a fast target is harder to hit;
   - morale factor: from 0.9 at morale 0 to 1.1 at morale 100 for the attacker (decision 71). The same factor scales weapon spread in first-person aim (decision 95).
@@ -45,7 +45,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **COMBAT-21** **Damage = weapon base damage × multiplier from the weapon-vs-armor table** (× `airborne_factor` when the target is flying). Nothing else changes it: not unit stats, not cover. (Decisions 57, 65)
 - **COMBAT-22** Armor types: infantry, light vehicle, heavy vehicle, structure, relic (indestructible), HQ.
 - **COMBAT-23** The table lives in `data/combat.yaml`.
-- **COMBAT-55** **Splash** (decision 136): only bombard attacks have splash. Every unit within the weapon's `splash_radius_m` of the impact point is hit at once, without its own hit roll, friend or foe; damage decreases with the distance from the impact point (`splash` in `data/combat.yaml`).
+- **COMBAT-55** **Bombard attacks** (decisions 136, 152): weapons with a `splash_radius_m` (artillery, the engineer's explosive charge). They **never miss** and have no hit chance: the shot lands on the aimed point, and every unit within `splash_radius_m` is hit at once, friend or foe; damage decreases with the distance from the impact point (`splash` in `data/combat.yaml`).
 
 ### Flying targets
 - **COMBAT-24** **Flying is a capability, not an armor type.** A flying unit keeps a normal armor type (for example light vehicle).
@@ -54,7 +54,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 4. Weapons
 ### Weapons are items
 - **COMBAT-26** A unit has **one weapon slot**. Each unit type lists the **weapon types it may use** (`weapons.allowed`). (Decision 52)
-- **COMBAT-27** A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: `data/economy.yaml`).
+- **COMBAT-27** A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: `data/economy.yaml`). Bought and swapped-out weapons are kept in the section's **storage** until a unit takes one (decision 151).
 - **COMBAT-28** Weapons are equipped or swapped **only while the unit is stored or next to its storage place**. (Decision 53)
 
 ### Dropped weapons
@@ -65,12 +65,13 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ### Ammo and reloading
 - **COMBAT-32** **Ammo is unlimited.** Only the loaded magazine is limited. (Decision 54)
 - **COMBAT-33** A **reload always gives a full magazine**; rounds left in it are discarded. The cost of reloading is its time, not lost ammo.
+- **COMBAT-56** A **1-round weapon** (`magazine_capacity: 1`) fires once per reload: the time between two shots is its `reload_time_s` (decision 150).
 
 ### Weapon characteristics
 Each weapon has, besides damage, range and AP per shot:
 | Field | Meaning |
 |---|---|
-| `rate_of_fire_rpm` | Firing speed: shots per minute while the magazine is not empty. |
+| `rate_of_fire_rpm` | Firing speed: shots per minute while the magazine is not empty. Not used by 1-round weapons (COMBAT-56). |
 | `magazine_capacity` | Cartridge capacity: shots before the weapon must be reloaded. |
 | `reload_time_s` | Loading speed: time to load a full magazine. No AP. |
 | `unload_time_s` | Unloading speed: time to unload the weapon. No AP. |
@@ -83,7 +84,7 @@ Each weapon has, besides damage, range and AP per shot:
 
 ## 6. Reaching 0 HP: death, prisoner or defection
 - **COMBAT-36** Normally a unit at 0 HP **dies** (permadeath; the commander resurrects in storage).
-- **COMBAT-37** **Only a commander can take a prisoner or cause a defection**, and only when he **deals the final blow himself**. When any other unit brings the target to 0 HP, it simply dies. The target must be an **enemy**: friendly fire never takes a prisoner or causes a defection (decision 131).
+- **COMBAT-37** **Only a commander can take a prisoner or cause a defection**, and only when he **deals the final blow himself**. When any other unit brings the target to 0 HP, it simply dies. The target must be an **enemy**: friendly fire never takes a prisoner or causes a defection (decision 131). An enemy commander or a guild camp is never spared (decision 149).
 - **COMBAT-38** When a **commander** brings it to 0 HP, there are **odds of another outcome**:
   - the unit is **taken prisoner**;
   - the unit **switches side**: if the attacking section has room under its cap (UNIT-39, UNIT-40), the unit **joins the attacker's section**. The owner loses the unit and the attacker gains it.
@@ -117,7 +118,7 @@ Each weapon has, besides damage, range and AP per shot:
 - **COMBAT-52** Its relay range starts at the `units.yaml` value and grows through its skill tree.
 
 ## 8. Cover
-- **COMBAT-53** Obstacles **block shots**. **Partial cover** (trees, craters, low walls) **lowers the chance of being hit**; it does not reduce damage. In first person it physically hides part of the target. **Full cover** blocks completely. (Decision 65, revises 37e)
+- **COMBAT-53** Obstacles **block shots**. **Partial cover** (trees, craters, low walls) **lowers the chance of being hit**; it does not reduce damage. In first person it physically hides part of the target. **Full cover** blocks completely in first person; under orders or AI it leaves the 5 % minimum (decision 135). (Decision 65, revises 37e)
 
 ## 9. Transports
 - **COMBAT-54** When a transport is destroyed, carried units are **ejected next to the wreck with heavy damage**: a share of their maximum HP (`transport` in `data/combat.yaml`, decision 137).

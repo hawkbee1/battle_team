@@ -34,7 +34,7 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
 2. Every open question gets an ID in `specs/95-open-questions.md` and is ticked when decided, with the number of the decision that settles it.
 3. When an area has no blocking open question left, its status goes to **review**, then **ready** once the designer agrees.
 4. Each rule in a *ready* spec has a short ID so code and tests can reference it. Prefixes: `MAP` (10), `UNIT` (20), `RELIC` (30), `SOC` (40), `HQ` (50), `ECO` (60), `COMBAT` (70).
-   - IDs are **stable**: never renumber. A new rule takes the next free number of its spec; a removed rule keeps its ID, struck through with the decision that removed it.
+   - IDs are **stable**: never renumbered, never reused. A new rule takes the next free number of its spec. A removed rule is simply deleted.
    - A rule change is a new decision in `specs/00-overview.md`; the rule text is updated in place and keeps its ID.
 
 ### Phase 2: implementation with coding agents
@@ -42,4 +42,5 @@ Milestones, in order:
 1. **M0 – Pathfinding** (`milestones/m0-pathfinding.md`): paths for every movement class on an abstract map. Headless.
 2. **M1 – Rules core** (`milestones/m1-rules-core.md`): AP, movement cost, vision and combat resolution, loading `data/*.yaml`, covered by unit tests. No rendering, no network.
 3. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code.
-4. Then: server-side persistence, networking, then the client (outline at the end of `milestones/m1-rules-core.md`).
+4. **M3 – Section AI and automation** (`milestones/m3-ai-and-automation.md`): what units do on their own. A discussion with the designer first.
+5. Then: server-side persistence, networking, then the client (outline at the end of `milestones/m1-rules-core.md`).

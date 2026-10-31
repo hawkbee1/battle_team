@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 8
+version: 9
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -15,13 +15,15 @@ armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Weapon characteristics
 #   base_damage, range_m, ap_per_shot
 #   rate_of_fire_rpm   firing speed: shots per minute while the magazine is not empty
+#                      (not used by 1-round weapons: they fire once per reload_time_s, decision 150)
 #   magazine_capacity  cartridge capacity: shots before a reload is needed
 #   reload_time_s      loading speed: seconds to load a full magazine (no AP cost)
 #   unload_time_s      unloading speed: seconds to unload the weapon (no AP cost)
 #   move_while_loaded  true: the unit can move with the weapon loaded
 #                      false: the weapon must be unloaded before the unit moves
 #   airborne_factor    damage multiplier against a flying target (0 = cannot hit it)
-#   base_accuracy      starting hit chance under orders/AI, before factors (decision 65)
+#   base_accuracy      starting hit chance under orders/AI, before factors (decision 65);
+#                      bombard weapons (with splash_radius_m) have none: they never miss (decision 152)
 #   indirect_fire      true: may target a ground position its section sees or a radio relays (decision 62)
 #   range_m is a cap: a unit only fires at targets it sees itself (decision 59),
 #   except indirect_fire weapons.
@@ -30,9 +32,9 @@ weapon_types:
   rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  base_accuracy: 0.70, rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
   machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  base_accuracy: 0.50, rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
   anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, base_accuracy: 0.60, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
-  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, base_accuracy: 0.40, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
+  artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
   anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  base_accuracy: 0.60, rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
-  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, base_accuracy: 0.90, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
+  explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
 # Weapon prices: data/economy.yaml (the default weapon is included in the unit price).
 
 multipliers:
@@ -43,7 +45,8 @@ multipliers:
   anti_air:    { infantry: 0.3, light_vehicle: 0.3, heavy_vehicle: 0.1,  structure: 0.1, hq: 0.05, relic: 0 }
   explosive:   { infantry: 1.5, light_vehicle: 1.2, heavy_vehicle: 1.0,  structure: 2.0, hq: 1.5,  relic: 0 }
 
-# Splash (decision 136): only bombard attacks have splash (explosive charge: Q-CBT-25).
+# Splash (decisions 136, 152): only bombard attacks have splash: weapons with a splash_radius_m
+# (artillery, explosive charge). They never miss: the shot lands on the aimed point.
 # Every unit within the weapon's splash_radius_m of the impact point is hit at once, without its
 # own hit roll, friend or foe. Damage falls off linearly with the distance, from 1 at the impact
 # point to damage_factor_at_edge at splash_radius_m.
@@ -80,6 +83,7 @@ zero_hp:
   defection_share: 0.5
   only_when_final_blow_by: commander
   target: enemy                    # friendly fire never spares a unit (decision 131)
+  never_spared: [commander, encampment]   # decision 149
 
 # Prisoners (decision 73): stored instantly in the captor section's storage.
 prisoners:
@@ -98,17 +102,16 @@ ammo:
 # chance = weapon.base_accuracy
 #          * (1 + (attacker.attack - target.defense) / 100)
 #          * distance_factor * cover_factor * size_factor * speed_factor
-#          * indirect_factor (indirect fire only)
 #          * morale_factor   (attacker morale, decision 71)
 #          clamped to [min, max]
+# Bombard attacks have no hit chance: they never miss (decision 152).
 # Cover only lowers hit chance; it never reduces damage (decision 65).
 hit_chance:
   clamp: { min: 0.05, max: 0.95 }
   distance_factor: { at_zero: 1.0, at_max_range: 0.5 }   # linear between 0 and range_m
-  cover_factor: { none: 1.0, partial: 0.5, full: 0.0 }   # full = blocked: no roll, no clamp (decision 135)
+  cover_factor: { none: 1.0, partial: 0.5, full: 0.0 }   # full: the clamp still gives 5 % (decision 135)
   size_factor:  { infantry: 0.8, light_vehicle: 1.0, heavy_vehicle: 1.2, structure: 1.5, hq: 2.0, relic: 2.0 }  # by target armor_type
   speed_factor: { per_mps: 0.02, min: 0.5 }   # 1 - per_mps * target speed, not below min
-  indirect_factor: 0.5
   morale_factor: { at_0: 0.9, at_100: 1.1 }   # linear in attacker morale
 
 # First-person aim (decision 58): attack tightens spread and sway.
@@ -123,7 +126,8 @@ dropped_weapons:
   pickup_ap: 5                  # AP to pick up a dropped weapon (exception to time-only handling)
   despawn_after_s: 600          # placeholder
 
-# Weapon swap at storage (decisions 53, 55, 134): time only, no AP.
+# Weapon swap at storage (decisions 53, 55, 134): time only, no AP. Bought and swapped-out
+# weapons are kept in the section's storage until a unit takes one (decision 151).
 weapon_swap:
   time_s: 5
 

@@ -20,6 +20,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 - `milestones/m0-pathfinding.md`: pathfinding on an abstract map (before the rules core).
 - `milestones/m1-rules-core.md`: headless rules core and its issues.
 - `milestones/m2-technical-stack.md`: choice of the technical stack.
+- `milestones/m3-ai-and-automation.md`: section AI, automatic actions and automation (discussion first).
 - Rule IDs: each rule in specs 10–70 has a stable ID (see `README.md`, Phase 1 step 4).
 - Markdown files explain the rules (they teach the game). YAML files hold the numbers (code loads them).
 
@@ -34,7 +35,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 6. Action points (AP): each unit has a **single AP pool**. Move, attack, build, heal etc. all draw from it. AP regenerate over time up to a per-unit maximum.
 
 ### Units and progression (see unit spec)
-7. Start: each player starts with 1 commander plus 3 units of another type. (Revised by decision 128: 4 units.)
+7. Start: each player starts with 1 commander plus 3 units of another type. (Revised by decision 128: the player buys his units.)
 8. XP: each unit earns XP from hits/kills, role actions, objectives, and time survived near the commander.
 9. Evolution: a **skill-point tree** per unit type, nodes bought in any order subject to prerequisites.
 10. Permanence: units and their XP/evolution persist across the battles of a war, and are lost at the end of the war. Permadeath: a killed unit is lost for good (commander excepted). (Revised: earlier versions said "permanent across battles" without the war limit.)
@@ -52,7 +53,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 19. A commander can spend money to buy more troops.
 
 ### Controlling units
-20. Both modes coexist: the player gives direct orders from the top-down camera, or enters a unit. Units that are not directly controlled follow simple section AI behaviours (follow commander, hold, patrol...).
+20. Both modes coexist: the player gives direct orders from the top-down camera, or enters a unit. Units that are not directly controlled follow simple section AI behaviours (follow commander, hold, patrol...). (To be defined in milestone M3, section AI and automation.)
 
 ### Vision
 21. Fog of war, **shared per section only**: a section sees what its own units see. Radios extend this sharing (see Radio).
@@ -78,7 +79,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 32. The player of the highest-ranking commander also manages the team HQ and may delegate that role to another player. Powers: see HQ section below.
 
 ### Joining and leaving
-33. Players can join a running battle at any time, spawning a commander + 3 units at their team's starting point (catch-up mechanics: to be defined). (Revised by decisions 82, 128 and 129: no catch-up; commander + 4 units, arriving at the guild camp or the HQ.)
+33. Players can join a running battle at any time, spawning a commander + 3 units at their team's starting point (catch-up mechanics: to be defined). (Revised by decisions 82, 128 and 129: no catch-up; the commander arrives at the guild camp or the HQ, and the player buys his units.)
 
 ### Radio (purchasable unit)
 34. A **radio** is a special unit that **a commander can buy from the start**.
@@ -91,8 +92,8 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 37c. Hits are hybrid: aim-based when a player is inside a unit, hit chance when units act under orders or AI.
 37d. Damage uses a weapon-type vs armor-type table. Friendly fire is on, full damage.
 37e. Cover blocks shots; partial cover lowers the chance of being hit (revised by decision 65: no damage reduction). Units in a destroyed transport are ejected with heavy damage.
-37f. At 0 HP a unit normally dies. Only when a commander deals the final blow himself, low morale and low AP raise the odds that it is taken prisoner, or switches side into the attacker's section if it has room (keeping its XP and evolution). Prisoners can be exchanged or ransomed. (Revised by decision 131: never through friendly fire.)
-37h. Each weapon has a firing speed, a cartridge (magazine) capacity, a loading speed, an unloading speed, and says whether the unit can move with it loaded.
+37f. At 0 HP a unit normally dies. Only when a commander deals the final blow himself, low morale and low AP raise the odds that it is taken prisoner, or switches side into the attacker's section if it has room (keeping its XP and evolution). Prisoners can be exchanged or ransomed. (Revised by decisions 131 and 149: never through friendly fire, never for commanders or camps.)
+37h. Each weapon has a firing speed, a cartridge (magazine) capacity, a loading speed, an unloading speed, and says whether the unit can move with it loaded. (Decision 150: a 1-round weapon fires once per reload.)
 37g. Morale is changed by the commander aura, nearby kills and ally deaths, and being outnumbered.
 
 ### Map and world (see map spec)
@@ -142,7 +143,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 
 ### Weapons, AP and vision (rules core, see combat and map specs)
 52. Weapons are items. A unit has one weapon slot and a per-type list of allowed weapon types. A newly bought unit comes with its type's default weapon (included in its price); other weapons are bought with section money.
-53. Weapons are equipped or swapped only while the unit is stored or next to its storage place. A killed unit drops its weapon; any unit of any team whose allowed list includes it can pick it up on the spot for an AP cost, dropping its own weapon in its place. Dropped weapons vanish after a delay.
+53. Weapons are equipped or swapped only while the unit is stored or next to its storage place. A killed unit drops its weapon; any unit of any team whose allowed list includes it can pick it up on the spot for an AP cost, dropping its own weapon in its place. Dropped weapons vanish after a delay. (Decision 151: spare weapons are kept in storage.)
 54. Ammo is unlimited; only the loaded magazine is limited. A reload always gives a full magazine and discards the rounds left in it.
 55. Reloading, unloading and swapping weapons cost time only, no AP. Shots, movement, weapon pick-up and role actions cost AP.
 56. A unit with 0 AP is never frozen: it keeps moving as fast as its AP regenerate; a shot or role action waits until it has enough AP. (Revised by decision 132: an action the unit cannot do is refused; decision 138: a pusher without AP waits.)
@@ -152,10 +153,10 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 60. A medic is a soldier with a heal role (category soldier).
 61. Roster v1 adds jeep (vehicle, wheeled), tank (vehicle, tracked), truck (transport, wheeled), helicopter (flying capability) and boat (boat capability, water only) to commander, soldier, medic, engineer, scout, artillery and radio. Stats are placeholders. (Revised by decision 86: `sail` replaces the `boat` capability; decision 141: the guild camp is a unit too.)
 
-62. Indirect fire: weapons flagged `indirect_fire` (artillery) may target a ground position that a unit of their section sees, or that a scout reports through a radio in range, with a lower hit chance. All other weapons need their unit's own sight.
+62. Indirect fire: weapons flagged `indirect_fire` (artillery) may target a ground position that a unit of their section sees, or that a scout reports through a radio in range, with a lower hit chance. All other weapons need their unit's own sight. (Revised by decision 152: bombard attacks never miss.)
 63. Picking up a dropped weapon costs AP (the only weapon handling that does; see 55).
 64. Prisoners and defectors keep their weapon. Units with no weapon (radio, truck) cannot attack.
-65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage. (Clarified by decision 135: full cover blocks the shot.)
+65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage. (Clarified by decision 135: full cover still leaves the 5 % minimum. Revised by decision 152: no indirect factor, bombard attacks never miss.)
 66. Build, repair, heal and capture cost a fixed AP amount paid up front, then take a duration (revised by decision 91: heal is instant; building costs per structure: decision 113); a unit needs the AP to start. Pushing a relic or the HQ costs each pusher AP per metre, like movement, with the slope factor.
 67. An interrupted action loses the AP paid but keeps its progress; resuming costs the AP of the remaining part. Exception: a capture interrupted by an arriving enemy loses its progress (decision 97).
 68. Flying units can land and take off (time, no AP). Landed, they move with their ground class, are hit as ground targets and can load/unload troops. Each map sets a maximum flying altitude. (Revised by decision 142: the map's highest terrain + 10 m.)
@@ -164,7 +165,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 ### Morale, prisoners, defectors, radio (see combat spec)
 70. Morale goes from 0 to 100, starts at a base value (50) and changes only through events (commander aura, nearby kills and ally deaths, being outnumbered). No drift.
 71. Morale slightly scales the attacker's hit chance (factor 0.9 at morale 0 to 1.1 at 100).
-72. 0-HP odds when a commander deals the final blow: p(spared) = 0.6 × ((100 − morale)/100 + (1 − AP/ap_max)) / 2. A spared unit defects or becomes a prisoner, 50/50; defection needs room in the attacking section, else prisoner. (Revised by decision 131: never through friendly fire.)
+72. 0-HP odds when a commander deals the final blow: p(spared) = 0.6 × ((100 − morale)/100 + (1 − AP/ap_max)) / 2. A spared unit defects or becomes a prisoner, 50/50; defection needs room in the attacking section, else prisoner. (Revised by decisions 131 and 149: never through friendly fire, never for commanders or camps.)
 73. A prisoner goes instantly to the captor section's prisoner storage (separate and unlimited, decision 94) and cannot fight or escape. Exchanges and ransoms are negotiated in game between section owners; a ransom goes entirely to the captor section. Prisoners never released are lost at war end.
 74. A defector is an ordinary unit of its new section (it can be killed, captured or defect again). Statistics count a defection for the captor and a loss for the previous owner.
 75. No extra limit on defections beyond the commander-only rule; watch the snowball effect in playtests.
@@ -210,11 +211,11 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 105. Medals are bronze, silver and gold for every kind of action and kill (by target type: units, commanders, jeeps...), earned at thresholds (example: bronze for killing 5 commanders).
 106. Cosmetics are purely visual.
 107. A player's sections share nothing, except cosmetics bought with a sharing option.
-108. Guilds: the creator is the chief (guild commander); he can hand the role to another member and can disband the guild, and cannot leave while chief. Maximum guild size depends on the guild level, which rises with the total XP earned by its sections while in the guild. A guild can have a single section. A section can play without a guild (storage at the HQ).
+108. Guilds: the creator is the chief (guild commander); he can hand the role to another member and can disband the guild, and cannot leave while chief (roles: decision 146). Maximum guild size depends on the guild level, which rises with the total XP earned by its sections while in the guild. A guild can have a single section. A section can play without a guild (storage at the HQ).
 
 ### HQ, storage, economy (round 3)
-109. Any unit of the team can push the HQ. HQ hit points: 1000 (battle setting).
-110. Deploying a stored unit costs it 10 AP; it is then fully operational. Stored units regenerate AP up to their maximum. A unit within 10 m of its storage place is stored at once; from anywhere else a recall takes 6 hours. An enemy within 20 m of a storage place blocks deployment.
+109. Any unit of the team can push the HQ (revised by decision 145: units with the `push` action). HQ hit points: 1000 (battle setting).
+110. Deploying a stored unit costs it 10 AP; it is then fully operational. Stored units regenerate AP up to their maximum. A unit within 10 m of its storage place is stored at once; from anywhere else a recall takes 6 hours. An enemy within 20 m of a storage place blocks deployment (and the arrival of new units, decision 147).
 111. Guild encampment: 500 w€, 300 HP.
 112. Default price of anything not priced: 100 w€. Money earned: hit 1, kill 5, construction 5, heal 5, HQ hit 10, HQ destruction 100. Transfer fees: 2 % inside a guild, 7 % outside. XP cannot be bought. No limit against build-and-destroy farming.
 
@@ -223,7 +224,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 114. The HQ and the encampment have no numeric armor: their armor types are `hq` and `structure`.
 115. Crushing: with 10 + n pushers a relic crushes up to n units in its path; with more blocking units it stops. (Revised by decision 138: crushed units die.)
 116. A relic lost with a destroyed reinforced bridge leaves the battle; a team still needs 5 relics for the timer, so with fewer than 5 left only the HQ victory remains. A lost HQ eliminates its team, as if destroyed.
-117. A relic pushed over the edge of a floating island falls (decision 46d confirmed).
+117. A relic pushed over the edge of a floating island falls (decision 46d confirmed; an HQ too, decision 148).
 118. Skill trees give stat bonuses only, no abilities. Every evolved stat is capped at 300 % of its base value.
 119. Scout observe: +30 m vision for 30 minutes, 10 AP; the scout cannot move while observing.
 120. A player never leaves a battle and stays in his team for its whole duration. He can store his whole section and deploy again when he wants, but not before 24 hours after his last alive unit was stored.
@@ -237,15 +238,15 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 
 ### Round 5 (review of 2026-10-26)
 127. **Section size.** The section size cap is the number of **active** units (on the field), the commander included. It is **5** at commander level 1 and grows by **1 every 5 commander levels**. A section owns at most **2 × cap** units (active + stored); its storage capacity is 2 × cap, so all its units always fit in storage. The guild camp and the HQ do not count toward the cap and cannot be stored.
-128. A new section starts with its commander and **4 units**.
+128. A new section starts with its commander and its starting money (500 w€, decision 102). The player buys his first units with it; at level 1 the cap leaves room for 4 of them on the field.
 129. A new section joins a guild by default, as a **trainee**. Its units arrive at the guild camp, or at the HQ if the guild has no camp. Nobody spawns at the team's starting point.
 130. A bought unit arrives next to the guild camp, or next to the HQ if the guild has no camp or the section has no guild. Buying needs free room in the section.
 131. Friendly fire never takes a prisoner or causes a defection: only a commander's final blow on an **enemy** unit can.
 132. Each unit type lists the **actions it can do**; an order for any other action is refused. A unit never lists an action that costs more AP up front than its `ap_max`.
 133. Slope is **signed**: going uphill costs more AP, going downhill costs less, for moving and for pushing. A slope steeper than the class maximum is impassable both ways.
 134. Swapping a weapon takes **5 s** (time only, no AP).
-135. **Full cover blocks** a shot completely. The 5–95 % clamp applies only to shots that are not blocked.
-136. Only **bombard** attacks have splash. Every unit within the splash radius is hit at once, without its own hit roll; damage decreases with the distance from the impact point.
+135. Full cover gives a cover factor of 0, and the 5–95 % clamp still applies: a unit in full cover keeps a 5 % chance of being hit under orders or AI. In first person, full cover blocks shots completely.
+136. Only **bombard** attacks have splash. Every unit within the splash radius is hit at once, without its own hit roll; damage decreases with the distance from the impact point. (Revised by decision 152: bombard attacks never miss.)
 137. Terrain objects (trees, buildings, constructions) have an armor type, `structure` by default. Ejection damage is a share of the unit's maximum HP. Default values, adjusted later.
 138. A pushed relic or HQ moves at a fixed speed of **5** (`push.speed_mps`; unit to confirm, Q-REL-10). A pusher with no AP left stops and waits for AP; the relic or HQ moves only while at least the minimum number of pushers push. **Crushing kills**: a unit crushed by a pushed or a falling relic dies.
 139. **Heal and repair** work on every friendly unit except the HQ.
@@ -253,6 +254,17 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 141. The **guild camp** (encampment) is a unit of the guild chief's section. It does not count toward his cap and cannot be stored. It moves slowly on its own, cannot fly, and can heal units.
 142. A flying unit cannot fly higher than the map's highest terrain point + **10 m**.
 143. Statistics and medals are computed from the battle logs, and they track friendly kills.
+
+### Round 6 (2026-10-31)
+144. Commander levels go from **1 to 60**. The section size cap grows at levels 6, 11, ..., 56, up to 16 at level 60. The section XP of each level is in `data/units.yaml` (placeholder curve).
+145. The default action lists of `data/units.yaml` are accepted: the radio and the guild camp neither capture nor push; the helicopter and the boat capture but do not push; the camp's heals earn money for the chief's section.
+146. Guild roles: **chief**, **member**, **trainee**. A trainee is a new member that the chief has not accepted yet. A guild has two chats: one for the chief and the members, one for the whole guild.
+147. An enemy within 20 m of a storage place also blocks the **arrival of new units** there.
+148. A pushed HQ can go over the edge of a floating island and **fall**, like a relic: it lands intact and kills the units under it.
+149. An enemy **commander** or a **guild camp** is never taken prisoner and never defects.
+150. A **1-round weapon** fires once per reload: the time between two shots is its reload time.
+151. Bought weapons and swapped-out weapons are kept in the section's **storage** until a unit takes one.
+152. The engineer's explosive charge is a **bombard** attack. Bombard attacks **never miss**: the shot lands on the aimed point and its splash hits every unit around it. They have no hit chance.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

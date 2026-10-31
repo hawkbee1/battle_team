@@ -26,7 +26,7 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 
 Role-specific stats are added per category: medic heal value, scout observe, transport weight limits, radio range, commander aura radius (see section 8). Engineer building: AP + build time per structure (decision 113). Weapon range, splash and terrain deformation belong to the **weapon**, not the unit.
 
-- **UNIT-38** Each unit type lists the **actions it can do** (`actions` in `data/units.yaml`). An order for any other action is refused. A unit never lists an action that costs more AP up front than its `ap_max` (decision 132).
+- **UNIT-38** Each unit type lists the **actions it can do** (`actions` in `data/units.yaml`). An order for any other action is refused. A unit never lists an action that costs more AP up front than its `ap_max` (decisions 132, 145).
 
 ## 3. Weapons
 - **UNIT-03** One weapon slot per unit. Each unit type has a **default weapon** (included in its price) and a list of **allowed** weapon types. (Decision 52)
@@ -70,9 +70,9 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-15** **Section XP sets the commander level.** The level sets the **section size cap** and the **storage capacity** (UNIT-39, UNIT-40).
 - **UNIT-16** Section XP **cannot be spent on stats**, not even the commander's.
 - **UNIT-17** Level table: `progression.commander_levels` in `data/units.yaml`; cap rule: `progression.section_size`.
-- **UNIT-39** **Section size cap** (decision 127): the number of **active** units (on the field), the commander included. **5** at commander level 1, **+1 every 5 commander levels** (levels 1–5: 5, levels 6–10: 6, ...).
+- **UNIT-39** **Section size cap** (decision 127): the number of **active** units (on the field), the commander included. **5** at commander level 1, **+1 every 5 commander levels** (levels 1–5: 5, levels 6–10: 6, ...), up to **16** at level **60**, the maximum (decision 144).
 - **UNIT-40** A section owns at most **2 × cap** units (active + stored). Its **storage capacity is 2 × cap**, so all its units always fit in storage. The guild camp and the HQ do not count toward the cap and cannot be stored (decision 127).
-- **UNIT-41** A new section starts with its commander and **4 units** (decision 128). Which units: Q-UNIT-15.
+- **UNIT-41** A new section starts with its **commander** and its starting money (SOC-15); the player buys his first units with it (decision 128).
 
 ## 6. Evolution: skill-point tree
 - **UNIT-18** **Each unit spends its own XP on itself**, on the **skill-point tree** of its unit type. This includes the commander, with his own XP and his own tree. (Decision 78)
@@ -85,7 +85,6 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 
 ## 7. Commander
 - **UNIT-24** Commander + units = a **section**.
-- ~~**UNIT-25**~~ Removed: duplicate of UNIT-15.
 - **UNIT-26** A commander gives bonuses to nearby units of his section (aura).
 - **UNIT-27** The commander buys troops with money. A bought unit needs free room in the section and arrives next to the guild camp, or next to the HQ (decision 130).
 - **UNIT-28** The commander always resurrects after death (no permadeath for commanders), **at once, without delay**, **in storage** with his section (decisions 80, 125). This stops an inactive player's commander from dying again and again.
