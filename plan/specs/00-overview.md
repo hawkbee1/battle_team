@@ -11,6 +11,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 - `specs/50-hq.md`: HQ role, manager, movement, destruction, storage.
 - `specs/60-economy.md`: money ownership, earning, spending, transfers.
 - `specs/70-combat-and-ap.md` with `data/combat.yaml`: AP, hit resolution, damage, friendly fire, morale, prisoners.
+- `specs/80-ai-and-automation.md`: section AI, automatic actions, automation by players (draft, milestone M1).
 - `specs/90-research-topic-priority.md`: research (industry and academic) on what matters most for success.
 - `specs/95-open-questions.md`: master list of open questions (to-do / done of the spec phase).
 - `specs/96-design-risks.md`: design risks noticed in reviews and not yet addressed.

@@ -119,3 +119,11 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-28** Where does a missed artillery shot land? Friendly fire is on (COMBAT-34). → decision 154
 - [x] **Q-CBT-26** Armor type of terrain objects; base of the ejection damage. → decision 137
 - [x] **Q-CBT-27** Heal and repair targets. → decision 139
+
+## Section AI and automation (80)
+- [ ] **Q-AI-01** A player unit with no order: stays still, or follows a simple behaviour?
+- [ ] **Q-AI-02** Units of an offline player: same as Q-AI-01, or different?
+- [ ] **Q-AI-03** AI agents through the API: same rules and limits as a human player, or their own?
+- [ ] **Q-AI-04** API keys: one per account or per agent, revocable, which sections they can act for?
+- [ ] **Q-AI-05** Server-managed sections: purpose, units, visibility to players.
+- [ ] **Q-AI-06** Server-managed sections: chance to fire per check, and how often a check happens (30 min proposed).

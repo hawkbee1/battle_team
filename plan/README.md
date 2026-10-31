@@ -21,6 +21,7 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
 | `specs/20-units-and-progression.md` + `data/units.yaml` | Unit stats, capabilities, XP, skill trees | ready |
 | `specs/30-special-units-and-victory.md` | Relics, capture, push, victory | ready |
 | `specs/40-newcomers-and-social.md` | Newcomer placement, wars, communication, sections | ready |
+| `specs/80-ai-and-automation.md` | Section AI and automation (milestone M1) | draft |
 | `specs/50-hq.md` | HQ, manager, storage | ready |
 | `specs/60-economy.md` | Money: earning, spending, transfers | ready |
 | `specs/70-combat-and-ap.md` + `data/combat.yaml` | AP, weapons, hits, damage, morale, prisoners | ready |

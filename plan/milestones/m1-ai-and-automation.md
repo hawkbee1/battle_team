@@ -10,13 +10,17 @@ This milestone writes rules only (specs and data), so it needs no technical stac
 - Under orders or AI, hits use the hit chance (COMBAT-15), and both control modes should give comparable results (COMBAT-16).
 - Logging off safely is costly (R-07 in `specs/96-design-risks.md`).
 
-## Topics to discuss
-1. **Behaviours**: the list (follow, hold, patrol, guard a relic, guard the camp or the HQ...), who sets them (the player, the HQ manager), per unit or per group.
-2. **Rules of engagement**: whether AI units fire on their own at the enemies they see, how they choose targets, how they avoid friendly fire (full damage, COMBAT-34), whether artillery fires at relayed targets by itself.
-3. **Automatic actions**: medics healing, engineers repairing, scouts observing, units capturing or pushing, without an order.
-4. **Offline players**: what "passive" means (return fire, stay, retreat), and whether units are stored or recalled automatically when a player goes offline.
-5. **Automation by players**: queued orders, waypoints, timed orders (for example a recall started at a set time), and the limits that keep automation from replacing play.
-6. **Server cost**: how much AI a battle of 100+ players needs (an input for the simulation host, M2 Issue 1).
+## Principles stated by the designer (2026-10-31)
+- No automatic fire and no automatic action for player units; they act only on an order.
+- An API exposes the game's actions to the app and to AI agents. Each call identifies its user.
+- The server creates and runs some sections. They have a limited, chance-based automaticity: a unit that sees an enemy in range fires with a chance checked periodically, not at each entry into range.
+
+## Topics to discuss, top level first
+1. **Units without an order**: player units and units of an offline player (`Q-AI-01`, `Q-AI-02`).
+2. **AI agents and the API**: the rules that apply to them, and the keys that identify users (`Q-AI-03`, `Q-AI-04`).
+3. **Server-managed sections**: their purpose, their units, and the chance-based firing (`Q-AI-05`, `Q-AI-06`).
+
+Only after these three, in this order: behaviours, targeting, queued orders and waypoints, and the server load (an input for the simulation host, M2 Issue 1).
 
 ## Done when
 - `specs/80-ai-and-automation.md` is **ready**, with rule IDs.
