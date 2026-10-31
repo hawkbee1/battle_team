@@ -105,7 +105,7 @@ Depends on: 5, 6.
 
 - `chance = base_accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed × morale factors (× indirect factor)`, clamped to `[min, max]`; full cover (factor 0) still gets the minimum (decision 135).
 - Indirect fire (artillery) may target a ground position seen by its section or relayed by a radio; other weapons need the unit's own sight. The engineer's explosive charge never misses (COMBAT-55).
-- A missed artillery shot lands in a random direction from the aimed point, at `miss_scatter.max_m` × `(roll − chance) / (1 − chance)`, never more than `range_m` (decision 154).
+- A missed artillery shot lands in a random direction from the aimed point, at `miss_scatter.max_m` × `(roll − chance) / (1 − chance)`. The landing point stays within `range_m` of the artillery: a point beyond it is moved back toward the artillery to `range_m` (decision 154). Splash damage does not depend on `range_m`.
 - First-person: spread from `aim` values, tightened by `attack`, scaled by morale. The rules core only provides the spread value; projectile flight is the client's job.
 - Hit roll uses the injected seeded RNG.
 

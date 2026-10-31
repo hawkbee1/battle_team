@@ -51,12 +51,14 @@ multipliers:
 # Every unit within the weapon's splash_radius_m of the impact point is hit at once, without its
 # own hit roll, friend or foe. Damage falls off linearly with the distance, from 1 at the impact
 # point to damage_factor_at_edge at splash_radius_m.
+# Splash damage does not depend on the weapon's range.
 splash:
   falloff: linear
   damage_factor_at_edge: 0.0     # placeholder
 
 # Missed artillery shot (decision 154): it lands in a random direction from the aimed point,
-# at miss_importance x max_m, never more than the weapon's range_m.
+# at miss_importance x max_m. The landing point stays within range_m of the artillery: a point
+# beyond it is moved back toward the artillery to range_m.
 # miss_importance = (roll - chance) / (1 - chance): 0 for a near miss, 1 for the worst miss.
 miss_scatter:
   max_m: 100                     # placeholder

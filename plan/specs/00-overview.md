@@ -267,7 +267,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 151. Bought weapons and swapped-out weapons are kept in the section's **storage** until a unit takes one.
 152. The engineer's explosive charge is a **bombard** attack that **never misses**, like a trap: it goes off on the aimed point and its splash hits every unit around it. Artillery shots keep their hit chance (decision 62).
 153. When the chief refuses a trainee, nothing else happens to its section: it has no guild, stores its units at the HQ, and can apply to another guild.
-154. A missed artillery shot lands away from the aimed point, in a random direction, at a distance proportional to how much it missed, never more than the weapon's range.
+154. A missed artillery shot lands away from the aimed point, in a random direction, at a distance proportional to how much it missed. The landing point always stays within the weapon's range from the artillery. Splash damage around the impact point does not depend on the range.
 155. A guild can be created by any section that is not in a guild and whose commander is **level 10** or more.
 
 ## Open questions
