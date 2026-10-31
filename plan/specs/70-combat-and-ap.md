@@ -7,19 +7,19 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **COMBAT-02** AP regenerate at a **constant rate** (`ap_regen` per second), always, whether the unit is idle, moving or fighting, up to `ap_max`.
 - **COMBAT-03** Movement cost depends on movement class, terrain and slope (`data/terrain.yaml`).
 - **COMBAT-04** **What costs AP:** each shot (`ap_per_shot`), each metre moved, each metre pushed (relic or HQ), picking up a weapon from the ground (decision 63), and role actions.
-- **COMBAT-05** **What costs only time:** reloading, unloading and swapping weapons, landing and taking off. They take their duration but no AP. (Decisions 55, 68)
-- **COMBAT-06** **A unit with 0 AP is never frozen.** It keeps moving, but only as fast as its AP come back. Example: a soldier moving at 5 m/s on grass spends 5 AP/s, more than its regen of 1.5 AP/s; once empty it goes on at about 1.5 m/s. A shot or a role action simply waits until the unit has enough AP. (Decision 56)
+- **COMBAT-05** **What costs only time:** reloading, unloading and swapping weapons, landing and taking off. They take their duration but no AP; a weapon swap takes **5 s** (`weapon_swap` in `data/combat.yaml`). (Decisions 55, 68, 134)
+- **COMBAT-06** **A unit with 0 AP is never frozen.** It keeps moving, but only as fast as its AP come back. Example: a soldier moving at 5 m/s on grass spends 5 AP/s, more than its regen of 1.5 AP/s; once empty it goes on at about 1.5 m/s. A shot or a role action simply waits until the unit has enough AP. An action the unit cannot do (not in its actions, UNIT-38) is refused. (Decisions 56, 132)
 
 ### Role actions (decisions 66, 67)
-- **COMBAT-07** **Build, repair and capture** cost a **fixed AP amount paid up front**, then take their **duration**. A unit must have the AP to start. **Healing is instant** (decision 91). Construction AP and build time per structure: `data/terrain.yaml` (decision 113).
-- **COMBAT-08** **Pushing** a relic or the HQ is movement: each pusher pays **AP per metre** pushed, with the slope factor of its movement class.
-- **COMBAT-09** **Interrupted action** (for example the unit moves away): the AP already paid are **lost**, the **progress is kept**. Resuming costs the AP of the **remaining part** only. **Exception:** a capture interrupted by an enemy entering the capture radius **loses its progress** (decision 97).
+- **COMBAT-07** **Build, repair and capture** cost a **fixed AP amount paid up front**, then take their **duration**. A unit must have the AP to start. **Healing is instant** (decision 91). Heal and repair work on every friendly unit except the HQ (decision 139). Construction AP and build time per structure: `data/terrain.yaml` (decision 113).
+- **COMBAT-08** **Pushing** a relic or the HQ is movement: each pusher pays **AP per metre** pushed, with the slope factor of its movement class (signed, decision 133). Unlike a moving unit, a pusher with no AP left stops and waits for AP (decision 138).
+- **COMBAT-09** **Interrupted action** (for example the unit moves away): the AP already paid are **lost**, the **progress is kept**. Resuming costs the AP of the **remaining part** only. **Exception:** a capture interrupted by an enemy entering the capture radius **loses its progress** (decision 97). Capture progress belongs to the team (RELIC-29, decision 140).
 - **COMBAT-10** Values in `data/combat.yaml` (`actions`, `push`); construction AP and build time per structure: `data/terrain.yaml` (decision 113).
 
 ## 2. Seeing and hitting
 ### Targets
 - **COMBAT-11** A unit fires only at targets **it sees itself**, up to its weapon's range. Seeing is limited by vision range, weather, terrain and height (see `specs/10-map-and-terrain.md`, section 5). Scouts and radios share information for awareness, not for aiming. (Decision 59)
-- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62)
+- **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62) Splash: COMBAT-55.
 - **COMBAT-13** A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
 
 ### Hit resolution: hybrid
@@ -28,7 +28,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 
   `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors` (× indirect factor), **clamped to 5–95 %**.
   - distance factor: from 1 at point blank down to 0.5 at maximum range;
-  - cover factor: none, partial or full (full = cannot be hit);
+  - cover factor: none or partial; **full cover blocks the shot**: no hit roll, and the clamp does not apply (decision 135);
   - size factor: by the target's armor type (a tank is easier to hit than a soldier);
   - speed factor: a fast target is harder to hit;
   - morale factor: from 0.9 at morale 0 to 1.1 at morale 100 for the attacker (decision 71). The same factor scales weapon spread in first-person aim (decision 95).
@@ -41,10 +41,11 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **COMBAT-19** **Neither changes damage.** (Decision 58)
 
 ## 3. Damage: weapon vs armor table
-- **COMBAT-20** Each weapon has a **weapon type**; each unit or object has an **armor type** (`armor_type` in `data/units.yaml`).
+- **COMBAT-20** Each weapon has a **weapon type**; each unit or object has an **armor type** (`armor_type` in `data/units.yaml`; objects: `data/terrain.yaml`, decision 137).
 - **COMBAT-21** **Damage = weapon base damage × multiplier from the weapon-vs-armor table** (× `airborne_factor` when the target is flying). Nothing else changes it: not unit stats, not cover. (Decisions 57, 65)
 - **COMBAT-22** Armor types: infantry, light vehicle, heavy vehicle, structure, relic (indestructible), HQ.
 - **COMBAT-23** The table lives in `data/combat.yaml`.
+- **COMBAT-55** **Splash** (decision 136): only bombard attacks have splash. Every unit within the weapon's `splash_radius_m` of the impact point is hit at once, without its own hit roll, friend or foe; damage decreases with the distance from the impact point (`splash` in `data/combat.yaml`).
 
 ### Flying targets
 - **COMBAT-24** **Flying is a capability, not an armor type.** A flying unit keeps a normal armor type (for example light vehicle).
@@ -53,7 +54,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 4. Weapons
 ### Weapons are items
 - **COMBAT-26** A unit has **one weapon slot**. Each unit type lists the **weapon types it may use** (`weapons.allowed`). (Decision 52)
-- **COMBAT-27** A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: Q-ECO-01).
+- **COMBAT-27** A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: `data/economy.yaml`).
 - **COMBAT-28** Weapons are equipped or swapped **only while the unit is stored or next to its storage place**. (Decision 53)
 
 ### Dropped weapons
@@ -78,14 +79,14 @@ Each weapon has, besides damage, range and AP per shot:
 
 ## 5. Friendly fire
 - **COMBAT-34** **On, full damage.** Artillery, explosions and crossfire hurt allies exactly like enemies.
-- **COMBAT-35** Consequence with permadeath: careless artillery can kill friendly units for good. Statistics and medals tracks friendly kills.
+- **COMBAT-35** Consequence with permadeath: careless artillery can kill friendly units for good. Statistics and medals track friendly kills (decision 143).
 
 ## 6. Reaching 0 HP: death, prisoner or defection
 - **COMBAT-36** Normally a unit at 0 HP **dies** (permadeath; the commander resurrects in storage).
-- **COMBAT-37** **Only a commander can take a prisoner or cause a defection**, and only when he **deals the final blow himself**. When any other unit brings the target to 0 HP, it simply dies.
+- **COMBAT-37** **Only a commander can take a prisoner or cause a defection**, and only when he **deals the final blow himself**. When any other unit brings the target to 0 HP, it simply dies. The target must be an **enemy**: friendly fire never takes a prisoner or causes a defection (decision 131).
 - **COMBAT-38** When a **commander** brings it to 0 HP, there are **odds of another outcome**:
   - the unit is **taken prisoner**;
-  - the unit **switches side**: if the attacking section has room (section size cap), the unit **joins the attacker's section**. The owner loses the unit and the attacker gains it.
+  - the unit **switches side**: if the attacking section has room under its cap (UNIT-39, UNIT-40), the unit **joins the attacker's section**. The owner loses the unit and the attacker gains it.
 - **COMBAT-39** The odds depend on the unit's **morale** and its **AP**: **low morale and low AP raise the odds of surrender (prisoner) or defection**. A fresh, confident unit fights to death. (Decision 72)
 
   `p(spared) = k × ((100 − morale)/100 + (1 − AP/ap_max)) / 2`, with k = 0.6.
@@ -119,7 +120,7 @@ Each weapon has, besides damage, range and AP per shot:
 - **COMBAT-53** Obstacles **block shots**. **Partial cover** (trees, craters, low walls) **lowers the chance of being hit**; it does not reduce damage. In first person it physically hides part of the target. **Full cover** blocks completely. (Decision 65, revises 37e)
 
 ## 9. Transports
-- **COMBAT-54** When a transport is destroyed, carried units are **ejected next to the wreck with heavy damage**.
+- **COMBAT-54** When a transport is destroyed, carried units are **ejected next to the wreck with heavy damage**: a share of their maximum HP (`transport` in `data/combat.yaml`, decision 137).
 
 ## 10. Open questions
 None. See `specs/95-open-questions.md`.

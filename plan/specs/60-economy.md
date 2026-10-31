@@ -11,10 +11,10 @@ Already decided (overview):
 - **ECO-03** medics earn money for their section when healing other units.
 
 ## 3. Spending money
-- **ECO-04** A commander buys **troops** for his section (within the section size cap, which grows with the commander level).
+- **ECO-04** A commander buys **troops** for his section, only when the section has **free room** (UNIT-39, UNIT-40; decision 130).
 - **ECO-05** A commander can buy **radios**.
 - **ECO-06** A guild commander can buy the **guild encampment** (again at any time if destroyed).
-- **ECO-07** Newly bought troops **appear in storage (homeland)**, then are deployed through the section's portal (guild encampment, or HQ for sections without guild), following the storage rules.
+- **ECO-07** A bought unit **arrives next to the section's portal**: the guild camp, or the HQ if the guild has no camp or the section has no guild (decision 130).
 
 ## 4. Transfers
 - **ECO-08** Money can be **transferred between players**, with **fees**.
@@ -38,3 +38,4 @@ Already decided (overview):
 - **ECO-20** **Starting money** of a new section = minStartingMoney = **500 w€** (decision 102).
 - **ECO-21** **XP cannot be bought.**
 - **ECO-22** **No limit** against build-and-destroy farming by engineers.
+- ~~**ECO-23**~~ Removed: duplicate of ECO-15.

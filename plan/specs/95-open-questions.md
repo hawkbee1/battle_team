@@ -1,9 +1,9 @@
 # Open questions (master list)
 
-This is the to-do / done list of the spec phase. Tick a question when it is decided and note the decision number from `00-overview.md`, for example `→ decision 52`. The "Open" sections inside each spec file give more context; they will be replaced by these IDs as questions are decided.
+This is the to-do / done list of the spec phase. Tick a question when it is decided and note the decision number from `00-overview.md`, for example `→ decision 52`. The "Open" sections inside each spec file give more context; they will be replaced by these IDs as questions are decided. Design risks that are not questions are tracked in `specs/96-design-risks.md`.
 
 ## General and technical
-- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24).
+- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24). Studied in `milestones/m2-technical-stack.md`.
 
 ## Map and terrain (10)
 - [x] **Q-MAP-01** Typical map sizes and range of team counts per map. → decision 84
@@ -15,6 +15,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-07** Hit points of trees, buildings, walls, bridges. → decision 89
 - [x] **Q-MAP-08** Day/night and weather. → decisions 59, 90
 - [x] **Q-MAP-09** ~~Performance budget for persistent world changes in a 100+ player battle.~~ Technical: out of scope for the spec phase, like Q-GEN-01.
+- [x] **Q-MAP-10** Is slope signed (going downhill cheaper)? → decision 133
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
@@ -30,6 +31,13 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-11** Team power: does section XP count too? → decision 93
 - [x] **Q-UNIT-12** "Just limited evolution of unit stats": trees give stat bonuses only (no abilities)? Is each stat capped (e.g. at most +50 % over base)? → decision 118 (stats only, cap 300 % of base)
 - [x] **Q-UNIT-13** Scout observe: +30 m or +30 %? Duration, AP cost, can the scout move while observing? → decision 119
+- [x] **Q-UNIT-14** Section size cap: does it count the commander, the camp, stored units? How does storage capacity relate to it? → decision 127
+- [ ] **Q-UNIT-15** Which 4 units does a new section start with (decision 128)? A fixed list, or chosen by the player?
+- [x] **Q-UNIT-16** An action that costs more AP than the unit's `ap_max` (a radio ordered to capture). → decision 132 (each unit lists the actions it can do)
+- [x] **Q-UNIT-17** Guild camp: owner, cap, storage, movement. → decision 141
+- [ ] **Q-UNIT-18** Section AI (decision 20): which behaviours (follow commander, hold, patrol...), do units under AI fire on their own, and what do the units of an offline player do (decision 29 says "passive")?
+- [ ] **Q-UNIT-19** Commander levels: "+1 every 5 levels" is read as a cap of 6 at level 6, 7 at level 11 (decision 127). `commander_levels` stops at level 5, so the cap never grows yet: section XP thresholds beyond level 5, and is there a maximum level?
+- [ ] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change.
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
@@ -40,6 +48,9 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-REL-06** Visibility of the 24-hour victory timer. → decision 100
 - [x] **Q-REL-07** ~~Validate in playtests the fairness of the full timer reset across time zones.~~ Dropped by the designer. → decision 100
 - [x] **Q-REL-08** Decision 46d says a relic can fall from a floating island; the answer to Q-MAP-06 says relics cannot leave floating islands. Which one? → decision 117 (they fall)
+- [x] **Q-REL-09** Push speed, pushers at 0 AP, crush damage and survivors in the path. → decision 138
+- [ ] **Q-REL-10** Push speed "5": `data/*.yaml` uses metres and seconds, and 5 m/s is a running soldier's speed, while relics "move very slowly" (RELIC-03). Is it 5 m/s, or another unit (for example 5 m per minute)?
+- [x] **Q-REL-11** Capture progress: does it belong to the unit or to the team? → decision 140
 
 ## Newcomers, wars and social (40)
 - [x] **Q-SOC-01** Team power formula. → decision 93 (no notion of active players)
@@ -56,6 +67,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-12** Sharing between a player's sections, extra commanders, several wars. → decisions 107, 124
 - [x] **Q-SOC-13** Guilds. → decision 108
 - [x] **Q-SOC-14** Discord integration: account linking, automatic channels per war/team/guild, a bot posting battle events and statistics? → decision 126 (account linking, channel access by section)
+- [x] **Q-SOC-15** Where a newcomer's units appear (decision 33 said the team's starting point). → decision 129
+- [ ] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it.
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
@@ -64,6 +77,9 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-04** Storage capacity per level (decision 79); radii for storing and blocking deployment. → decision 110
 - [x] **Q-HQ-05** Encampment price, HP and armor. → decisions 111, 114
 - [x] **Q-HQ-06** Does the 24-hour lock (decision 120) also start when a section is stored because its commander died (decision 80)? If yes, every commander death would block the section for 24 hours. → decision 125 (no; the commander resurrects in storage)
+- [x] **Q-HQ-07** Where a bought unit arrives, and the room it needs. → decision 130
+- [ ] **Q-HQ-08** Is the arrival of new units at the camp or the HQ blocked by an enemy within 20 m, like deployment (HQ-36)?
+- [ ] **Q-HQ-09** Can a pushed HQ go over the edge of a floating island and fall, like a relic (RELIC-22)?
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)
@@ -91,3 +107,13 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-15** Do prisoners use the captor section's storage capacity? Does a captor with full storage still take prisoners? → decision 94
 - [x] **Q-CBT-16** Does morale also affect first-person aim (spread), like `attack` does, to keep both control modes comparable? → decision 95
 - [x] **Q-CBT-17** HQ and encampment "10 armor": armor is a type in the damage table (decision 57), not a number. Is 10 a flat damage reduction per hit for structures, an evasion (`defense`) value, or something else? → decision 114 (no numeric armor)
+- [x] **Q-CBT-18** Can friendly fire take prisoners or cause defections? → decision 131
+- [ ] **Q-CBT-19** Can an enemy commander, or a guild camp, be taken prisoner or defect when a commander deals the final blow?
+- [ ] **Q-CBT-20** Firing cycle of 1-round weapons: `rate_of_fire_rpm` applies "while the magazine is not empty". Is the time between two artillery shots the reload time (10 s), the rate of fire (15 s), or both added (25 s)?
+- [ ] **Q-CBT-21** Weapon inventory: where are bought weapons and swapped-out weapons kept, and is there a limit?
+- [x] **Q-CBT-22** Weapon swap time. → decision 134
+- [x] **Q-CBT-23** Full cover (factor 0) versus the 5 % minimum hit chance. → decision 135
+- [x] **Q-CBT-24** Indirect fire: what a hit on a ground position means, and whether splash victims roll separately. → decision 136
+- [ ] **Q-CBT-25** Is the engineer's explosive charge a bombard attack (it has a 4 m splash in `data/combat.yaml`)? Where does a missed bombard shot land?
+- [x] **Q-CBT-26** Armor type of terrain objects; base of the ejection damage. → decision 137
+- [x] **Q-CBT-27** Heal and repair targets. → decision 139

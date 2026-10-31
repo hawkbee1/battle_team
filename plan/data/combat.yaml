@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 7
+version: 8
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -33,7 +33,7 @@ weapon_types:
   artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, base_accuracy: 0.40, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
   anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  base_accuracy: 0.60, rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
   explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, base_accuracy: 0.90, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4 }   # engineer charge
-# Weapon prices: see Q-ECO-01 (the default weapon is included in the unit price).
+# Weapon prices: data/economy.yaml (the default weapon is included in the unit price).
 
 multipliers:
   rifle:       { infantry: 1.0, light_vehicle: 0.3, heavy_vehicle: 0.05, structure: 0.1, hq: 0.05, relic: 0 }
@@ -43,13 +43,21 @@ multipliers:
   anti_air:    { infantry: 0.3, light_vehicle: 0.3, heavy_vehicle: 0.1,  structure: 0.1, hq: 0.05, relic: 0 }
   explosive:   { infantry: 1.5, light_vehicle: 1.2, heavy_vehicle: 1.0,  structure: 2.0, hq: 1.5,  relic: 0 }
 
+# Splash (decision 136): only bombard attacks have splash (explosive charge: Q-CBT-25).
+# Every unit within the weapon's splash_radius_m of the impact point is hit at once, without its
+# own hit roll, friend or foe. Damage falls off linearly with the distance, from 1 at the impact
+# point to damage_factor_at_edge at splash_radius_m.
+splash:
+  falloff: linear
+  damage_factor_at_edge: 0.0     # placeholder
+
 friendly_fire: { enabled: true, damage_factor: 1.0 }
 
 # Units carried by a transport (decision 81): each takes this share of every hit on the
 # transport, recomputed with its own armor type. Ejection damage at transport death: 37e.
 transport:
   carried_damage_share: 0.25
-  ejection_damage_share_of_hp: 0.5   # placeholder, explosion damage when ejected
+  ejection_damage_share_of_max_hp: 0.5   # placeholder, explosion damage when ejected (decision 137)
 
 # Morale (decision 70): 0..100, starts at base, changes only through events, no drift.
 morale:
@@ -71,6 +79,7 @@ zero_hp:
   k: 0.6
   defection_share: 0.5
   only_when_final_blow_by: commander
+  target: enemy                    # friendly fire never spares a unit (decision 131)
 
 # Prisoners (decision 73): stored instantly in the captor section's storage.
 prisoners:
@@ -96,7 +105,7 @@ ammo:
 hit_chance:
   clamp: { min: 0.05, max: 0.95 }
   distance_factor: { at_zero: 1.0, at_max_range: 0.5 }   # linear between 0 and range_m
-  cover_factor: { none: 1.0, partial: 0.5, full: 0.0 }
+  cover_factor: { none: 1.0, partial: 0.5, full: 0.0 }   # full = blocked: no roll, no clamp (decision 135)
   size_factor:  { infantry: 0.8, light_vehicle: 1.0, heavy_vehicle: 1.2, structure: 1.5, hq: 2.0, relic: 2.0 }  # by target armor_type
   speed_factor: { per_mps: 0.02, min: 0.5 }   # 1 - per_mps * target speed, not below min
   indirect_factor: 0.5
@@ -114,9 +123,14 @@ dropped_weapons:
   pickup_ap: 5                  # AP to pick up a dropped weapon (exception to time-only handling)
   despawn_after_s: 600          # placeholder
 
+# Weapon swap at storage (decisions 53, 55, 134): time only, no AP.
+weapon_swap:
+  time_s: 5
+
 ap:
   regen_mode: constant          # same rate whatever the unit does (decision 37b)
   at_zero: act_at_regen_rate    # decision 56: movement slows to regen speed; paid actions wait for enough AP
+  # An action that is not in the unit's units.yaml `actions` is refused (decision 132).
   costs_ap: [shot, move, push, pickup_weapon, role_actions]
   time_only: [reload, unload, swap_weapon, land, take_off]   # decisions 55, 68
 
@@ -124,16 +138,21 @@ ap:
 # A unit must have the AP to start. Interrupted: AP lost, progress kept.
 # Constructions (build) have their own AP/time per structure: data/terrain.yaml (decision 113).
 actions:
-  heal:    { instant: true }                             # AP and HP from the medic's role (units.yaml, decision 91)
-  repair:  { ap: 10, duration_s: 10, hp_restored: 50 }   # placeholder, per repair action
-  capture: { settings: data/battle.yaml }                # decision 97
+  heal:    { instant: true, targets: friendly_except_hq }   # AP and HP from the healer's role (units.yaml, decisions 91, 139)
+  repair:  { ap: 10, duration_s: 10, hp_restored: 50, targets: friendly_except_hq }   # placeholder; structures too (decisions 13, 139)
+  capture: { settings: data/battle.yaml, progress_owner: team }   # decisions 97, 140
   interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining, capture_progress_kept: false }   # decisions 67, 97
 
-# Pushing a relic or the HQ (decision 66): AP per metre for each pusher, like movement,
-# multiplied by the slope factor of the pusher's movement class (data/terrain.yaml).
+# Pushing a relic or the HQ (decisions 66, 98, 138): at least min_pushers units that can push
+# (units.yaml actions). The relic or HQ moves at speed_mps. Each pusher pays ap_per_m, multiplied
+# by the signed slope factor of its movement class (data/terrain.yaml). A pusher with no AP left
+# stops and waits for AP; the push stops while fewer than min_pushers push.
 push:
+  speed_mps: 5                  # decision 138; unit to confirm (Q-REL-10)
   ap_per_m: 2.0                 # placeholder
   min_pushers: 10               # decision 98
-  # Crushing (decision 115): with min_pushers + n pushers the relic crushes up to n units
-  # in its path; with more blocking units than n it stops. A pushed HQ never crushes.
+  pusher_without_ap: waits      # decision 138 (a moving unit slows to its regen speed instead, decision 56)
+  # Crushing (decisions 115, 138): with min_pushers + n pushers the relic crushes up to n units
+  # in its path; with more blocking units than n it stops. A crushed unit dies. A pushed HQ never crushes.
   crush_units_per_extra_pusher: 1
+  crush: kills

@@ -3,7 +3,7 @@
 Status: **ready**. Decisions come from the Q&A with the game designer; changes go through `specs/95-open-questions.md`. Each rule has a stable ID (`UNIT-NN`).
 
 ## 1. Unit categories
-commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus radios. **A medic is a soldier with a heal role** (category `soldier`, decision 60).
+commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus radios and the guild camp (category `encampment`, decision 141). **A medic is a soldier with a heal role** (category `soldier`, decision 60).
 - **UNIT-01** **Flying is a capability** (`capabilities: [flying]`), not a unit category: a unit of any suitable category may have it.
 - **UNIT-02** **Sail is a capability** (`capabilities: [sail]`): the unit moves on water with the `sail` profile. Without a ground movement class it is a boat; with one it is amphibious. (Decision 86)
 
@@ -22,8 +22,11 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 | `armor_type` | Armor type used by the weapon-vs-armor damage table (`data/combat.yaml`). |
 | `morale` | 0..100 (see combat spec). |
 | `capabilities` | Optional list of extra abilities: `flying`, `sail`. |
+| `actions` | What the unit can do besides moving and shooting: `capture`, `push`, `build`, `repair`, `heal`, `observe` (UNIT-38). |
 
 Role-specific stats are added per category: medic heal value, scout observe, transport weight limits, radio range, commander aura radius (see section 8). Engineer building: AP + build time per structure (decision 113). Weapon range, splash and terrain deformation belong to the **weapon**, not the unit.
+
+- **UNIT-38** Each unit type lists the **actions it can do** (`actions` in `data/units.yaml`). An order for any other action is refused. A unit never lists an action that costs more AP up front than its `ap_max` (decision 132).
 
 ## 3. Weapons
 - **UNIT-03** One weapon slot per unit. Each unit type has a **default weapon** (included in its price) and a list of **allowed** weapon types. (Decision 52)
@@ -44,6 +47,7 @@ Role-specific stats are added per category: medic heal value, scout observe, tra
 | truck | transport | wheeled | light vehicle | none | carries units by weight |
 | helicopter | vehicle | (flying) | light vehicle | machine gun | flying capability |
 | boat | transport | (water) | light vehicle | machine gun | sail capability, carries units by weight |
+| encampment (guild camp) | encampment | tracked | structure | none | guild chief's, heals, slow, never stored, outside the cap |
 
 Stats in `data/units.yaml` are placeholders, tuned in playtests.
 
@@ -63,9 +67,12 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 
 ### Section XP and commander level (decision 79)
 - **UNIT-14** A **share of every XP point** a unit earns (20 %, placeholder) is **moved to the section's XP**; the unit keeps the rest.
-- **UNIT-15** **Section XP sets the commander level.** The level sets the **section size cap** and the **storage capacity**.
+- **UNIT-15** **Section XP sets the commander level.** The level sets the **section size cap** and the **storage capacity** (UNIT-39, UNIT-40).
 - **UNIT-16** Section XP **cannot be spent on stats**, not even the commander's.
-- **UNIT-17** Level table: `progression.commander_levels` in `data/units.yaml`.
+- **UNIT-17** Level table: `progression.commander_levels` in `data/units.yaml`; cap rule: `progression.section_size`.
+- **UNIT-39** **Section size cap** (decision 127): the number of **active** units (on the field), the commander included. **5** at commander level 1, **+1 every 5 commander levels** (levels 1–5: 5, levels 6–10: 6, ...).
+- **UNIT-40** A section owns at most **2 × cap** units (active + stored). Its **storage capacity is 2 × cap**, so all its units always fit in storage. The guild camp and the HQ do not count toward the cap and cannot be stored (decision 127).
+- **UNIT-41** A new section starts with its commander and **4 units** (decision 128). Which units: Q-UNIT-15.
 
 ## 6. Evolution: skill-point tree
 - **UNIT-18** **Each unit spends its own XP on itself**, on the **skill-point tree** of its unit type. This includes the commander, with his own XP and his own tree. (Decision 78)
@@ -78,8 +85,9 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 
 ## 7. Commander
 - **UNIT-24** Commander + units = a **section**.
+- ~~**UNIT-25**~~ Removed: duplicate of UNIT-15.
 - **UNIT-26** A commander gives bonuses to nearby units of his section (aura).
-- **UNIT-27** The commander buys troops with money.
+- **UNIT-27** The commander buys troops with money. A bought unit needs free room in the section and arrives next to the guild camp, or next to the HQ (decision 130).
 - **UNIT-28** The commander always resurrects after death (no permadeath for commanders), **at once, without delay**, **in storage** with his section (decisions 80, 125). This stops an inactive player's commander from dying again and again.
 - **UNIT-29** **When the commander dies:**
   - he loses a share of his own **unspent XP**; his **level is never lost**;
@@ -93,11 +101,12 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-32** At the end of the war everything is lost. The game keeps **logs, statistics and medals** for consultation (decisions 49g, 49h); cosmetics are kept (49i).
 
 ## 8. Specific unit roles
-- **UNIT-33** **Engineer**: builds and repairs bridges, reinforced bridges, ladders, walls, roads, traps. Earns money for the section by constructing.
+- **UNIT-33** **Engineer**: builds and repairs bridges, reinforced bridges, ladders, walls, roads, traps. He also repairs every friendly unit except the HQ (decision 139). Earns money for the section by constructing.
 - **UNIT-34** **Scout**: shares positions of spotted enemies. Info flows through radios in range to all sections (awareness only: units aim at what they see themselves). Special action **observe**: **+30 m vision for 30 minutes**, 10 AP; the scout cannot move while observing. (Decisions 91, 119)
-- **UNIT-35** **Medic**: soldier with a heal role. **Healing is instant**: it costs AP and restores the medic's `heal` value in HP. Earns money for the section when healing. (Decision 91)
+- **UNIT-35** **Medic**: soldier with a heal role. **Healing is instant**: it costs AP and restores the medic's `heal` value in HP. It works on every friendly unit except the HQ (decision 139). Earns money for the section when healing. (Decision 91)
 - **UNIT-36** **Radio**: purchasable by a commander. Gathers info from team scouts in its area (evolvable range) and shares it with all sections. Slow, not transportable.
 - **UNIT-37** **Transports** (truck, boat): carry units **by weight**: each unit has a weight; a transport has a total weight capacity and a maximum weight per carried unit (decision 91). Carried units **take a share of every hit** on the transport, computed with their own armor type, and are **ejected with explosion damage** when it is destroyed. (Decision 81) Stored units can never be harmed.
+- **UNIT-42** **Guild camp** (encampment, decision 141): a unit of the guild chief's section, outside his cap and never stored. It moves slowly on its own, cannot fly, cannot reach floating islands (decision 88) and heals friendly units. Price, HP and armor: HQ-43.
 
 ## 9. Open questions
 See `specs/95-open-questions.md`, section "Units and progression".

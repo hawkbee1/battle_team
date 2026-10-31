@@ -25,6 +25,7 @@ Consequences for the build:
 - **MAP-08** Late joiners and returning players must receive the delta layer.
 - **MAP-09** Engineers **cannot fill craters**. Destroyed trees and structures **never regrow**. A crater is at most **20 m deep**. (Decision 85)
 - **MAP-10** Hit points: tree 100, building 500, wall 200, bridge 200, reinforced bridge 400 (decision 89, `data/terrain.yaml`).
+- **MAP-40** Objects (trees, buildings, constructions) have an **armor type** for the damage table, `structure` by default (decision 137, `data/terrain.yaml`).
 
 ## 3. Movement
 Each unit belongs to a **movement class**. Moving costs AP. The AP cost depends on the terrain under the unit, on the movement class, and on the slope.
@@ -37,9 +38,9 @@ Movement classes:
 
 Rules:
 - **MAP-15** For each (movement class, terrain type) pair the data file gives either an AP cost per metre or `impassable`.
-- **MAP-16** A **slope factor** multiplies the cost: the steeper the slope, the higher the cost; above a per-class maximum slope the terrain is impassable.
-- **MAP-17** **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain and have altitude limit (terrain max altitude + 10).
-- **MAP-18** **Flying units can land and take off** (decision 68). Both take time, no AP. A landed unit moves with its ground movement class, is hit as a ground target, and can load or unload troops if it carries any. Each map sets a **maximum flying altitude**.
+- **MAP-16** A **slope factor** multiplies the cost. Slope is **signed** (decision 133): going uphill raises the cost, going downhill lowers it, down to a per-class floor. A slope steeper than the per-class maximum, up or down, is impassable.
+- **MAP-17** **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain and cannot fly higher than the map's highest terrain point + 10 m (decision 142, `data/terrain.yaml`).
+- **MAP-18** **Flying units can land and take off** (decision 68). Both take time, no AP. A landed unit moves with its ground movement class, is hit as a ground target, and can load or unload troops if it carries any. Its altitude limit is given by MAP-17.
 - **MAP-19** **Sail is a capability too** (decision 86). A unit with `sail` moves on rivers and lakes with the `sail` profile of the data file. With no ground movement class it is a **boat** (water only); with a ground class as well it is **amphibious**.
 - **MAP-20** **Out of AP:** a moving unit is never frozen; once its AP are empty it moves only as fast as its regen allows (decision 56, combat spec).
 - **MAP-21** The numeric tables live in `data/terrain.yaml`.

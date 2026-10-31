@@ -1,6 +1,7 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
-version: 3
+# `victory` and `storage` hold battle-wide rule values (decisions 45, 110); they are not declared battle settings.
+version: 4
 
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -28,6 +29,18 @@ capture:
 # HQ (decision 109)
 hq:
   hp: 1000                   # armor type: hq (decision 114)
+
+# Victory (decisions 45, 46c): hold relics_to_hold relics for hold_s, or be the last HQ.
+victory:
+  relics_to_hold: 5
+  hold_s: 86400
+
+# Storage and deployment (decision 110).
+storage:
+  store_radius_m: 10         # a unit this close to its storage place is stored at once
+  recall_s: 21600            # recall from anywhere else (6 h); nothing stops it
+  deploy_ap: 10              # AP a unit pays to deploy
+  deploy_block_radius_m: 20  # an enemy this close to the storage place blocks deployment
 
 # Weather (decision 90): changes randomly, per map. No day/night.
 weather:

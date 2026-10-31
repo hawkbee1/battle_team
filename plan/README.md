@@ -9,6 +9,7 @@ This folder holds the game specification and the work plan. The Flutter/Flame co
 | `data/*.yaml` | Numbers (stats, costs, tables): `units`, `combat`, `terrain`, `battle` (battle-setting defaults), `economy`, `medals`. Code loads these files; numbers are never written in code. |
 | `milestones/*.md` | Implementation milestones and their issues, each naming the rule IDs it implements. |
 | `specs/95-open-questions.md` | Master list of open questions. This is the to-do / done list of the spec phase. |
+| `specs/96-design-risks.md` | Design risks noticed in reviews and not yet addressed. |
 
 ## Spec status
 Each spec moves through: **draft** → **review** → **ready**. *Ready* means the area is complete enough for coding agents to implement it, and changes go through the open-questions list.
@@ -24,6 +25,7 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
 | `specs/60-economy.md` | Money: earning, spending, transfers | ready |
 | `specs/70-combat-and-ap.md` + `data/combat.yaml` | AP, weapons, hits, damage, morale, prisoners | ready |
 | `specs/90-research-topic-priority.md` | Research note (input, not a decision) | reference |
+| `specs/96-design-risks.md` | Design risks | tracking |
 
 ## How we work
 
@@ -36,5 +38,8 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
    - A rule change is a new decision in `specs/00-overview.md`; the rule text is updated in place and keeps its ID.
 
 ### Phase 2: implementation with coding agents
-1. First milestone: a headless rules core (AP, movement cost, combat resolution) that loads `data/*.yaml` and is covered by unit tests. No rendering, no network. Issues: `milestones/m1-rules-core.md`.
-2. Then: server-side persistence and networking, then the client.
+Milestones, in order:
+1. **M0 – Pathfinding** (`milestones/m0-pathfinding.md`): paths for every movement class on an abstract map. Headless.
+2. **M1 – Rules core** (`milestones/m1-rules-core.md`): AP, movement cost, vision and combat resolution, loading `data/*.yaml`, covered by unit tests. No rendering, no network.
+3. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code.
+4. Then: server-side persistence, networking, then the client (outline at the end of `milestones/m1-rules-core.md`).

@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 6
+version: 7
 
 common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
@@ -19,6 +19,10 @@ common_stats: [hp, ap_max, ap_regen, attack, defense, move_speed, vision_range, 
 #   `allowed` lists the weapon types it may equip at storage or pick up on the field.
 #   Allowed lists are placeholders.
 # morale: 0..100, starts at data/combat.yaml morale.base. See specs/70-combat-and-ap.md.
+# actions (decision 132): what the unit can do besides moving and shooting:
+#   capture, push, build, repair, heal, observe. An order for any other action is refused.
+#   No listed action costs more AP up front than the unit's ap_max. Lists are placeholders
+#   (Q-UNIT-20). Heal and repair work on every friendly unit except the HQ (decision 139).
 
 units:
   commander:
@@ -27,7 +31,8 @@ units:
     armor_type: infantry
     base: { weight: 1, hp: 200, ap_max: 100, ap_regen: 2.0, attack: 15, defense: 10, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun] }
-    role: { aura_radius: 30 }  # section size cap and storage: progression.commander_levels
+    actions: [capture, push]
+    role: { aura_radius: 30 }  # section size cap and storage: progression.section_size
     permadeath: false          # resurrects in storage at once (decisions 80, 125)
   soldier:
     category: soldier
@@ -35,12 +40,14 @@ units:
     armor_type: infantry
     base: { weight: 1, hp: 100, ap_max: 60, ap_regen: 1.5, attack: 12, defense: 5, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun, anti_tank, anti_air] }
+    actions: [capture, push]
   engineer:
     category: engineer
     movement_class: foot
     armor_type: infantry
     base: { weight: 1, hp: 90, ap_max: 80, ap_regen: 1.5, attack: 6, defense: 4, move_speed: 4, vision_range: 120 }
     weapons: { default: rifle, allowed: [rifle, explosive] }
+    actions: [capture, push, build, repair]
     role: { build: [bridge, reinforced_bridge, ladder, wall, road_segment, trap], repair: true }
   scout:
     category: scout
@@ -48,6 +55,7 @@ units:
     armor_type: infantry
     base: { weight: 1, hp: 70, ap_max: 70, ap_regen: 2.0, attack: 5, defense: 8, move_speed: 7, vision_range: 300 }
     weapons: { default: rifle, allowed: [rifle] }
+    actions: [capture, push, observe]
     role: { reports_to_radio: true, observe: { vision_bonus_m: 30, duration_s: 1800, ap: 10, can_move: false } }   # decision 119
   medic:
     category: soldier          # decision 60: a medic is a soldier with a heal role
@@ -55,6 +63,7 @@ units:
     armor_type: infantry
     base: { weight: 1, hp: 80, ap_max: 70, ap_regen: 1.5, attack: 4, defense: 3, move_speed: 5, vision_range: 120 }
     weapons: { default: rifle, allowed: [rifle] }
+    actions: [capture, push, heal]
     role: { heal: 20, heal_ap: 10, earns_money_when_healing: true }   # instant heal: 10 AP restores 20 HP (decision 91)
   artillery:
     category: artillery
@@ -62,22 +71,28 @@ units:
     armor_type: light_vehicle
     base: { weight: 8, hp: 150, ap_max: 80, ap_regen: 1.0, attack: 10, defense: 2, move_speed: 2, vision_range: 100 }
     weapons: { default: artillery, allowed: [artillery] }   # range, splash, deformation: weapon data
+    actions: [capture, push]
   radio:
     category: radio
     movement_class: tracked
     armor_type: structure
     base: { weight: 10, hp: 250, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 80 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
+    actions: []                 # ap_max 40 < capture AP 50; does not push (Q-UNIT-20)
     role: { relay_range: 150, shares_with: all_sections_of_team, transportable: false }   # starting range, evolves via tree
     purchasable_by: commander   # normal unit: destructible, can be captured, stored (decision 76)
 
-  encampment:
+  encampment:                   # guild camp (decision 141)
     category: encampment          # guild storage place with a portal (decisions 28, 46h4)
-    movement_class: tracked
+    owner: guild_commander        # a unit of the guild chief's section
+    counts_in_section_cap: false  # outside the cap, and never stored (decision 127)
+    storable: false
+    movement_class: tracked       # moves slowly on its own; cannot fly or reach floating islands (decision 88)
     armor_type: structure
     base: { weight: 50, hp: 300, ap_max: 40, ap_regen: 0.5, attack: 0, defense: 0, move_speed: 0.3, vision_range: 50 }
     weapons: { default: null, allowed: [] }
-    role: { transportable: false }
+    actions: [heal]
+    role: { heal: 20, heal_ap: 10, earns_money_when_healing: true, transportable: false }   # placeholders (Q-UNIT-20)
     purchasable_by: guild_commander   # price: data/economy.yaml; armor type structure (decision 114)
 
   # Roster v1 additions (decision 61)
@@ -87,18 +102,21 @@ units:
     armor_type: light_vehicle
     base: { weight: 4, hp: 180, ap_max: 120, ap_regen: 2.0, attack: 8, defense: 6, move_speed: 15, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
+    actions: [capture, push]
   tank:
     category: vehicle
     movement_class: tracked
     armor_type: heavy_vehicle
     base: { weight: 12, hp: 600, ap_max: 100, ap_regen: 1.5, attack: 10, defense: 1, move_speed: 6, vision_range: 120 }
     weapons: { default: anti_tank, allowed: [anti_tank, machine_gun] }
+    actions: [capture, push]
   truck:
     category: transport
     movement_class: wheeled
     armor_type: light_vehicle
     base: { weight: 8, hp: 250, ap_max: 120, ap_regen: 2.0, attack: 0, defense: 3, move_speed: 12, vision_range: 100 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
+    actions: [capture, push]
     role: { max_total_weight: 6, max_unit_weight: 2 }   # decision 91
   helicopter:
     category: vehicle
@@ -108,6 +126,7 @@ units:
     armor_type: light_vehicle
     base: { weight: 6, hp: 200, ap_max: 120, ap_regen: 2.0, attack: 10, defense: 10, move_speed: 20, vision_range: 300 }
     weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
+    actions: [capture]          # does not push (Q-UNIT-20)
   boat:
     category: transport
     movement_class: null        # water only (sail without ground class)
@@ -115,6 +134,7 @@ units:
     armor_type: light_vehicle
     base: { weight: 6, hp: 200, ap_max: 100, ap_regen: 2.0, attack: 8, defense: 4, move_speed: 8, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
+    actions: [capture]          # water only: does not push (Q-UNIT-20)
     role: { max_total_weight: 4, max_unit_weight: 2 }   # boards/unloads next to the shore (decision 86)
 
 # Progression (decisions 77-79)
@@ -134,12 +154,22 @@ progression:
   victory_xp: 1                   # per unit of the winning team; normal section share applies (decision 92)
   section_xp_share: 0.2           # share of each XP point earned by a unit, moved to section XP
   # Section XP sets the commander level. It cannot be spent on stats.
-  commander_levels:               # placeholders; storage capacity: Q-HQ-04
-    - { level: 1, section_xp: 0,     section_size_cap: 4,  storage_capacity: 8 }
-    - { level: 2, section_xp: 500,   section_size_cap: 6,  storage_capacity: 12 }
-    - { level: 3, section_xp: 1500,  section_size_cap: 8,  storage_capacity: 16 }
-    - { level: 4, section_xp: 4000,  section_size_cap: 11, storage_capacity: 22 }
-    - { level: 5, section_xp: 10000, section_size_cap: 15, storage_capacity: 30 }
+  # Section size (decision 127). The cap counts ACTIVE units (on the field), the commander included:
+  #   cap = cap_at_level_1 + floor((level - 1) / extra_unit_every_levels)   (levels 1-5: 5, 6-10: 6...)
+  # A section owns at most max_units_factor x cap units (active + stored), which is also its
+  # storage capacity, so all its units always fit in storage. The guild camp (encampment) and
+  # the HQ are not counted and cannot be stored.
+  section_size:
+    cap_at_level_1: 5
+    extra_unit_every_levels: 5
+    max_units_factor: 2
+  starting_units: 4               # besides the commander (decision 128); which units: Q-UNIT-15
+  commander_levels:               # placeholders; the cap first grows at level 6 (Q-UNIT-19)
+    - { level: 1, section_xp: 0 }
+    - { level: 2, section_xp: 500 }
+    - { level: 3, section_xp: 1500 }
+    - { level: 4, section_xp: 4000 }
+    - { level: 5, section_xp: 10000 }
 
 # Evolution trees (decisions 78, 118)
 # Each unit spends its OWN XP on its own tree, commander included. Nodes are permanent

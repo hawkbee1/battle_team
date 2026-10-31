@@ -5,7 +5,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 1. Team power and newcomer placement
 - **SOC-01** Each team has a **power** value.
 - **SOC-02** A new player is placed in the **team with the lowest power**.
-- **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** among the guilds that have **opted in to accept new players**. The player chooses one of them.
+- **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** among the guilds that have **opted in to accept new players**. The player chooses one of them. His new section joins it as a **trainee** (decision 129; what a trainee is: Q-SOC-16).
 - **SOC-04** Why (research note): early friends and guild membership are the strongest predictors of staying; having a choice supports autonomy; joining the weakest team helps balance battles.
 
 - **SOC-05** **Team power = unit XP + section XP** of the team. The rules have **no notion of active or inactive players**. (Decision 93)
@@ -18,7 +18,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ## 2. Money safety net (minStartingMoney)
 - **SOC-10** When a commander **dies** or **loses all his units**, his money becomes:
   `money = max(money_before_event, war.minStartingMoney)`
-- **SOC-11** `minStartingMoney` is a variable of the **war** entity. Its value comes from the war's lore and settings (to be defined).
+- **SOC-11** `minStartingMoney` is a variable of the **war** entity. Its value comes from the war's lore and settings (default: SOC-15).
 - **SOC-12** Effect: a player can always rebuild a minimum section, which limits the "lost everything, quit" pattern seen with permadeath (research note B4, B5).
 
 - **SOC-13** A **war** is a **series of battles**. Its settings and lore (including `minStartingMoney`) apply to all its battles.
@@ -37,12 +37,14 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-22** **War and battle statistics** are available during and after the war.
 
 ### What a player keeps after a war
+- ~~**SOC-23**~~ Removed: duplicate of SOC-22.
 - **SOC-24** **War medals**: earned during a war, attached to that war.
 - **SOC-25** **Game medals**: permanent, account-level.
 - **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Thresholds in `data/medals.yaml`. (Decision 105)
 - **SOC-27** **Cosmetics** for sections and units: bought with **real money** during a war, **kept after the war** and can be applied to other units later. They are **purely visual**. (Decision 106)
+- ~~**SOC-28**~~ Removed: duplicate of SOC-19.
 - **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; on a tie, the one whose commander has the most XP. (Decision 121)
-- **SOC-30** A player can **join a running war at any time**, entering the **current battle** (commander + 3 units at his team's starting point, decision 33). (Decision 122)
+- **SOC-30** A player can **join a running war at any time**, entering the **current battle** (commander + 4 units, arriving at the guild camp, or at the HQ if the guild has no camp; decisions 128, 129). (Decision 122)
 
 ## 3. Communication is fundamental
 Three channels are core features of the game, not extras:
@@ -54,7 +56,7 @@ Three channels are core features of the game, not extras:
 - **SOC-35** **Most communication may happen on a Discord server** rather than in the game.
 
 - **SOC-36** Communication **history is kept**.
-- **SOC-37** **In game: pings and map markers.** guild and direct chat, voice happens **on Discord**. Team chat is sync between discord and game.
+- **SOC-37** **In game: pings, map markers and team chat.** Team chat is synced between the game and Discord. Guild chat, direct chat and voice happen **on Discord**. (Decision 123)
 - **SOC-38** **Game and Discord accounts are linked.** Access to Discord channels depends on the player's **sections** (their wars, teams and guilds). (Decision 126)
 - **SOC-39** Moderation tools are deferred until after a few real battles (Q-SOC-11).
 

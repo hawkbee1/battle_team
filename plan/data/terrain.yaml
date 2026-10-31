@@ -1,20 +1,23 @@
 # Draft terrain table. All numbers are PLACEHOLDERS to be tuned.
 # ap_cost_per_m: AP spent per metre moved (before the slope factor).
 # null means impassable for that movement class or profile.
-version: 4
+version: 5
 movement_classes: [foot, wheeled, tracked]
 # The `flying` and `sail` entries below are movement PROFILES, used by units that have the
 # flying or sail capability (data/units.yaml). They are not movement classes.
 # A landed flying unit uses its ground movement_class (decision 68).
-# Maximum flying altitude is a per-map setting in the map file, not here.
+# Flying altitude limit: the map's highest terrain point + this many metres (decision 142).
+flying_max_above_highest_terrain_m: 10
 
 slope:
-  # cost multiplier = 1 + slope_degrees * factor ; impassable above max_degrees
-  foot:    { factor: 0.05, max_degrees: 45 }
-  wheeled: { factor: 0.10, max_degrees: 25 }
-  tracked: { factor: 0.07, max_degrees: 35 }
-  flying:  { factor: 0.0,  max_degrees: 90 }
-  sail:    { factor: 0.0,  max_degrees: 90 }   # water is flat
+  # Slope is signed (decision 133): positive uphill, negative downhill.
+  # cost multiplier = max(min_multiplier, 1 + slope_degrees * factor)
+  # Impassable when the slope, up or down, is steeper than max_degrees. Pushing uses the same multiplier.
+  foot:    { factor: 0.05, max_degrees: 45, min_multiplier: 0.5 }   # min_multiplier: placeholder
+  wheeled: { factor: 0.10, max_degrees: 25, min_multiplier: 0.5 }
+  tracked: { factor: 0.07, max_degrees: 35, min_multiplier: 0.5 }
+  flying:  { factor: 0.0,  max_degrees: 90, min_multiplier: 1.0 }
+  sail:    { factor: 0.0,  max_degrees: 90, min_multiplier: 1.0 }   # water is flat
 
 # Vision (decision 59)
 # effective_vision = vision_range * weather.vision_factor * terrain[observer].vision_factor
@@ -28,7 +31,7 @@ vision:
   forest_vision_cost_per_m: 4.0
   destroyed_objects_block: false
 
-# Weather is a per-battle state that changes over time (decision 59). Change rules: Q-MAP-08.
+# Weather is a per-battle state that changes randomly, per map (decisions 59, 90; data/battle.yaml).
 weather:
   clear: { vision_factor: 1.0 }
   rain:  { vision_factor: 0.7 }
@@ -90,14 +93,15 @@ craters:
   fillable_by_engineers: false
 
 # Objects (decision 89: HP). Destroyed trees and structures never regrow (decision 85).
+# Every object has an armor type for the damage table: structure by default (decision 137).
 # Constructions (decision 113): AP paid up front + build time, no money. Values are placeholders
 # except the reinforced bridge (decision 99).
 objects:
-  tree:      { blocks_los: false, conceals: forest, destructible: true, hp: 100 }
-  building:  { blocks_los: true,  destructible: true, hp: 500 }
-  wall:      { blocks_los: true,  destructible: true, hp: 200, built_by: engineer, ap: 10, build_time_s: 300 }
-  bridge:    { blocks_los: false, destructible: true, hp: 200, built_by: engineer, relic_crossable: false, ap: 10, build_time_s: 300 }
-  reinforced_bridge: { blocks_los: false, destructible: true, hp: 400, built_by: engineer, relic_crossable: true, ap: 20, build_time_s: 600 }  # decision 99
-  ladder:    { blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
-  road_segment: { blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
-  trap:      { blocks_los: false, destructible: true, hp: 50, built_by: engineer, hidden_from_enemies: true, ap: 5, build_time_s: 60 }
+  tree:      { armor_type: structure, blocks_los: false, conceals: forest, destructible: true, hp: 100 }
+  building:  { armor_type: structure, blocks_los: true,  destructible: true, hp: 500 }
+  wall:      { armor_type: structure, blocks_los: true,  destructible: true, hp: 200, built_by: engineer, ap: 10, build_time_s: 300 }
+  bridge:    { armor_type: structure, blocks_los: false, destructible: true, hp: 200, built_by: engineer, relic_crossable: false, ap: 10, build_time_s: 300 }
+  reinforced_bridge: { armor_type: structure, blocks_los: false, destructible: true, hp: 400, built_by: engineer, relic_crossable: true, ap: 20, build_time_s: 600 }  # decision 99
+  ladder:    { armor_type: structure, blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
+  road_segment: { armor_type: structure, blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
+  trap:      { armor_type: structure, blocks_los: false, destructible: true, hp: 50, built_by: engineer, hidden_from_enemies: true, ap: 5, build_time_s: 60 }
