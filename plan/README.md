@@ -8,7 +8,7 @@ This folder holds the game specification and the work plan. The rest of the repo
 | `specs/*.md` | Rules of the game, written to teach it. One file per area. |
 | `data/*.yaml` | Numbers (stats, costs, tables): `units`, `combat`, `terrain`, `battle` (battle-setting defaults), `economy`, `medals`. Code loads these files; numbers are never written in code. |
 | `milestones/*.md` | Implementation milestones and their issues, each naming the rule IDs it implements. |
-| `stack/*.md` | Technical stack decision records (milestone M2), one per issue. Proposals until confirmed. |
+| `stack/*.md` | Technical stack decision records (milestone M2), one per issue, confirmed by the designer on 2026-11-01. |
 | `milestones/performance-tests.md` | Performance tests, written with the code they measure; each has a target from a stack record. |
 | `specs/95-open-questions.md` | Master list of open questions. This is the to-do / done list of the spec phase. |
 | `specs/96-design-risks.md` | Design risks noticed in reviews and not yet addressed. |
@@ -45,7 +45,7 @@ Specs and data never depend on the technical stack. **No code is written before 
 
 Milestones, in order:
 1. **M1 – Section AI and automation** (`milestones/m1-ai-and-automation.md`): rules for what units do on their own. A discussion with the designer; no code.
-2. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code. No code.
+2. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code. No code. Done on 2026-11-01.
 3. **M3 – Pathfinding** (`milestones/m3-pathfinding.md`): paths for every movement class, headless.
 4. **M4 – Rules core** (`milestones/m4-rules-core.md`): AP, movement cost, vision and combat resolution, loading `data/*.yaml`, covered by unit tests. No rendering, no network.
 5. **M5 to M7**: server-side persistence, networking, then the client (outline at the end of `milestones/m4-rules-core.md`).

@@ -92,5 +92,5 @@ Acceptance criteria:
 - The outline of M5 to M7 at the end of `milestones/m4-rules-core.md` is rewritten for the chosen stack.
 
 ## Status (2026-11-01)
-- The eight records exist in `plan/stack/`. The three conditions above are met; M2 ends when the designer has confirmed all eight. Confirmed: 01 to 05.
+- **M2 is done.** The designer confirmed the eight records in `plan/stack/` on 2026-11-01. Code can start: M3 and M4 do not depend on each other.
 - No open question is left.

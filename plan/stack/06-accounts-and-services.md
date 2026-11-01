@@ -1,6 +1,6 @@
 # Stack decision 6: accounts and external services
 
-Status: **proposed** (milestone M2, Issue 6). Rules: SOC-16 (admins create wars and battles), SOC-27 (cosmetics bought with real money), SOC-37 and SOC-38 (Discord linking and team chat synced with Discord); decisions 126, 158, 161, 162, 165; AI-03, AI-04, AI-05, AI-09.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 6). Rules: SOC-16 (admins create wars and battles), SOC-27 (cosmetics bought with real money), SOC-37 and SOC-38 (Discord linking and team chat synced with Discord); decisions 126, 158, 161, 162, 165; AI-03, AI-04, AI-05, AI-09.
 
 ## What the rules require
 - **Player accounts**, one per player, and a player holds several commanders (`specs/40-newcomers-and-social.md`).
@@ -10,17 +10,29 @@ Status: **proposed** (milestone M2, Issue 6). Rules: SOC-16 (admins create wars 
 - **One API key per account** (decision 158), revocable by the user or an admin, with every action attributed to the key's owner (decision 162).
 
 ## Accounts
-**Appwrite Auth** in the shared Hawkbee project. The app already uses it (`appwrite_api_client`), and the sessions it issues authenticate the WebSocket connection (stack decision 3).
+**Appwrite Auth** in the shared Hawkbee project: the local instance in development, probably an Appwrite Cloud project live (stack decision 1). The app already uses it (`appwrite_api_client`). The socket signs in with a short-lived JWT that Appwrite Auth issues (stack decision 3).
 
 ## Discord
-- **Linking**: Discord OAuth2, done through Appwrite's OAuth support, if the Appwrite version used offers a Discord provider. **To verify** on the project before implementation. Otherwise, a direct OAuth2 flow with the server as the callback.
-- **Team chat sync**: a Discord bot. Its gateway connection is long-lived, so it cannot run in a serverless function. It runs in a small separate Dart service ("bridge") that talks to the simulation host through the same command API as the other senders. Bridge messages are logged with their origin.
+- **Linking**: Discord OAuth2 through Appwrite's Discord provider, which Appwrite Auth offers. **To verify** on the project: that it links a Discord identity to an existing account instead of creating a new user.
+- **Team chat sync**: a Discord bot in a small separate Dart service ("bridge"), built on the `nyxx` package (Discord Gateway and REST). Its gateway connection is long-lived, so it cannot run in a serverless function: it runs in its own Docker container next to the host. It talks to the simulation host through the same command API as the other senders, and its messages are logged with their origin.
+- Reading message text needs Discord's privileged **Message Content** intent, which Discord must approve once the bot is in more than 100 servers.
 
 ## Cosmetics and payments
-- **iOS and Android**: the store's own billing (App Store and Google Play). Digital goods sold inside an app must use the store's billing. **Store rules to verify** before release.
-- **Web and Windows**: a card payment provider (Stripe is the default candidate), with a hosted checkout.
+Decided by the designer (2026-11-01):
+- **Purchases happen only in the web version**, through a card payment provider (Stripe by default) with a hosted checkout.
+- The **iOS and Android apps have no shop and no link to it**, so store billing is not used. The desktop apps (Windows, Linux, and macOS, shipped outside the Mac App Store) have no shop but link to the web shop.
+- A cosmetic belongs to the account, so one bought on the web shows on every platform.
+- **To verify before release**: Apple's rule on items bought outside the app in multi-platform games (App Review Guideline 3.1.3(b)) and Google Play's equivalent. Store rules change often.
 - The server grants a cosmetic only after verifying the purchase, once per purchase (idempotent, so a repeated notification grants nothing twice).
 - Cosmetics are visual only (decision 106), so a grant never touches the rules core.
+
+## Error reporting (Sentry)
+Decided by the designer (2026-11-01):
+- **Sentry** collects errors and crashes from the Flutter client on all six targets (`sentry_flutter`), the simulation host, the Discord bridge and the Appwrite Functions (`sentry`, Dart VM and web). `sentry_dart_plugin` uploads debug symbols so native and obfuscated stack traces stay readable.
+- Pure packages (`battle_rules`, `battle_pathfinding`, `battle_protocol`, `battle_map`, `battle_stats`) never call Sentry. Their callers report, through an `ErrorReporter` port (stack decision 7), so tests use a fake.
+- Environments `development` and `production`; the release is the app or service version.
+- No personal data in reports: the account ID only, no email, no chat text. The data region (EU or US) is chosen with the Sentry plan.
+- Sentry is for errors only. Gameplay history stays in the battle logs (stack decision 2).
 
 ## Admin tools
 - Admins are identified with an Appwrite team or label, checked on the server.
@@ -37,5 +49,5 @@ Status: **proposed** (milestone M2, Issue 6). Rules: SOC-16 (admins create wars 
 Every logged action has one origin: **player**, **AI** or **server** (decisions 162 and 166). A player's session tags a player action; an API key tags an AI action; the server's own identity tags a server action (decision 165).
 
 ## Consequences
-- Appwrite Auth, the Discord provider and the store billing each have external limits and rules. They are checked before the milestone that uses them (M5 and M7), not assumed here.
-- The bridge and the payment handler are separate services. They are not part of the rules core.
+- Appwrite Auth, the Discord provider, Discord's intents and the payment provider each have external limits and rules. They are checked before the milestone that uses them (M5 and M7), not assumed here.
+- The bridge and the payment webhook handler are separate services. They are not part of the rules core.

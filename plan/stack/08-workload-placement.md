@@ -1,6 +1,6 @@
 # Stack decision 8: where the work runs (client, serverless, server)
 
-Status: **proposed** (milestone M2, Issue 8). Rules: decisions 2, 3, 143, 157, 158, 161, 162, 167 to 172, 183; COMBAT-14; SOC-16, SOC-27, SOC-37, SOC-38. The Appwrite facts below were checked on 2026-11-01 against the Appwrite documentation.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 8). Rules: decisions 2, 3, 143, 157, 158, 161, 162, 167 to 172, 183; COMBAT-14; SOC-16, SOC-27, SOC-37, SOC-38. The Appwrite facts below were checked on 2026-11-01 against the Appwrite documentation.
 
 ## Principle
 Authority does not move. Whatever decides an outcome (a move, a hit, a capture, AP, morale, the victory, a statistic, a medal) runs on the simulation host, or in a function that reads the host's logs. A client may run any work that only changes what is shown, or what is checked before it is sent. The host checks it again. A client's result is never trusted, so a modified client gains nothing.
@@ -9,6 +9,7 @@ Authority does not move. Whatever decides an outcome (a move, a hit, a capture, 
 - **Runtimes:** Dart is supported. `backend/functions/ping` already runs on `dart-3.13`.
 - **Triggers:** Appwrite events, HTTP calls, and cron schedules (the shortest interval is one minute).
 - **Timeout:** 900 seconds maximum, the system-wide limit that `_APP_FUNCTIONS_TIMEOUT` sets on a self-hosted instance. A community thread reports that synchronous executions stop at 30 seconds whatever the timeout. **To verify on the project** before relying on it; long work runs asynchronously.
+- **Self-hosted versus Cloud:** these facts were checked for a self-hosted instance (development). Live, on Appwrite Cloud, the plan's limits apply (timeout, executions, cron); they are checked when the plan is chosen.
 - **No persistent state:** a function has no connection that lasts between calls and no memory kept from one call to the next. It cannot hold a live battle or a WebSocket.
 
 Sources: [Appwrite Functions documentation](https://appwrite.io/docs/products/functions/functions.md), [Appwrite self-hosting, function runtimes](https://appwrite.io/docs/advanced/self-hosting/configuration/functions.md), [community thread on the 30-second limit](https://appwrite.io/threads/1261111233646690427).
@@ -30,12 +31,23 @@ The AP rules bound the work (stack decision 1). A 1,000-unit battle has about 24
 | Order acceptance, sequence number, write-ahead log | Simulation host | Stack decision 2 |
 | Socket fan-out to 100+ players | Simulation host | Needs connections that last |
 | Discord account linking | Appwrite OAuth if it offers a Discord provider; otherwise a function as the OAuth callback | Stack decision 6 |
-| API key creation and revocation (hashed, shown once) | Function | Request-driven (decisions 158, 161) |
-| Store and payment webhooks: verify the purchase, grant the cosmetic once | Function | Webhook; the grant is idempotent (stack decision 6) |
-| Admin creates a war or a battle (SOC-16) | Function | Request-driven, written to Appwrite |
-| Statistics and medals from uploaded logs | Function, once a day per battle | Batch work off the live path (decision 143); about 0.4 MB of log per battle-day |
+| API keys, Stripe webhook, war and battle setup, end of battle, guild requests, statistics, notifications | Functions (table below) | Request-, event- or schedule-driven work around the battle, written to Appwrite |
 | Discord gateway bridge | A separate long-running service, not a function | The gateway is a connection that lasts (stack decision 6) |
 | Map validation | Dart command in CI and the map builder | Build-time work (stack decision 5) |
+
+## Functions
+Designer, 2026-11-01. Each function is an adapter around the package it calls (see below).
+
+| Function | Trigger | Package |
+|---|---|---|
+| `api_keys`: create (hashed, shown once) and revoke (decisions 158, 161) | HTTP | `battle_protocol` (key format, shared with the host's check) |
+| `payment_webhook`: verify the Stripe event, grant the cosmetic once (stack decision 6) | Webhook | none: an adapter, with a write keyed by the payment ID |
+| `create_war`, `create_battle` (admins, SOC-16), with team balancing by team power (decision 103) | HTTP | `battle_rules` |
+| `end_battle`: carry the sections over to the next battle of the war, record the result | Event: battle ended | `battle_rules` |
+| `guild_requests`: create, apply, accept or refuse a trainee, between battles (during a battle the host handles them) | HTTP | `battle_rules` |
+| `daily_stats`: statistics and medals from the uploaded logs (decision 143), about 0.4 MB per battle-day | Cron, daily per battle | `battle_stats` |
+| `notify`: push notifications (war announced, battle starting) through Appwrite Messaging | Event | none |
+| `discord_link_callback`: only if Appwrite's Discord provider cannot link an existing account | HTTP | none |
 
 ## Client trust
 No platform lets the host prove that a client is genuine (checked 2026-11-01): App Attest on iOS is strong, Play Integrity on Android is medium (rooted phones pass its lower tiers), macOS has almost none, and Windows, Linux and the web have none. Anything a client computes is therefore a proposal the host checks.
@@ -55,6 +67,7 @@ Sources: [Apple, DCAppAttestService.isSupported](https://developer.apple.com/tut
 4. Work longer than a few seconds runs asynchronously. The statistics batch reads about 0.4 MB per battle-day, well inside the timeout.
 
 ## Consequences
-- The live battle stays on the simulation host, so the serverless part is the glue around it: accounts, keys, purchases, admin requests and statistics.
+- The live battle stays on the simulation host, so the serverless part is the glue around it: keys, purchases, battle setup and end, guilds between battles, statistics and notifications.
+- The war, section and guild rules a function needs (team power, balancing, carry-over, guilds) live in `battle_rules`, not in `battle_host`, so a function can call them. M5 adds them there.
 - Statistics are computed from logs in batch, so their cost does not touch the live battle.
-- Appwrite limits remain open (stack decision 2): the file count of the 10-second log uploads comes first.
+- Appwrite limits: the local instance's settings in development, the Cloud plan's quotas live (stack decision 2).

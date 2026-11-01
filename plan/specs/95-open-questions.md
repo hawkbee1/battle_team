@@ -3,7 +3,7 @@
 This is the to-do / done list of the spec phase. Tick a question when it is decided and note the decision number from `00-overview.md`, for example `→ decision 52`. The "Open" sections inside each spec file give more context; they will be replaced by these IDs as questions are decided. Design risks that are not questions are tracked in `specs/96-design-risks.md`.
 
 ## General and technical
-- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24). Decided in `stack/` (milestone M2, eight records, proposed).
+- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24). Decided in `stack/` (milestone M2, eight records, confirmed 2026-11-01).
 
 ## Map and terrain (10)
 - [x] **Q-MAP-01** Typical map sizes and range of team counts per map. → decision 84
