@@ -1,6 +1,6 @@
 # Stack decision 5: map format and authoring
 
-Status: **proposed** (milestone M2, Issue 5). Rules: MAP-04 (up to 10 × 50 km), MAP-05 (one loader on server and client), MAP-06, MAP-08, MAP-09, MAP-11 to MAP-19 (movement classes and terrain), MAP-22 to MAP-25 (water, islands), MAP-36 to MAP-38 (floating islands); the navigation model of M3 Issue 2; Q-MAP-09 (world-change budget). The flutter_scene facts come from `04-client-and-rendering.md`.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 5). Rules: MAP-04 (up to 10 × 50 km), MAP-05 (one loader on server and client), MAP-06, MAP-08, MAP-09, MAP-11 to MAP-19 (movement classes and terrain), MAP-22 to MAP-25 (water, islands), MAP-36 to MAP-38 (floating islands); the navigation model of M3 Issue 2; Q-MAP-09 (world-change budget). The flutter_scene facts come from `04-client-and-rendering.md`.
 
 ## What the rules require
 - Heights, terrain types (grass, forest, town, water, mountain…), floating islands, and objects (trees, buildings, walls, roads, bridges, ladders). All numbers come from `plan/data/*.yaml`.
@@ -25,7 +25,18 @@ Status: **proposed** (milestone M2, Issue 5). Rules: MAP-04 (up to 10 × 50 km),
 - **Objects** (trees, buildings, walls): prefabs built from glTF at build time (`.glb` through the build hook, loaded as `.fsceneb`). Repeated objects such as trees are `InstancedMesh`es, one per object type per tile.
 - **Textures**: KTX2 (ETC1S) for terrain and object textures, to fit the memory budget on phones.
 
-A **map builder** command (a Dart package in the repository) validates a map and writes the tiles. It checks what can be checked statically: terrain types and armour types exist, bridges and ladders connect land to land, islands are linked to the ground only by bridges or ladders (MAP-36), no object sits on a cell it cannot occupy. The map builder does not ship with the client. The same tile data is read by the server (for the rules) and the client (for display), through the one loader of MAP-05.
+A **map builder** command (in the `battle_map` package, stack decision 7) validates a map and writes the tiles. It checks what can be checked statically: terrain types and armour types exist, bridges and ladders connect land to land, islands are linked to the ground only by bridges or ladders (MAP-36), no object sits on a cell it cannot occupy. The map builder does not ship with the client. The same tile data is read by the server (for the rules) and the client (for display), through the one loader of MAP-05.
+
+**Craters** are delta-layer entries (centre, radius, depth), as stack decision 3 sends them: the heightmap never changes during a battle. A crater is smaller than a cell (an artillery splash is 8 m), so the host uses its exact shape for sight lines, cover and shot tracing, the navigation model samples it on the cells it covers, and the client draws it in detail over the tile mesh (designer, 2026-11-01).
+
+## Authoring
+Agreed with the designer (2026-11-01):
+1. The map builder generates a first map from real data: elevation from a public model (IGN RGE ALTI for France, Copernicus elsewhere), terrain types and roads from OpenStreetMap land cover.
+2. The map is corrected by hand: the terrain image in an image editor, the objects in `objects.yaml`.
+3. Floating islands and the starting points of relics and HQs are added in `objects.yaml`.
+4. The builder checks the result and writes the tiles. An in-game map editor comes later, if ever.
+
+Licences to check before release: OpenStreetMap is ODbL (attribution, and a distributed database derived from it, such as the terrain images, is offered under ODbL), IGN data is under the Licence Ouverte, and the Copernicus DEM has its own licence.
 
 ## Sizes and budgets
 - A 10 × 50 km map: 1,000 × 5,000 cells. Heights 2 bytes per cell (10 MB raw), terrain 1 byte per cell (5 MB raw). Compressed PNG is much smaller. The client downloads the tiles near the camera.
@@ -37,4 +48,4 @@ A **map builder** command (a Dart package in the repository) validates a map and
 - The map files are data, not code: they are versioned like `plan/data`, and the builder checks them in tests.
 - Floating islands are separate surfaces, linked only by bridges and ladders. The navigation model keeps them as separate regions (M3 Issue 2).
 - The cell size is the main lever of pathfinding cost. Changing it later means rebuilding every map, so it is chosen here and checked with the first benchmark (M3 Issue 6).
-- Terrain tile meshes are rebuilt when a crater or a construction changes a tile; the cost of that rebuild is a benchmark in `performance-tests.md`.
+- A construction or a destroyed object changes a tile's objects, and a crater adds a patch drawn over its mesh; their cost on the client is a benchmark in `performance-tests.md`.

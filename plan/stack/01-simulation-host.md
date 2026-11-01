@@ -1,6 +1,6 @@
 # Stack decision 1: simulation host
 
-Status: **proposed** (milestone M2, Issue 1). Rules: decisions 2 to 4, 160, 165, 167 to 172; MAP-04; COMBAT-01, COMBAT-02; RELIC-14; HQ-32; the 24-hour locks, 30-minute captures and victory timer of the specs.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 1). Rules: decisions 2 to 4, 160, 165, 167 to 172; MAP-04; COMBAT-01, COMBAT-02; RELIC-14; HQ-32; the 24-hour locks, 30-minute captures and victory timer of the specs.
 
 ## What the rules require
 - An **authoritative** server for battles of 100+ players, up to about 1,000 units (decision 2).
@@ -47,6 +47,6 @@ Results:
 ## Consequences
 - Every input (order, time step, seed) must be logged before it is acknowledged, so that a crash does not lose an order (stack decision 2).
 - The rules core is pure Dart with no Flutter import; the host and the client both depend on it (M4 Issue 1).
-- Battle placement (which process hosts which battle) is a server concern, not a rule. It is recorded when it is built (M5).
+- **Hosting** (designer, 2026-11-01): each host process runs in a Docker container. In development everything is local, next to the self-hosted Appwrite. Live, Appwrite will probably be an Appwrite Cloud project, so the host containers run on a separate server, in the same region as that project (provider chosen in M5). Battle placement (which container hosts which battle) is a server concern, not a rule; it is recorded when it is built (M5).
 - Bursts, not the daily average, set the peak: up to a few thousand hit rolls per second for a few seconds when rested units open fire.
 - Benchmarks are required before the process size is fixed: the figures above are estimates, not measurements.

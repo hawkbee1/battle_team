@@ -71,7 +71,7 @@ Label: `delta`
 Rules: MAP-06, MAP-07, MAP-09, MAP-28, MAP-37.
 Depends on: 3.
 
-- Paths follow the changes of a battle (the delta layer): bridges, ladders, roads and walls built; trees, buildings, walls and bridges destroyed; craters, which change heights and slopes.
+- Paths follow the changes of a battle (the delta layer): bridges, ladders, roads and walls built; trees, buildings, walls and bridges destroyed; craters, which change heights and slopes: each is an entry (centre, radius, depth) sampled on the cells it covers (stack decision 5).
 - A change updates only the part of the search data it touches.
 
 Acceptance criteria:

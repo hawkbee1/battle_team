@@ -1,6 +1,6 @@
 # Stack decision 2: persistence
 
-Status: **proposed** (milestone M2, Issue 2). Rules: decisions 3, 26 to 28, 143, 161, 162, 167 to 172; HQ-20; the war and section rules of `specs/40-newcomers-and-social.md` and `specs/50-hq.md`; AI-04, AI-05.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 2). Rules: decisions 3, 26 to 28, 143, 161, 162, 167 to 172; HQ-20; the war and section rules of `specs/40-newcomers-and-social.md` and `specs/50-hq.md`; AI-04, AI-05.
 
 ## What the rules require
 - **Battle state**: units, sections, relics, terrain changes (the delta layer, MAP-06, MAP-08), timers. Kept while the battle runs (decision 3).
@@ -32,15 +32,15 @@ Estimated 2026-11-01 from the AP rules (stack decision 1 has the derivation). De
 Write path for one battle:
 1. An order arrives. The host appends it to its local write-ahead log and calls `fsync`. Orders are rare (about 0.05 a second), so the `fsync` costs little.
 2. Only then does the host acknowledge the order to the sender.
-3. Every 10 seconds, the host uploads the new log entries as one compressed file to Appwrite Storage. At typical volumes a file holds about one event.
+3. Every 10 seconds, if there are new log entries, the host uploads them as one compressed file to Appwrite Storage. An interval with no new entry uploads nothing (designer, 2026-11-01).
 4. Every 5 minutes, the host writes a snapshot of the battle state, also to Appwrite Storage.
 
 Recovery: load the latest snapshot, replay the uploaded and local logs after it. Both the snapshot and the replay are deterministic (stack decision 1).
 
 ## Consequences
-- **Known gap, accepted by the designer (2026-10-31)**: if a host machine is lost together with its local disk, the inputs of the last 10 seconds may be lost. Accepted until the first real battles (M8). The alternative is to replicate the write-ahead log before acknowledging, which costs latency.
-- **File count is now the limit to check.** The 10-second upload gives about 8,640 files per battle per day, or about 864,000 a day for 100 battles. Size is no longer a concern. The designer kept the 10-second interval (2026-11-01), so the accepted loss window stays at 10 seconds. A longer interval would give fewer files but a longer loss window (1 minute: 1,440 files a battle-day; 10 minutes: 144).
-- Appwrite limits (file count, storage per battle, write rate) must be checked against the Hawkbee project before implementation.
+- **Known gap, accepted by the designer (2026-10-31)**: if a host machine is lost together with its local disk, the inputs of the last 10 seconds may be lost. Accepted until the first real battles (M8). The alternative is to replicate the write-ahead log before acknowledging, which costs latency. Live, the host and Appwrite Cloud are on different machines, so the uploads cover the loss of the host machine; in development everything is local (stack decision 1, hosting).
+- **File count.** Only a 10-second interval with new entries uploads a file, so a battle makes at most about 4,000 files a day at typical volumes, fewer when events cluster in fights (8,640 if every interval uploaded). Size is not a concern. The designer kept the 10-second interval (2026-11-01), so the accepted loss window stays at 10 seconds.
+- **Appwrite limits.** In development, the settings of the local instance. Live, the quotas of the Appwrite Cloud plan (storage, bandwidth, database operations, function executions), checked when the plan is chosen, before M5 goes live. Operation counts matter more than bytes.
 - Battle logs are the source of statistics and medals (decision 143), so their format is a data contract: it is versioned from the start.
 - If log volume ever outgrows Appwrite Storage, the next step is a dedicated database (option 2). At the current volumes this trigger is far away.
 - Every action in the log carries its origin: player, AI or server (decisions 162, 166).

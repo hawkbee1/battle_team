@@ -37,8 +37,8 @@ Conventions:
 - Where: `stack/04`.
 
 ### P-06 Terrain tiles and map loading (M7)
-- Measure: time to load a tile near the camera, time to first frame on a new map, memory of the tiles in view, and the time to rebuild a tile after a crater or a construction.
-- Target: to be set after P-05. Tile rebuild must fit in the frame budget or run off the frame.
+- Measure: time to load a tile near the camera, time to first frame on a new map, memory of the tiles in view, and the time to add a crater patch or a construction to a tile in view (stack decision 5).
+- Target: to be set after P-05. Adding a crater or a construction must fit in the frame budget or run off the frame.
 - Where: `stack/05`.
 
 ### P-07 World change applied on the host (M3 Issue 5, `stack/05`)

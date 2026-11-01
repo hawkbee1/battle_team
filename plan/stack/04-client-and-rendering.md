@@ -1,6 +1,6 @@
 # Stack decision 4: client and 3D rendering
 
-Status: **proposed** (milestone M2, Issue 4). Rules: decision 5 (top-down and first person); MAP-04; COMBAT-14 (aim in first person); decisions 3 and 4 (real time). Targets: iOS, Android, macOS, Windows, Linux and Web.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 4). Rules: decision 5 (top-down and first person); MAP-04; COMBAT-14 (aim in first person); decisions 3 and 4 (real time). Targets: iOS, Android, macOS, Windows, Linux and Web.
 
 ## What the rules require
 - A **top-down camera** over a map of up to 10 × 50 km, and **first-person** control of one unit through its eyes (decision 5).
@@ -49,12 +49,16 @@ The formats and components below were read from the package's source and documen
 **Performance tools.** The `flutter_scene-performance` skill gives the method: measure in profile mode, read the UI thread and the raster thread separately, then apply the fixes in a fixed order (instancing, LOD, culling, post-processing, materials, static shadows). `examples/stress_bench` runs synthetic scenes (10,000 items, 50,000 instances, churn) and prints the timings of each frame phase. It is the model for Battle Team's rendering benchmarks (`milestones/performance-tests.md`).
 
 ## Frame budget
-Proposed, to confirm:
-- Target: **60 frames per second** (16.6 ms per frame) on desktop targets. On phones and the web, the target is set after the spike (below).
+- Target: **60 frames per second** (16.6 ms per frame) on desktop. On phones and the web: at least **30 fps in top-down** and **60 fps in first person**, where aiming needs it (designer, 2026-11-01). The spike checks both floors (below).
 - Split of the frame: state update from the network and render data up to 4 ms; world and unit rendering up to 10 ms; interface up to 2 ms.
 - Units far from the camera use simplified meshes and instancing. Only the unit under first-person control uses full detail.
 
-**The slowest target device is not known yet.** The designer does not know it either. The spike chooses it by measurement: three candidate devices per platform (for example a low-end phone, a laptop with an integrated GPU, and a web browser on that laptop). The slowest one measured becomes the reference for the budget. Until then, the phone and web budgets are open.
+**The slowest target device is chosen by measurement** in the spike, among the designer's devices (2026-11-01):
+- iOS: iPhone 11. Android: Pixel 6. macOS: the Mac.
+- Linux and Windows: the main laptop (both systems; it also runs the Docker containers), and an old Lenovo laptop as the low-end machine.
+- Web: a browser on the old Lenovo and on the main laptop.
+
+The slowest one measured becomes the reference for the budget, and the floors above are checked on it.
 
 ## Risks
 - flutter_scene's performance with about 1,000 units on screen, on the slowest device and on the web, is **not measured**. This record does not claim a limit.

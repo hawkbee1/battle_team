@@ -1,6 +1,6 @@
 # Stack decision 3: networking
 
-Status: **proposed** (milestone M2, Issue 3). Rules: decisions 2, 3, 4, 5; MAP-08, MAP-29; RELIC-10 (alerts); decisions 161, 165, 166, 172; AI-03, AI-09.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 3). Rules: decisions 2, 3, 4, 5; MAP-08, MAP-29; RELIC-10 (alerts); decisions 161, 165, 166, 172, 183; AI-03, AI-09.
 
 ## What the rules require
 - Orders reach the server and state reaches the players in **real time**, for 100+ players per battle (decisions 2 and 4).
@@ -26,6 +26,8 @@ Update policy:
 
 Fog filter: the host computes each section's visible set once per tick (see stack decision 1) and sends each section only what it sees.
 
+What orders carry: a shot carries its aim direction and fire time (decision 183); a move order may carry the client's path, which the host checks (stack decision 8). First-person movement is a stream of short move orders, about 5 to 10 a second while the player holds a direction. It is small and bounded by AP (an infantry pool is a 30 m dash); the rate is set with the protocol (M6).
+
 ## Traffic estimate for one section during a fight
 Re-estimated 2026-11-01 from the AP rules (stack decision 1). Assumptions: a section has at most 16 units, so it holds 480 AP at battle start (16 × 30). A viewer sees up to 10 sections fighting at once. An event is about 40 bytes. A moving unit streams its position at 16 bytes × 5 Hz.
 - **Events:** at the typical mix, 480 AP is about 80 events over 10 minutes (0.13 per second per section). At worst, with 1 m orders, it is 480 events (0.8 per second). Ten fighting sections give 1.3 to 8 events per second, about **0.4 to 2.6 kbit/s down**.
@@ -38,6 +40,6 @@ Late join: the visible state plus the delta layer. The delta layer is a list of 
 
 ## Consequences
 - The host needs a WebSocket endpoint for players and an HTTPS endpoint for AI agents and the server. Both feed the same command handler.
-- Player accounts are checked with the Appwrite session token on connection. AI calls are checked with the account's API key (decision 158). The two checks produce the origin tag used in the log (decision 162).
+- Players sign in with a short-lived Appwrite JWT (`account.createJWT`, valid 15 minutes) sent when the socket opens. The host checks it once with Appwrite (local in development, Appwrite Cloud live) and binds the socket to the account; orders never touch Appwrite. AI calls are checked with the account's API key (decision 158). The two checks produce the origin tag used in the log (decision 162).
 - The protocol (message formats, versions) becomes a contract between `battle_host` and the client. It is written down in M5 or M6, in the same package as the rules core.
 - The number of moving vehicles in view and the shape of fire bursts are now the main traffic levers, since infantry rarely moves. Grouping shots per unit per tick is decided with the protocol (M5 or M6). The 5 Hz cadence and fog per section are still tuned with the scenario harness (M4 Issue 11), not by guessing.
