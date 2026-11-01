@@ -55,11 +55,11 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ### Weapons are items
 - **COMBAT-26** A unit has **one weapon slot**. Each unit type lists the **weapon types it may use** (`weapons.allowed`). (Decision 52)
 - **COMBAT-27** A newly bought unit comes with its type's **default weapon**, included in its price. Other weapons are **bought with section money** (prices: `data/economy.yaml`). Bought and swapped-out weapons are kept in the section's **storage** until a unit takes one (decision 151).
-- **COMBAT-28** Weapons are equipped or swapped **only while the unit is stored or next to its storage place**. (Decision 53)
+- **COMBAT-28** Weapons are equipped or swapped **only while the unit is stored or next to its storage place**. A weapon taken from storage arrives **unloaded** (decisions 53, 187).
 
 ### Dropped weapons
 - **COMBAT-29** A **killed unit drops its weapon** on the ground. (Decision 53)
-- **COMBAT-30** **Any unit of any team** whose allowed list includes that weapon type can **pick it up on the spot**, for an **AP cost** (the only weapon handling that costs AP, decision 63). Its current weapon drops in its place.
+- **COMBAT-30** **Any unit of any team** whose allowed list includes that weapon type can **pick it up on the spot**, for an **AP cost** (the only weapon handling that costs AP, decision 63). Its current weapon drops in its place. The picked-up weapon arrives **unloaded** (decision 187).
 - **COMBAT-31** Dropped weapons **vanish after a delay**.
 
 ### Ammo and reloading

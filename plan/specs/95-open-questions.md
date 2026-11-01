@@ -131,6 +131,9 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-32** `ap_per_m` of the units the designer did not name. → decision 181 (placeholders accepted)
 - [x] **Q-CBT-33** Infantry pace, radio and guild camp speeds. → decision 182 (infantry runs; radio 5 m/s, guild camp 1 m/s)
 - [x] **Q-CBT-34** First-person shots: projectile speed or instant hit, and the hit volume of each unit type. → decision 183 (a speed per weapon; `hit_box_m` per unit and for the HQ)
+- [x] **Q-CBT-35** Crushing with 10 + *n* pushers and more than *n* units in the path: does the relic crush *n* of them and stop at the next, or stop at once? → decision 185 (crushes the first *n* it meets, stops at the next)
+- [x] **Q-CBT-36** Friendly fire and the own HQ: COMBAT-34 hurts allies, HQ-16 says enemy units damage the HQ. Does own fire damage the own HQ? → decision 186 (yes)
+- [x] **Q-CBT-37** Is a weapon taken from storage or picked up loaded? → decision 187 (unloaded; a new unit's default weapon comes loaded)
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).
