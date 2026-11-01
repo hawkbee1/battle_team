@@ -2,7 +2,7 @@
 version: 11
 
 # AP max is 30 for every unit (decision 167). AP recovery is one rate for all units, a battle setting (data/battle.yaml, decision 172).
-# ap_per_m: AP per metre on flat ground (decision 169). Terrain, movement class and slope multiply it
+# ap_per_m: AP per metre on flat ground (decisions 169, 181). Terrain, movement class and slope multiply it
 #   (data/terrain.yaml). move_speed is the time per metre, in m/s; it does not set the AP cost.
 common_stats: [hp, ap_max, ap_per_m, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
@@ -121,7 +121,7 @@ units:
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
     actions: [capture, push]
     role: { max_total_weight: 6, max_unit_weight: 2 }   # decision 91
-  helicopter:                   # move_speed capped at the jeep's (decision 174)
+  helicopter:                   # base move_speed at most the jeep's; evolution may exceed it (decisions 174, 178)
     category: vehicle
     movement_class: wheeled     # ground class used while landed (decision 68)
     capabilities: [flying]
@@ -130,7 +130,7 @@ units:
     base: { weight: 6, hp: 200, ap_max: 30, ap_per_m: 0.1, attack: 10, defense: 10, move_speed: 28, vision_range: 300 }
     weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
     actions: [capture]          # does not push (decision 145)
-  boat:                         # move_speed capped at the tank's (decision 174)
+  boat:                         # base move_speed at most the tank's; evolution may exceed it (decisions 174, 178)
     category: transport
     movement_class: null        # water only (sail without ground class)
     capabilities: [sail]
@@ -146,7 +146,7 @@ progression:
     hit: 2
     kill: 20
     role_action: 5                # per completed build, repair, heal, spotting report
-    capture: 50
+    capture: 50                   # shared by the AP each unit put into the pot, on success (decision 179)
     near_commander_per_min: 1
   target_scaling:                 # hit/kill XP x min(cap, 1 + target_xp / max(attacker_xp, 1))
     cap: 3.0

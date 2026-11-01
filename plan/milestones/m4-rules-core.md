@@ -35,7 +35,7 @@ Typed, immutable models for `units.yaml`, `combat.yaml`, `terrain.yaml`, `battle
 Validation (fail with a clear message naming file, key and value):
 - every unit `armor_type` is in `armor_types`; every `weapons.default` is null (unarmed unit, `allowed: []`) or in its `allowed` list; every allowed weapon exists in `weapon_types`;
 - every weapon has a row in `multipliers` with every armor type; `hit_chance.size_factor` covers every armor type;
-- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and `ap_max` is 30; a flying unit's `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decision 174);
+- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`, `push`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and `ap_max` is 30; a flying unit's base `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decisions 174, 178);
 - `commander_levels.section_xp` has `max_level` values, in increasing order;
 - every terrain object has an `armor_type` in `armor_types`;
 - every action in a unit's `actions` is known (`capture`, `push`, `build`, `repair`, `heal`, `observe`) and its up-front AP is at most the unit's `ap_max` (decision 132).
@@ -65,7 +65,8 @@ Depends on: 2.
 
 - AP cost of moving a unit along a path given as samples `(terrain type, slope degrees, length m)`.
 - Cost per metre: the unit's `ap_per_m` × the `ap_multiplier` of (movement class or profile, terrain) × `max(min_multiplier, 1 + slope × factor)`, with a **signed** slope (positive uphill, decision 133); impassable when the table says `null` or the slope, up or down, is steeper than `max_degrees`.
-- Profiles: `flying` (while flying), `sail` (water); a landed flyer uses its ground class; a unit with `sail` and a ground class (amphibious) uses whichever fits the terrain; a boat (sail, no ground class) cannot enter land.
+- Time along a path: its length ÷ `move_speed`, on any terrain and slope (decision 180); with no AP left, the unit moves as fast as its AP come back (COMBAT-06).
+- Profiles: `flying` (while flying), `sail` (water), `push` (a pushed relic or the moving HQ, decisions 175, 177); a landed flyer uses its ground class; a unit with `sail` and a ground class (amphibious) uses whichever fits the terrain; a boat (sail, no ground class) cannot enter land.
 
 Acceptance criteria:
 - Table-driven tests for every movement class on every terrain, including impassable cases and the slope limit, uphill and downhill, and the downhill floor. Units with different `ap_per_m` (infantry, tank, jeep).
@@ -143,19 +144,20 @@ Acceptance criteria:
 
 ## Issue 10: Role actions, pushing and interruption
 Label: `actions`
-Rules: COMBAT-07, COMBAT-08, COMBAT-09, UNIT-33, UNIT-35, UNIT-38, RELIC-05, RELIC-06, RELIC-07, RELIC-08, RELIC-09, RELIC-24, RELIC-25, RELIC-29, HQ-12, HQ-14.
+Rules: COMBAT-07, COMBAT-08, COMBAT-09, UNIT-33, UNIT-35, UNIT-38, RELIC-05, RELIC-06, RELIC-07, RELIC-08, RELIC-09, RELIC-24, RELIC-25, RELIC-29, HQ-10, HQ-12, HQ-14.
 Depends on: 3, 4.
 
 - Build and repair: AP paid up front (the unit must have it), then a duration. Construction AP and time from `terrain.yaml` objects.
 - Capture: a team pot of `pot_ap`, filled by units inside the radius with `contribution_ap` per action, as often as they like; the capture duration starts when the pot is full (decisions 170, 173). Values from `battle.yaml`.
-- A partly filled pot keeps its AP until it is used up or control is lost (decision 173, Q-REL-13).
+- A partly filled pot keeps its AP until it is used up. A relic's push pot empties when another team captures the relic or when it falls from an island; a capture pot empties when an enemy enters the radius, even with no unit of its team inside (decisions 173, 176).
 - Heal is instant: `heal_ap` restores `heal` HP. Heal and repair work on every friendly unit except the HQ (decision 139).
 - Interrupted action: AP lost, progress kept, resuming costs the remaining part; **except** a capture interrupted by an enemy entering the radius, which loses its progress and its pot. Capture progress belongs to the team: another unit of the team can resume it (decision 140).
 - Capture radius: every unit inside counts whatever its state; any enemy blocks.
-- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_m_per_h`; pushers add `contribution_ap` per action to the team push pot, and each metre pushed costs `pot_ap_per_m` from it × a signed slope factor (which one: Q-REL-12); an empty pot stops the relic, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
+- Push: at least `min_pushers` units that can push; the relic moves at `speed_m_per_h`; pushers add `contribution_ap` per action to the team push pot, and each metre pushed costs `pot_ap_per_m` from it × the ground and signed slope multipliers of the `push` profile (decision 175); an empty pot stops the relic, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them.
+- HQ move: ordered by the manager, paid from the HQ's own AP (`hq` in `battle.yaml`) at `hq.ap_per_m` × the `push` profile, at `hq.speed_m_per_h`; with no AP it moves as fast as its AP come back (COMBAT-06); any unit in its path ends the order (decision 177).
 
 Acceptance criteria:
-- Tests for each action, both interruption cases, the capture block, a capture pot filled by several units, a capture resumed by another unit of the team, an empty push pot, a partly filled pot kept after the push stops, and the crush rule with 10, 11 and 13 pushers.
+- Tests for each action, both interruption cases, the capture block, a capture pot filled by several units, a capture resumed by another unit of the team, an empty push pot, a partly filled pot kept after the push stops, a push pot emptied by a capture and by a fall, a waiting capture pot emptied by an enemy entering the radius, the crush rule with 10, 11 and 13 pushers, an HQ draining its AP in mud, and an HQ move ended by a unit in its path.
 
 ## Issue 11: Scenario harness
 Label: `tooling`
@@ -170,7 +172,7 @@ Acceptance criteria:
 ---
 
 ## Later milestones (outline, for the chosen stack)
-- **M5 – Simulation host and persistence** (`battle_host` package, Dart, see `stack/01` and `stack/02`): battle state in memory, write-ahead log and snapshots, log batches to Appwrite Storage, low-write data in Appwrite. World delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), section AI and API orders (AI-01 to AI-09), statistics and medals computed from the battle logs in batch (decision 143).
+- **M5 – Simulation host and persistence** (`battle_host` package, Dart, see `stack/01` and `stack/02`): battle state in memory, write-ahead log and snapshots, log batches to Appwrite Storage, low-write data in Appwrite. World delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-43), relic ownership and victory timer (RELIC-10 to RELIC-18), section AI and API orders (AI-01 to AI-09), statistics and medals computed from the battle logs in batch (decision 143).
 - **M6 – Networking** (`stack/03`): WebSocket for players, HTTPS for AI agents and the server, one command handler. Fog of war per section (MAP-29) filtered on the host, 5 Hz position updates, alerts (RELIC-10), late joiners get the delta layer (MAP-08).
 - **M7 – Client** (`stack/04`, `stack/06`): flutter_scene for the 3D world, Flutter widgets for the interface, top-down and first-person control, pings, map markers and team chat (decision 123). Discord account linking (decision 126) through the bridge service. Starts with the rendering spike on the slowest target device.
 - **M8 – Revision after real battles**: `milestones/m8-revision-after-real-battles.md`.

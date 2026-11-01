@@ -158,18 +158,19 @@ actions:
   capture: { settings: data/battle.yaml, progress_owner: team }   # decisions 97, 140, 170, 173
   interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining, capture_progress_kept: false }   # decisions 67, 97
 
-# Pushing a relic or the HQ (decisions 66, 98, 138, 171): at least min_pushers units that can push
-# (units.yaml actions). The relic or HQ moves at speed_m_per_h while the team's push pot holds AP.
-# Each metre pushed costs pot_ap_per_m from the pot, multiplied by a signed slope factor
-# (data/terrain.yaml; which class: Q-REL-12). Pushers add contribution_ap per action, as often as they like.
+# Pushing a relic (decisions 66, 98, 138, 171, 175): at least min_pushers units that can push
+# (units.yaml actions). The relic moves at speed_m_per_h while its push pot holds AP. The HQ is not pushed (data/battle.yaml hq).
+# Each metre pushed costs pot_ap_per_m from the pot, times the ground and signed slope multipliers
+# of the push profile (data/terrain.yaml, decision 175). Pushers add contribution_ap per action, as often as they like.
 # An empty pot stops the push; it stops too while fewer than min_pushers push.
+# One pot per relic, for its owner; it empties when another team captures the relic or it falls (decision 176).
 push:
   speed_m_per_h: 5              # decision 138
-  pot_ap_per_m: 10              # placeholder: 50 AP per 5 m (Q-REL-12)
+  pot_ap_per_m: 10              # placeholder: flat grass (decision 175)
   contribution_ap: 5            # AP a pusher adds to the pot per action (decision 171)
   min_pushers: 10               # decision 98
   pot_empty: stops              # decision 171
   # Crushing (decisions 115, 138): with min_pushers + n pushers the relic crushes up to n units
-  # in its path; with more blocking units than n it stops. A crushed unit dies. A pushed HQ never crushes.
+  # in its path; with more blocking units than n it stops. A crushed unit dies.
   crush_units_per_extra_pusher: 1
   crush: kills

@@ -118,8 +118,8 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 
 ### HQ (see HQ spec)
 46g. HQ manager powers: team-wide orders and map markers, and moving the HQ. The manager is the player with the most medal points (delegation possible).
-46h. The HQ is pushed by units like a relic, with the same obstacles. The manager is fixed at battle start (delegation only).
-46h1. A pushed HQ does not crush units, it pushes them sideways. No fallback if the manager is offline: he must delegate.
+46h. The HQ is pushed by units like a relic, with the same obstacles. The manager is fixed at battle start (delegation only). (Revised by decision 177: the HQ is not pushed, it moves on its own.)
+46h1. A pushed HQ does not crush units, it pushes them sideways (revised by decision 177: a unit in its path ends the move). No fallback if the manager is offline: he must delegate.
 46h3. A section in a guild stores its units in its guild encampment; a section without guild stores them in the HQ. A unit next to its storage place is stored immediately; elsewhere it can be recalled after a long delay that nothing stops. Stored units deploy instantly next to their storage place, except while an enemy is next to it. Storage capacity is limited per section and grows with the commander level (decision 79). (Revised by decision 127: storage capacity = 2 × section size cap.)
 46h4. A guild without encampment uses the HQ. A blocked encampment does not allow deploying from the HQ instead. An encampment is destroyed like any other unit and can be bought again at any time.
 46h5. Lore: storage is the homeland. HQs and encampments hold teleportation portals usable only by authorized units. Destroying an HQ or encampment never affects stored units.
@@ -216,7 +216,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 108. Guilds: the creator is the chief (guild commander); he can hand the role to another member and can disband the guild, and cannot leave while chief (roles: decision 146; who can create a guild: decision 155). Maximum guild size depends on the guild level, which rises with the total XP earned by its sections while in the guild. A guild can have a single section. A section can play without a guild (storage at the HQ).
 
 ### HQ, storage, economy (round 3)
-109. Any unit of the team can push the HQ (revised by decision 145: units with the `push` action). HQ hit points: 1000 (battle setting).
+109. Any unit of the team can push the HQ (revised by decision 145: units with the `push` action; decision 177: the HQ is not pushed). HQ hit points: 1000 (battle setting).
 110. Deploying a stored unit costs it 10 AP; it is then fully operational. Stored units regenerate AP up to their maximum. A unit within 10 m of its storage place is stored at once; from anywhere else a recall takes 6 hours. An enemy within 20 m of a storage place blocks deployment (and the arrival of new units, decision 147).
 111. Guild encampment: 500 w€, 300 HP.
 112. Default price of anything not priced: 100 w€. Money earned: hit 1, kill 5, construction 5, heal 5, HQ hit 10, HQ destruction 100. Transfer fees: 2 % inside a guild, 7 % outside. XP cannot be bought. No limit against build-and-destroy farming.
@@ -262,7 +262,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 145. The default action lists of `data/units.yaml` are accepted: the radio and the guild camp neither capture nor push; the helicopter and the boat capture but do not push; the camp's heals earn money for the chief's section.
 146. Guild roles: **chief**, **member**, **trainee**. A trainee is a new member that the chief has not accepted yet. A guild has two chats: one for the chief and the members, one for the whole guild.
 147. An enemy within 20 m of a storage place also blocks the **arrival of new units** there.
-148. A pushed HQ can go over the edge of a floating island and **fall**, like a relic: it lands intact and kills the units under it.
+148. A pushed HQ can go over the edge of a floating island and **fall**, like a relic: it lands intact and kills the units under it. (Revised by decision 177: the HQ moves on its own and falls when ordered over the edge.)
 149. An enemy **commander** or a **guild camp** is never taken prisoner and never defects.
 150. A **1-round weapon** fires once per reload: the time between two shots is its reload time.
 151. Bought weapons and swapped-out weapons are kept in the section's **storage** until a unit takes one.
@@ -287,10 +287,20 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 168. AP recovery is **1 AP per hour** for every unit, constant, while moving, fighting, idle or stored. It is not a unit stat (revises decision 37b and COMBAT-02). Decision 172 makes the rate a battle setting.
 169. Movement cost is **per unit**: `ap_per_m` is the AP per metre on flat ground (infantry 1, tank 0.2, jeep 0.1). The movement class and the terrain multiply it (`ap_multiplier`, grass 1.0), and the slope multiplier still applies. `move_speed` stays as the time per metre (revises MAP-15 and COMBAT-03).
 170. **Capture is a team pot.** The 50 AP are put into a pot by units inside the capture radius, 5 AP per action, as often as they like. The 30-minute capture starts when the pot is full. An enemy entering the radius loses the progress and the pot (RELIC-08). One unit has at most 30 AP, so it cannot pay 50 AP alone (revises decisions 66 and 97).
-171. **Push is a team pot.** Pushers add 5 AP per action to the team's push pot, as often as they like, and the pot pays for the push: pushers no longer pay their own AP per metre. The minimum of 10 pushers still applies (revises the AP part of decision 138). The pot's price per metre and its slope factor: Q-REL-12.
+171. **Push is a team pot.** Pushers add 5 AP per action to the team's push pot, as often as they like, and the pot pays for the push: pushers no longer pay their own AP per metre. The minimum of 10 pushers still applies (revises the AP part of decision 138). Price per metre, ground and slope: decision 175.
 172. The AP recovery rate is a **battle setting**, `ap.recovery_per_hour` in `data/battle.yaml`, default **1 AP per hour**. Special events can use another rate (refines decision 168).
-173. **Pots keep their AP.** A partly filled capture or push pot stays until it is used up or control is lost (what counts as control loss: Q-REL-13). A capture's 30-minute timer starts when its pot is full.
-174. **Speeds follow real units.** `move_speed` (m/s) is set close to what a real unit of that kind does. A flying unit never goes faster than the jeep, and a sailing unit never faster than the tank.
+173. **Pots keep their AP.** A partly filled capture or push pot stays until it is used up or control is lost (what counts as control loss: decision 176). A capture's 30-minute timer starts when its pot is full.
+174. **Speeds follow real units.** `move_speed` (m/s) is set close to what a real unit of that kind does. A flying unit never goes faster than the jeep, and a sailing unit never faster than the tank. (Base speeds only: decision 178.)
+
+### Round 8 (2026-11-01)
+175. **Push profile.** A pushed relic or HQ has its own movement profile, `push`, in `data/terrain.yaml`: a slope row (signed factor, steepest slope, downhill floor) and a ground multiplier per terrain type. Mud and sand make a push dearer and a road cheaper, as slope does. Forests, towns, mountains and water are impassable. Each metre pushed costs `push.pot_ap_per_m` from the push pot, **10 AP** on flat grass, times the ground and slope multipliers. All these values are placeholders. Settles the price and slope part of decision 171.
+176. **What empties a pot.** Each relic has **one push pot**, for the team that owns it. It empties when another team captures the relic or when the relic falls from a floating island. A capture pot empties when an enemy enters the capture radius, from the first AP put in, even while no unit of its team is inside. Settles the control-loss part of decision 173.
+177. **The HQ is not pushed: it moves on its own.** The HQ manager (HQ-05), or the player he delegated the role to, orders each move. The HQ has its own AP: **30** at most, recovering at the battle rate (decision 172). Each metre costs **0.2 AP** on flat grass, times the ground and slope multipliers of the `push` profile (decision 175): mud, sand and uphill drain its pool, a road or downhill saves AP. It moves at **5 m per hour**, slower than any unit. **Any unit in its path**, friend or enemy, **ends the move order**, and the manager must order again; the HQ never crushes and never pushes units aside. It can go over the edge of a floating island and fall when the manager orders a path over the edge. The values are placeholders. Revises decisions 46h, 46h1, 109 and 148.
+178. **Speed caps apply to base speeds.** The caps of decision 174 hold for base `move_speed` only. Evolution raises any speed up to 300 % of its base (decision 118), so an evolved flyer or sailing unit can outrun a jeep or a tank that has not evolved.
+179. **Capture XP is split by AP.** When a capture succeeds, its XP (`xp_sources.capture`, 50) is shared among the units that put AP into its pot, in proportion to the AP each one put in: 1 XP per AP with the default numbers. Units that died or left the radius since still get their share. A lost pot pays no XP. The section share applies as usual.
+180. **Ground and slope change only the AP cost.** `move_speed` is the same on every ground and slope. Rough ground and slopes slow a unit only through its AP: once its pool is spent, it moves as fast as its AP come back.
+181. The `ap_per_m` placeholders are accepted: artillery, radio and guild camp **0.2**; truck, helicopter and boat **0.1**. They are tuned with the scenario harness (M4 Issue 11).
+182. **Infantry runs.** Infantry keeps running speeds, 4 to 7 m/s: a 30 m pool is a short dash. The radio moves at **5 m/s** and the guild camp at **1 m/s**.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

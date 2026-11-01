@@ -38,8 +38,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-18** Section AI (decision 20): which behaviours (follow commander, hold, patrol...), do units under AI fire on their own, and what do the units of an offline player do (decision 29 says "passive")? → milestone `milestones/m1-ai-and-automation.md`
 - [x] **Q-UNIT-19** Commander levels: "+1 every 5 levels" is read as a cap of 6 at level 6, 7 at level 11 (decision 127). `commander_levels` stops at level 5, so the cap never grows yet: section XP thresholds beyond level 5, and is there a maximum level? → decision 144 (max level 60)
 - [x] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change. → decision 145 (accepted)
-- [ ] **Q-UNIT-21** Speed caps and evolution: `move_speed` evolves up to ×3 (decision 118), so a helicopter could outrun the jeep's 28 m/s. Does the cap of decision 174 apply to evolved speeds, and against the jeep's base or evolved speed?
-- [ ] **Q-UNIT-22** Capture XP (`xp_sources.capture`, 50) with a team pot (decision 170): to every contributor, shared by the AP each one put in, or to the unit that fills the pot?
+- [x] **Q-UNIT-21** Speed caps and evolution: does the cap of decision 174 apply to evolved speeds? → decision 178 (base speeds only; evolution follows the 300 % cap)
+- [x] **Q-UNIT-22** Capture XP (`xp_sources.capture`, 50) with a team pot (decision 170): who gets it? → decision 179 (shared by the AP each unit put in, paid on success)
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
@@ -53,8 +53,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-REL-09** Push speed, pushers at 0 AP, crush damage and survivors in the path. → decision 138
 - [x] **Q-REL-10** Push speed "5": `data/*.yaml` uses metres and seconds, and 5 m/s is a running soldier's speed, while relics "move very slowly" (RELIC-03). Is it 5 m/s, or another unit (for example 5 m per minute)? → decision 138 (5 m per hour)
 - [x] **Q-REL-11** Capture progress: does it belong to the unit or to the team? → decision 140
-- [ ] **Q-REL-12** Push pot (decision 171): what does it pay per metre? Assumed: 10 AP (50 AP per 5 m, one hour at 5 m/h; `push.pot_ap_per_m`). Which slope factor applies? A relic has no movement class; before decision 171 each pusher paid with its own class.
-- [ ] **Q-REL-13** Control loss (decision 173): what empties a partly filled pot? Assumed: the relic or HQ changes owner; for a capture pot, also an enemy entering the radius (RELIC-08).
+- [x] **Q-REL-12** Push pot (decision 171): price per metre and slope factor. → decision 175 (10 AP per metre, a `push` profile for ground and slope)
+- [x] **Q-REL-13** Control loss (decision 173): what empties a partly filled pot? → decision 176 (a relic's push pot: capture by another team or a fall; a capture pot: an enemy entering the radius)
 
 ## Newcomers, wars and social (40)
 - [x] **Q-SOC-01** Team power formula. → decision 93 (no notion of active players)
@@ -85,6 +85,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-07** Where a bought unit arrives, and the room it needs. → decision 130
 - [x] **Q-HQ-08** Is the arrival of new units at the camp or the HQ blocked by an enemy within 20 m, like deployment (HQ-36)? → decision 147 (yes)
 - [x] **Q-HQ-09** Can a pushed HQ go over the edge of a floating island and fall, like a relic (RELIC-22)? → decision 148 (yes)
+- [x] **Q-HQ-10** The HQ is not pushed: how does it move? → decision 177 (own AP, 0.2 AP per metre with the `push` profile, 5 m per hour; a unit in its path ends the order)
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)
@@ -125,9 +126,10 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-27** Heal and repair targets. → decision 139
 - [x] **Q-CBT-29** Does a capture pot or a push pot keep its AP, or does it empty over time? → decision 173 (it stays until used up or control is lost)
 - [x] **Q-CBT-30** Does the 30-minute capture start when the pot is full, or does it run while the pot fills? → decision 173 (when full)
-- [ ] **Q-CBT-31** Does `move_speed` drop on rough ground (forest, mud), or does only the AP cost change? (Assumed: only the AP cost. Speeds were set to real-life values by decision 174.)
-- [ ] **Q-CBT-32** `ap_per_m` of the units the designer did not name: artillery 0.2, radio 0.2, guild camp 0.2, truck 0.1, helicopter 0.1, boat 0.1. (Placeholders.)
-- [ ] **Q-CBT-33** Infantry speeds stayed at 4 to 7 m/s, a run; walking is about 1.4 m/s. Should infantry move at a walking pace? The radio (5 m/s) and guild camp (1 m/s) speeds are placeholders too.
+- [x] **Q-CBT-31** Does `move_speed` drop on rough ground (forest, mud), or does only the AP cost change? → decision 180 (only the AP cost)
+- [x] **Q-CBT-32** `ap_per_m` of the units the designer did not name. → decision 181 (placeholders accepted)
+- [x] **Q-CBT-33** Infantry pace, radio and guild camp speeds. → decision 182 (infantry runs; radio 5 m/s, guild camp 1 m/s)
+- [ ] **Q-CBT-34** First-person shots (COMBAT-14: projectiles travel in 3D, obstacles block them): does a shot travel at a speed per weapon, or hit at once along its line? What hit volume (height, width, length) does each unit type have? The data has neither, so nothing can trace a shot yet. Assumed: nothing; M4 Issue 7 leaves projectile flight to the client.
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).

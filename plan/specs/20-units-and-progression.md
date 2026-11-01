@@ -15,7 +15,7 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 | `ap_per_m` | AP per metre moved on flat ground. Terrain, movement class and slope multiply it (decision 169). |
 | `attack` | **Accuracy.** Raises hit chance under orders/AI and tightens spread in first-person aim. Does not change damage. |
 | `defense` | **Evasion.** Lowers the chance of being hit. Does not change damage. |
-| `move_speed` | Speed when moving, in m/s, close to a real unit's speed: it sets the time per metre. The AP cost is `ap_per_m`. A flying unit never goes faster than the jeep, a sailing unit never faster than the tank (decision 174). |
+| `move_speed` | Speed when moving, in m/s, close to a real unit's speed: it sets the time per metre. The AP cost is `ap_per_m`. A flying unit's base speed is never above the jeep's, a sailing unit's never above the tank's (decision 174); evolution can then raise it up to 300 % of base, like any stat (decision 178). |
 | `vision_range` | Radius of sight before weather, terrain and height modifiers, then limited by line of sight (see map spec). |
 | `movement_class` | foot, wheeled or tracked (see map spec). Empty for a boat. |
 | `weight` | Used by transports, which carry by weight (decision 91). |
@@ -64,6 +64,7 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-09** **Stronger targets give more XP** (decision 77): hit and kill XP is multiplied by `1 + target XP / attacker XP`, capped at ×3.
 - **UNIT-10** **Anti-farming**: repeated XP from the same target or the same build spot within a time window shrinks. Hitting allies gives no XP.
 - **UNIT-11** **victoryXp**: every unit of every section in the winning team of a battle gains **1 XP**, which counts toward section XP like any XP. (Decision 92)
+- **UNIT-43** **Capture XP is split by AP** (decision 179): when a capture succeeds, its XP (`xp_sources.capture`) is shared among the units that put AP into the capture pot, in proportion to their AP (1 XP per AP with the defaults), including units that died or left the radius since. A lost pot (RELIC-08) pays nothing.
 - **UNIT-12** **Team power** = unit XP + section XP of the team (decision 93).
 - **UNIT-13** No catch-up mechanism for late joiners: placement in the weakest team (decision 47) is the only compensation. (Decision 82)
 

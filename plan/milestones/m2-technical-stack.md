@@ -93,4 +93,4 @@ Acceptance criteria:
 
 ## Status (2026-11-01)
 - The eight records exist in `plan/stack/` and are **proposed**. The three conditions above are met; M2 ends when the designer confirms the records.
-- Open questions that block M3 or M4: Q-REL-12 and Q-REL-13 (M3 Issue 4, M4 Issue 10). The others still open (Q-CBT-31 to Q-CBT-33, Q-UNIT-21, Q-UNIT-22) are about placeholders or M5.
+- Open question that blocks M4: Q-CBT-34 (M4 Issue 7). No other question is open.

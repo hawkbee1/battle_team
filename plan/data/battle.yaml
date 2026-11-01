@@ -28,12 +28,16 @@ teams:
 capture:
   duration_s: 1800           # starts when the pot is full
   pot_ap: 50                 # team pot: units in the radius add contribution_ap per action
+                             # an enemy entering the radius empties it, even with no unit of the team inside (decision 176)
   contribution_ap: 5
   radius_m: 30               # same radius to capture and to block
 
-# HQ (decision 109)
+# HQ (decisions 109, 177): moves on its own on the manager's order, paying from its own AP.
 hq:
   hp: 1000                   # armor type: hq (decision 114)
+  ap_max: 30                 # recovers at ap.recovery_per_hour
+  ap_per_m: 0.2              # placeholder: flat grass, times the push profile (data/terrain.yaml)
+  speed_m_per_h: 5           # placeholder: slower than any unit
 
 # Victory (decisions 45, 46c): hold relics_to_hold relics for hold_s, or be the last HQ.
 victory:

@@ -1,6 +1,6 @@
 # Milestone 3: pathfinding
 
-Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and HQs, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`, `stack/05-map-format.md`): Dart, in the package `battle_pathfinding` (its own repository, hawkbee `packages/battle_pathfinding`, stack decision 7), with the 10 m cell grid of the map format.
+Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and the moving HQ, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`, `stack/05-map-format.md`): Dart, in the package `battle_pathfinding` (its own repository, hawkbee `packages/battle_pathfinding`, stack decision 7), with the 10 m cell grid of the map format.
 
 Each issue below is ready to be created as a GitHub issue in the milestone "M3 – Pathfinding". Labels: `pathfinding` plus the one listed.
 
@@ -53,18 +53,18 @@ Acceptance criteria:
 - Table-driven tests per class and profile on fixture maps: impassable cases, the slope limit both ways, a ladder climbed by foot units only, a boat crossing, an amphibious crossing, a flyer over a mountain.
 - The cost of a returned path equals the sum of its samples under the injected cost.
 
-## Issue 4: Paths for pushed relics and HQs
+## Issue 4: Paths for relics and HQs
 Label: `search`
-Rules: RELIC-19, RELIC-20, RELIC-21, RELIC-22, RELIC-26, RELIC-28, HQ-11, HQ-48.
+Rules: RELIC-19, RELIC-20, RELIC-21, RELIC-22, RELIC-26, RELIC-28, HQ-11, HQ-14, HQ-48.
 Depends on: 3.
 
-- Relics and HQs cannot fly, and cannot cross water (except on reinforced bridges), forests, towns or walls.
+- Relics and HQs cannot fly, and cannot cross water (except on reinforced bridges), forests, towns, mountains or walls.
 - A relic or an HQ can go over the edge of a floating island and fall (RELIC-22, HQ-48).
 - A walled-in relic has no path until a wall is destroyed (RELIC-28).
-- The push is paid from the team's push pot (decision 171); its price per metre and slope factor are open (Q-REL-12).
+- The cost is the injected one with the `push` profile; the AP per metre is `push.pot_ap_per_m` for a relic and `hq.ap_per_m` for an HQ (decisions 175, 177). The profile's slope limit applies uphill and downhill.
 
 Acceptance criteria:
-- A relic crosses a reinforced bridge but not a normal one, avoids forests and towns, has no path when walled in, and falls from an island edge; an HQ falls too.
+- A relic crosses a reinforced bridge but not a normal one, avoids forests and towns, has no path when walled in, takes a road rather than mud, is blocked by a slope steeper than the `push` limit up or down, and falls from an island edge; an HQ falls too.
 
 ## Issue 5: World changes
 Label: `delta`

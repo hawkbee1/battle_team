@@ -54,12 +54,13 @@ The research note (`specs/90-research-topic-priority.md`) ranks it as the topic 
 ## R-07 One player or one unit can block a whole group
 - An absent HQ manager freezes HQ moves and team orders for as long as he is away; there is no fallback (HQ-08).
 - One enemy unit parked within 20 m of a guild camp keeps all the guild's stored units in storage, and they cannot deploy from the HQ instead (HQ-36, HQ-39). New units arriving at the camp are blocked too (decision 147).
+- One unit, friend or enemy, standing in the HQ's path ends its move order (HQ-12, decision 177): the manager must order again, around it.
 - Logging off safely means walking back within 10 m of the storage place or waiting for a 6-hour recall, and storing everything starts the 24-hour lock (HQ-35). That makes R-01 the easiest way to log off.
 
 ## R-08 Tuning notes for the scenario harness (M4 Issue 11)
 - Sustained speed is about `recovery per hour ÷ ap_per_m` (decisions 168, 172): 1 m per hour for infantry at the default rate once its 30 AP are spent. A full pool covers 30 m on foot, 150 m in a tank and 300 m in a jeep on flat ground. `move_speed` only sets the time per metre.
 - Vision is much shorter than weapon range: a soldier sees 150 m (60 m in fog), while weapon ranges go from 250 to 1,200 m. An anti-air soldier sees a helicopter at 150 m; the helicopter's height bonus lets it see him at 450 m.
-- At 5 m per hour (decision 138), a pushed relic or HQ moves 120 m a day: about 8 days for 1 km, on maps up to 50 km long. A push costs 50 AP per hour from the team's push pot (decision 171). With 1 AP per hour per unit, about 50 units must recover at once to keep it moving, so the relic stops most of the time. Units in the path can still step aside before being crushed.
+- At 5 m per hour (decisions 138, 177), a pushed relic or the HQ moves 120 m a day: about 8 days for 1 km, on maps up to 50 km long. The HQ spends 1 AP per hour on flat grass, what it recovers, so mud, sand and slopes slow it down. A relic push costs 50 AP per hour from its push pot on flat grass, more in mud, sand or uphill (decisions 171, 175). With 1 AP per hour per unit, about 50 units must recover at once to keep it moving, so the relic stops most of the time. Units in the path can still step aside before being crushed.
 
 ## R-09 With 30 AP and 1 AP per hour, a unit's pool is most of its budget
 Raised by decisions 167 and 168. Accepted for now (designer, 2026-11-01): 1 AP per hour is the intended default pace. Special events may use another rate (decision 172).
