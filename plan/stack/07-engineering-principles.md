@@ -48,6 +48,7 @@ Not used: Singleton (see above) and Visitor (sealed types cover it in Dart).
 - Each package is its own public GitHub repository, `hawkbee1/<name>`, added to hawkbee as a git submodule at `packages/<name>`. This is the repo-per-package rule of the whole workspace. Creation procedure (scaffold, `gh repo create --public`, `git submodule add`, merge commits only): hawkbee `docs/dart_code_3d/agent-workflow.md`, section 2.
 - Planned names, each created in the milestone that first needs it: `battle_pathfinding` (M3), `battle_rules` (rules core, M4), `battle_protocol` (commands and messages between host and client, M5 and M6), `battle_host` (simulation host, a Dart executable, M5), `battle_map` (map format loader and builder, stack decision 5), `battle_stats` (statistics and medals from logs, stack decision 8).
 - `apps/battle_team` depends on them by version, not by relative path (convention of hawkbee commit d7a6716).
+- **Game data in packages.** Packages build only inside a hawkbee checkout (`resolution: workspace`), so tests on real values read `apps/battle_team/plan/data/*.yaml` from that checkout, by a path relative to the package (designer, 2026-11-01). The data is never copied into a package. `battle_rules` reads no files: its caller passes the YAML text. The app bundles `plan/data` as assets; the host reads it from disk.
 
 ## Consequences
 - A package that an Appwrite Function runs needs a committed vendored copy, as `hawkbee_schema` has in `backend/functions/ping/vendor/`, because the Appwrite CLI honours `.gitignore` when it packages a function.

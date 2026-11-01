@@ -7,7 +7,7 @@ Each issue below is ready to be created as a GitHub issue in the milestone "M4 â
 ## Conventions for all issues
 - **Repositories (stack decision 7)**: each package lives in the hawkbee workspace `packages/` folder, in its own public repository `hawkbee1/<name>` added to hawkbee as a git submodule. Procedure: hawkbee `docs/dart_code_3d/agent-workflow.md`, section 2.
 - **Language and layout (M2)**: Dart. `battle_rules` is a pure Dart package with no Flutter import, so the host and the client both use it. Tests with `package:test`, lints with `very_good_analysis`, coverage with `very_good test --coverage`. 100 % line coverage target.
-- **Numbers only in YAML.** No game number is written in code or tests except inside test fixtures. Tests on real values read them from `plan/data/*.yaml`. When a value is tuned, the tests that use it are updated in the same change.
+- **Numbers only in YAML.** No game number is written in code or tests except inside test fixtures. Tests on real values read them from `apps/battle_team/plan/data/*.yaml` in the hawkbee checkout; `battle_rules` takes the YAML text from its caller (stack decision 7). When a value is tuned, the tests that use it are updated in the same change.
 - **Deterministic.** Time is passed in (no wall clock); randomness comes from an injected seeded RNG.
 - Immutable models, no global state.
 - A rule that seems unclear or contradictory is not guessed: open a question in `plan/specs/95-open-questions.md` and link it in the issue.
