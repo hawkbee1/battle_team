@@ -59,7 +59,7 @@ Proposed, to confirm:
 ## Risks
 - flutter_scene's performance with about 1,000 units on screen, on the slowest device and on the web, is **not measured**. This record does not claim a limit.
 - The Flutter GPU switch and the 3.47.1 requirement for shipped desktop builds are constraints on the release process, not only on development.
-- The first-person camera needs projectile visuals in 3D. The rules give only the spread (M4 Issue 7); the visuals are the client's job.
+- The first-person camera needs projectile visuals in 3D. The host traces each shot (decision 183, stack decision 8); the client only draws it.
 
 ## Consequences
 - The client depends on `battle_rules` for display maths and on the network protocol (stack decision 3). It never runs its own combat resolution.

@@ -19,6 +19,7 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 | `vision_range` | Radius of sight before weather, terrain and height modifiers, then limited by line of sight (see map spec). |
 | `movement_class` | foot, wheeled or tracked (see map spec). Empty for a boat. |
 | `weight` | Used by transports, which carry by weight (decision 91). |
+| `hit_box_m` | Hit volume for first-person shots: width, length and height in metres, close to the real unit (decision 183). |
 | `armor_type` | Armor type used by the weapon-vs-armor damage table (`data/combat.yaml`). |
 | `morale` | 0..100 (see combat spec). |
 | `capabilities` | Optional list of extra abilities: `flying`, `sail`. |

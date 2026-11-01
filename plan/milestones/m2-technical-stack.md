@@ -93,4 +93,4 @@ Acceptance criteria:
 
 ## Status (2026-11-01)
 - The eight records exist in `plan/stack/` and are **proposed**. The three conditions above are met; M2 ends when the designer confirms the records.
-- Open question that blocks M4: Q-CBT-34 (M4 Issue 7). No other question is open.
+- No open question is left.

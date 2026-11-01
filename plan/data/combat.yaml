@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 13
+version: 14
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -22,6 +22,8 @@ armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 #   move_while_loaded  true: the unit can move with the weapon loaded
 #                      false: the weapon must be unloaded before the unit moves
 #   airborne_factor    damage multiplier against a flying target (0 = cannot hit it)
+#   projectile_speed_mps  speed of a first-person shot (decision 183). Not set for indirect fire
+#                      (artillery) or a weapon that never misses (explosive charge).
 #   base_accuracy      starting hit chance under orders/AI, before factors (decision 65);
 #                      a weapon with never_misses has none (decision 152)
 #   indirect_fire      true: may target a ground position its section sees or a radio relays (decision 62)
@@ -30,11 +32,11 @@ armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 #   except indirect_fire weapons.
 # Values are the accepted starting point for the rules core (decision 69).
 weapon_types:
-  rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  base_accuracy: 0.70, rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  airborne_factor: 0.2 }
-  machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  base_accuracy: 0.50, rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  airborne_factor: 0.4 }
-  anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, base_accuracy: 0.60, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  airborne_factor: 0.1 }
+  rifle:       { base_damage: 12, range_m: 400,  ap_per_shot: 2,  base_accuracy: 0.70, rate_of_fire_rpm: 40,  magazine_capacity: 10,  reload_time_s: 3,  unload_time_s: 2,  move_while_loaded: true,  projectile_speed_mps: 900, airborne_factor: 0.2 }
+  machine_gun: { base_damage: 8,  range_m: 300,  ap_per_shot: 1,  base_accuracy: 0.50, rate_of_fire_rpm: 500, magazine_capacity: 100, reload_time_s: 8,  unload_time_s: 4,  move_while_loaded: true,  projectile_speed_mps: 850, airborne_factor: 0.4 }
+  anti_tank:   { base_damage: 60, range_m: 250,  ap_per_shot: 10, base_accuracy: 0.60, rate_of_fire_rpm: 6,   magazine_capacity: 1,   reload_time_s: 6,  unload_time_s: 3,  move_while_loaded: true,  projectile_speed_mps: 300, airborne_factor: 0.1 }
   artillery:   { base_damage: 40, range_m: 1200, ap_per_shot: 15, base_accuracy: 0.40, rate_of_fire_rpm: 4,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 30, move_while_loaded: false, airborne_factor: 0.0, splash_radius_m: 8, deforms_terrain: true, indirect_fire: true }
-  anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  base_accuracy: 0.60, rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, airborne_factor: 2.0 }
+  anti_air:    { base_damage: 30, range_m: 800,  ap_per_shot: 6,  base_accuracy: 0.60, rate_of_fire_rpm: 60,  magazine_capacity: 20,  reload_time_s: 10, unload_time_s: 15, move_while_loaded: false, projectile_speed_mps: 600, airborne_factor: 2.0 }
   explosive:   { base_damage: 80, range_m: 5,    ap_per_shot: 20, rate_of_fire_rpm: 1,   magazine_capacity: 1,   reload_time_s: 10, unload_time_s: 5,  move_while_loaded: true,  airborne_factor: 0.0, splash_radius_m: 4, never_misses: true }   # engineer charge (decision 152)
 # Weapon prices: data/economy.yaml (the default weapon is included in the unit price).
 

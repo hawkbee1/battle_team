@@ -1,10 +1,11 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 11
+version: 12
 
 # AP max is 30 for every unit (decision 167). AP recovery is one rate for all units, a battle setting (data/battle.yaml, decision 172).
 # ap_per_m: AP per metre on flat ground (decisions 169, 181). Terrain, movement class and slope multiply it
 #   (data/terrain.yaml). move_speed is the time per metre, in m/s; it does not set the AP cost.
-common_stats: [hp, ap_max, ap_per_m, attack, defense, move_speed, vision_range, movement_class, armor_type, morale]
+common_stats: [hp, ap_max, ap_per_m, attack, defense, move_speed, vision_range, movement_class, armor_type, hit_box_m, morale]
+# hit_box_m: hit volume for first-person shots, in metres, close to the real unit (decision 183).
 # attack:   accuracy. Raises hit chance under orders/AI, tightens spread in first-person aim.
 # defense:  evasion. Lowers the chance of being hit. Neither stat changes damage (decision 58).
 # armor_type: one of data/combat.yaml armor_types. Damage = weapon x weapon-vs-armor table.
@@ -32,6 +33,7 @@ units:
     category: commander
     movement_class: foot
     armor_type: infantry
+    hit_box_m: { width: 0.6, length: 0.6, height: 1.8 }
     base: { weight: 1, hp: 200, ap_max: 30, ap_per_m: 1.0, attack: 15, defense: 10, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun] }
     actions: [capture, push]
@@ -41,6 +43,7 @@ units:
     category: soldier
     movement_class: foot
     armor_type: infantry
+    hit_box_m: { width: 0.6, length: 0.6, height: 1.8 }
     base: { weight: 1, hp: 100, ap_max: 30, ap_per_m: 1.0, attack: 12, defense: 5, move_speed: 5, vision_range: 150 }
     weapons: { default: rifle, allowed: [rifle, machine_gun, anti_tank, anti_air] }
     actions: [capture, push]
@@ -48,6 +51,7 @@ units:
     category: engineer
     movement_class: foot
     armor_type: infantry
+    hit_box_m: { width: 0.6, length: 0.6, height: 1.8 }
     base: { weight: 1, hp: 90, ap_max: 30, ap_per_m: 1.0, attack: 6, defense: 4, move_speed: 4, vision_range: 120 }
     weapons: { default: rifle, allowed: [rifle, explosive] }
     actions: [capture, push, build, repair]
@@ -56,6 +60,7 @@ units:
     category: scout
     movement_class: foot
     armor_type: infantry
+    hit_box_m: { width: 0.6, length: 0.6, height: 1.8 }
     base: { weight: 1, hp: 70, ap_max: 30, ap_per_m: 1.0, attack: 5, defense: 8, move_speed: 7, vision_range: 300 }
     weapons: { default: rifle, allowed: [rifle] }
     actions: [capture, push, observe]
@@ -64,6 +69,7 @@ units:
     category: soldier          # decision 60: a medic is a soldier with a heal role
     movement_class: foot
     armor_type: infantry
+    hit_box_m: { width: 0.6, length: 0.6, height: 1.8 }
     base: { weight: 1, hp: 80, ap_max: 30, ap_per_m: 1.0, attack: 4, defense: 3, move_speed: 5, vision_range: 120 }
     weapons: { default: rifle, allowed: [rifle] }
     actions: [capture, push, heal]
@@ -72,6 +78,7 @@ units:
     category: artillery
     movement_class: tracked
     armor_type: light_vehicle
+    hit_box_m: { width: 3.5, length: 7.0, height: 3.0 }
     base: { weight: 8, hp: 150, ap_max: 30, ap_per_m: 0.2, attack: 10, defense: 2, move_speed: 12, vision_range: 100 }
     weapons: { default: artillery, allowed: [artillery] }   # range, splash, deformation: weapon data
     actions: [capture, push]
@@ -79,6 +86,7 @@ units:
     category: radio
     movement_class: tracked
     armor_type: structure
+    hit_box_m: { width: 3.0, length: 6.0, height: 3.0 }
     base: { weight: 10, hp: 250, ap_max: 30, ap_per_m: 0.2, attack: 0, defense: 0, move_speed: 5, vision_range: 80 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
     actions: []                 # unarmed, no capture, no push (decision 145)
@@ -92,6 +100,7 @@ units:
     storable: false
     movement_class: tracked       # moves slowly on its own; cannot fly or reach floating islands (decision 88)
     armor_type: structure
+    hit_box_m: { width: 8.0, length: 12.0, height: 4.0 }
     base: { weight: 50, hp: 300, ap_max: 30, ap_per_m: 0.2, attack: 0, defense: 0, move_speed: 1, vision_range: 50 }
     weapons: { default: null, allowed: [] }
     actions: [heal]
@@ -103,6 +112,7 @@ units:
     category: vehicle
     movement_class: wheeled
     armor_type: light_vehicle
+    hit_box_m: { width: 1.9, length: 4.5, height: 1.8 }
     base: { weight: 4, hp: 180, ap_max: 30, ap_per_m: 0.1, attack: 8, defense: 6, move_speed: 28, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
     actions: [capture, push]
@@ -110,6 +120,7 @@ units:
     category: vehicle
     movement_class: tracked
     armor_type: heavy_vehicle
+    hit_box_m: { width: 3.6, length: 7.5, height: 2.5 }
     base: { weight: 12, hp: 600, ap_max: 30, ap_per_m: 0.2, attack: 10, defense: 1, move_speed: 14, vision_range: 120 }
     weapons: { default: anti_tank, allowed: [anti_tank, machine_gun] }
     actions: [capture, push]
@@ -117,6 +128,7 @@ units:
     category: transport
     movement_class: wheeled
     armor_type: light_vehicle
+    hit_box_m: { width: 2.5, length: 8.0, height: 3.0 }
     base: { weight: 8, hp: 250, ap_max: 30, ap_per_m: 0.1, attack: 0, defense: 3, move_speed: 22, vision_range: 100 }
     weapons: { default: null, allowed: [] }   # unarmed: cannot attack (decision 64)
     actions: [capture, push]
@@ -127,6 +139,7 @@ units:
     capabilities: [flying]
     flying: { land_time_s: 8, take_off_time_s: 8 }   # placeholder; max altitude is set by the map
     armor_type: light_vehicle
+    hit_box_m: { width: 3.0, length: 14.0, height: 4.0 }
     base: { weight: 6, hp: 200, ap_max: 30, ap_per_m: 0.1, attack: 10, defense: 10, move_speed: 28, vision_range: 300 }
     weapons: { default: machine_gun, allowed: [machine_gun, anti_tank] }
     actions: [capture]          # does not push (decision 145)
@@ -135,6 +148,7 @@ units:
     movement_class: null        # water only (sail without ground class)
     capabilities: [sail]
     armor_type: light_vehicle
+    hit_box_m: { width: 3.0, length: 9.0, height: 2.0 }
     base: { weight: 6, hp: 200, ap_max: 30, ap_per_m: 0.1, attack: 8, defense: 4, move_speed: 11, vision_range: 150 }
     weapons: { default: machine_gun, allowed: [machine_gun] }
     actions: [capture]          # water only: does not push (decision 145)

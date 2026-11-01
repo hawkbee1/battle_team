@@ -23,7 +23,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **COMBAT-13** A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
 
 ### Hit resolution: hybrid
-- **COMBAT-14** When a player is **inside a unit** (first-person control), hits depend on the player's **aim**: projectiles travel in 3D and obstacles block them. The unit's `attack` tightens weapon spread and sway, so an evolved unit still aims better.
+- **COMBAT-14** When a player is **inside a unit** (first-person control), hits depend on the player's **aim**: projectiles travel in 3D and obstacles block them. The unit's `attack` tightens weapon spread and sway, so an evolved unit still aims better. A shot flies at its weapon's `projectile_speed_mps` and hits the first **hit volume** (`hit_box_m` of a unit or the HQ) or obstacle on its path, so a moving target can leave the line before it arrives. Artillery and the explosive charge do not fly (decision 183).
 - **COMBAT-15** When a unit acts under **orders or section AI** (top-down control or offline-passive), a **hit chance** is computed (decision 65):
 
   `chance = weapon base accuracy × (1 + (attack − defense) / 100) × distance × cover × size × speed × morale factors` (× indirect factor), **clamped to 5–95 %**.
@@ -77,6 +77,7 @@ Each weapon has, besides damage, range and AP per shot:
 | `unload_time_s` | Unloading speed: time to unload the weapon. No AP. |
 | `move_while_loaded` | Whether the unit can move with the weapon loaded. If not, it must unload first (for example artillery). |
 | `airborne_factor` | Damage multiplier against flying targets (0 = cannot hit them). |
+| `projectile_speed_mps` | Speed of a first-person shot (decision 183). Not set for artillery or the explosive charge. |
 
 ## 5. Friendly fire
 - **COMBAT-34** **On, full damage.** Artillery, explosions and crossfire hurt allies exactly like enemies.

@@ -1,7 +1,7 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
 # `victory` and `storage` hold battle-wide rule values (decisions 45, 110); they are not declared battle settings.
-version: 6
+version: 7
 
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -38,6 +38,7 @@ hq:
   ap_max: 30                 # recovers at ap.recovery_per_hour
   ap_per_m: 0.2              # placeholder: flat grass, times the push profile (data/terrain.yaml)
   speed_m_per_h: 5           # placeholder: slower than any unit
+  hit_box_m: { width: 20, length: 20, height: 8 }   # placeholder: first-person shots (decision 183)
 
 # Victory (decisions 45, 46c): hold relics_to_hold relics for hold_s, or be the last HQ.
 victory:

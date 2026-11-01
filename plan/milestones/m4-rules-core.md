@@ -35,7 +35,7 @@ Typed, immutable models for `units.yaml`, `combat.yaml`, `terrain.yaml`, `battle
 Validation (fail with a clear message naming file, key and value):
 - every unit `armor_type` is in `armor_types`; every `weapons.default` is null (unarmed unit, `allowed: []`) or in its `allowed` list; every allowed weapon exists in `weapon_types`;
 - every weapon has a row in `multipliers` with every armor type; `hit_chance.size_factor` covers every armor type;
-- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`, `push`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and `ap_max` is 30; a flying unit's base `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decisions 174, 178);
+- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`, `push`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and `ap_max` is 30; every unit and the HQ have a `hit_box_m`; every weapon except artillery and the explosive charge has a `projectile_speed_mps`; a flying unit's base `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decisions 174, 178);
 - `commander_levels.section_xp` has `max_level` values, in increasing order;
 - every terrain object has an `armor_type` in `armor_types`;
 - every action in a unit's `actions` is known (`capture`, `push`, `build`, `repair`, `heal`, `observe`) and its up-front AP is at most the unit's `ap_max` (decision 132).
@@ -108,11 +108,12 @@ Depends on: 5, 6.
 - `chance = base_accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed × morale factors (× indirect factor)`, clamped to `[min, max]`; full cover (factor 0) still gets the minimum (decision 135).
 - Indirect fire (artillery) may target a ground position seen by its section or relayed by a radio; other weapons need the unit's own sight. The engineer's explosive charge never misses (COMBAT-55).
 - A missed artillery shot lands in a random direction from the aimed point, at `miss_scatter.max_m` × `(roll − chance) / (1 − chance)`. The landing point stays within `range_m` of the artillery: a point beyond it is moved back toward the artillery to `range_m` (decision 154). Splash damage does not depend on `range_m`.
-- First-person: spread from `aim` values, tightened by `attack`, scaled by morale. The rules core only provides the spread value; projectile flight is the client's job.
+- First-person (decision 183): the order gives the aim direction and the fire time. The rules core deviates the direction by the spread (`aim` values, tightened by `attack`, scaled by morale) with the seeded RNG, flies the projectile at `projectile_speed_mps`, and returns the first hit volume (`hit_box_m`) or obstacle on its path. Obstacles come from an injected query (terrain and objects), as sight lines do in Issue 5. The client only draws the projectile (stack decision 8).
 - Hit roll uses the injected seeded RNG.
 
 Acceptance criteria:
 - Factor tests and clamp tests; a statistical test (fixed seed, 10,000 rolls) matches the computed chance within 1 %.
+- First-person: a shot hits the first hit volume or obstacle on its path; a target that moves out of the line during the flight is missed; the same seed gives the same spread.
 
 ## Issue 8: Damage, friendly fire, transports
 Label: `combat`

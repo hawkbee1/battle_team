@@ -129,7 +129,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-31** Does `move_speed` drop on rough ground (forest, mud), or does only the AP cost change? → decision 180 (only the AP cost)
 - [x] **Q-CBT-32** `ap_per_m` of the units the designer did not name. → decision 181 (placeholders accepted)
 - [x] **Q-CBT-33** Infantry pace, radio and guild camp speeds. → decision 182 (infantry runs; radio 5 m/s, guild camp 1 m/s)
-- [ ] **Q-CBT-34** First-person shots (COMBAT-14: projectiles travel in 3D, obstacles block them): does a shot travel at a speed per weapon, or hit at once along its line? What hit volume (height, width, length) does each unit type have? The data has neither, so nothing can trace a shot yet. Assumed: nothing; M4 Issue 7 leaves projectile flight to the client.
+- [x] **Q-CBT-34** First-person shots: projectile speed or instant hit, and the hit volume of each unit type. → decision 183 (a speed per weapon; `hit_box_m` per unit and for the HQ)
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).

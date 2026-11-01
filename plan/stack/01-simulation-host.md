@@ -35,6 +35,7 @@ Assumptions (placeholders, to measure in M4 Issue 11 and M3 Issue 6). They hold 
 - Morale updated per minute, not per tick: about 17 updates per second.
 - AP is lazy (see Choice): no work per tick.
 - Server-managed units are checked every 30 minutes (decision 160): negligible.
+- First-person shots are traced on the host (decision 183): one ray march per shot against terrain, objects and nearby hit volumes, well under a millisecond each, within the shot counts below.
 
 Results:
 - **Hit rolls:** typical about 2,000 shots a day, 0.02 per second on average. The AP budget caps it at 12,000 rifle shots a day (0.14 per second), or 24,000 machine-gun shots a day (0.28 per second).
