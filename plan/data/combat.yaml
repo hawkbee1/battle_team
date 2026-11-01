@@ -149,23 +149,23 @@ ap:
   costs_ap: [shot, move, push, pickup_weapon, role_actions]
   time_only: [reload, unload, swap_weapon, land, take_off]   # decisions 55, 68
 
-# Role actions (decision 66): fixed AP paid up front, then a duration.
+# Role actions (decision 66): fixed AP paid up front, then a duration. Capture is paid into a team pot (decision 170).
 # A unit must have the AP to start. Interrupted: AP lost, progress kept.
 # Constructions (build) have their own AP/time per structure: data/terrain.yaml (decision 113).
 actions:
   heal:    { instant: true, targets: friendly_except_hq }   # AP and HP from the healer's role (units.yaml, decisions 91, 139)
   repair:  { ap: 10, duration_s: 10, hp_restored: 50, targets: friendly_except_hq }   # placeholder; structures too (decisions 13, 139)
-  capture: { settings: data/battle.yaml, progress_owner: team }   # decisions 97, 140
+  capture: { settings: data/battle.yaml, progress_owner: team }   # decisions 97, 140, 170, 173
   interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining, capture_progress_kept: false }   # decisions 67, 97
 
 # Pushing a relic or the HQ (decisions 66, 98, 138, 171): at least min_pushers units that can push
 # (units.yaml actions). The relic or HQ moves at speed_m_per_h while the team's push pot holds AP.
-# Each metre pushed costs pot_ap_per_m from the pot, multiplied by the signed slope factor of the
-# movement class (data/terrain.yaml). Pushers add contribution_ap per action, as often as they like.
+# Each metre pushed costs pot_ap_per_m from the pot, multiplied by a signed slope factor
+# (data/terrain.yaml; which class: Q-REL-12). Pushers add contribution_ap per action, as often as they like.
 # An empty pot stops the push; it stops too while fewer than min_pushers push.
 push:
   speed_m_per_h: 5              # decision 138
-  pot_ap_per_m: 10              # 50 AP per 5 m (decision 171)
+  pot_ap_per_m: 10              # placeholder: 50 AP per 5 m (Q-REL-12)
   contribution_ap: 5            # AP a pusher adds to the pot per action (decision 171)
   min_pushers: 10               # decision 98
   pot_empty: stops              # decision 171

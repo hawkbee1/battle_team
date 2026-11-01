@@ -30,7 +30,7 @@ A **map builder** command (a Dart package in the repository) validates a map and
 ## Sizes and budgets
 - A 10 × 50 km map: 1,000 × 5,000 cells. Heights 2 bytes per cell (10 MB raw), terrain 1 byte per cell (5 MB raw). Compressed PNG is much smaller. The client downloads the tiles near the camera.
 - Vertices: each cell has a vertex, so 5 million vertices in total across all tiles. Only the tiles near the camera are drawn at full detail.
-- In memory on the host: about 20 MB for one map copy, shared by all its battles (decision 1).
+- In memory on the host: about 20 MB for one map copy, shared by all its battles (stack decision 1).
 - **World-change budget** (answers Q-MAP-09 at the level of the stack): a change is applied on the host in under 10 ms, and reaches the clients in under 1 second. The path update budget is M3 Issue 5's: only the cells touched by the change are re-computed. Both are tests in `performance-tests.md`.
 
 ## Consequences

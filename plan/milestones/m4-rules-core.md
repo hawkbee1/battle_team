@@ -1,12 +1,12 @@
 # Milestone 4: headless rules core
 
-Goal: a headless rules core that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`): Dart, in the package `packages/battle_rules` of this repository.
+Goal: a headless rules core that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`): Dart, in the package `battle_rules` (its own repository, hawkbee `packages/battle_rules`, stack decision 7).
 
 Each issue below is ready to be created as a GitHub issue in the milestone "M4 – Rules core". Labels: `rules-core` plus the one listed. Every issue names the spec rules it implements; code and tests cite those IDs in comments and test names (for example a test named `COMBAT-06 moves at regen speed at 0 AP`).
 
 ## Conventions for all issues
-- Inside this repository (battle_team), an exception to the hawkbee convention of one repository per package.
-- **Language and layout (M2)**: Dart. `packages/battle_rules` is a pure Dart package with no Flutter import, so the host and the client both use it. Tests with `package:test`, lints with `very_good_analysis`, coverage with `very_good test --coverage`. 100 % line coverage target.
+- **Repositories (stack decision 7)**: each package lives in the hawkbee workspace `packages/` folder, in its own public repository `hawkbee1/<name>` added to hawkbee as a git submodule. Procedure: hawkbee `docs/dart_code_3d/agent-workflow.md`, section 2.
+- **Language and layout (M2)**: Dart. `battle_rules` is a pure Dart package with no Flutter import, so the host and the client both use it. Tests with `package:test`, lints with `very_good_analysis`, coverage with `very_good test --coverage`. 100 % line coverage target.
 - **Numbers only in YAML.** No game number is written in code or tests except inside test fixtures. Tests on real values read them from `plan/data/*.yaml`. When a value is tuned, the tests that use it are updated in the same change.
 - **Deterministic.** Time is passed in (no wall clock); randomness comes from an injected seeded RNG.
 - Immutable models, no global state.
@@ -64,11 +64,11 @@ Rules: COMBAT-03, MAP-11, MAP-12, MAP-13, MAP-14, MAP-15, MAP-16, MAP-17, MAP-18
 Depends on: 2.
 
 - AP cost of moving a unit along a path given as samples `(terrain type, slope degrees, length m)`.
-- Cost per metre from the (movement class or profile, terrain) table × `max(min_multiplier, 1 + slope × factor)`, with a **signed** slope (positive uphill, decision 133); impassable when the table says `null` or the slope, up or down, is steeper than `max_degrees`.
+- Cost per metre: the unit's `ap_per_m` × the `ap_multiplier` of (movement class or profile, terrain) × `max(min_multiplier, 1 + slope × factor)`, with a **signed** slope (positive uphill, decision 133); impassable when the table says `null` or the slope, up or down, is steeper than `max_degrees`.
 - Profiles: `flying` (while flying), `sail` (water); a landed flyer uses its ground class; a unit with `sail` and a ground class (amphibious) uses whichever fits the terrain; a boat (sail, no ground class) cannot enter land.
 
 Acceptance criteria:
-- Table-driven tests for every movement class on every terrain, including impassable cases and the slope limit, uphill and downhill, and the downhill floor.
+- Table-driven tests for every movement class on every terrain, including impassable cases and the slope limit, uphill and downhill, and the downhill floor. Units with different `ap_per_m` (infantry, tank, jeep).
 - Boat, amphibious and helicopter (flying and landed) cases.
 
 ## Issue 5: Vision
@@ -146,14 +146,16 @@ Label: `actions`
 Rules: COMBAT-07, COMBAT-08, COMBAT-09, UNIT-33, UNIT-35, UNIT-38, RELIC-05, RELIC-06, RELIC-07, RELIC-08, RELIC-09, RELIC-24, RELIC-25, RELIC-29, HQ-12, HQ-14.
 Depends on: 3, 4.
 
-- Build, repair, capture: AP paid up front (unit must have it), then a duration. Construction AP and time from `terrain.yaml` objects; capture values from `battle.yaml`.
+- Build and repair: AP paid up front (the unit must have it), then a duration. Construction AP and time from `terrain.yaml` objects.
+- Capture: a team pot of `pot_ap`, filled by units inside the radius with `contribution_ap` per action, as often as they like; the capture duration starts when the pot is full (decisions 170, 173). Values from `battle.yaml`.
+- A partly filled pot keeps its AP until it is used up or control is lost (decision 173, Q-REL-13).
 - Heal is instant: `heal_ap` restores `heal` HP. Heal and repair work on every friendly unit except the HQ (decision 139).
 - Interrupted action: AP lost, progress kept, resuming costs the remaining part; **except** a capture interrupted by an enemy entering the radius, which loses its progress and its pot. Capture progress belongs to the team: another unit of the team can resume it (decision 140).
 - Capture radius: every unit inside counts whatever its state; any enemy blocks.
-- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_m_per_h`; each metre pushed costs `pot_ap_per_m` from the team push pot × the signed slope factor of its class; an empty pot stops the relic, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
+- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_m_per_h`; pushers add `contribution_ap` per action to the team push pot, and each metre pushed costs `pot_ap_per_m` from it × a signed slope factor (which one: Q-REL-12); an empty pot stops the relic, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
 
 Acceptance criteria:
-- Tests for each action, both interruption cases, the capture block, a capture resumed by another unit of the team, a pusher running out of AP, and the crush rule with 10, 11 and 13 pushers.
+- Tests for each action, both interruption cases, the capture block, a capture pot filled by several units, a capture resumed by another unit of the team, an empty push pot, a partly filled pot kept after the push stops, and the crush rule with 10, 11 and 13 pushers.
 
 ## Issue 11: Scenario harness
 Label: `tooling`

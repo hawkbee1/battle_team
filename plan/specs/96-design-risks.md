@@ -28,9 +28,9 @@ Accepted for now (designer, 2026-10-31).
 
 ## R-02 Money is paid per hit, not per damage
 Accepted for now (designer, 2026-10-31).
-- Destroying the 1,000 HP HQ earns about 25,000 w€ in hit money with machine guns (0.4 damage per hit, 10 w€ per HQ hit), and 90 w€ with explosive charges (ECO-18).
+- Destroying the 1,000 HP HQ earns about 25,000 w€ in hit money with machine guns (0.4 damage per hit, 10 w€ per HQ hit), and 90 w€ with explosive charges (ECO-18). The 2,500 machine-gun hits cost at least 2,500 AP: about 83 full pools, or about 100 unit-days of recovery at the default rate (decision 172).
 - Nothing excludes hits on relics (0 damage), on allies or on the team's own structures; only XP excludes allies (UNIT-10).
-- A heal pays 5 w€ whatever it restores. A medic healing a teammate that a friendly rifleman keeps shooting earns about 2,700 w€/h. The build-and-destroy loop accepted in ECO-22 earns about 60 w€/h per engineer. Guild camps can heal too (decision 141).
+- A heal pays 5 w€ whatever it restores, and costs 10 AP. At the default rate a medic heals 3 times from a full pool, then once every 10 hours: about 12 w€ a day. The build-and-destroy loop accepted in ECO-22 is limited the same way: a 5 AP ladder, road or trap every 5 hours earns about 24 w€ a day per engineer, before the AP spent to destroy it. Guild camps can heal too (decision 141).
 
 ## R-03 A newcomer's first week has no rule
 The research note (`specs/90-research-topic-priority.md`) ranks it as the topic with the highest impact.

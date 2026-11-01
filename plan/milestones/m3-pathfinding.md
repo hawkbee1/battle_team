@@ -1,6 +1,6 @@
 # Milestone 3: pathfinding
 
-Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and HQs, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`, `stack/05-map-format.md`): Dart, in `packages/battle_rules` beside M4, with the 10 m cell grid of the map format.
+Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and HQs, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`, `stack/05-map-format.md`): Dart, in the package `battle_pathfinding` (its own repository, hawkbee `packages/battle_pathfinding`, stack decision 7), with the 10 m cell grid of the map format.
 
 Each issue below is ready to be created as a GitHub issue in the milestone "M3 – Pathfinding". Labels: `pathfinding` plus the one listed.
 
@@ -10,7 +10,7 @@ Each issue below is ready to be created as a GitHub issue in the milestone "M3 �
 - The movement cost is **injected**: a function `(unit AP per metre, movement class or profile, terrain type, signed slope) → AP per metre, or impassable`. Tests use fixture costs; M4 Issue 4 later provides the real one from `data/terrain.yaml`. M3 and M4 therefore do not depend on each other.
 
 ## Conventions
-Same as M4 (`milestones/m4-rules-core.md`, "Conventions for all issues"): inside this repository, language and tools from M2, 100 % line coverage target, deterministic, immutable models, rule IDs in test names, and no guessing (open a question in `specs/95-open-questions.md`).
+Same as M4 (`milestones/m4-rules-core.md`, "Conventions for all issues"): a package in the hawkbee workspace with its own repository (stack decision 7), language and tools from M2, 100 % line coverage target, deterministic, immutable models, rule IDs in test names, and no guessing (open a question in `specs/95-open-questions.md`).
 
 ---
 
@@ -61,7 +61,7 @@ Depends on: 3.
 - Relics and HQs cannot fly, and cannot cross water (except on reinforced bridges), forests, towns or walls.
 - A relic or an HQ can go over the edge of a floating island and fall (RELIC-22, HQ-48).
 - A walled-in relic has no path until a wall is destroyed (RELIC-28).
-- The slope cost is the pushers' (signed, decision 133).
+- The push is paid from the team's push pot (decision 171); its price per metre and slope factor are open (Q-REL-12).
 
 Acceptance criteria:
 - A relic crosses a reinforced bridge but not a normal one, avoids forests and towns, has no path when walled in, and falls from an island edge; an HQ falls too.

@@ -8,7 +8,7 @@ Each issue below is ready to be created as a GitHub issue in the milestone "M2 â
 - Persistent battles that last days and keep running while players are away (decision 3), in real time (decision 4).
 - 100+ players per battle (decision 2), 2 to 5 teams, maps up to 10 Ã— 50 km (MAP-04).
 - An authoritative server: fog of war per section (MAP-29), hit resolution with a seeded RNG (M4).
-- Timers from seconds to days: AP regen, morale per minute, 30-minute captures, 6-hour recalls, 24-hour locks and the victory timer.
+- Timers from seconds to days: AP recovery, morale per minute, 30-minute captures, 6-hour recalls, 24-hour locks and the victory timer.
 - A world that changes during a battle and must reach late joiners (MAP-06, MAP-08).
 - Top-down command and first-person control of a unit (decision 5).
 - The rules core (M4) and pathfinding (M3) running where the rules are resolved.
@@ -69,7 +69,7 @@ Acceptance criteria:
 - Decision record.
 
 ## Issue 7: Engineering principles and package layout
-Label: `stack`
+Label: `engineering`
 
 SOLID principles, Gang of Four patterns and their use in Dart, the VGV tooling used to build and test, and the location of every package (`packages/`, never under `apps/battle_team/`).
 
@@ -90,3 +90,7 @@ Acceptance criteria:
 - Every issue has its decision record, and Q-GEN-01 points to them.
 - M3 and M4 name their language, project layout and tools.
 - The outline of M5 to M7 at the end of `milestones/m4-rules-core.md` is rewritten for the chosen stack.
+
+## Status (2026-11-01)
+- The eight records exist in `plan/stack/` and are **proposed**. The three conditions above are met; M2 ends when the designer confirms the records.
+- Open questions that block M3 or M4: Q-REL-12 and Q-REL-13 (M3 Issue 4, M4 Issue 10). The others still open (Q-CBT-31 to Q-CBT-33, Q-UNIT-21, Q-UNIT-22) are about placeholders or M5.

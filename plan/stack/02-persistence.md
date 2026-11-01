@@ -9,7 +9,7 @@ Status: **proposed** (milestone M2, Issue 2). Rules: decisions 3, 26 to 28, 143,
 - **API keys**: one per account, stored so that they can be revoked by the user or an admin (decisions 158, 161). Each action records whether a player or an AI did it (decision 162).
 
 ## Volumes
-Estimated 2026-11-01 from the AP rules (record 01 has the derivation). Default recovery, one battle:
+Estimated 2026-11-01 from the AP rules (stack decision 1 has the derivation). Default recovery, one battle:
 
 | Case | Log events a day | Size a day |
 |---|---|---|
@@ -17,6 +17,7 @@ Estimated 2026-11-01 from the AP rules (record 01 has the derivation). Default r
 | Worst: 1 m orders with machine guns | about 24,000 | about 2.4 MB |
 
 - Battle-start burst: up to 5,000 events, once per battle.
+- What is logged: inputs (orders with their time, seeds) and, in the same entry as each attack, its outcome (hit or miss, damage, kill), so the statistics batch reads the log without replaying the battle. Tick times are implicit (1 Hz from the battle start) and are not logged.
 - Write rate: about 0.05 events per second per battle (typical), 0.3 at worst. About 5 to 28 per second for 100 battles.
 - Statistics: one batch a day per battle, reading about 0.4 MB. No timeout concern.
 
@@ -34,7 +35,7 @@ Write path for one battle:
 3. Every 10 seconds, the host uploads the new log entries as one compressed file to Appwrite Storage. At typical volumes a file holds about one event.
 4. Every 5 minutes, the host writes a snapshot of the battle state, also to Appwrite Storage.
 
-Recovery: load the latest snapshot, replay the uploaded and local logs after it. Both the snapshot and the replay are deterministic (decision 1).
+Recovery: load the latest snapshot, replay the uploaded and local logs after it. Both the snapshot and the replay are deterministic (stack decision 1).
 
 ## Consequences
 - **Known gap, accepted by the designer (2026-10-31)**: if a host machine is lost together with its local disk, the inputs of the last 10 seconds may be lost. Accepted until the first real battles (M8). The alternative is to replicate the write-ahead log before acknowledging, which costs latency.

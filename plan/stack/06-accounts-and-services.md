@@ -10,7 +10,7 @@ Status: **proposed** (milestone M2, Issue 6). Rules: SOC-16 (admins create wars 
 - **One API key per account** (decision 158), revocable by the user or an admin, with every action attributed to the key's owner (decision 162).
 
 ## Accounts
-**Appwrite Auth** in the shared Hawkbee project. The app already uses it (`appwrite_api_client`), and the sessions it issues authenticate the WebSocket connection (decision 3).
+**Appwrite Auth** in the shared Hawkbee project. The app already uses it (`appwrite_api_client`), and the sessions it issues authenticate the WebSocket connection (stack decision 3).
 
 ## Discord
 - **Linking**: Discord OAuth2, done through Appwrite's OAuth support, if the Appwrite version used offers a Discord provider. **To verify** on the project before implementation. Otherwise, a direct OAuth2 flow with the server as the callback.

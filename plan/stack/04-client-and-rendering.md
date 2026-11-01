@@ -11,7 +11,7 @@ Status: **proposed** (milestone M2, Issue 4). Rules: decision 5 (top-down and fi
 ## Options
 1. **Flame** (the current app dependency). A 2D engine. A top-down view can be drawn in 2D, but first person cannot. Rejected for the game world.
 2. **flutter_scene** (3D on Flutter's GPU stack, with a WebGL2 backend for the web). Already a submodule of the workspace (`packages/flutter_scene`) and used by `dart_code_3d`. The same Dart code runs on all six targets, and Flutter widgets draw the interface on top.
-3. **Unity or Godot.** Mature 3D on all targets, but a different language and toolchain. The Dart rules core would need a port or a bridge, which breaks decision 1. Rejected.
+3. **Unity or Godot.** Mature 3D on all targets, but a different language and toolchain. The Dart rules core would need a port or a bridge, which breaks stack decision 1. Rejected.
 4. **A web 3D library inside a WebView** (for example three.js). One code path on Web, but separate paths on the other platforms, and a bridge for the interface. Rejected.
 
 ## Choice
@@ -62,7 +62,7 @@ Proposed, to confirm:
 - The first-person camera needs projectile visuals in 3D. The rules give only the spread (M4 Issue 7); the visuals are the client's job.
 
 ## Consequences
-- The client depends on `battle_rules` for display maths and on the network protocol (decision 3). It never runs its own combat resolution.
+- The client depends on `battle_rules` for display maths and on the network protocol (stack decision 3). It never runs its own combat resolution.
 - The 3D code lives beside the app's Flame scaffold until M7 decides what stays.
 - The spike is the first M7 task, so the choice can be reversed cheaply if it fails.
 - Linux and macOS need their platform folders added to the app (the repository has `macos/` but no `linux/` yet). This is an M7 task.

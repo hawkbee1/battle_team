@@ -16,7 +16,7 @@ Status: **proposed** (milestone M2, Issue 1). Rules: decisions 2 to 4, 160, 165,
 4. **Pure event sourcing with no tick**: every change scheduled as an event. Continuous AP and vision make it hard to keep correct.
 
 ## Choice
-**Option 3, on long-running processes.** Each process hosts a set of battles that share a map. A battle stays on one process for its whole life. Recovery after a crash: load the latest snapshot, then replay the inputs logged after it (see decision 2).
+**Option 3, on long-running processes.** Each process hosts a set of battles that share a map. A battle stays on one process for its whole life. Recovery after a crash: load the latest snapshot, then replay the inputs logged after it (see stack decision 2).
 
 AP is computed lazily: AP at time *t* is `min(ap_max, AP at the last update + hours since then × recovery_per_hour)`.
 
@@ -38,14 +38,14 @@ Assumptions (placeholders, to measure in M4 Issue 11 and M3 Issue 6). They hold 
 
 Results:
 - **Hit rolls:** typical about 2,000 shots a day, 0.02 per second on average. The AP budget caps it at 12,000 rifle shots a day (0.14 per second), or 24,000 machine-gun shots a day (0.28 per second).
-- **Battle-start burst:** the starting pools allow up to 15,000 rifle shots (30,000 AP at 2 AP each). If 400 units (40 %) fire rifles together at about 0.67 shots per second each, that is about **270 hit rolls per second for about one minute**.
+- **Bursts:** a rested unit holds 30 AP: 15 rifle shots, fired in about 22 s (40 rounds a minute, one 3 s reload), or 30 machine-gun shots, fired in about 4 s. If 400 units (40 %) open fire together, that is about **270 hit rolls per second for about 20 s with rifles**, or about **3,300 per second for about 4 s with machine guns**. The same burst happens whenever rested units meet, not only at battle start.
 - **CPU:** path requests and hit rolls cost little. Target scans for units in contact (about 1 ms per tick on average) dominate. Total about **1 to 2 minutes of one core per simulated day**. Scans gated on units that have the AP for a shot would lower it further. Measured in M4 Issue 11.
-- **Memory:** the map is shared by all battles on it. A 10 × 50 km map at 10 m cells is 1,000 × 5,000 = 5 million cells, about 4 bytes each: about 20 MB, plus about 15 MB for about 200,000 objects. Each battle adds about 1 MB for its units. About 20 battles per process would fit in about 0.6 GB. The figure of 10 m per cell is a proposal (see decision 5).
+- **Memory:** the map is shared by all battles on it. A 10 × 50 km map at 10 m cells is 1,000 × 5,000 = 5 million cells, about 4 bytes each: about 20 MB, plus about 15 MB for about 200,000 objects. Each battle adds about 1 MB for its units. About 20 battles per process would fit in about 0.6 GB. The figure of 10 m per cell is a proposal (see stack decision 5).
 - **Logs:** about 4,000 events a day at about 100 bytes each: **about 0.4 MB of log per battle per day**. Worst case (1 m orders): 24,000 events, 2.4 MB. The battle-start burst adds up to 5,000 events once. Details in `02-persistence.md`.
 
 ## Consequences
-- Every input (order, time step, seed) must be logged before it is acknowledged, so that a crash does not lose an order (decision 2).
+- Every input (order, time step, seed) must be logged before it is acknowledged, so that a crash does not lose an order (stack decision 2).
 - The rules core is pure Dart with no Flutter import; the host and the client both depend on it (M4 Issue 1).
 - Battle placement (which process hosts which battle) is a server concern, not a rule. It is recorded when it is built (M5).
-- The burst at battle start, not the daily average, sets the peak. The host must sustain about 270 hit rolls per second for a minute.
+- Bursts, not the daily average, set the peak: up to a few thousand hit rolls per second for a few seconds when rested units open fire.
 - Benchmarks are required before the process size is fixed: the figures above are estimates, not measurements.

@@ -17,17 +17,17 @@ Conventions:
 
 ### P-02 Simulation host, one 1,000-unit battle over one simulated day (M2 Issue 1)
 - Measure: CPU per tick at peak and on average, memory of one battle and of one map, and the number of battles one process holds.
-- Target: the estimate in `stack/01` (about 5 ms per tick at peak; 1 to 3 % of one core on average). Replace with the measured figures.
+- Target: the estimate in `stack/01` (about 1 to 2 minutes of one core per simulated day; bursts of up to a few thousand hit rolls per second for a few seconds). Replace with the measured figures.
 - Where: `stack/01`.
 
 ### P-03 Battle log volume (M2 Issue 2)
 - Measure: bytes per logged event, events per second, and the upload size per 10-second batch.
-- Target: about 90 MB per battle per day (estimate). The Appwrite Storage limits must hold at that volume (`stack/02`).
+- Target: about 0.4 MB per battle per day, 2.4 MB at worst (estimates), in about 8,640 ten-second files. The Appwrite file-count and storage limits must hold at that number (`stack/02`).
 - Where: `stack/02`.
 
 ### P-04 Network traffic of one section in a fight (M2 Issue 3)
 - Measure: bytes per second to one section during a fight, and the late-join transfer size (visible state plus the delta layer).
-- Target: about 70 kbit/s down per section (estimate, 100 units in view at 5 Hz); late-join transfer of a few hundred kilobytes, compressed.
+- Target: about 7 to 9 kbit/s down per section during a fight, with bursts of about 35 kbit/s (rifles) to 430 kbit/s (machine guns, one event per shot) for a few seconds (estimates, `stack/03`); late-join transfer of a few hundred kilobytes, compressed.
 - Where: `stack/03`.
 
 ### P-05 Rendering spike: 1,000 units on screen (M7, before the client)
