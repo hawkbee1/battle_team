@@ -40,6 +40,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change. → decision 145 (accepted)
 - [x] **Q-UNIT-21** Speed caps and evolution: does the cap of decision 174 apply to evolved speeds? → decision 178 (base speeds only; evolution follows the 300 % cap)
 - [x] **Q-UNIT-22** Capture XP (`xp_sources.capture`, 50) with a team pot (decision 170): who gets it? → decision 179 (shared by the AP each unit put in, paid on success)
+- [x] **Q-UNIT-23** Scout observe (+30 m, decision 119): added to `vision_range` before the weather and terrain factors, or after them? → decision 184 (to `vision_range`)
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96

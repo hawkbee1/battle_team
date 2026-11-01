@@ -302,6 +302,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 181. The `ap_per_m` placeholders are accepted: artillery, radio and guild camp **0.2**; truck, helicopter and boat **0.1**. They are tuned with the scenario harness (M4 Issue 11).
 182. **Infantry runs.** Infantry keeps running speeds, 4 to 7 m/s: a 30 m pool is a short dash. The radio moves at **5 m/s** and the guild camp at **1 m/s**.
 183. **First-person shots fly.** In first-person control a shot is a projectile that travels at its weapon's speed (`projectile_speed_mps`: rifle 900, machine gun 850, anti-tank 300, anti-air 600 m/s). The player's aim gives its direction, the spread deviates it at random, and it hits the first unit, HQ or obstacle on its path. Each unit type and the HQ have a hit volume (`hit_box_m`: width, length, height), close to the real thing. All values are placeholders. Artillery keeps its rolled indirect fire and the explosive charge never misses, so neither flies.
+184. **Observe raises the vision range.** The scout's observe bonus (+30 m, decision 119) is added to its `vision_range`, before the weather and terrain factors: in fog (factor 0.4) it adds 12 m.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

@@ -61,7 +61,9 @@ Rules:
 ### Effective vision (decision 59)
 Vision is reduced by weather and terrain and extended by height:
 
-`effective vision = vision_range × weather factor × terrain factor + height bonus`
+`effective vision = (vision_range + observe bonus) × weather factor × terrain factor + height bonus`
+
+The observe bonus is a scout's while it observes (UNIT-34, decision 184), 0 otherwise.
 
 - **MAP-31** **Weather factor**: weather is a state of the battle (clear, rain, fog, snow) that **changes randomly, per map**. Each state has a vision factor. **There is no day/night: it is always day.** (Decision 90)
 - **MAP-32** **Terrain factor**: the terrain where the observer stands (for example a forest lowers it).
