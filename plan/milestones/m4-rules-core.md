@@ -2,7 +2,7 @@
 
 Goal: a headless rules core that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`): Dart, in the package `battle_rules` (its own repository, hawkbee `packages/battle_rules`, stack decision 7).
 
-Each issue below is ready to be created as a GitHub issue in the milestone "M4 – Rules core". Labels: `rules-core` plus the one listed. Every issue names the spec rules it implements; code and tests cite those IDs in comments and test names (for example a test named `COMBAT-06 moves at regen speed at 0 AP`).
+Each issue below is one agent work session (hawkbee `docs/battle_team/`). Every issue names the spec rules it implements; code and tests cite those IDs in comments and test names (for example a test named `COMBAT-06 moves at regen speed at 0 AP`).
 
 ## Conventions for all issues
 - **Repositories (stack decision 7)**: each package lives in the hawkbee workspace `packages/` folder, in its own public repository `hawkbee1/<name>` added to hawkbee as a git submodule. Procedure: hawkbee `docs/dart_code_3d/agent-workflow.md`, section 2.
@@ -15,7 +15,6 @@ Each issue below is ready to be created as a GitHub issue in the milestone "M4 �
 ---
 
 ## Issue 1: Project scaffold
-Label: `infra`
 Rules: none (setup).
 
 Create the rules-core project with the language, layout and tools chosen in M2, with no rendering or UI dependency.
@@ -26,11 +25,10 @@ Acceptance criteria:
 - Its README says how to run the tests and points to `plan/`.
 
 ## Issue 2: Load and validate the data files
-Label: `data`
 Rules: COMBAT-10, COMBAT-20, COMBAT-22, COMBAT-23, COMBAT-50, UNIT-03, UNIT-17, UNIT-23, UNIT-38, MAP-15, MAP-21, MAP-35, MAP-40.
 Depends on: 1.
 
-Typed, immutable models for `units.yaml`, `combat.yaml`, `terrain.yaml`, `battle.yaml`, `economy.yaml`, `medals.yaml`, and a loader that takes a directory path.
+Typed, immutable models for `units.yaml`, `combat.yaml`, `terrain.yaml`, `battle.yaml`, `economy.yaml`, `medals.yaml`, and a parser that takes the text of each file: the package reads no files (stack decision 7).
 
 Validation (fail with a clear message naming file, key and value):
 - every unit `armor_type` is in `armor_types`; every `weapons.default` is null (unarmed unit, `allowed: []`) or in its `allowed` list; every allowed weapon exists in `weapon_types`;
@@ -45,7 +43,6 @@ Acceptance criteria:
 - One fixture per validation rule proves the error message.
 
 ## Issue 3: Simulation clock and AP pool
-Label: `ap`
 Rules: COMBAT-01, COMBAT-02, COMBAT-04, COMBAT-05, COMBAT-06, MAP-20, HQ-34, UNIT-38.
 Depends on: 2.
 
@@ -59,7 +56,6 @@ Acceptance criteria:
 - Property test: AP stays within `[0, ap_max]` for any sequence of actions and time steps.
 
 ## Issue 4: Movement cost
-Label: `movement`
 Rules: COMBAT-03, MAP-11, MAP-12, MAP-13, MAP-14, MAP-15, MAP-16, MAP-17, MAP-18, MAP-19, MAP-22, MAP-23, UNIT-01, UNIT-02.
 Depends on: 2.
 
@@ -73,7 +69,6 @@ Acceptance criteria:
 - Boat, amphibious and helicopter (flying and landed) cases.
 
 ## Issue 5: Vision
-Label: `vision`
 Rules: COMBAT-11, MAP-26, MAP-27, MAP-28, MAP-29, MAP-30, MAP-31, MAP-32, MAP-33, MAP-34, MAP-35, UNIT-34.
 Depends on: 2.
 
@@ -87,7 +82,6 @@ Acceptance criteria:
 - Tests per factor and combined; a flying observer (shorter forest crossing) sees a forest target a ground observer cannot.
 
 ## Issue 6: Weapons and firing cycle
-Label: `combat`
 Rules: COMBAT-04, COMBAT-05, COMBAT-13, COMBAT-26, COMBAT-27, COMBAT-28, COMBAT-29, COMBAT-30, COMBAT-31, COMBAT-32, COMBAT-33, COMBAT-56, UNIT-03, UNIT-04.
 Depends on: 3.
 
@@ -100,8 +94,7 @@ Depends on: 3.
 Acceptance criteria:
 - Timeline tests (e.g. artillery must unload before moving; MG empties a magazine at its rate of fire).
 
-## Issue 7: Hit chance under orders/AI and first-person spread
-Label: `combat`
+## Issue 7: Hit chance under orders/AI and first-person shots
 Rules: COMBAT-12, COMBAT-14, COMBAT-15, COMBAT-16, COMBAT-17, COMBAT-18, COMBAT-19, COMBAT-49, COMBAT-53.
 Depends on: 5, 6.
 
@@ -116,7 +109,6 @@ Acceptance criteria:
 - First-person: a shot hits the first hit volume or obstacle on its path; a target that moves out of the line during the flight is missed; the same seed gives the same spread.
 
 ## Issue 8: Damage, friendly fire, transports
-Label: `combat`
 Rules: COMBAT-20, COMBAT-21, COMBAT-24, COMBAT-25, COMBAT-34, COMBAT-36, COMBAT-54, COMBAT-55, UNIT-37, MAP-40, HQ-16, HQ-22.
 Depends on: 2.
 
@@ -130,7 +122,6 @@ Acceptance criteria:
 - Tests for every weapon against every armor type read from the real table; flying target cases; carried units; splash falloff with distance.
 
 ## Issue 9: Morale and 0-HP outcomes
-Label: `combat`
 Rules: COMBAT-36, COMBAT-37, COMBAT-38, COMBAT-39, COMBAT-40, COMBAT-41, COMBAT-43, COMBAT-46, COMBAT-47, COMBAT-48, COMBAT-49, UNIT-39.
 Depends on: 8.
 
@@ -143,8 +134,7 @@ Acceptance criteria:
 - Non-commander final blow always kills; a commander's final blow on an ally always kills.
 - An enemy commander or a guild camp is never spared (decision 149).
 
-## Issue 10: Role actions, pushing and interruption
-Label: `actions`
+## Issue 10: Role actions, pushing, HQ moves and interruption
 Rules: COMBAT-07, COMBAT-08, COMBAT-09, UNIT-33, UNIT-35, UNIT-38, RELIC-05, RELIC-06, RELIC-07, RELIC-08, RELIC-09, RELIC-24, RELIC-25, RELIC-29, HQ-10, HQ-12, HQ-14.
 Depends on: 3, 4.
 
@@ -161,7 +151,6 @@ Acceptance criteria:
 - Tests for each action, both interruption cases, the capture block, a capture pot filled by several units, a capture resumed by another unit of the team, an empty push pot, a partly filled pot kept after the push stops, a push pot emptied by a capture and by a fall, a waiting capture pot emptied by an enemy entering the radius, the crush rule with 10, 11 and 13 pushers, an HQ draining its AP in mud, and an HQ move ended by a unit in its path.
 
 ## Issue 11: Scenario harness
-Label: `tooling`
 Rules: all of the above (integration).
 Depends on: 3–10.
 

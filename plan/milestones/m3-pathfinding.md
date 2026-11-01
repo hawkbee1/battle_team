@@ -2,7 +2,7 @@
 
 Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and the moving HQ, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`, `stack/05-map-format.md`): Dart, in the package `battle_pathfinding` (its own repository, hawkbee `packages/battle_pathfinding`, stack decision 7), with the 10 m cell grid of the map format.
 
-Each issue below is ready to be created as a GitHub issue in the milestone "M3 – Pathfinding". Labels: `pathfinding` plus the one listed.
+Each issue below is one agent work session (hawkbee `docs/battle_team/`).
 
 ## Why before the rules core, and what it does not depend on
 - M4 computes the AP cost of a path, but nothing produces paths, and maps are up to 10 × 50 km (MAP-04).
@@ -15,7 +15,6 @@ Same as M4 (`milestones/m4-rules-core.md`, "Conventions for all issues"): a pack
 ---
 
 ## Issue 1: Project scaffold
-Label: `infra`
 Rules: none (setup).
 
 Create the pathfinding project like M4 Issue 1.
@@ -24,7 +23,6 @@ Acceptance criteria:
 - Tests and static analysis pass with one placeholder test.
 
 ## Issue 2: Navigation model
-Label: `map`
 Rules: MAP-02, MAP-16, MAP-22, MAP-23, MAP-36, MAP-37.
 Depends on: 1.
 
@@ -39,8 +37,7 @@ Acceptance criteria:
 - Fixture maps with a river, a forest, a town, a mountain and a floating island load into the model.
 - Slope tests: uphill positive, downhill negative.
 
-## Issue 3: Paths for units
-Label: `search`
+## Issue 3: Paths for units and path check
 Rules: COMBAT-03, MAP-11 to MAP-19, MAP-22 to MAP-25, MAP-36, MAP-37, UNIT-01, UNIT-02.
 Depends on: 2.
 
@@ -48,13 +45,14 @@ Depends on: 2.
 - Ladders are for foot units; bridges for every ground class; boats stay on water; amphibious units switch between their ground class and `sail`; flying units ignore ground terrain and stay under the altitude limit (MAP-17).
 - "No path" is a valid answer: the unit is stranded (MAP-37).
 - Output: the path as samples for M4 Issue 4.
+- **Path check** (stack decision 8): a client may send its own path; the check walks it cell by cell (passability, slope limit, injected cost) and returns its cost or the first invalid step, without searching again.
 
 Acceptance criteria:
 - Table-driven tests per class and profile on fixture maps: impassable cases, the slope limit both ways, a ladder climbed by foot units only, a boat crossing, an amphibious crossing, a flyer over a mountain.
 - The cost of a returned path equals the sum of its samples under the injected cost.
+- A path returned by the search passes the check with the same cost; a path through an impassable cell or over the slope limit fails at that step.
 
 ## Issue 4: Paths for relics and HQs
-Label: `search`
 Rules: RELIC-19, RELIC-20, RELIC-21, RELIC-22, RELIC-26, RELIC-28, HQ-11, HQ-14, HQ-48.
 Depends on: 3.
 
@@ -67,7 +65,6 @@ Acceptance criteria:
 - A relic crosses a reinforced bridge but not a normal one, avoids forests and towns, has no path when walled in, takes a road rather than mud, is blocked by a slope steeper than the `push` limit up or down, and falls from an island edge; an HQ falls too.
 
 ## Issue 5: World changes
-Label: `delta`
 Rules: MAP-06, MAP-07, MAP-09, MAP-28, MAP-37.
 Depends on: 3.
 
@@ -79,12 +76,11 @@ Acceptance criteria:
 - Paths after an update are the same as paths computed from scratch on the changed map.
 
 ## Issue 6: Long paths on big maps
-Label: `performance`
 Rules: MAP-04.
 Depends on: 3, 5.
 
 - Paths across a 10 × 50 km map for hundreds of units (hierarchical search or another method).
-- A benchmark on a synthetic map of that size records time and memory per path. The budget itself is set with the technical stack (M2).
+- A benchmark on a synthetic map of that size records time and memory per path. Target: P-01 in `performance-tests.md`.
 
 Acceptance criteria:
 - The benchmark runs from the command line and its results are committed.

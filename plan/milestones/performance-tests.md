@@ -22,7 +22,7 @@ Conventions:
 
 ### P-03 Battle log volume (M2 Issue 2)
 - Measure: bytes per logged event, events per second, and the upload size per 10-second batch.
-- Target: about 0.4 MB per battle per day, 2.4 MB at worst (estimates), in about 8,640 ten-second files. The Appwrite file-count and storage limits must hold at that number (`stack/02`).
+- Target: about 0.4 MB per battle per day, 2.4 MB at worst (estimates), in at most about 4,000 files a day (only 10-second intervals with new entries upload). The Appwrite limits must hold: the local instance in development, the Cloud plan's quotas live (`stack/02`).
 - Where: `stack/02`.
 
 ### P-04 Network traffic of one section in a fight (M2 Issue 3)
@@ -32,8 +32,8 @@ Conventions:
 
 ### P-05 Rendering spike: 1,000 units on screen (M7, before the client)
 - Measure: frame time in profile mode, split into UI thread and raster thread (the method of the `flutter_scene-performance` skill), for each platform: iOS, Android, macOS, Windows, Linux and Web.
-- Devices: three candidates per platform. The slowest measured one becomes the reference device for the budget (`stack/04`). The designer chooses the devices to test.
-- Target: 16.6 ms per frame (60 fps) on desktop. Phone and web targets: set after the first measurements.
+- Devices: the designer's, listed in `stack/04` (iPhone 11, Pixel 6, the Mac, the main laptop under Linux and Windows, an old Lenovo laptop, a browser on both laptops). The slowest measured one becomes the reference device.
+- Target: 16.6 ms per frame (60 fps) on desktop. Phones and web: at least 30 fps in top-down and 60 fps in first person (`stack/04`).
 - Where: `stack/04`.
 
 ### P-06 Terrain tiles and map loading (M7)
@@ -54,6 +54,4 @@ Conventions:
 5. P-07 with M3 Issue 5 and again with M5.
 
 ## Open
-- The devices for P-05 (designer's choice).
-- The budget for phones and the web (after P-05).
 - The number of battles per process (after P-02).

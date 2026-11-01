@@ -16,6 +16,7 @@ The game design lives in `plan/`. **Read it before writing game logic.**
 - `plan/data/*.yaml`: every number of the game (stats, costs, tables, battle-setting defaults).
 - `plan/milestones/*.md`: milestones and their issues. M2 is done; M3 (pathfinding) and M4 (rules core) come next and do not depend on each other.
 - `plan/stack/*.md`: technical stack decision records.
+- Work sessions, one per milestone issue: hawkbee `docs/battle_team/`.
 
 "decision N" means design decision N in `00-overview.md`; "stack decision N" means `plan/stack/0N-*.md`.
 

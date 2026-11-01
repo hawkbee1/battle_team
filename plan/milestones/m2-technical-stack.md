@@ -2,7 +2,7 @@
 
 Goal: choose the technical stack **from the rules**. Each choice is written down as a decision record. **No code is written in this milestone, nor before it ends**: specs and data never depend on the stack, code always does. Nothing in the current code is a stack decision until this milestone confirms it (Q-GEN-01).
 
-Each issue below is ready to be created as a GitHub issue in the milestone "M2 â€“ Technical stack". Labels: `stack` plus the one listed. Each issue ends with a decision record in `plan/stack/`, one file per issue: options considered, choice, reasons, and consequences for the later milestones.
+Each issue below ends with a decision record in `plan/stack/`, one file per issue: options considered, choice, reasons, and consequences for the later milestones.
 
 ## What the stack must support (from the specs)
 - Persistent battles that last days and keep running while players are away (decision 3), in real time (decision 4).
@@ -17,7 +17,6 @@ Each issue below is ready to be created as a GitHub issue in the milestone "M2 â
 ---
 
 ## Issue 1: Simulation host
-Label: `server`
 
 What runs an authoritative battle: how the clock advances (ticks or scheduled events), how one battle runs for days, how it recovers from a crash, how many battles run at once. Also the language and tools of the code that runs there: the rules core (M4) and pathfinding (M3).
 
@@ -26,7 +25,6 @@ Acceptance criteria:
 - An estimate of the load of a 1,000-unit battle over one day (AP, movement, morale, captures, timers, AI from M1), with its reasoning.
 
 ## Issue 2: Persistence
-Label: `server`
 
 Where battle state, the world delta layer, wars, sections and logs are stored; how statistics and medals are computed from the logs (decision 143).
 
@@ -34,7 +32,6 @@ Acceptance criteria:
 - Decision record.
 
 ## Issue 3: Networking
-Label: `network`
 
 How orders and state updates reach 100+ players in real time; fog of war filtered per section on the server; alerts (RELIC-10); late joiners receiving the delta layer (MAP-08).
 
@@ -43,7 +40,6 @@ Acceptance criteria:
 - An estimate of the update traffic of one section during a fight.
 
 ## Issue 4: Client and 3D rendering
-Label: `client`
 
 Engine and renderer for the top-down camera and first-person control; target platforms and their frame budget.
 
@@ -52,7 +48,6 @@ Acceptance criteria:
 - The slowest target device and its frame budget are named.
 
 ## Issue 5: Map format and authoring
-Label: `map`
 
 Map format, authoring workflow and tools, loader on server and client (MAP-05), conversion to the navigation model of pathfinding (M3); performance budgets for world changes (Q-MAP-09) and pathfinding (M3 Issue 6).
 
@@ -61,7 +56,6 @@ Acceptance criteria:
 - How a map becomes the navigation model of pathfinding (M3) is described.
 
 ## Issue 6: Accounts and external services
-Label: `services`
 
 Player accounts, Discord account linking and team chat sync (SOC-37, SOC-38), payments for cosmetics (SOC-27), admin tools for wars and battles (SOC-16).
 
@@ -69,7 +63,6 @@ Acceptance criteria:
 - Decision record.
 
 ## Issue 7: Engineering principles and package layout
-Label: `engineering`
 
 SOLID principles, Gang of Four patterns and their use in Dart, the VGV tooling used to build and test, and the location of every package (`packages/`, never under `apps/battle_team/`).
 
@@ -78,7 +71,6 @@ Acceptance criteria:
 - Each planned package named, with the milestone that creates it.
 
 ## Issue 8: Where the work runs (client, serverless, server)
-Label: `server`
 
 Which work runs on the client, in serverless functions, and on the simulation host, so that the server load stays low without moving any authority off the host. Checks the Appwrite Functions limits (runtimes, timeouts, cron) on the project before use.
 
