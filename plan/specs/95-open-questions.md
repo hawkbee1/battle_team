@@ -3,7 +3,7 @@
 This is the to-do / done list of the spec phase. Tick a question when it is decided and note the decision number from `00-overview.md`, for example `→ decision 52`. The "Open" sections inside each spec file give more context; they will be replaced by these IDs as questions are decided. Design risks that are not questions are tracked in `specs/96-design-risks.md`.
 
 ## General and technical
-- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24). Studied in `milestones/m2-technical-stack.md`.
+- [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24). Decided in `stack/` (milestone M2, six records, proposed).
 
 ## Map and terrain (10)
 - [x] **Q-MAP-01** Typical map sizes and range of team counts per map. → decision 84
@@ -121,9 +121,11 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-27** Heal and repair targets. → decision 139
 
 ## Section AI and automation (80)
-- [ ] **Q-AI-01** A player unit with no order: stays still, or follows a simple behaviour?
-- [ ] **Q-AI-02** Units of an offline player: same as Q-AI-01, or different?
-- [ ] **Q-AI-03** AI agents through the API: same rules and limits as a human player, or their own?
-- [ ] **Q-AI-04** API keys: one per account or per agent, revocable, which sections they can act for?
-- [ ] **Q-AI-05** Server-managed sections: purpose, units, visibility to players.
-- [ ] **Q-AI-06** Server-managed sections: chance to fire per check, and how often a check happens (30 min proposed).
+- [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).
+- [x] **Q-AI-02** ~~Units of an offline player: same as Q-AI-01, or different?~~ Dropped by the designer (2026-10-31).
+- [x] **Q-AI-03** AI agents through the API: same rules and limits as a human player; only the call rate is limited. → decision 157
+- [x] **Q-AI-04** API keys: one per account. → decision 158
+- [x] **Q-AI-05** Server-managed sections: they look the same as other sections; their purpose stays out of the specs. → decision 159
+- [x] **Q-AI-06** Server-managed sections: fixed chance per check, checked every 30 minutes. → decision 160
+- [x] **Q-AI-07** Server-managed units: besides the chance-based fire, can they move, hold, heal or capture? → decision 163 (same capabilities as a normal section)
+- [x] **Q-AI-08** Hit rule of a server-managed shot: the hit chance of COMBAT-15, or another rule? → decision 164 (same rules as a normal unit)

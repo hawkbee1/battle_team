@@ -10,17 +10,14 @@ This milestone writes rules only (specs and data), so it needs no technical stac
 - Under orders or AI, hits use the hit chance (COMBAT-15), and both control modes should give comparable results (COMBAT-16).
 - Logging off safely is costly (R-07 in `specs/96-design-risks.md`).
 
-## Principles stated by the designer (2026-10-31)
-- No automatic fire and no automatic action for player units; they act only on an order.
-- An API exposes the game's actions to the app and to AI agents. Each call identifies its user.
-- The server creates and runs some sections. They have a limited, chance-based automaticity: a unit that sees an enemy in range fires with a chance checked periodically, not at each entry into range.
+## Decided (decisions 156 to 160)
+- Player units act only on orders. Nothing happens automatically for them, including units of an offline player.
+- AI agents play by the same rules as players, through the API. One API key per account identifies the user.
+- Server-managed sections look like other sections. Their units may fire on a chance, checked every 30 minutes.
 
-## Topics to discuss, top level first
-1. **Units without an order**: player units and units of an offline player (`Q-AI-01`, `Q-AI-02`).
-2. **AI agents and the API**: the rules that apply to them, and the keys that identify users (`Q-AI-03`, `Q-AI-04`).
-3. **Server-managed sections**: their purpose, their units, and the chance-based firing (`Q-AI-05`, `Q-AI-06`).
+Key revocation and action history are decisions 161 and 162. Server-managed sections have the same capabilities as a normal section (163), and their shots follow the normal hit rule (164). The rules are in `specs/80-ai-and-automation.md` (`AI-01` to `AI-08`), in review.
 
-Only after these three, in this order: behaviours, targeting, queued orders and waypoints, and the server load (an input for the simulation host, M2 Issue 1).
+The behaviours, targeting, queued orders, waypoints and detailed AI rules of the first draft are dropped: the decisions above make them moot.
 
 ## Done when
 - `specs/80-ai-and-automation.md` is **ready**, with rule IDs.

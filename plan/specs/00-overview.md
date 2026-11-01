@@ -11,7 +11,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 - `specs/50-hq.md`: HQ role, manager, movement, destruction, storage.
 - `specs/60-economy.md`: money ownership, earning, spending, transfers.
 - `specs/70-combat-and-ap.md` with `data/combat.yaml`: AP, hit resolution, damage, friendly fire, morale, prisoners.
-- `specs/80-ai-and-automation.md`: section AI, automatic actions, automation by players (draft, milestone M1).
+- `specs/80-ai-and-automation.md`: section AI, AI agents through the API, server-managed sections (ready, milestone M1).
 - `specs/90-research-topic-priority.md`: research (industry and academic) on what matters most for success.
 - `specs/95-open-questions.md`: master list of open questions (to-do / done of the spec phase).
 - `specs/96-design-risks.md`: design risks noticed in reviews and not yet addressed.
@@ -55,7 +55,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 19. A commander can spend money to buy more troops.
 
 ### Controlling units
-20. Both modes coexist: the player gives direct orders from the top-down camera, or enters a unit. Units that are not directly controlled follow simple section AI behaviours (follow commander, hold, patrol...). (To be defined in milestone M1, section AI and automation.)
+20. Both modes coexist: the player gives direct orders from the top-down camera, or enters a unit. Units that are not directly controlled follow simple section AI behaviours (follow commander, hold, patrol...). (Revised by decision 156: player units have no behaviours of their own and act only on orders.)
 
 ### Vision
 21. Fog of war, **shared per section only**: a section sees what its own units see. Radios extend this sharing (see Radio).
@@ -270,6 +270,17 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 153. When the chief refuses a trainee, nothing else happens to its section: it has no guild, stores its units at the HQ, and can apply to another guild.
 154. A missed artillery shot lands away from the aimed point, in a random direction, at a distance proportional to how much it missed. The landing point always stays within the weapon's range from the artillery. Splash damage around the impact point does not depend on the range.
 155. A guild can be created by any section that is not in a guild and whose commander is **level 10** or more.
+156. **No automatic action for player units.** A unit controlled by a player, or acting for a player through the API, fires, moves, heals, repairs, captures, pushes and builds only on an order. A unit without an order does nothing. The same holds for units of an offline player, which stay passive (decision 29).
+157. **AI agents play by the same rules as players.** An AI agent acting through the API has the same rules and limits as a human player. Only the rate of its calls is limited, to stop floods.
+158. **One API key per account.** Each user account has one API key. It identifies the user on every call, and every action sent with it is attributed to that user.
+159. **Server-managed sections look the same as other sections.** The server creates and runs some sections. Players see them as ordinary sections. Their purpose is not written in the specs.
+160. **Server-managed units fire on a chance.** A unit of a server-managed section that sees an enemy within its weapon range may fire. The chance is checked every 30 minutes, and is the same at each check. It is not rolled each time an enemy enters range. The chance and the interval are placeholders in `data/battle.yaml`, to be set later.
+161. **API key revocation.** A user can revoke their own API key, and an admin can revoke any key.
+162. **Who acted.** Every action records whether the player did it or an AI did it, according to the API key used. (Revised by decision 166: the server is a third origin.)
+163. **Server-managed sections have the same capabilities as a normal section.** They can do everything a player's section can do.
+164. **Server-managed shots follow the normal rules.** A shot by a server-managed unit uses the hit chance of COMBAT-15, like any unit acting under orders.
+165. **The server orders through the API.** The server gives the orders of its sections through the same API as AI agents. The engine that triggers these calls is developed in a later phase; the specs do not describe it.
+166. **Three origins.** Every action records its origin: **player** (a player's session), **AI** (an API key), or **server** (the server's own calls for its sections). Refines decision 162.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

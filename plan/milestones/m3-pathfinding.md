@@ -1,6 +1,6 @@
 # Milestone 3: pathfinding
 
-Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and HQs, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Language and tools come from the technical stack (M2).
+Goal: a headless module that finds the cheapest path in AP for every movement class and profile, and for pushed relics and HQs, on the battle map. It returns each path as the samples the rules core takes as input: `(terrain type, signed slope in degrees, length in m)` (M4 Issue 4). **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`, `stack/05-map-format.md`): Dart, in `packages/battle_rules` beside M4, with the 10 m cell grid of the map format.
 
 Each issue below is ready to be created as a GitHub issue in the milestone "M3 – Pathfinding". Labels: `pathfinding` plus the one listed.
 

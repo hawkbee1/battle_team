@@ -68,6 +68,24 @@ Player accounts, Discord account linking and team chat sync (SOC-37, SOC-38), pa
 Acceptance criteria:
 - Decision record.
 
+## Issue 7: Engineering principles and package layout
+Label: `stack`
+
+SOLID principles, Gang of Four patterns and their use in Dart, the VGV tooling used to build and test, and the location of every package (`packages/`, never under `apps/battle_team/`).
+
+Acceptance criteria:
+- Decision record.
+- Each planned package named, with the milestone that creates it.
+
+## Issue 8: Where the work runs (client, serverless, server)
+Label: `server`
+
+Which work runs on the client, in serverless functions, and on the simulation host, so that the server load stays low without moving any authority off the host. Checks the Appwrite Functions limits (runtimes, timeouts, cron) on the project before use.
+
+Acceptance criteria:
+- Decision record.
+- Each function planned, with the package it calls.
+
 ## Done when
 - Every issue has its decision record, and Q-GEN-01 points to them.
 - M3 and M4 name their language, project layout and tools.

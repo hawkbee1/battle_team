@@ -1,34 +1,31 @@
-# Section AI and Automation
+# Section AI, AI Agents and Server-Managed Sections
 
-Status: **draft**. Built in milestone 1 (`milestones/m1-ai-and-automation.md`). The discussion starts at the top level: the principles in section 1 and the questions in section 3. Precise rules (behaviours, targeting, numbers) come only after those answers. Open points are `Q-AI-NN` in `specs/95-open-questions.md`.
+Status: **ready**. Built in milestone 1 (`milestones/m1-ai-and-automation.md`). Decisions come from the Q&A with the game designer; the decision numbers are in `specs/00-overview.md`. Each rule keeps its ID (`AI-NN`); changes go through a new decision.
 
-## 1. Principles stated by the designer (2026-10-31)
-Not yet numbered decisions. They become decisions in `specs/00-overview.md` when the top-level discussion closes.
+## 1. Rules
 
-- **No automatic fire and no automatic action for player units.** A unit controlled by a player, or acting for a player through the API, acts only on an order.
-- **An API** exposes the game's actions to the app and to AI agents. Every call carries a code that clearly identifies the user. An AI agent can use the API to trigger actions.
-- **Server-managed sections.** The server creates and runs some sections. They have a limited automaticity, and it is not reflexive: a unit does not fire each time an enemy enters its range. A unit of such a section that sees an enemy in range fires with a chance, checked periodically (for example every 30 minutes).
+### Player units
+- **AI-01** A unit controlled by a player acts only on an order from that player. Nothing happens automatically for it: no fire, movement, healing, repair, capture, push or construction. (Decisions 156, 20.)
+- **AI-02** A unit of an offline player stays passive on the field and can be attacked. Players are expected to store their units before leaving. (Decisions 156, 29.)
 
-## 2. What the existing rules say
-These rules predate the principles above, so they must be checked against them.
-- Decision 20: units not directly controlled follow simple section AI behaviours (follow, hold, patrol).
-- Decision 29: units of an offline player stay passive on the field and can be attacked. Players are expected to store them before leaving.
-- COMBAT-15 and COMBAT-16: a unit acting under orders or section AI uses a hit chance, and both control modes should give comparable results.
-- COMBAT-11 and COMBAT-12: a unit fires only at what it sees. Artillery can also fire at a ground position its section sees, or one a scout reports by radio.
-- HQ-32, R-01 and R-07: a recall takes 6 hours and cannot be stopped; logging off is the costly part.
+### AI agents and the API
+- **AI-03** An AI agent acting through the API has the same rules and limits as a human player. Only the rate of its calls is limited, to stop floods. (Decision 157.)
+- **AI-04** Each user account has one API key. The key identifies the user on every call. A user can revoke their own key, and an admin can revoke any key. (Decisions 158, 161.)
+- **AI-05** Every action records its origin: the player, an AI (according to the API key used), or the server. (Decisions 162, 166.)
 
-## 3. Questions to settle first
-The proposals are a starting point for the discussion. They are not rules.
+### Server-managed sections
+- **AI-06** The server creates and runs some sections. They look the same as other sections, and can do everything a player's section can do. Their purpose is not written in the specs. (Decisions 159, 163.)
+- **AI-07** A unit of a server-managed section that sees an enemy within its weapon range may fire. The chance is checked every 30 minutes and is the same at each check. It is not rolled each time an enemy enters range. The values are in `data/battle.yaml`. (Decision 160.)
+- **AI-08** A shot by a server-managed unit follows the normal rules: the hit chance of COMBAT-15, like any unit acting under orders. (Decision 164.)
+- **AI-09** The server gives the orders of its sections through the same API as AI agents. (Decision 165.)
 
-- **Q-AI-01** A player unit with no order: does it stay where it is, or does it follow a simple behaviour (follow the commander, hold)? Proposal: it stays where it is and does not fire. A movement behaviour can be added later if the designer wants one.
-- **Q-AI-02** Units of an offline player: do they behave like Q-AI-01 (idle, can be attacked, decision 29), or differently? Proposal: the same as Q-AI-01.
-- **Q-AI-03** AI agents using the API: do they follow the same rules and limits as a human player (same AP, one commander per battle, same actions), or do they have limits of their own? Proposal: the same rules. Only the rate of calls is limited, to stop floods.
-- **Q-AI-04** Keys: one key per user account, or one key per agent? Can a key be revoked? Which sections can it act for? Proposal: one key per agent, revocable, acting only for the user's own sections. Every action is logged under the user.
-- **Q-AI-05** Server-managed sections: what are they for (filling battles, defending an HQ, a training ground, something else)? Which units do they have? Are they visible to players as sections of other players? No proposal yet.
-- **Q-AI-06** Server-managed sections: is the chance to fire the same for every target and every unit? Is it checked every 30 minutes, or on another rhythm? Proposal: a fixed chance per check, with the values in `data/battle.yaml`, set later.
+## 2. Existing rules this touches
+- Decision 20 (units without orders follow section AI behaviours) is revised by decision 156. Section AI no longer applies to player units.
+- Decision 29 (offline units stay passive and can be attacked) is consistent with AI-02.
+- COMBAT-15 and COMBAT-16 describe the hit chance under orders. AI-08 applies the same rule to server-managed shots.
+- R-01 and R-07 (logging off) are unchanged by these rules.
 
-## 4. Later, after section 3
-- Precise behaviours, targeting, and what happens to friendly fire.
-- Queued orders, waypoints and timed orders.
-- The number of server-managed units that decide per tick, which is the input for the server load of a 1,000-unit battle (M2 Issue 1).
-- The API itself is a technical design: it belongs to M2 (networking, Issue 3; accounts, Issue 6). The rules only require that each call identifies its user.
+## 3. Not written here
+- The engine that triggers the server's API calls (AI-09). It is developed in a later phase. Decision 159 keeps the purpose of the server-managed sections out of the specs.
+- The API itself is a technical design. It belongs to M2 (networking, Issue 3; accounts, Issue 6). The rules only require that each call identifies its user (AI-04).
+- Server load: each server-managed unit is checked every 30 minutes, which keeps the load small. This feeds the estimate for a 1,000-unit battle (M2 Issue 1).

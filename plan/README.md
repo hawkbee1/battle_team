@@ -8,6 +8,8 @@ This folder holds the game specification and the work plan. The rest of the repo
 | `specs/*.md` | Rules of the game, written to teach it. One file per area. |
 | `data/*.yaml` | Numbers (stats, costs, tables): `units`, `combat`, `terrain`, `battle` (battle-setting defaults), `economy`, `medals`. Code loads these files; numbers are never written in code. |
 | `milestones/*.md` | Implementation milestones and their issues, each naming the rule IDs it implements. |
+| `stack/*.md` | Technical stack decision records (milestone M2), one per issue. Proposals until confirmed. |
+| `milestones/performance-tests.md` | Performance tests, written with the code they measure; each has a target from a stack record. |
 | `specs/95-open-questions.md` | Master list of open questions. This is the to-do / done list of the spec phase. |
 | `specs/96-design-risks.md` | Design risks noticed in reviews and not yet addressed. |
 
@@ -21,7 +23,7 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
 | `specs/20-units-and-progression.md` + `data/units.yaml` | Unit stats, capabilities, XP, skill trees | ready |
 | `specs/30-special-units-and-victory.md` | Relics, capture, push, victory | ready |
 | `specs/40-newcomers-and-social.md` | Newcomer placement, wars, communication, sections | ready |
-| `specs/80-ai-and-automation.md` | Section AI and automation (milestone M1) | draft |
+| `specs/80-ai-and-automation.md` | Section AI, AI agents through the API, server-managed sections (milestone M1) | ready |
 | `specs/50-hq.md` | HQ, manager, storage | ready |
 | `specs/60-economy.md` | Money: earning, spending, transfers | ready |
 | `specs/70-combat-and-ap.md` + `data/combat.yaml` | AP, weapons, hits, damage, morale, prisoners | ready |
@@ -34,7 +36,7 @@ Each spec moves through: **draft** → **review** → **ready**. *Ready* means t
 1. Decisions come from Q&A with the game designer and are recorded in the matching spec file and in `specs/00-overview.md` (numbered decisions).
 2. Every open question gets an ID in `specs/95-open-questions.md` and is ticked when decided, with the number of the decision that settles it.
 3. When an area has no blocking open question left, its status goes to **review**, then **ready** once the designer agrees.
-4. Each rule in a *ready* spec has a short ID so code and tests can reference it. Prefixes: `MAP` (10), `UNIT` (20), `RELIC` (30), `SOC` (40), `HQ` (50), `ECO` (60), `COMBAT` (70).
+4. Each rule in a *ready* spec has a short ID so code and tests can reference it. Prefixes: `MAP` (10), `UNIT` (20), `RELIC` (30), `SOC` (40), `HQ` (50), `ECO` (60), `COMBAT` (70), `AI` (80).
    - IDs are **stable**: never renumbered, never reused. A new rule takes the next free number of its spec. A removed rule is simply deleted.
    - A rule change is a new decision in `specs/00-overview.md`; the rule text is updated in place and keeps its ID.
 

@@ -1,11 +1,12 @@
 # Milestone 4: headless rules core
 
-Goal: a headless rules core that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network.** Language and tools come from the technical stack (M2).
+Goal: a headless rules core that loads `plan/data/*.yaml` and resolves AP, movement, vision and combat exactly as the specs say, covered by unit tests. **No rendering, no network.** Stack from M2 (`stack/01-simulation-host.md`): Dart, in the package `packages/battle_rules` of this repository.
 
 Each issue below is ready to be created as a GitHub issue in the milestone "M4 – Rules core". Labels: `rules-core` plus the one listed. Every issue names the spec rules it implements; code and tests cite those IDs in comments and test names (for example a test named `COMBAT-06 moves at regen speed at 0 AP`).
 
 ## Conventions for all issues
-- Inside this repository (battle_team), an exception to the hawkbee convention of one repository per package. Language, project layout, test tools and lints: from M2. 100 % line coverage target.
+- Inside this repository (battle_team), an exception to the hawkbee convention of one repository per package.
+- **Language and layout (M2)**: Dart. `packages/battle_rules` is a pure Dart package with no Flutter import, so the host and the client both use it. Tests with `package:test`, lints with `very_good_analysis`, coverage with `very_good test --coverage`. 100 % line coverage target.
 - **Numbers only in YAML.** No game number is written in code or tests except inside test fixtures. Tests on real values read them from `plan/data/*.yaml`. When a value is tuned, the tests that use it are updated in the same change.
 - **Deterministic.** Time is passed in (no wall clock); randomness comes from an injected seeded RNG.
 - Immutable models, no global state.
@@ -166,9 +167,8 @@ Acceptance criteria:
 
 ---
 
-## Later milestones (outline)
-Rewritten once the technical stack is chosen (M2).
-- **M5 – Server state and persistence**: battle state on the server, world delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), statistics and medals computed from the battle logs (decision 143), section AI (rules from M1).
-- **M6 – Networking**: real-time orders, fog of war per section (MAP-29), alerts.
-- **M7 – Client**: top-down and first-person control, pings, map markers and team chat (decision 123), Discord account linking (decision 126).
+## Later milestones (outline, for the chosen stack)
+- **M5 – Simulation host and persistence** (`battle_host` package, Dart, see `stack/01` and `stack/02`): battle state in memory, write-ahead log and snapshots, log batches to Appwrite Storage, low-write data in Appwrite. World delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-42), relic ownership and victory timer (RELIC-10 to RELIC-18), section AI and API orders (AI-01 to AI-09), statistics and medals computed from the battle logs in batch (decision 143).
+- **M6 – Networking** (`stack/03`): WebSocket for players, HTTPS for AI agents and the server, one command handler. Fog of war per section (MAP-29) filtered on the host, 5 Hz position updates, alerts (RELIC-10), late joiners get the delta layer (MAP-08).
+- **M7 – Client** (`stack/04`, `stack/06`): flutter_scene for the 3D world, Flutter widgets for the interface, top-down and first-person control, pings, map markers and team chat (decision 123). Discord account linking (decision 126) through the bridge service. Starts with the rendering spike on the slowest target device.
 - **M8 – Revision after real battles**: `milestones/m8-revision-after-real-battles.md`.
