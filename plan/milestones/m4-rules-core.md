@@ -33,7 +33,7 @@ Typed, immutable models for `units.yaml`, `combat.yaml`, `terrain.yaml`, `battle
 Validation (fail with a clear message naming file, key and value):
 - every unit `armor_type` is in `armor_types`; every `weapons.default` is null (unarmed unit, `allowed: []`) or in its `allowed` list; every allowed weapon exists in `weapon_types`;
 - every weapon has a row in `multipliers` with every armor type; `hit_chance.size_factor` covers every armor type;
-- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`, `push`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and `ap_max` is 30; every unit and the HQ have a `hit_box_m`; every weapon except artillery and the explosive charge has a `projectile_speed_mps`; a flying unit's base `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decisions 174, 178);
+- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`, `push`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and its `ap_max` equals `battle.yaml` `ap.max` (decision 167); every unit and the HQ have a `hit_box_m`; every weapon except artillery and the explosive charge has a `projectile_speed_mps`; a flying unit's base `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decisions 174, 178);
 - `commander_levels.section_xp` has `max_level` values, in increasing order;
 - every terrain object has an `armor_type` in `armor_types`;
 - every action in a unit's `actions` is known (`capture`, `push`, `build`, `repair`, `heal`, `observe`) and its up-front AP is at most the unit's `ap_max` (decision 132).
