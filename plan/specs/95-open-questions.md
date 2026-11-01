@@ -119,6 +119,10 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-28** Where does a missed artillery shot land? Friendly fire is on (COMBAT-34). → decision 154
 - [x] **Q-CBT-26** Armor type of terrain objects; base of the ejection damage. → decision 137
 - [x] **Q-CBT-27** Heal and repair targets. → decision 139
+- [x] **Q-CBT-29** Does a capture pot or a push pot keep its AP, or does it empty over time? → decision 173 (it stays until used up or control is lost)
+- [x] **Q-CBT-30** Does the 30-minute capture start when the pot is full, or does it run while the pot fills? → decision 173 (when full)
+- [ ] **Q-CBT-31** Does `move_speed` drop on rough ground (forest, mud), or does only the AP cost change? (Assumed: only the AP cost. Speeds were set to real-life values by decision 174.)
+- [ ] **Q-CBT-32** `ap_per_m` of the units the designer did not name: artillery 0.2, radio 0.2, guild camp 0.2, truck 0.1, helicopter 0.1, boat 0.1. (Placeholders.)
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).

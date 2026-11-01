@@ -1,7 +1,7 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
 # `victory` and `storage` hold battle-wide rule values (decisions 45, 110); they are not declared battle settings.
-version: 4
+version: 6
 
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -9,6 +9,10 @@ commander_death:
   xp_loss_share: 0.25        # share of the commander's own UNSPENT XP lost; his level is never lost
   ap_loss_share: 1.0         # share of ap_max removed from each stored unit (1.0 = AP to 0)
   morale_loss: 20            # morale points removed from each stored unit
+
+# AP recovery (decisions 168, 172): AP every unit recovers per hour. Special events may use another rate.
+ap:
+  recovery_per_hour: 1
 
 # Start of every battle of a war (decision 83)
 battle_start:
@@ -20,10 +24,11 @@ battle_start:
 teams:
   count: 2                   # 2..5 (decision 84)
 
-# Relic capture (decision 97)
+# Relic capture (decisions 97, 170)
 capture:
-  duration_s: 1800
-  ap: 50
+  duration_s: 1800           # starts when the pot is full
+  pot_ap: 50                 # team pot: units in the radius add contribution_ap per action
+  contribution_ap: 5
   radius_m: 30               # same radius to capture and to block
 
 # HQ (decision 109)

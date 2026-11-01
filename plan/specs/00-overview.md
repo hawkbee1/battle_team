@@ -41,7 +41,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 8. XP: each unit earns XP from hits/kills, role actions, objectives, and time survived near the commander.
 9. Evolution: a **skill-point tree** per unit type, nodes bought in any order subject to prerequisites.
 10. Permanence: units and their XP/evolution persist across the battles of a war, and are lost at the end of the war. Permadeath: a killed unit is lost for good (commander excepted). (Revised: earlier versions said "permanent across battles" without the war limit.)
-11. Common stats: HP, AP max and regen, attack, defense, move speed, vision range, movement class, armor type, morale. (Revised by decisions 57-58: armor type added; attack and defense act on hit chance, not damage.)
+11. Common stats: HP, AP max, attack, defense, move speed, AP per metre, vision range, movement class, armor type, morale. (Revised by decisions 57-58: armor type added; attack and defense act on hit chance, not damage. Revised by decisions 167-169: AP max is 30 for every unit, AP recovery is one rate for all, and AP per metre is a unit stat.)
 12. Unit categories: commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus radios. (Revised by decision 60: a medic is a soldier with a heal role.)
 12b. **Flying is a capability** of some units, not a unit category, a movement class or an armor type.
 13. Engineers build or repair: bridges, ladders, walls, roads, traps.
@@ -90,7 +90,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 37. A radio is movable but very slow and too big to be carried by a transport. It is a different object from the 8 map special units.
 
 ### Combat and AP (see combat spec)
-37b. AP regenerate at a constant rate, whatever the unit does.
+37b. AP regenerate at a constant rate, whatever the unit does. (Revised by decision 168: 1 AP per hour.)
 37c. Hits are hybrid: aim-based when a player is inside a unit, hit chance when units act under orders or AI.
 37d. Damage uses a weapon-type vs armor-type table. Friendly fire is on, full damage.
 37e. Cover blocks shots; partial cover lowers the chance of being hit (revised by decision 65: no damage reduction). Units in a destroyed transport are ejected with heavy damage.
@@ -159,7 +159,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 63. Picking up a dropped weapon costs AP (the only weapon handling that does; see 55).
 64. Prisoners and defectors keep their weapon. Units with no weapon (radio, truck) cannot attack.
 65. Hit chance under orders/AI = weapon base accuracy × (1 + (attack − defense)/100) × distance × cover × size × speed factors (× indirect factor), clamped to 5–95 %. Partial cover lowers hit chance only, never damage. (Clarified by decision 135: full cover still leaves the 5 % minimum.)
-66. Build, repair, heal and capture cost a fixed AP amount paid up front, then take a duration (revised by decision 91: heal is instant; building costs per structure: decision 113); a unit needs the AP to start. Pushing a relic or the HQ costs each pusher AP per metre, like movement, with the slope factor.
+66. Build, repair, heal and capture cost a fixed AP amount paid up front, then take a duration (revised by decision 91: heal is instant; building costs per structure: decision 113); a unit needs the AP to start. Pushing a relic or the HQ costs each pusher AP per metre, like movement, with the slope factor. (Revised by decisions 170-171: capture and push are paid into team pots.)
 67. An interrupted action loses the AP paid but keeps its progress; resuming costs the AP of the remaining part. Exception: a capture interrupted by an arriving enemy loses its progress (decision 97).
 68. Flying units can land and take off (time, no AP). Landed, they move with their ground class, are hit as ground targets and can load/unload troops. Each map sets a maximum flying altitude. (Revised by decision 142: the map's highest terrain + 10 m.)
 69. Weapon values in `data/combat.yaml` are the accepted starting point for the first milestone; they are tuned with headless simulations and playtests.
@@ -200,7 +200,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 
 ### Relics and victory (round 3, see relic spec)
 96. Relics are huge statues of the gods of war from different mythologies.
-97. Capture takes 30 min and 50 AP. One radius (default 30 m) is used to capture and to block: every unit inside it counts, whatever its state (carried, flying, offline). A capture interrupted by an enemy entering the radius loses its progress. Duration, AP and radius are battle settings.
+97. Capture takes 30 min and 50 AP (revised by decision 170: the 50 AP are a team pot). One radius (default 30 m) is used to capture and to block: every unit inside it counts, whatever its state (carried, flying, offline). A capture interrupted by an enemy entering the radius loses its progress. Duration, AP and radius are battle settings.
 98. Pushing needs at least 10 pushers. Slope changes the effort exactly as for movement. (Revised by decisions 133 and 138: signed slope, push speed, pushers without AP.)
 99. Reinforced bridge: 20 AP, 10 min to build, 400 HP. A relic or HQ on a reinforced bridge that is destroyed is lost.
 100. The victory countdown is visible. No special playtest is planned for time-zone fairness.
@@ -227,7 +227,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 115. Crushing: with 10 + n pushers a relic crushes up to n units in its path; with more blocking units it stops. (Revised by decision 138: crushed units die.)
 116. A relic lost with a destroyed reinforced bridge leaves the battle; a team still needs 5 relics for the timer, so with fewer than 5 left only the HQ victory remains. A lost HQ eliminates its team, as if destroyed.
 117. A relic pushed over the edge of a floating island falls (decision 46d confirmed; an HQ too, decision 148).
-118. Skill trees give stat bonuses only, no abilities. Every evolved stat is capped at 300 % of its base value.
+118. Skill trees give stat bonuses only, no abilities. Every evolved stat is capped at 300 % of its base value. (AP max and AP recovery are not evolvable: decision 167.)
 119. Scout observe: +30 m vision for 30 minutes, 10 AP; the scout cannot move while observing.
 120. A player never leaves a battle and stays in his team for its whole duration. He can store his whole section and deploy again when he wants, but not before 24 hours after his last alive unit was stored.
 121. Medal points: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; ties go to the commander with the most XP.
@@ -250,7 +250,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 135. Full cover gives a cover factor of 0, and the 5–95 % clamp still applies: a unit in full cover keeps a 5 % chance of being hit under orders or AI. In first person, full cover blocks shots completely.
 136. Only **bombard** attacks have splash. Every unit within the splash radius is hit at once, without its own hit roll; damage decreases with the distance from the impact point. (Decision 152: the explosive charge never misses.)
 137. Terrain objects (trees, buildings, constructions) have an armor type, `structure` by default. Ejection damage is a share of the unit's maximum HP. Default values, adjusted later.
-138. A pushed relic or HQ moves at a fixed speed of **5 m per hour** (`push.speed_m_per_h`). A pusher with no AP left stops and waits for AP; the relic or HQ moves only while at least the minimum number of pushers push. **Crushing kills**: a unit crushed by a pushed or a falling relic dies.
+138. A pushed relic or HQ moves at a fixed speed of **5 m per hour** (`push.speed_m_per_h`). A pusher with no AP left stops and waits for AP; the relic or HQ moves only while at least the minimum number of pushers push. (The AP part is revised by decision 171: the push pot.) **Crushing kills**: a unit crushed by a pushed or a falling relic dies.
 139. **Heal and repair** work on every friendly unit except the HQ.
 140. **Capture progress belongs to the team.** When the capturing unit leaves or dies, another unit of its team inside the radius can resume, paying the AP of the remaining part. An enemy entering the radius still erases the progress (decision 97).
 141. The **guild camp** (encampment) is a unit of the guild chief's section. It does not count toward his cap and cannot be stored. It moves slowly on its own, cannot fly, and can heal units.
@@ -281,6 +281,16 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 164. **Server-managed shots follow the normal rules.** A shot by a server-managed unit uses the hit chance of COMBAT-15, like any unit acting under orders.
 165. **The server orders through the API.** The server gives the orders of its sections through the same API as AI agents. The engine that triggers these calls is developed in a later phase; the specs do not describe it.
 166. **Three origins.** Every action records its origin: **player** (a player's session), **AI** (an API key), or **server** (the server's own calls for its sections). Refines decision 162.
+
+### Round 7 (2026-11-01)
+167. Every unit has an AP maximum of **30**. Evolution does not raise AP maximum or AP recovery.
+168. AP recovery is **1 AP per hour** for every unit, constant, while moving, fighting, idle or stored. It is not a unit stat (revises decision 37b and COMBAT-02). Decision 172 makes the rate a battle setting.
+169. Movement cost is **per unit**: `ap_per_m` is the AP per metre on flat ground (infantry 1, tank 0.2, jeep 0.1). The movement class and the terrain multiply it (`ap_multiplier`, grass 1.0), and the slope multiplier still applies. `move_speed` stays as the time per metre (revises MAP-15 and COMBAT-03).
+170. **Capture is a team pot.** The 50 AP are put into a pot by units inside the capture radius, 5 AP per action, as often as they like. The 30-minute capture starts when the pot is full. An enemy entering the radius loses the progress and the pot (RELIC-08). One unit has at most 30 AP, so it cannot pay 50 AP alone (revises decisions 66 and 97).
+171. **Push is a team pot.** Each metre pushed costs **10 AP** from the team's push pot (50 AP per 5 m, one hour at 5 m/h). Pushers add 5 AP per action, as often as they like. Pushers no longer pay their own AP per metre. The minimum of 10 pushers and the slope rule still apply (revises the AP part of decision 138).
+172. The AP recovery rate is a **battle setting**, `ap.recovery_per_hour` in `data/battle.yaml`, default **1 AP per hour**. Special events can use another rate (refines decision 168).
+173. **Pots keep their AP.** A partly filled capture or push pot stays until it is used up, or the team loses control: the relic or HQ changes owner, or, for a capture, an enemy enters the radius (RELIC-08). A capture's 30-minute timer starts when its pot is full.
+174. **Speeds follow real units.** `move_speed` (m/s) is set close to what a real unit of that kind does. A flying unit never goes faster than the jeep, and a sailing unit never faster than the tank. Infantry keep their current speeds.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

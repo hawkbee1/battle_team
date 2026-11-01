@@ -17,6 +17,7 @@ The numbers below come from `data/*.yaml` at the time of the review. They are pl
 | R-06 | Nothing ends a stalemated battle | open |
 | R-07 | One player or one unit can block a whole group | open |
 | R-08 | Tuning notes for the scenario harness | open |
+| R-09 | With 30 AP and 1 AP per hour, a unit's pool is most of its budget | accepted for now (2026-11-01) |
 
 ## R-01 A commander's death is a free instant recall and a money top-up
 Accepted for now (designer, 2026-10-31).
@@ -35,7 +36,7 @@ Accepted for now (designer, 2026-10-31).
 The research note (`specs/90-research-topic-priority.md`) ranks it as the topic with the highest impact.
 - There is no protection from veterans, no mentoring and no death recap. The note cites EVE players who quit because they "don't understand what happened" (A3).
 - Decision 77's XP multiplier never goes below ×1, so killing new units pays as well as anything else.
-- With the ×3 stat cap (decision 118), a veteran unit can have 3× HP and 3× AP regen.
+- With the ×3 stat cap (decision 118), a veteran unit can have 3× HP (AP is not evolvable, decision 167).
 - Decision 129 puts every new section in a guild as a trainee, awaiting the chief's acceptance (decision 146). It gives newcomers a group, not protection.
 
 ## R-04 A newcomer cannot join friends
@@ -56,6 +57,13 @@ The research note (`specs/90-research-topic-priority.md`) ranks it as the topic 
 - Logging off safely means walking back within 10 m of the storage place or waiting for a 6-hour recall, and storing everything starts the 24-hour lock (HQ-35). That makes R-01 the easiest way to log off.
 
 ## R-08 Tuning notes for the scenario harness (M4 Issue 11)
-- Sustained speed is about `ap_regen ÷ AP per metre`. A soldier empties its 60 AP in about 17 s; after that every ground unit moves at 1 to 2 m/s off-road, so `move_speed` only matters in short bursts.
+- Sustained speed is about `recovery per hour ÷ ap_per_m` (decisions 168, 172): 1 m per hour for infantry at the default rate once its 30 AP are spent. A full pool covers 30 m on foot, 150 m in a tank and 300 m in a jeep on flat ground. `move_speed` only sets the time per metre.
 - Vision is much shorter than weapon range: a soldier sees 150 m (60 m in fog), while weapon ranges go from 250 to 1,200 m. An anti-air soldier sees a helicopter at 150 m; the helicopter's height bonus lets it see him at 450 m.
-- At 5 m per hour (decision 138), a pushed relic or HQ moves 120 m a day: about 8 days for 1 km, on maps up to 50 km long. Each pusher spends 10 AP per hour, so AP never limits a push, and units in the path can always step aside before being crushed.
+- At 5 m per hour (decision 138), a pushed relic or HQ moves 120 m a day: about 8 days for 1 km, on maps up to 50 km long. A push costs 50 AP per hour from the team's push pot (decision 171). With 1 AP per hour per unit, about 50 units must recover at once to keep it moving, so the relic stops most of the time. Units in the path can still step aside before being crushed.
+
+## R-09 With 30 AP and 1 AP per hour, a unit's pool is most of its budget
+Raised by decisions 167 and 168. Accepted for now (designer, 2026-11-01): 1 AP per hour is the intended default pace. Special events may use another rate (decision 172).
+- A full pool of 30 AP is one fight: 15 rifle shots, 30 machine-gun shots, 3 anti-tank shots, 2 artillery shots, 5 anti-air shots or 1 explosive charge (`data/combat.yaml`).
+- After its pool is spent, a unit recovers 24 AP a day: 12 rifle shots, or 24 m of infantry walking.
+- At that pace, infantry needs about 5.7 years to cross a 50 km map. Its pool alone covers 30 m.
+- The pace of each special event is a battle setting (decision 172), so the default can stay slow while events go faster.

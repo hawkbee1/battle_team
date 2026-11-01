@@ -9,15 +9,15 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **RELIC-04** They are different from radios (radios are purchasable units that relay scout information).
 
 ## 2. Capture (decision 97)
-- **RELIC-05** **Any unit within the capture radius** of a relic can start a **capture action**, if capturing is one of its actions (decision 132). It costs **50 AP** and takes **30 minutes**.
+- **RELIC-05** **Any unit within the capture radius** of a relic can start a **capture action**, if capturing is one of its actions (decision 132). It needs a **team pot of 50 AP**: any unit inside the radius adds **5 AP** per capture action, as often as it likes (decision 170). The **30-minute** capture starts once the pot is full (decision 173).
 - **RELIC-06** A capture is **blocked while enemy units are within the same radius**. Defenders can therefore protect a relic by standing next to it.
 - **RELIC-07** **Every unit inside the radius counts**, whatever its state: carried, flying, offline or passive. (Stored units are not on the map.) An owner's offline units still block a capture.
-- **RELIC-08** If an enemy enters the radius during a capture, the capture stops and **its progress is lost** (exception to decision 67). Otherwise the progress belongs to the team (RELIC-29).
-- **RELIC-09** Capture duration, AP and radius (default **30 m**) are **battle settings** (`data/battle.yaml`).
+- **RELIC-08** If an enemy enters the radius during a capture, the capture stops and **its progress and its pot are lost** (exception to decision 67, decision 170). Otherwise the progress belongs to the team (RELIC-29).
+- **RELIC-09** Capture duration, pot size, contribution and radius (default **30 m**) are **battle settings** (`data/battle.yaml`).
 - **RELIC-10** When a relic changes owner, the **previous owner team is alerted** at once.
 - **RELIC-11** Once captured, the relic is **owned** by the capturing team until another team captures it.
 - **RELIC-12** No protection time after a capture: a relic can be retaken as soon as no enemy of the attacker is near.
-- **RELIC-29** **Capture progress belongs to the team** (decision 140). When the capturing unit leaves the radius or dies, another unit of its team inside the radius can resume, paying the AP of the remaining part (COMBAT-09).
+- **RELIC-29** **Capture progress belongs to the team** (decision 140). When the capturing unit leaves the radius or dies, another unit of its team inside the radius can resume by adding to the pot (COMBAT-07, COMBAT-09).
 
 ## 3. Benefits
 - **RELIC-13** Owning a relic gives **nothing besides the victory timer**. It is a pure objective: no income, vision or combat bonus.
@@ -36,7 +36,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **RELIC-22** A relic **can fall from a floating island** when pushed over its edge (decision 46d, confirmed by decision 117). It lands intact below, keeps its owner and **kills the units under it** (decision 138).
 - **RELIC-23** A relic **crushes units in its path if it is pushed hard enough**.
 
-- **RELIC-24** **Push** (decisions 98, 138): at least **10 pushers** that can push (`push` in their actions); the relic then moves at a **fixed speed** of **5 m per hour** (`push.speed_m_per_h`). Each pusher pays **AP per metre** pushed, and **slope changes the effort exactly as for movement** (signed, decision 133). A pusher with no AP left **stops and waits** for AP; the relic moves only while at least 10 pushers push.
+- **RELIC-24** **Push** (decisions 98, 138, 171): at least **10 pushers** that can push (`push` in their actions); the relic then moves at a **fixed speed** of **5 m per hour** (`push.speed_m_per_h`). Each metre pushed costs **10 AP** from the team's **push pot** (50 AP per 5 m), and **slope changes the cost exactly as for movement** (signed, decision 133). Pushers add **5 AP** per action to the pot, as often as they like. A partly filled pot stays until it is used up or the team loses control of the relic or HQ (decision 173). When the pot is empty the relic **stops** until more AP arrive; the relic moves only while at least 10 pushers push.
 - **RELIC-25** **Crushing kills** (decision 138): a crushed unit dies, whatever its team. A relic crushes only when pushed with **more than the minimum number of pushers**: with 10 + *n* pushers it crushes **up to *n* units** in its path; if more units block it, it stops. (Decision 115)
 - **RELIC-26** **Water**: relics cross water only on **reinforced bridges** (decision 99): **20 AP**, **10 min** to build, **400 HP**. If the bridge is destroyed while a relic or an HQ is on it, that relic or HQ is **lost** (decision 116):
   - a lost relic **leaves the battle**; a team still needs **5 relics** for the timer, so with fewer than 5 relics left only the HQ victory remains;

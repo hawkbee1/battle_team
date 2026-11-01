@@ -44,10 +44,10 @@ Not used: Singleton (see above) and Visitor (sealed types cover it in Dart).
 - Each milestone's PR gets the VGV review agents: architecture, test quality and simplicity (`vgv-wingspan`).
 
 ## Package layout
-- Every Battle Team package lives in the Hawkbee workspace `packages/` folder, beside the other packages. None lives under `apps/battle_team/`.
-- Planned names: `battle_rules` (rules core, M4), `battle_pathfinding` (M3), `battle_protocol` (commands and messages between host and client, M5 and M6), `battle_host` (simulation host, a Dart executable, M5), `battle_map` (map format loader and builder, decision 5), `battle_stats` (statistics and medals from logs, decision 8).
+- Every Battle Team package is code, so it lives in the Hawkbee workspace `packages/` folder, beside the other packages. None lives under `apps/battle_team/`. The rules (`plan/specs`, `plan/data`, `plan/milestones`, `plan/stack`) are written documents and stay in `apps/battle_team/plan/`.
+- Each package is its own public GitHub repository, `hawkbee1/<name>`, added to hawkbee as a git submodule at `packages/<name>`. This is the repo-per-package rule that applies to every package in the workspace.
+- Planned names, each created in the milestone that first needs it: `battle_pathfinding` (M3), `battle_rules` (rules core, M4), `battle_protocol` (commands and messages between host and client, M5 and M6), `battle_host` (simulation host, a Dart executable, M5), `battle_map` (map format loader and builder, decision 5), `battle_stats` (statistics and medals from logs, decision 8).
 - `apps/battle_team` depends on them by version, not by relative path (convention of commit d7a6716).
-- **Open:** whether each Battle Team package is its own repository added as a submodule, as the other packages are. To be confirmed by the designer.
 
 ## Consequences
 - A package that an Appwrite Function runs needs a committed vendored copy, as `hawkbee_schema` already has, because the Appwrite CLI honours `.gitignore` when it packages a function.

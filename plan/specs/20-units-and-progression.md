@@ -11,11 +11,11 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 | Stat | Meaning |
 |---|---|
 | `hp` | Health. At 0 the unit dies. Permadeath for all units except commanders. |
-| `ap_max` | Maximum of the single AP pool. |
-| `ap_regen` | AP regenerated per second, up to `ap_max`. |
+| `ap_max` | Maximum of the single AP pool: 30 for every unit (decision 167). |
+| `ap_per_m` | AP per metre moved on flat ground. Terrain, movement class and slope multiply it (decision 169). |
 | `attack` | **Accuracy.** Raises hit chance under orders/AI and tightens spread in first-person aim. Does not change damage. |
 | `defense` | **Evasion.** Lowers the chance of being hit. Does not change damage. |
-| `move_speed` | Speed when moving (moving costs AP). |
+| `move_speed` | Speed when moving, in m/s, close to a real unit's speed: it sets the time per metre. The AP cost is `ap_per_m`. A flying unit never goes faster than the jeep, a sailing unit never faster than the tank (decision 174). |
 | `vision_range` | Radius of sight before weather, terrain and height modifiers, then limited by line of sight (see map spec). |
 | `movement_class` | foot, wheeled or tracked (see map spec). Empty for a boat. |
 | `weight` | Used by transports, which carry by weight (decision 91). |
@@ -23,6 +23,8 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 | `morale` | 0..100 (see combat spec). |
 | `capabilities` | Optional list of extra abilities: `flying`, `sail`. |
 | `actions` | What the unit can do besides moving and shooting: `capture`, `push`, `build`, `repair`, `heal`, `observe` (UNIT-38). |
+
+AP recovery is not a unit stat: every unit recovers at the battle's rate, **1 AP per hour** by default (decisions 168, 172; `ap.recovery_per_hour` in `data/battle.yaml`).
 
 Role-specific stats are added per category: medic heal value, scout observe, transport weight limits, radio range, commander aura radius (see section 8). Engineer building: AP + build time per structure (decision 113). Weapon range, splash and terrain deformation belong to the **weapon**, not the unit.
 
@@ -80,7 +82,7 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-20** A node gives a stat bonus, with an XP cost (no abilities, see UNIT-22).
 - **UNIT-21** Bought nodes are **permanent** (no respec). **No node excludes another**; the XP cost is the only limit.
 
-- **UNIT-22** Trees give **stat bonuses only**, no abilities. **Every evolved stat is capped at 300 % of its base value** (×3). (Decision 118)
+- **UNIT-22** Trees give **stat bonuses only**, no abilities. **Every evolved stat is capped at 300 % of its base value** (×3). AP max and AP recovery cannot be evolved. (Decisions 118, 167)
 - **UNIT-23** Default tree for every unit type (`data/units.yaml`, `trees`): for each stat, a chain of +10 % steps; step *n* costs 100 × *n* XP and requires step *n* − 1. Some types add their role stats (radio range, aura radius, transport weight, heal).
 
 ## 7. Commander

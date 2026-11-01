@@ -35,7 +35,7 @@ Typed, immutable models for `units.yaml`, `combat.yaml`, `terrain.yaml`, `battle
 Validation (fail with a clear message naming file, key and value):
 - every unit `armor_type` is in `armor_types`; every `weapons.default` is null (unarmed unit, `allowed: []`) or in its `allowed` list; every allowed weapon exists in `weapon_types`;
 - every weapon has a row in `multipliers` with every armor type; `hit_chance.size_factor` covers every armor type;
-- every terrain `ap_cost_per_m` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`; every movement class and profile has a `slope` entry;
+- every terrain `ap_multiplier` covers `foot`, `wheeled`, `tracked`, `flying`, `sail`; every movement class and profile has a `slope` entry; every unit has an `ap_per_m`, and `ap_max` is 30; a flying unit's `move_speed` is at most the jeep's and a sailing unit's at most the tank's (decision 174);
 - `commander_levels.section_xp` has `max_level` values, in increasing order;
 - every terrain object has an `armor_type` in `armor_types`;
 - every action in a unit's `actions` is known (`capture`, `push`, `build`, `repair`, `heal`, `observe`) and its up-front AP is at most the unit's `ap_max` (decision 132).
@@ -49,13 +49,13 @@ Label: `ap`
 Rules: COMBAT-01, COMBAT-02, COMBAT-04, COMBAT-05, COMBAT-06, MAP-20, HQ-34, UNIT-38.
 Depends on: 2.
 
-- AP regenerate at `ap_regen` per second up to `ap_max`, whatever the unit does (also while stored).
+- AP recover at the battle's `ap.recovery_per_hour` (1 by default) up to `ap_max` (30), whatever the unit does (also while stored).
 - Spending: a paid action (shot, role action, pick-up) that the unit can do **waits** until the unit has enough AP and never goes negative. An action the unit cannot do (not in its `actions`) is refused.
-- Movement at 0 AP continues at the speed the regen allows.
+- Movement at 0 AP continues at the speed the AP recovery allows (the battle's rate).
 - Time-only actions (reload, unload, swap, land, take off) never touch AP.
 
 Acceptance criteria:
-- Test from the spec: a soldier moving at 5 m/s on grass (1 AP/m, regen 1.5) empties its pool, then moves at 1.5 m/s.
+- Test from the spec: an infantry unit (1 AP per metre) moving on grass covers 30 m, then moves 1 m per hour.
 - Property test: AP stays within `[0, ap_max]` for any sequence of actions and time steps.
 
 ## Issue 4: Movement cost
@@ -148,9 +148,9 @@ Depends on: 3, 4.
 
 - Build, repair, capture: AP paid up front (unit must have it), then a duration. Construction AP and time from `terrain.yaml` objects; capture values from `battle.yaml`.
 - Heal is instant: `heal_ap` restores `heal` HP. Heal and repair work on every friendly unit except the HQ (decision 139).
-- Interrupted action: AP lost, progress kept, resuming costs the remaining part; **except** a capture interrupted by an enemy entering the radius, which loses its progress. Capture progress belongs to the team: another unit of the team can resume it (decision 140).
+- Interrupted action: AP lost, progress kept, resuming costs the remaining part; **except** a capture interrupted by an enemy entering the radius, which loses its progress and its pot. Capture progress belongs to the team: another unit of the team can resume it (decision 140).
 - Capture radius: every unit inside counts whatever its state; any enemy blocks.
-- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_m_per_h`; each pusher pays `ap_per_m` × the signed slope factor of its class; a pusher with no AP left stops and waits, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
+- Push: at least `min_pushers` units that can push; the relic or HQ moves at `speed_m_per_h`; each metre pushed costs `pot_ap_per_m` from the team push pot × the signed slope factor of its class; an empty pot stops the relic, and the push stops while fewer than `min_pushers` push; with `min_pushers + n` pushers a relic crushes (kills) up to `n` units, otherwise it stops at them; a pushed HQ never crushes.
 
 Acceptance criteria:
 - Tests for each action, both interruption cases, the capture block, a capture resumed by another unit of the team, a pusher running out of AP, and the crush rule with 10, 11 and 13 pushers.

@@ -2,7 +2,7 @@
 # damage = weapon.base_damage * multipliers[weapon_type][target.armor_type]
 #          * weapon.airborne_factor   (only when the target is flying)
 # Unit `attack` and `defense` do NOT change damage: they change the chance to hit (see hit_chance).
-version: 11
+version: 13
 
 armor_types: [infantry, light_vehicle, heavy_vehicle, structure, hq, relic]
 # Every unit declares one armor_type (data/units.yaml).
@@ -143,8 +143,8 @@ weapon_swap:
   time_s: 5
 
 ap:
-  regen_mode: constant          # same rate whatever the unit does (decision 37b)
-  at_zero: act_at_regen_rate    # decision 56: movement slows to regen speed; paid actions wait for enough AP
+  # AP recovery rate: ap.recovery_per_hour in data/battle.yaml (decisions 168, 172).
+  at_zero: act_at_regen_rate    # decision 56: movement continues at the AP recovery speed; paid actions wait for enough AP
   # An action that is not in the unit's units.yaml `actions` is refused (decision 132).
   costs_ap: [shot, move, push, pickup_weapon, role_actions]
   time_only: [reload, unload, swap_weapon, land, take_off]   # decisions 55, 68
@@ -158,15 +158,17 @@ actions:
   capture: { settings: data/battle.yaml, progress_owner: team }   # decisions 97, 140
   interruption: { ap_refund: false, progress_kept: true, resume_cost: proportional_to_remaining, capture_progress_kept: false }   # decisions 67, 97
 
-# Pushing a relic or the HQ (decisions 66, 98, 138): at least min_pushers units that can push
-# (units.yaml actions). The relic or HQ moves at speed_m_per_h. Each pusher pays ap_per_m, multiplied
-# by the signed slope factor of its movement class (data/terrain.yaml). A pusher with no AP left
-# stops and waits for AP; the push stops while fewer than min_pushers push.
+# Pushing a relic or the HQ (decisions 66, 98, 138, 171): at least min_pushers units that can push
+# (units.yaml actions). The relic or HQ moves at speed_m_per_h while the team's push pot holds AP.
+# Each metre pushed costs pot_ap_per_m from the pot, multiplied by the signed slope factor of the
+# movement class (data/terrain.yaml). Pushers add contribution_ap per action, as often as they like.
+# An empty pot stops the push; it stops too while fewer than min_pushers push.
 push:
   speed_m_per_h: 5              # decision 138
-  ap_per_m: 2.0                 # placeholder
+  pot_ap_per_m: 10              # 50 AP per 5 m (decision 171)
+  contribution_ap: 5            # AP a pusher adds to the pot per action (decision 171)
   min_pushers: 10               # decision 98
-  pusher_without_ap: waits      # decision 138 (a moving unit slows to its regen speed instead, decision 56)
+  pot_empty: stops              # decision 171
   # Crushing (decisions 115, 138): with min_pushers + n pushers the relic crushes up to n units
   # in its path; with more blocking units than n it stops. A crushed unit dies. A pushed HQ never crushes.
   crush_units_per_extra_pusher: 1

@@ -7,7 +7,7 @@ Each issue below is ready to be created as a GitHub issue in the milestone "M3 �
 ## Why before the rules core, and what it does not depend on
 - M4 computes the AP cost of a path, but nothing produces paths, and maps are up to 10 × 50 km (MAP-04).
 - The map format is chosen with the technical stack (M2, Issue 5). This milestone works on a **navigation model** built from it, plus a small fixture format for tests.
-- The movement cost is **injected**: a function `(movement class or profile, terrain type, signed slope) → AP per metre, or impassable`. Tests use fixture costs; M4 Issue 4 later provides the real one from `data/terrain.yaml`. M3 and M4 therefore do not depend on each other.
+- The movement cost is **injected**: a function `(unit AP per metre, movement class or profile, terrain type, signed slope) → AP per metre, or impassable`. Tests use fixture costs; M4 Issue 4 later provides the real one from `data/terrain.yaml`. M3 and M4 therefore do not depend on each other.
 
 ## Conventions
 Same as M4 (`milestones/m4-rules-core.md`, "Conventions for all issues"): inside this repository, language and tools from M2, 100 % line coverage target, deterministic, immutable models, rule IDs in test names, and no guessing (open a question in `specs/95-open-questions.md`).
