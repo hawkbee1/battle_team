@@ -14,7 +14,7 @@ Already decided (overview):
 - **ECO-04** A commander buys **troops** for his section, only when the section has **free room** (UNIT-39, UNIT-40; decision 130).
 - **ECO-05** A commander can buy **radios**.
 - **ECO-06** A guild commander can buy the **guild encampment** (again at any time if destroyed).
-- **ECO-07** A bought unit **arrives next to the section's portal**: the guild camp, or the HQ if the guild has no camp or the section has no guild (decision 130).
+- **ECO-07** A bought unit **arrives next to the section's portal**: the guild camp, or the HQ if the guild has no camp or the section has no guild (decision 130). Nothing is bought while an enemy blocks its arrival or the section is under its 24-hour lock (HQ-46, decision 205).
 
 ## 4. Transfers
 - **ECO-08** Money can be **transferred between players**, with **fees**.

@@ -67,13 +67,13 @@ Acceptance criteria:
 - The safety net after a commander's death and after the loss of the last unit, and not otherwise.
 
 ## Issue 4: Storage, deployment and the commander's death
-Rules: HQ-02, HQ-03, HQ-13, HQ-24 to HQ-42, HQ-44, HQ-46, HQ-47, ECO-07, UNIT-28, UNIT-29, UNIT-42, COMBAT-44, COMBAT-45, COMBAT-51.
+Rules: HQ-02, HQ-03, HQ-13, HQ-24 to HQ-42, HQ-44, HQ-46, HQ-47, HQ-49, ECO-07, UNIT-28, UNIT-29, UNIT-42, COMBAT-44, COMBAT-45, COMBAT-51; decisions 204 to 207.
 Package: `battle_rules`.
 Depends on: 2, 3.
 
 - Where a unit is, as a State (stack decision 7): on the field, carried, stored, prisoner. The guild camp and the HQ are never stored.
 - The storage place: the guild camp, or the HQ when the section has no guild or the guild no camp. A unit within `store_radius_m` is stored at once; elsewhere a recall takes `recall_s` and nothing stops it.
-- Deploying costs `deploy_ap`, next to the storage place; an enemy within `deploy_block_radius_m` blocks it, and a blocked camp gives no fallback to the HQ. Storing every alive unit by choice locks the section for `section_redeploy_lock_s`; a storage forced by the commander's death does not.
+- Deploying costs `deploy_ap`, next to the storage place; an enemy within `deploy_block_radius_m` blocks it, and a blocked camp gives no fallback to the HQ. The last unit to leave the field, stored, recalled, killed, captured or defected, locks the section for `section_redeploy_lock_s` (decision 204); a storage forced by the commander's death does not. A loaded transport is not stored (HQ-49); a blocked or locked arrival refuses the purchase (decision 205).
 - The commander's death: he resurrects at once in storage, loses `xp_loss_share` of his unspent XP (never his level), and every unit of his section on the field, carried ones included, is stored at once with the AP and morale losses of `commander_death`.
 - Prisoners: an unlimited prisoner storage; exchange and ransom offers between section owners, the ransom going entirely to the captor section; a released prisoner returns to its owner's storage.
 

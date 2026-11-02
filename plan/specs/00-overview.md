@@ -325,6 +325,10 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 201. **A killing shot earns both.** The shot that kills a unit earns the hit's XP and money as well as the kill's.
 202. **No money from allies.** Hitting an ally or the own HQ earns no money, as it earns no XP (UNIT-10).
 203. **The fee comes out of the amount.** A transfer of 100 w€ outside the guild gives the receiver 93 w€; the 7 w€ fee is destroyed. The sender never pays more than he sends.
+204. **The last unit to leave the field starts the lock.** The 24-hour lock (decision 120) starts once no unit of the section is on the field, however the last one left it: stored, recalled, killed, taken prisoner or defected. It runs from that moment. Only a commander's death never starts it (decision 125). The guild camp, which is never stored, and the section's units held prisoner do not count.
+205. **A blocked arrival refuses the purchase.** While an enemy within 20 m blocks the arrival of new units (decision 147), or the section is under its 24-hour lock, nothing is bought and no money is spent: a bought unit arrives on the field.
+206. **A transport is stored empty.** A loaded transport cannot be stored or recalled: its passengers get off first. A recalled transport takes no passengers. At a commander's death, the units of other sections his transports carry are set down where they are; his own section's carried units are stored with the rest (UNIT-29).
+207. **A commander's XP loss lowers his earned XP too.** The XP he loses at his death (UNIT-29) come off his earned XP as well as his unspent XP: a kill on him is worth less, and his team's power drops.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.
