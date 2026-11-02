@@ -6,7 +6,7 @@ version: 9
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
 commander_death:
-  xp_loss_share: 0.25        # share of the commander's own UNSPENT XP lost; his level is never lost
+  xp_loss_share: 0.25        # share of the commander's own UNSPENT XP lost, from his earned XP too (decision 207); his level is never lost
   ap_loss_share: 1.0         # share of ap_max removed from each stored unit (1.0 = AP to 0)
   morale_loss: 20            # morale points removed from each stored unit
 
@@ -64,6 +64,7 @@ weather:
   mode: random
   states: [clear, rain, fog, snow]   # data/terrain.yaml weather
 
-# Full section storage (decision 120): once every alive unit of a section is stored BY CHOICE,
-# the section cannot deploy again for this long. Not after a commander's death (decision 125).
+# Full section storage (decisions 120, 204): once no unit of a section is left on the field, the
+# section cannot deploy again for this long, from the moment the last one left it. Not after a
+# commander's death (decision 125).
 section_redeploy_lock_s: 86400

@@ -92,8 +92,8 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-27** The commander buys troops with money. A bought unit needs free room in the section and arrives next to the guild camp, or next to the HQ (decision 130).
 - **UNIT-28** The commander always resurrects after death (no permadeath for commanders), **at once, without delay**, **in storage** with his section (decisions 80, 125). This stops an inactive player's commander from dying again and again.
 - **UNIT-29** **When the commander dies:**
-  - he loses a share of his own **unspent XP**; his **level is never lost**;
-  - **all units of his section on the field** (carried ones included) go **instantly to storage**, losing AP and morale;
+  - he loses a share of his own **unspent XP**, from his earned XP too (decision 207); his **level is never lost**;
+  - **all units of his section on the field** (carried ones included) go **instantly to storage**, losing AP and morale; units of other sections his transports carry are set down where they are (decision 206);
   - there is **no 24-hour lock**: the section can deploy again at once, each unit paying 10 AP (decision 125).
   - The XP share, AP loss and morale loss are **battle settings** (`data/battle.yaml`).
 
