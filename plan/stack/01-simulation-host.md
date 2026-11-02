@@ -31,7 +31,7 @@ Assumptions (placeholders, to measure in M4 Issue 11 and M3 Issue 6). They hold 
 - 1,000 units, each with at most 30 AP and 1 AP per hour of recovery. The battle has about **24,000 AP a day** to spend, after the starting pools of 30,000 AP.
 - Every logged move or attack spends AP. Typical mix: half the events are attacks (rifles, 2 AP per shot), half are moves (10 m orders, 10 AP each). That gives about **4,000 events a day** (table in `02-persistence.md`).
 - Combat tick at 1 Hz. Units in contact check their visible targets each tick, with a spatial index (about 50 candidates per check).
-- One path request per move order: about 2,000 a day, about 1 ms each with a hierarchical search.
+- One path request per move order: about 2,000 a day, about 15 ms each for a 2 km path (measured, P-01): about 30 s of one core a day.
 - Morale updated per minute, not per tick: about 17 updates per second.
 - AP is lazy (see Choice): no work per tick.
 - Server-managed units are checked every 30 minutes (decision 160): negligible.
@@ -40,7 +40,7 @@ Assumptions (placeholders, to measure in M4 Issue 11 and M3 Issue 6). They hold 
 Results:
 - **Hit rolls:** typical about 2,000 shots a day, 0.02 per second on average. The AP budget caps it at 12,000 rifle shots a day (0.14 per second), or 24,000 machine-gun shots a day (0.28 per second).
 - **Bursts:** a rested unit holds 30 AP: 15 rifle shots, fired in about 22 s (40 rounds a minute, one 3 s reload), or 30 machine-gun shots, fired in about 4 s. If 400 units (40 %) open fire together, that is about **270 hit rolls per second for about 20 s with rifles**, or about **3,300 per second for about 4 s with machine guns**. The same burst happens whenever rested units meet, not only at battle start.
-- **CPU:** path requests and hit rolls cost little. Target scans for units in contact (about 1 ms per tick on average) dominate. Total about **1 to 2 minutes of one core per simulated day**. Scans gated on units that have the AP for a shot would lower it further. Measured in M4 Issue 11.
+- **CPU:** hit rolls cost little and path requests about 30 s a day. Target scans for units in contact (about 1 ms per tick on average) dominate. Total about **1 to 2 minutes of one core per simulated day**. Scans gated on units that have the AP for a shot would lower it further. Measured in M4 Issue 11.
 - **Memory:** the map is shared by all battles on it. A 10 × 50 km map at 10 m cells is 1,000 × 5,000 = 5 million cells, about 4 bytes each: about 20 MB, plus about 15 MB for about 200,000 objects. Each battle adds about 1 MB for its units. About 20 battles per process would fit in about 0.6 GB. The figure of 10 m per cell is a proposal (see stack decision 5).
 - **Logs:** about 4,000 events a day at about 100 bytes each: **about 0.4 MB of log per battle per day**. Worst case (1 m orders): 24,000 events, 2.4 MB. The battle-start burst adds up to 5,000 events once. Details in `02-persistence.md`.
 

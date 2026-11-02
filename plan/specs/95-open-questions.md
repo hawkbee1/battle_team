@@ -16,14 +16,14 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-08** Day/night and weather. → decisions 59, 90
 - [x] **Q-MAP-09** ~~Performance budget for persistent world changes in a 100+ player battle.~~ Technical: out of scope for the spec phase, like Q-GEN-01.
 - [x] **Q-MAP-10** Is slope signed (going downhill cheaper)? → decision 133
-- [ ] **Q-MAP-11** How is a step between two cells priced? Assumed: half on each cell's terrain, with the step's slope (M3 Issue 3).
-- [ ] **Q-MAP-12** What terrain does a bridge deck cost as? Assumed: `road`.
-- [ ] **Q-MAP-13** What does climbing a ladder cost? Assumed: foot units only; the height climbed, priced as flat ground of the arrival cell (1 AP per metre for infantry on grass).
-- [ ] **Q-MAP-14** Do intact buildings and walls stop units, as walls stop relics (RELIC-20)? Assumed: yes for ground units; trees do not; flying units ignore them.
-- [ ] **Q-MAP-15** Does a flying unit pay to go up to a floating island or down from it? Assumed: no, under the altitude limit (MAP-17).
-- [ ] **Q-MAP-16** A relic or the HQ pushed or moved over a floating island's edge falls (RELIC-22, HQ-48): does the fall cost AP, and where can it land? Assumed: the fall is free and it lands on the ground cell next to the edge, except onto a building or a wall; the path goes on from there (M3 Issue 4).
-- [ ] **Q-MAP-17** What shape does a crater give the ground, and what if craters overlap? Assumed: a bowl, `depth × (1 − (distance / radius)²)` at each covered cell's centre; where craters overlap, the deepest counts; craters dig the ground surface only, not floating islands (M3 Issue 5).
-- [ ] **Q-MAP-18** Can a unit move diagonally between two cells when one of the two cells it passes between is impassable for it (a wall's corner, a river's bend)? Assumed: no; a diagonal step needs both of those cells passable for the mode used (M3 review).
+- [x] **Q-MAP-11** How is a step between two cells priced? → decision 188
+- [x] **Q-MAP-12** What terrain does a bridge deck cost as? → decision 189
+- [x] **Q-MAP-13** What does climbing a ladder cost? → decision 190
+- [x] **Q-MAP-14** Do intact buildings and walls stop units, as walls stop relics (RELIC-20)? → decision 191
+- [x] **Q-MAP-15** Does a flying unit pay to go up to a floating island or down from it? → decision 192
+- [x] **Q-MAP-16** A relic or the HQ pushed or moved over a floating island's edge falls (RELIC-22, HQ-48): does the fall cost AP, and where can it land? → decision 193
+- [x] **Q-MAP-17** What shape does a crater give the ground, and what if craters overlap? → decision 194
+- [x] **Q-MAP-18** Can a unit move diagonally between two cells when one of the two cells it passes between is impassable for it (a wall's corner, a river's bend)? → decision 195
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)

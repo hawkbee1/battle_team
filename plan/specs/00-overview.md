@@ -307,5 +307,15 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 186. **Friendly fire hurts the own HQ.** The own team's fire, splash included, damages its HQ like any other target (COMBAT-34).
 187. **A weapon that changes hands arrives unloaded.** A weapon taken from storage in a swap, or picked up from the ground, must be reloaded before it fires. A newly bought unit's default weapon comes loaded with a full magazine.
 
+### Round 9 (2026-11-02): movement details found while building the pathfinding
+188. **A move pays each terrain it crosses.** Where a move goes from one terrain to another, each terrain is paid for the distance on it, with the slope of the move (MAP-41).
+189. **A bridge deck costs as road** for every unit, relic and HQ that crosses it (MAP-42).
+190. **Ladders are for foot units.** Climbing a ladder, up or down, costs the height climbed, priced as flat ground of the terrain at its far end: 1 AP per metre for infantry on grass (MAP-43).
+191. **Buildings and walls stop ground units**, as walls stop relics (RELIC-20). Trees do not. Flying units ignore all of them. A wall at the end of a bridge or at the top of a ladder stops ground units too (MAP-44).
+192. **Flying to and from a floating island is free:** a flying unit pays no AP to go up to an island or down from it, under the altitude limit (MAP-45).
+193. **A fall is free and lands next to the edge.** A relic or the HQ that goes over a floating island's edge pays no AP for the fall. It lands on the ground just past the edge, whatever its terrain, but never onto a building or a wall, and its path goes on from there (MAP-39).
+194. **A crater is a bowl.** Its depth at a distance *d* from its centre is `depth × (1 − (d / radius)²)`. Where craters overlap, the deepest one counts. Craters dig the ground only, never a floating island (MAP-46).
+195. **No cutting corners.** A move never passes between two places when one of them is impassable for it (a wall's corner, a river's bend): it goes around (MAP-47).
+
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.
