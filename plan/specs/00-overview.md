@@ -321,6 +321,10 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 197. **Earned XP counts.** Target scaling (UNIT-09) and team power (UNIT-12) use the XP a unit has earned, spent on its tree or not. Buying a node never makes a unit a weaker target or lowers its team's power.
 198. **Same build spot: within 10 m.** For anti-farming (UNIT-10), a build within **10 m** of one of the same unit's builds in the window counts as a repeat (`diminishing.same_spot_radius_m`, placeholder).
 199. **No XP for time near the commander.** Units earn XP from hits and kills, role actions and captures only. Revises decision 8.
+200. **Whole w€.** Every amount of money is a whole number of w€. A fee is rounded to the nearest whole w€, halves up.
+201. **A killing shot earns both.** The shot that kills a unit earns the hit's XP and money as well as the kill's.
+202. **No money from allies.** Hitting an ally or the own HQ earns no money, as it earns no XP (UNIT-10).
+203. **The fee comes out of the amount.** A transfer of 100 w€ outside the guild gives the receiver 93 w€; the 7 w€ fee is destroyed. The sender never pays more than he sends.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

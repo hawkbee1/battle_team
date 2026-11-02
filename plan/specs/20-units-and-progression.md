@@ -56,7 +56,7 @@ Stats in `data/units.yaml` are placeholders, tuned in playtests.
 
 ## 5. XP
 Sources (decision 199):
-- **UNIT-05** hits and kills,
+- **UNIT-05** hits and kills; the shot that kills earns both (decision 201),
 - **UNIT-06** role actions (engineers building and repairing, medics healing, scouts spotting enemies),
 - **UNIT-07** capturing and objectives,
 

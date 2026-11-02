@@ -53,7 +53,7 @@ Acceptance criteria:
 - The cap at levels 1, 5, 6 and 60; a section at its cap owns at most 2 × cap units.
 
 ## Issue 3: Money
-Rules: ECO-01 to ECO-22, SOC-10 to SOC-15, COMBAT-27, UNIT-27, UNIT-41, HQ-04, HQ-43.
+Rules: ECO-01 to ECO-06, ECO-08 to ECO-22, SOC-10 to SOC-15, COMBAT-27, UNIT-27, UNIT-41, HQ-04, HQ-43; decisions 200 to 203.
 Package: `battle_rules`.
 Depends on: 2.
 
@@ -67,7 +67,7 @@ Acceptance criteria:
 - The safety net after a commander's death and after the loss of the last unit, and not otherwise.
 
 ## Issue 4: Storage, deployment and the commander's death
-Rules: HQ-02, HQ-03, HQ-13, HQ-24 to HQ-42, HQ-44, HQ-46, HQ-47, UNIT-28, UNIT-29, UNIT-42, COMBAT-44, COMBAT-45, COMBAT-51.
+Rules: HQ-02, HQ-03, HQ-13, HQ-24 to HQ-42, HQ-44, HQ-46, HQ-47, ECO-07, UNIT-28, UNIT-29, UNIT-42, COMBAT-44, COMBAT-45, COMBAT-51.
 Package: `battle_rules`.
 Depends on: 2, 3.
 

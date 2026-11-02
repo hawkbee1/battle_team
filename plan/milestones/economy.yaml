@@ -17,7 +17,7 @@ earnings:                    # money for the acting unit's section
   hq_hit: 10
   hq_destruction: 100
 
-transfer_fees:
+transfer_fees:               # share of the amount sent, rounded to whole w€ (decisions 200, 203)
   inside_guild: 0.02
   outside_guild: 0.07        # fees are destroyed (decision 25b)
 
