@@ -83,14 +83,14 @@ Acceptance criteria:
 - A commander's death with a carried unit in the section; an exchange and a ransom.
 
 ## Issue 5: Relic ownership and victory
-Rules: RELIC-10 to RELIC-18, RELIC-26, RELIC-27, HQ-18, HQ-19, HQ-20, HQ-23, HQ-45.
+Rules: RELIC-10 to RELIC-18, RELIC-26, RELIC-27, HQ-18, HQ-19, HQ-20, HQ-23, HQ-45; decision 208.
 Package: `battle_rules`.
 Depends on: 4.
 
 - A capture completed (M4.10) changes the relic's owner at once and tells the previous owner (the alert of RELIC-10; M6 delivers it). No protection time.
 - The victory timer: a team that owns `victory.relics_to_hold` relics for `victory.hold_s` wins; the timer resets fully when it drops below, even for a moment. Its countdown is part of the state the clients will see.
 - A relic lost with a destroyed reinforced bridge leaves the battle; with fewer relics left than `relics_to_hold`, only the HQ victory remains.
-- Elimination: a destroyed HQ, or one lost with a bridge, eliminates its team; its units on the field are stored, its stored units stay. The last HQ standing wins.
+- Elimination: a destroyed HQ, or one lost with a bridge, eliminates its team; its units on the field are stored, its guild camps included (decision 208), its stored units stay. The last HQ standing wins.
 
 Acceptance criteria:
 - A 24-hour hold that wins; one that drops to 4 relics for one second and starts again from zero.
