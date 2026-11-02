@@ -4,7 +4,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 
 ## 1. The 8 special units: relics
 - **RELIC-01** The 8 special units are **relics: huge statues of the gods of war from different mythologies** (decision 96). Detailed lore is to be written.
-- **RELIC-02** They are placed on solid ground when a battle starts.
+- **RELIC-02** They are placed on solid ground when a battle starts, a floating island included (decision 216).
 - **RELIC-03** They are **movable objects**, but move very slowly and are too big to be carried by a transport.
 - **RELIC-04** They are different from radios (radios are purchasable units that relay scout information).
 

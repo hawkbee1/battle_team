@@ -4,7 +4,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 
 ## 1. Maps are hand-authored
 - **MAP-01** Battle maps are designed by hand (no procedural generation). A battle picks one authored map.
-- **MAP-02** A map defines: ground layout, biomes, trees, rivers, lakes, mountains, roads, towns, floating islands, team starting points, and the initial positions of the 8 special units.
+- **MAP-02** A map defines: ground layout, biomes, trees, rivers, lakes, mountains, roads, towns, floating islands, team starting points, and the initial positions of the special units (8 by design; from `victory.relics_to_hold` to fewer than twice as many, decision 218).
 - **MAP-03** **Number of teams and map size are battle settings** (chosen when a battle is created, within what the chosen map supports). Each map file declares which team counts it supports and its starting points.
 - **MAP-04** Maps are up to **10,000 × 50,000 m**; a battle has **2 to 5 teams**. (Decision 84)
 - **MAP-05** Consequence for the build: we need a map format, an authoring workflow and a loader on server and client.
@@ -27,6 +27,7 @@ Consequences for the build:
 - **MAP-46** A crater is a **bowl**: at a distance *d* from its centre the ground is `depth × (1 − (d / radius)²)` lower. Where craters overlap, the deepest one counts. Craters dig the ground only, never a floating island. (Decision 194)
 - **MAP-10** Hit points: tree 100, building 500, wall 200, bridge 200, reinforced bridge 400 (decision 89, `data/terrain.yaml`).
 - **MAP-40** Objects (trees, buildings, constructions) have an **armor type** for the damage table, `structure` by default (decision 137, `data/terrain.yaml`).
+- **MAP-48** Objects stand **only on land**: trees, buildings, walls, traps and roads never on water; bridges only on water, with land at both ends. (Decision 217)
 
 ## 3. Movement
 Each unit belongs to a **movement class**. Moving costs AP. The AP cost depends on the terrain under the unit, on the movement class, and on the slope.

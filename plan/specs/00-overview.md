@@ -337,6 +337,9 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 213. **Trainees count toward a guild's size.** A full guild takes no new trainee and is not offered to newcomers.
 214. **The camp follows the chief.** When the chief hands his role to a member, the guild camp passes to the new chief's section. When he disbands the guild, the camp is destroyed.
 215. **Only the chief opts the guild in or out** of the newcomer list.
+216. **Starting positions.** A relic may start on a floating island, on any cell that is not water. An HQ starts on the ground, never on a floating island.
+217. **Objects stand on land.** Trees, buildings, walls, traps and roads never stand on water. Bridges stand only on water, with land at both ends. Nothing else limits where a map puts its objects.
+218. **The number of relics comes from the data.** A map places at least `relics_to_hold` relics, so they can win, and fewer than twice as many, so no tie is possible (RELIC-17).
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.
