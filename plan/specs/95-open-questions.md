@@ -40,6 +40,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-20** Default `actions` per unit type (`data/units.yaml`), set in review: radio and camp neither capture nor push; helicopter and boat capture but do not push; the camp's heals earn money for the chief's section (ECO-18). Confirm or change. → decision 145 (accepted)
 - [x] **Q-UNIT-21** Speed caps and evolution: does the cap of decision 174 apply to evolved speeds? → decision 178 (base speeds only; evolution follows the 300 % cap)
 - [x] **Q-UNIT-22** Capture XP (`xp_sources.capture`, 50) with a team pot (decision 170): who gets it? → decision 179 (shared by the AP each unit put in, paid on success)
+- [x] **Q-UNIT-23** Scout observe (+30 m, decision 119): added to `vision_range` before the weather and terrain factors, or after them? → decision 184 (to `vision_range`)
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
@@ -130,6 +131,9 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-32** `ap_per_m` of the units the designer did not name. → decision 181 (placeholders accepted)
 - [x] **Q-CBT-33** Infantry pace, radio and guild camp speeds. → decision 182 (infantry runs; radio 5 m/s, guild camp 1 m/s)
 - [x] **Q-CBT-34** First-person shots: projectile speed or instant hit, and the hit volume of each unit type. → decision 183 (a speed per weapon; `hit_box_m` per unit and for the HQ)
+- [x] **Q-CBT-35** Crushing with 10 + *n* pushers and more than *n* units in the path: does the relic crush *n* of them and stop at the next, or stop at once? → decision 185 (crushes the first *n* it meets, stops at the next)
+- [x] **Q-CBT-36** Friendly fire and the own HQ: COMBAT-34 hurts allies, HQ-16 says enemy units damage the HQ. Does own fire damage the own HQ? → decision 186 (yes)
+- [x] **Q-CBT-37** Is a weapon taken from storage or picked up loaded? → decision 187 (unloaded; a new unit's default weapon comes loaded)
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).

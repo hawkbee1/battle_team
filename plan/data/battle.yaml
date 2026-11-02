@@ -1,7 +1,7 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
-# `victory` and `storage` hold battle-wide rule values (decisions 45, 110); they are not declared battle settings.
-version: 7
+# `ap.max`, `victory` and `storage` hold battle-wide rule values (decisions 45, 110, 167); they are not declared battle settings.
+version: 8
 
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -10,8 +10,9 @@ commander_death:
   ap_loss_share: 1.0         # share of ap_max removed from each stored unit (1.0 = AP to 0)
   morale_loss: 20            # morale points removed from each stored unit
 
-# AP recovery (decisions 168, 172): AP every unit recovers per hour. Special events may use another rate.
 ap:
+  max: 30                    # AP maximum of every unit; each unit's ap_max in data/units.yaml equals it (decision 167)
+  # AP recovery (decisions 168, 172): AP every unit recovers per hour. Special events may use another rate.
   recovery_per_hour: 1
 
 # Start of every battle of a war (decision 83)

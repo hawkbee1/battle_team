@@ -1,7 +1,7 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
 version: 12
 
-# AP max is 30 for every unit (decision 167). AP recovery is one rate for all units, a battle setting (data/battle.yaml, decision 172).
+# AP max is the same for every unit: data/battle.yaml ap.max (decision 167). AP recovery is one rate for all units, a battle setting (data/battle.yaml, decision 172).
 # ap_per_m: AP per metre on flat ground (decisions 169, 181). Terrain, movement class and slope multiply it
 #   (data/terrain.yaml). move_speed is the time per metre, in m/s; it does not set the AP cost.
 common_stats: [hp, ap_max, ap_per_m, attack, defense, move_speed, vision_range, movement_class, armor_type, hit_box_m, morale]
