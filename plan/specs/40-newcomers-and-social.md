@@ -8,7 +8,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** among the guilds that have **opted in to accept new players**. The player chooses one of them. His new section joins it as a **trainee** (decision 129; trainee: SOC-50).
 - **SOC-04** Why (research note): early friends and guild membership are the strongest predictors of staying; having a choice supports autonomy; joining the weakest team helps balance battles.
 
-- **SOC-05** **Team power = unit XP + section XP** of the team. The rules have **no notion of active or inactive players**. (Decision 93)
+- **SOC-05** **Team power = unit XP + section XP** of the team, with the XP units have earned (decision 197). The rules have **no notion of active or inactive players**. (Decision 93)
 - **SOC-06** A **new player** is **anyone joining**. (Decision 101)
 - **SOC-07** If fewer than 4 opted-in guilds exist in the team, the list is **filled with randomly picked guilds that did not opt in**, up to 4. A team with fewer than 4 guilds shows all of them.
 - **SOC-08** A guild can **leave the newcomer list at any time**, with **no reward or penalty**. (Decision 101)

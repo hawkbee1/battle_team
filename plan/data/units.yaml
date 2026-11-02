@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 13
+version: 14
 
 # AP max is the same for every unit: data/battle.yaml ap.max (decision 167). AP recovery is one rate for all units, a battle setting (data/battle.yaml, decision 172).
 # ap_per_m: AP per metre on flat ground (decisions 169, 181). Terrain, movement class and slope multiply it
@@ -161,12 +161,13 @@ progression:
     kill: 20
     role_action: 5                # per completed build, repair, heal, spotting report
     capture: 50                   # shared by the AP each unit put into the pot, on success (decision 179)
-    near_commander_per_min: 1
-  target_scaling:                 # hit/kill XP x min(cap, 1 + target_xp / max(attacker_xp, 1))
+                                  # no XP for time near the commander (decision 199)
+  target_scaling:                 # hit/kill XP x min(cap, 1 + target_xp / max(attacker_xp, 1)), earned XP (decision 197)
     cap: 3.0
   diminishing:                    # same target or same build spot, within the window
     window_s: 600
     factor_per_repeat: 0.5
+    same_spot_radius_m: 10        # a build this close to one of the unit's builds is at the same spot (decision 198)
   friendly_hits_give_xp: false
   victory_xp: 1                   # per unit of the winning team; normal section share applies (decision 92)
   section_xp_share: 0.2           # share of each XP point earned by a unit, moved to section XP

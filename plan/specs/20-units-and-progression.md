@@ -55,18 +55,17 @@ Role-specific stats are added per category: medic heal value, scout observe, tra
 Stats in `data/units.yaml` are placeholders, tuned in playtests.
 
 ## 5. XP
-Sources (all four were chosen):
+Sources (decision 199):
 - **UNIT-05** hits and kills,
 - **UNIT-06** role actions (engineers building and repairing, medics healing, scouts spotting enemies),
 - **UNIT-07** capturing and objectives,
-- **UNIT-08** time survived near the commander.
 
 XP belongs to the unit and persists across the battles of a **war**. A section (and all its units, XP and evolution) is created when the player enters a war and is **lost at the end of the war** (see `specs/40-newcomers-and-social.md`).
-- **UNIT-09** **Stronger targets give more XP** (decision 77): hit and kill XP is multiplied by `1 + target XP / attacker XP`, capped at ×3.
-- **UNIT-10** **Anti-farming**: repeated XP from the same target or the same build spot within a time window shrinks. Hitting allies gives no XP.
+- **UNIT-09** **Stronger targets give more XP** (decision 77): hit and kill XP is multiplied by `1 + target XP / attacker XP`, capped at ×3. Both are the XP each unit has earned, spent or not (decision 197).
+- **UNIT-10** **Anti-farming**: repeated XP from the same target or the same build spot within a time window shrinks. A build within 10 m of one of the unit's builds in the window is at the same spot (decision 198). Hitting allies gives no XP.
 - **UNIT-11** **victoryXp**: every unit of every section in the winning team of a battle gains **1 XP**, which counts toward section XP like any XP. (Decision 92)
 - **UNIT-43** **Capture XP is split by AP** (decision 179): when a capture succeeds, its XP (`xp_sources.capture`) is shared among the units that put AP into the capture pot, in proportion to their AP (1 XP per AP with the defaults), including units that died or left the radius since. A lost pot (RELIC-08) pays nothing.
-- **UNIT-12** **Team power** = unit XP + section XP of the team (decision 93).
+- **UNIT-12** **Team power** = unit XP + section XP of the team (decision 93), with the XP units have earned (decision 197).
 - **UNIT-13** No catch-up mechanism for late joiners: placement in the weakest team (decision 47) is the only compensation. (Decision 82)
 
 ### Section XP and commander level (decision 79)
