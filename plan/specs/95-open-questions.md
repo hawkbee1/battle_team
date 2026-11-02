@@ -21,6 +21,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [ ] **Q-MAP-13** What does climbing a ladder cost? Assumed: foot units only; the height climbed, priced as flat ground of the arrival cell (1 AP per metre for infantry on grass).
 - [ ] **Q-MAP-14** Do intact buildings and walls stop units, as walls stop relics (RELIC-20)? Assumed: yes for ground units; trees do not; flying units ignore them.
 - [ ] **Q-MAP-15** Does a flying unit pay to go up to a floating island or down from it? Assumed: no, under the altitude limit (MAP-17).
+- [ ] **Q-MAP-16** A relic or the HQ pushed or moved over a floating island's edge falls (RELIC-22, HQ-48): does the fall cost AP, and where can it land? Assumed: the fall is free and it lands on the ground cell next to the edge, whatever its terrain; the path goes on from there (M3 Issue 4).
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
