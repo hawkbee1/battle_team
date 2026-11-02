@@ -24,6 +24,7 @@ Consequences for the build:
 - **MAP-07** Craters and destroyed objects change cover, pathing and line of sight.
 - **MAP-08** Late joiners and returning players must receive the delta layer.
 - **MAP-09** Engineers **cannot fill craters**. Destroyed trees and structures **never regrow**. A crater is at most **20 m deep**. (Decision 85)
+- **MAP-46** A crater is a **bowl**: at a distance *d* from its centre the ground is `depth × (1 − (d / radius)²)` lower. Where craters overlap, the deepest one counts. Craters dig the ground only, never a floating island. (Decision 194)
 - **MAP-10** Hit points: tree 100, building 500, wall 200, bridge 200, reinforced bridge 400 (decision 89, `data/terrain.yaml`).
 - **MAP-40** Objects (trees, buildings, constructions) have an **armor type** for the damage table, `structure` by default (decision 137, `data/terrain.yaml`).
 
@@ -39,6 +40,10 @@ Movement classes:
 Rules:
 - **MAP-15** For each (movement class, terrain type) pair the data file gives either a multiplier on the unit's AP per metre (`ap_multiplier`, grass is 1.0; decision 169) or `impassable`.
 - **MAP-16** A **slope factor** multiplies the cost. Slope is **signed** (decision 133): going uphill raises the cost, going downhill lowers it, down to a per-class floor. A slope steeper than the per-class maximum, up or down, is impassable.
+- **MAP-41** A move from one terrain to another pays **each terrain for the distance on it**, with the slope of the move. (Decision 188)
+- **MAP-42** A **bridge deck costs as road** for every unit, relic and HQ. (Decision 189)
+- **MAP-44** Intact **buildings and walls stop ground units** (foot, wheeled, tracked), including at the end of a bridge or the top of a ladder. Trees do not. Flying units ignore all of them. (Decision 191)
+- **MAP-47** **No cutting corners:** a move never passes between two places when one of them is impassable for it (a wall's corner, a river's bend). (Decision 195)
 - **MAP-17** **Flying is a capability, not a movement class.** A unit with the `flying` capability moves with the `flying` profile of the data file: it ignores ground terrain and cannot fly higher than the map's highest terrain point + 10 m (decision 142, `data/terrain.yaml`).
 - **MAP-18** **Flying units can land and take off** (decision 68). Both take time, no AP. A landed unit moves with its ground movement class, is hit as a ground target, and can load or unload troops if it carries any. Its altitude limit is given by MAP-17.
 - **MAP-19** **Sail is a capability too** (decision 86). A unit with `sail` moves on rivers and lakes with the `sail` profile of the data file. With no ground movement class it is a **boat** (water only); with a ground class as well it is **amphibious**.
@@ -76,9 +81,11 @@ Ground types, trees, roads, towns, rivers, lakes, mountains, floating islands, p
 
 ## 7. Floating islands
 - **MAP-36** Reachable by **flying units**, or via **bridges or ladders built by engineers** from nearby terrain.
+- **MAP-43** **Ladders are for foot units.** Climbing one, up or down, costs the height climbed, priced as flat ground of the terrain at its far end (1 AP per metre for infantry on grass). (Decision 190)
+- **MAP-45** A flying unit pays **no AP to go up to an island or down from it**, under the altitude limit (MAP-17). (Decision 192)
 - **MAP-37** **No height limit for ladders.** Bridges and ladders can be destroyed; ground units can then be **stranded**. (Decision 88)
 - **MAP-38** Radios are units like any other on an island. **Encampments cannot reach islands.**
-- **MAP-39** A relic pushed over an island's edge **falls** and lands intact below (decisions 46d, 117).
+- **MAP-39** A relic pushed, or the HQ moved, over an island's edge **falls** and lands intact below (decisions 46d, 117, 148). The fall costs no AP. It lands on the ground just past the edge, whatever its terrain, never onto a building or a wall, and its path goes on from there. (Decision 193)
 
 ## 8. Open questions
 None open. Performance budgets are technical and out of scope for the spec phase.

@@ -12,7 +12,8 @@ Conventions:
 
 ### P-01 Path search on a 10 × 50 km map (M3 Issue 6)
 - Measure: time per path, and the AP cost of the fast search against the exact search.
-- Target: at most 10 % more AP than the exact search (M3 Issue 6). Time per path to be set from the first measurement; the estimate is about 1 ms.
+- Target: at most 10 % more AP than the exact search (M3 Issue 6). With 10 m cells, on the host, compiled ahead of time: at most **50 ms** for a 2 km path and **500 ms** for a path across the map, once the search is prepared for the mover (designer, 2026-11-02).
+- Measured (M3 Issue 6, `battle_pathfinding/benchmark_results`): median 15 ms for 2 km and about 150 ms across the map, at most 0.6 % more AP than the exact search. A hierarchical search with precomputed paths between blocks would be the next step if the target tightens.
 - Where: `stack/01`, `stack/05`.
 
 ### P-02 Simulation host, one 1,000-unit battle over one simulated day (M2 Issue 1)
@@ -47,7 +48,7 @@ Conventions:
 - Where: `stack/05`, `stack/03`.
 
 ## Order
-1. P-01 with M3 Issue 6, when the path search exists.
+1. P-01 with M3 Issue 6 (done), and again with M5 when the host shares the search data between movers.
 2. P-02 and P-03 with M5, when the simulation host exists.
 3. P-04 with M6, when the protocol exists.
 4. P-05 and P-06 as the first M7 task, before the client is built.
