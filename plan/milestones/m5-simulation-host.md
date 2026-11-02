@@ -110,7 +110,7 @@ Acceptance criteria:
 - The four guild cases of SOC-03 and SOC-07; the manager on a points tie.
 
 ## Issue 7: Wars, sections and guilds
-Rules: SOC-13, SOC-16 to SOC-19, SOC-21, SOC-40 to SOC-53, UNIT-24, UNIT-30, UNIT-31, UNIT-32.
+Rules: SOC-13, SOC-16 to SOC-19, SOC-21, SOC-40 to SOC-53, UNIT-24, UNIT-30, UNIT-31, UNIT-32; decisions 212 to 215.
 Package: `battle_rules`.
 Depends on: 6.
 

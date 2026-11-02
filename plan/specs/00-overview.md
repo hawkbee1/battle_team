@@ -333,6 +333,10 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 209. **Trainees stay with their guild.** When teams are balanced (decision 103), a trainee section is kept in its guild's team like the chief and the members.
 210. **A new commander always arrives.** A new section's commander arrives next to his portal even when an enemy is within 20 m: the block of decision 147 applies to bought units only.
 211. **Exact ties are drawn.** A newcomer facing teams of the same lowest power, or HQ manager candidates with the same medal points and commander XP, is settled by a draw with the battle's seeded random.
+212. **Every battle starts in storage.** At the start of each battle of a war, every unit of a section is in storage, its guild camp included. Units deploy from their portal; until the chief deploys the camp next to the HQ, the guild uses the HQ portal.
+213. **Trainees count toward a guild's size.** A full guild takes no new trainee and is not offered to newcomers.
+214. **The camp follows the chief.** When the chief hands his role to a member, the guild camp passes to the new chief's section. When he disbands the guild, the camp is destroyed.
+215. **Only the chief opts the guild in or out** of the newcomer list.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

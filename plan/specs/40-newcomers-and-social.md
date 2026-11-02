@@ -11,7 +11,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-05** **Team power = unit XP + section XP** of the team, with the XP units have earned (decision 197). The rules have **no notion of active or inactive players**. (Decision 93)
 - **SOC-06** A **new player** is **anyone joining**. (Decision 101)
 - **SOC-07** If fewer than 4 opted-in guilds exist in the team, the list is **filled with randomly picked guilds that did not opt in**, up to 4. A team with fewer than 4 guilds shows all of them.
-- **SOC-08** A guild can **leave the newcomer list at any time**, with **no reward or penalty**. (Decision 101)
+- **SOC-08** A guild can **leave the newcomer list at any time**, with **no reward or penalty**; only its chief opts it in or out. A full guild is not offered (decision 213). (Decisions 101, 215)
 
 - **SOC-09** **A player never leaves a battle.** He stays in his team for the whole battle. To take a break he **stores his whole section**; he can deploy again when he wants, but **not before 24 hours** after his last unit left the field. (Decisions 120, 204)
 
@@ -70,8 +70,8 @@ Confirmed: a player account holds several commanders; each commander leads one s
 - **SOC-45** A player has **one commander per war** and can take part in **several wars at the same time**. (Decision 124)
 
 ## 5. Guilds (decision 108)
-- **SOC-46** The **creator of a guild is its chief** (the guild commander). He can **hand the role to another member** and can **disband the guild**. The chief **cannot leave** the guild while he is chief.
-- **SOC-47** **Maximum guild size depends on the guild level**, which rises with the **total XP earned by its sections while in the guild**.
+- **SOC-46** The **creator of a guild is its chief** (the guild commander). He can **hand the role to another member** and can **disband the guild**. The chief **cannot leave** the guild while he is chief. On a handover the guild camp passes to the new chief's section; on disband it is destroyed (decision 214).
+- **SOC-47** **Maximum guild size depends on the guild level**, which rises with the **total XP earned by its sections while in the guild**. Trainees count toward the size (decision 213).
 - **SOC-48** A guild can have **a single section**.
 - **SOC-49** A section can play **without a guild**; it then stores its units at the HQ.
 - **SOC-50** Guild roles (decision 146): **chief**, **member** and **trainee**. A trainee is a new member that the chief has not accepted yet.
