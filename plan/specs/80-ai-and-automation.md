@@ -15,7 +15,7 @@ Status: **ready**. Built in milestone 1 (`milestones/m1-ai-and-automation.md`). 
 
 ### Server-managed sections
 - **AI-06** The server creates and runs some sections. They look the same as other sections, and can do everything a player's section can do. Their purpose is not written in the specs. (Decisions 159, 163.)
-- **AI-07** A unit of a server-managed section that sees an enemy within its weapon range may fire. The chance is checked every 30 minutes and is the same at each check. It is not rolled each time an enemy enters range. The values are in `data/battle.yaml`. (Decision 160.)
+- **AI-07** A unit of a server-managed section that sees an enemy within its weapon range may fire. The chance, 50 %, is checked every 30 minutes and is the same at each check. It is not rolled each time an enemy enters range. The values are placeholders in `data/battle.yaml`. (Decisions 160, 196.)
 - **AI-08** A shot by a server-managed unit follows the normal rules: the hit chance of COMBAT-15, like any unit acting under orders. (Decision 164.)
 - **AI-09** The server gives the orders of its sections through the same API as AI agents. (Decision 165.)
 

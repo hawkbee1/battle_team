@@ -83,6 +83,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-15** Where a newcomer's units appear (decision 33 said the team's starting point). → decision 129
 - [x] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it. → decision 146 (a member awaiting the chief's acceptance)
 - [x] **Q-SOC-17** What happens to a trainee's section when the chief refuses it? → decision 153
+- [ ] **Q-SOC-18** How does a guild's level rise, and what maximum size does each level give (SOC-47)? Assumed: guild XP counts every XP point its sections' units earn while in the guild, and gives the level on the `commander_levels` curve; the guild holds 5 sections at level 1, one more every 5 levels, 16 at level 60 (`progression.guild_size` in `data/units.yaml`, placeholders).
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
@@ -152,3 +153,4 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-AI-06** Server-managed sections: fixed chance per check, checked every 30 minutes. → decision 160
 - [x] **Q-AI-07** Server-managed units: besides the chance-based fire, can they move, hold, heal or capture? → decision 163 (same capabilities as a normal section)
 - [x] **Q-AI-08** Hit rule of a server-managed shot: the hit chance of COMBAT-15, or another rule? → decision 164 (same rules as a normal unit)
+- [x] **Q-AI-09** What chance does a server-managed unit fire with at each check (decision 160)? → decision 196

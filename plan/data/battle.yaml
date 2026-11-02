@@ -1,7 +1,7 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
 # `ap.max`, `victory` and `storage` hold battle-wide rule values (decisions 45, 110, 167); they are not declared battle settings.
-version: 8
+version: 9
 
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -52,6 +52,12 @@ storage:
   recall_s: 21600            # recall from anywhere else (6 h); nothing stops it
   deploy_ap: 10              # AP a unit pays to deploy
   deploy_block_radius_m: 20  # an enemy this close to the storage place blocks deployment
+
+# Server-managed sections (decisions 160, 196): each unit that sees an enemy within its weapon's
+# range fires with fire_chance at each check, every check_interval_s; not when an enemy enters range.
+server_managed:
+  fire_chance: 0.5           # placeholder
+  check_interval_s: 1800     # 30 minutes (decision 160)
 
 # Weather (decision 90): changes randomly, per map. No day/night.
 weather:
