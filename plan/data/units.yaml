@@ -1,5 +1,5 @@
 # Draft units table. All numbers are PLACEHOLDERS to be tuned.
-version: 12
+version: 13
 
 # AP max is the same for every unit: data/battle.yaml ap.max (decision 167). AP recovery is one rate for all units, a battle setting (data/battle.yaml, decision 172).
 # ap_per_m: AP per metre on flat ground (decisions 169, 181). Terrain, movement class and slope multiply it
@@ -181,6 +181,12 @@ progression:
     extra_unit_every_levels: 5
     max_units_factor: 2
   guild_creation_min_level: 10    # commander level a section needs to create a guild (decision 155)
+  # Guild size (SOC-47; assumed, Q-SOC-18): the guild's level comes from every XP point its sections'
+  # units earn while in the guild, on the commander_levels curve below. Placeholders.
+  #   max sections = sections_at_level_1 + floor((level - 1) / extra_section_every_levels)   (16 at level 60)
+  guild_size:
+    sections_at_level_1: 5
+    extra_section_every_levels: 5
   # Commander levels (decision 144), 1 to max_level. section_xp[i] is the section XP needed to
   # reach level i + 1. Placeholder curve: going from level n to n + 1 costs 500 x n.
   # Cap from section_size: levels 1-5: 5, 6-10: 6, ..., 56-60: 16.

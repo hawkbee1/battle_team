@@ -162,7 +162,7 @@ Acceptance criteria:
 ---
 
 ## Later milestones (outline, for the chosen stack)
-- **M5 – Simulation host and persistence** (`battle_host` package, Dart, see `stack/01` and `stack/02`; the war, section and guild rules go in `battle_rules` so functions can call them, `stack/08`; errors reported to Sentry, `stack/06`): battle state in memory, write-ahead log and snapshots, log batches to Appwrite Storage, low-write data in Appwrite. World delta layer (MAP-06, MAP-08), storage and deployment (HQ-24 to HQ-47), economy (ECO), XP and progression (UNIT-05 to UNIT-43), relic ownership and victory timer (RELIC-10 to RELIC-18), section AI and API orders (AI-01 to AI-09), statistics and medals computed from the battle logs in batch (decision 143).
+- **M5 – Simulation host and persistence**: `milestones/m5-simulation-host.md`.
 - **M6 – Networking** (`stack/03`): WebSocket for players, HTTPS for AI agents and the server, one command handler. Fog of war per section (MAP-29) filtered on the host, 5 Hz position updates, alerts (RELIC-10), late joiners get the delta layer (MAP-08).
 - **M7 – Client** (`stack/04`, `stack/06`): flutter_scene for the 3D world, Flutter widgets for the interface, top-down and first-person control, pings, map markers and team chat (decision 123). Discord account linking (decision 126) through the bridge service. Starts with the rendering spike on the slowest target device.
 - **M8 – Revision after real battles**: `milestones/m8-revision-after-real-battles.md`.

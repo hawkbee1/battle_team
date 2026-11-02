@@ -48,5 +48,6 @@ Milestones, in order:
 2. **M2 – Technical stack** (`milestones/m2-technical-stack.md`): the stack is chosen from the rules, not taken from the current code. No code. Done on 2026-11-01.
 3. **M3 – Pathfinding** (`milestones/m3-pathfinding.md`): paths for every movement class, headless.
 4. **M4 – Rules core** (`milestones/m4-rules-core.md`): AP, movement cost, vision and combat resolution, loading `data/*.yaml`, covered by unit tests. No rendering, no network.
-5. **M5 to M7**: server-side persistence, networking, then the client (outline at the end of `milestones/m4-rules-core.md`).
-6. **M8 – Revision after real battles** (`milestones/m8-revision-after-real-battles.md`): moderation tools and the points left to watch in real battles.
+5. **M5 – Simulation host and persistence** (`milestones/m5-simulation-host.md`).
+6. **M6 and M7**: networking, then the client (outline at the end of `milestones/m4-rules-core.md`).
+7. **M8 – Revision after real battles** (`milestones/m8-revision-after-real-battles.md`): moderation tools and the points left to watch in real battles.
