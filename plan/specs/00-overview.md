@@ -318,6 +318,9 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 194. **A crater is a bowl.** Its depth at a distance *d* from its centre is `depth × (1 − (d / radius)²)`. Where craters overlap, the deepest one counts. Craters dig the ground only, never a floating island (MAP-46).
 195. **No cutting corners.** A move never passes between two places when one of them is impassable for it (a wall's corner, a river's bend): it goes around (MAP-47).
 196. **Server-managed units fire at 50 % per check.** At each 30-minute check (decision 160), a server-managed unit that sees an enemy within its weapon's range fires with a chance of **50 %**. Both values are placeholders in `data/battle.yaml` (`server_managed`).
+197. **Earned XP counts.** Target scaling (UNIT-09) and team power (UNIT-12) use the XP a unit has earned, spent on its tree or not. Buying a node never makes a unit a weaker target or lowers its team's power.
+198. **Same build spot: within 10 m.** For anti-farming (UNIT-10), a build within **10 m** of one of the same unit's builds in the window counts as a repeat (`diminishing.same_spot_radius_m`, placeholder).
+199. **No XP for time near the commander.** Units earn XP from hits and kills, role actions and captures only. Revises decision 8.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

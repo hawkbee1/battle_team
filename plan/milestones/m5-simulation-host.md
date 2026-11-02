@@ -40,11 +40,11 @@ Acceptance criteria:
 - An evolved helicopter can outrun a jeep that has not evolved (decision 178).
 
 ## Issue 2: XP, section XP and commander level
-Rules: UNIT-05 to UNIT-11, UNIT-14 to UNIT-17, UNIT-39, UNIT-40, UNIT-43.
+Rules: UNIT-05 to UNIT-11, UNIT-14 to UNIT-17, UNIT-39, UNIT-40, UNIT-43; decisions 197 to 199.
 Package: `battle_rules`.
 
-- XP for hits and kills, scaled by `1 + target XP / attacker XP` up to the cap; repeated XP from the same target or the same build spot within `diminishing.window_s` shrinks by `factor_per_repeat`; hitting allies gives none.
-- XP for role actions, for time near the commander, for captures (split by the AP each unit put into the pot, decision 179, with the contributions M4.10 records), and `victory_xp` for every unit of the winning team.
+- XP for hits and kills, scaled by `1 + target XP / attacker XP` up to the cap, with earned XP; repeated XP from the same target or the same build spot (within `same_spot_radius_m`) within `diminishing.window_s` shrinks by `factor_per_repeat`; hitting allies gives none.
+- XP for role actions and for captures (split by the AP each unit put into the pot, decision 179, with the contributions M4.10 records), and `victory_xp` for every unit of the winning team.
 - `section_xp_share` of every XP point goes to the section. Section XP sets the commander level (`commander_levels`), which sets the section size cap and the number of units a section may own (`section_size`).
 
 Acceptance criteria:
