@@ -99,7 +99,7 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 
 ## 7b. Between battles of a war (decision 83)
 - **UNIT-30** A section keeps everything from one battle to the next: units, XP, evolution, weapons, money, prisoners.
-- **UNIT-31** At the start of each battle every unit gets **full AP and HP** and its **morale back to base**.
+- **UNIT-31** At the start of each battle every unit gets **full AP and HP** and its **morale back to base**, and starts **in storage**, the guild camp included (decision 212).
 - **UNIT-32** At the end of the war everything is lost. The game keeps **logs, statistics and medals** for consultation (decisions 49g, 49h); cosmetics are kept (49i).
 
 ## 8. Specific unit roles
@@ -108,7 +108,7 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-35** **Medic**: soldier with a heal role. **Healing is instant**: it costs AP and restores the medic's `heal` value in HP. It works on every friendly unit except the HQ (decision 139). Earns money for the section when healing. (Decision 91)
 - **UNIT-36** **Radio**: purchasable by a commander. Gathers info from team scouts in its area (evolvable range) and shares it with all sections. Slow, not transportable.
 - **UNIT-37** **Transports** (truck, boat): carry units **by weight**: each unit has a weight; a transport has a total weight capacity and a maximum weight per carried unit (decision 91). Carried units **take a share of every hit** on the transport, computed with their own armor type, and are **ejected with explosion damage** when it is destroyed. (Decision 81) Stored units can never be harmed.
-- **UNIT-42** **Guild camp** (encampment, decision 141): a unit of the guild chief's section, outside his cap and never stored except at its team's elimination (HQ-20, decision 208). It moves slowly on its own, cannot fly, cannot reach floating islands (decision 88) and heals friendly units. Price, HP and armor: HQ-43.
+- **UNIT-42** **Guild camp** (encampment, decision 141): a unit of the guild chief's section, outside his cap and never stored except between battles and at its team's elimination (decisions 208, 212). It moves slowly on its own, cannot fly, cannot reach floating islands (decision 88) and heals friendly units. Price, HP and armor: HQ-43.
 
 ## 9. Open questions
 See `specs/95-open-questions.md`, section "Units and progression".
