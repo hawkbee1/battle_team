@@ -340,6 +340,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 216. **Starting positions.** A relic may start on a floating island, on any cell that is not water. An HQ starts on the ground, never on a floating island.
 217. **Objects stand on land.** Trees, buildings, walls, traps and roads never stand on water. Bridges stand only on water, with land at both ends. Nothing else limits where a map puts its objects.
 218. **The number of relics comes from the data.** A map places at least `relics_to_hold` relics, so they can win, and fewer than twice as many, so no tie is possible (RELIC-17).
+219. **Who chooses a pushed relic's path.** The player whose unit first tries to move the relic while its push pot is empty chooses the path. Later pushes add to the pot and follow that path until the pot is empty again.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.
