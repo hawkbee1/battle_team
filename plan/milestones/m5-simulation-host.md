@@ -124,7 +124,7 @@ Acceptance criteria:
 - Each guild action, refused where the rules say so; a trainee refused by the chief (decision 153).
 
 ## Issue 8: Map format and loader
-Rules: MAP-01 to MAP-05, MAP-10, MAP-36, MAP-40, RELIC-02, HQ-01.
+Rules: MAP-01 to MAP-05, MAP-10, MAP-36, MAP-40, MAP-48, RELIC-02, HQ-01; decisions 216 to 218.
 Package: `battle_map` (new, `dart_package`).
 
 - The tiles of stack decision 5: 256 × 256 cells of 10 m, with a 16-bit height image, an indexed terrain image and `objects.yaml` (trees, buildings, walls, roads, bridges, ladders, floating islands). A map file lists its tiles, the team counts it supports, the HQ starting points for each count and the relics' starting positions.
