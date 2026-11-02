@@ -329,6 +329,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 205. **A blocked arrival refuses the purchase.** While an enemy within 20 m blocks the arrival of new units (decision 147), or the section is under its 24-hour lock, nothing is bought and no money is spent: a bought unit arrives on the field.
 206. **A transport is stored empty.** A loaded transport cannot be stored or recalled: its passengers get off first. A recalled transport takes no passengers. At a commander's death, the units of other sections his transports carry are set down where they are; his own section's carried units are stored with the rest (UNIT-29).
 207. **A commander's XP loss lowers his earned XP too.** The XP he loses at his death (UNIT-29) come off his earned XP as well as his unspent XP: a kill on him is worth less, and his team's power drops.
+208. **An eliminated team's camp is stored.** When a team is eliminated, its guild camps on the field are stored with its other units (HQ-20), the one exception to "never stored": the guild chief's section keeps its camp for the next battle of the war.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

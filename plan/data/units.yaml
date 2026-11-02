@@ -96,7 +96,7 @@ units:
   encampment:                   # guild camp (decision 141)
     category: encampment          # guild storage place with a portal (decisions 28, 46h4)
     owner: guild_commander        # a unit of the guild chief's section
-    counts_in_section_cap: false  # outside the cap, and never stored (decision 127)
+    counts_in_section_cap: false  # outside the cap, and never stored (decision 127) but at its team's elimination (decision 208)
     storable: false
     movement_class: tracked       # moves slowly on its own; cannot fly or reach floating islands (decision 88)
     armor_type: structure
