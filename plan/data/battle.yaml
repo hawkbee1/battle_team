@@ -1,7 +1,7 @@
 # Default battle settings. All numbers are PLACEHOLDERS to be tuned.
 # These are settings of a battle (chosen when an admin creates it); these values are the defaults.
 # `ap.max`, `victory` and `storage` hold battle-wide rule values (decisions 45, 110, 167); they are not declared battle settings.
-version: 9
+version: 10
 
 # Commander death (decisions 80, 125): no respawn delay; the commander resurrects in storage.
 # All units of his section on the field (carried ones included) go instantly to storage.
@@ -24,6 +24,10 @@ battle_start:
 # Teams (decision 103): balanced by team power at each battle.
 teams:
   count: 2                   # 2..5 (decision 84)
+
+# Newcomers (SOC-03, SOC-07): a new player picks his guild among this many, drawn at random.
+newcomers:
+  guilds_offered: 4
 
 # Relic capture (decisions 97, 170)
 capture:

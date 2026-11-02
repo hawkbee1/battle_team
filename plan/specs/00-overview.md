@@ -262,7 +262,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 144. Commander levels go from **1 to 60**. The section size cap grows at levels 6, 11, ..., 56, up to 16 at level 60. The section XP of each level is in `data/units.yaml` (placeholder curve).
 145. The default action lists of `data/units.yaml` are accepted: the radio and the guild camp neither capture nor push; the helicopter and the boat capture but do not push; the camp's heals earn money for the chief's section.
 146. Guild roles: **chief**, **member**, **trainee**. A trainee is a new member that the chief has not accepted yet. A guild has two chats: one for the chief and the members, one for the whole guild.
-147. An enemy within 20 m of a storage place also blocks the **arrival of new units** there.
+147. An enemy within 20 m of a storage place also blocks the **arrival of new units** there. (A new section's commander is never blocked: decision 210.)
 148. A pushed HQ can go over the edge of a floating island and **fall**, like a relic: it lands intact and kills the units under it. (Revised by decision 177: the HQ moves on its own and falls when ordered over the edge.)
 149. An enemy **commander** or a **guild camp** is never taken prisoner and never defects.
 150. A **1-round weapon** fires once per reload: the time between two shots is its reload time.
@@ -330,6 +330,9 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 206. **A transport is stored empty.** A loaded transport cannot be stored or recalled: its passengers get off first. A recalled transport takes no passengers. At a commander's death, the units of other sections his transports carry are set down where they are; his own section's carried units are stored with the rest (UNIT-29).
 207. **A commander's XP loss lowers his earned XP too.** The XP he loses at his death (UNIT-29) come off his earned XP as well as his unspent XP: a kill on him is worth less, and his team's power drops.
 208. **An eliminated team's camp is stored.** When a team is eliminated, its guild camps on the field are stored with its other units (HQ-20), the one exception to "never stored": the guild chief's section keeps its camp for the next battle of the war.
+209. **Trainees stay with their guild.** When teams are balanced (decision 103), a trainee section is kept in its guild's team like the chief and the members.
+210. **A new commander always arrives.** A new section's commander arrives next to his portal even when an enemy is within 20 m: the block of decision 147 applies to bought units only.
+211. **Exact ties are drawn.** A newcomer facing teams of the same lowest power, or HQ manager candidates with the same medal points and commander XP, is settled by a draw with the battle's seeded random.
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.
