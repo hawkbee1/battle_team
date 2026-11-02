@@ -53,7 +53,7 @@ Acceptance criteria:
 - The cap at levels 1, 5, 6 and 60; a section at its cap owns at most 2 × cap units.
 
 ## Issue 3: Money
-Rules: ECO-01 to ECO-22, SOC-10 to SOC-15, COMBAT-27, UNIT-27, UNIT-41, HQ-04, HQ-43.
+Rules: ECO-01 to ECO-22, SOC-10 to SOC-15, COMBAT-27, UNIT-27, UNIT-41, HQ-04, HQ-43; decisions 200 to 203.
 Package: `battle_rules`.
 Depends on: 2.
 
