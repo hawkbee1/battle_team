@@ -16,6 +16,11 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-08** Day/night and weather. → decisions 59, 90
 - [x] **Q-MAP-09** ~~Performance budget for persistent world changes in a 100+ player battle.~~ Technical: out of scope for the spec phase, like Q-GEN-01.
 - [x] **Q-MAP-10** Is slope signed (going downhill cheaper)? → decision 133
+- [ ] **Q-MAP-11** How is a step between two cells priced? Assumed: half on each cell's terrain, with the step's slope (M3 Issue 3).
+- [ ] **Q-MAP-12** What terrain does a bridge deck cost as? Assumed: `road`.
+- [ ] **Q-MAP-13** What does climbing a ladder cost? Assumed: foot units only; the height climbed, priced as flat ground of the arrival cell (1 AP per metre for infantry on grass).
+- [ ] **Q-MAP-14** Do intact buildings and walls stop units, as walls stop relics (RELIC-20)? Assumed: yes for ground units; trees do not; flying units ignore them.
+- [ ] **Q-MAP-15** Does a flying unit pay to go up to a floating island or down from it? Assumed: no, under the altitude limit (MAP-17).
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
