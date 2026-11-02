@@ -4,8 +4,8 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 
 ## 1. Team power and newcomer placement
 - **SOC-01** Each team has a **power** value.
-- **SOC-02** A new player is placed in the **team with the lowest power**.
-- **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** among the guilds that have **opted in to accept new players**. The player chooses one of them. His new section joins it as a **trainee** (decision 129; trainee: SOC-50).
+- **SOC-02** A new player is placed in the **team with the lowest power**; an exact tie is drawn at random (decision 211).
+- **SOC-03** Inside that team, the new player is offered **4 guilds picked at random** (`newcomers.guilds_offered` in `data/battle.yaml`) among the guilds that have **opted in to accept new players**. The player chooses one of them. His new section joins it as a **trainee** (decision 129; trainee: SOC-50).
 - **SOC-04** Why (research note): early friends and guild membership are the strongest predictors of staying; having a choice supports autonomy; joining the weakest team helps balance battles.
 
 - **SOC-05** **Team power = unit XP + section XP** of the team, with the XP units have earned (decision 197). The rules have **no notion of active or inactive players**. (Decision 93)
@@ -13,7 +13,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-07** If fewer than 4 opted-in guilds exist in the team, the list is **filled with randomly picked guilds that did not opt in**, up to 4. A team with fewer than 4 guilds shows all of them.
 - **SOC-08** A guild can **leave the newcomer list at any time**, with **no reward or penalty**. (Decision 101)
 
-- **SOC-09** **A player never leaves a battle.** He stays in his team for the whole battle. To take a break he **stores his whole section**; he can deploy again when he wants, but **not before 24 hours** after the last alive unit was stored. (Decision 120)
+- **SOC-09** **A player never leaves a battle.** He stays in his team for the whole battle. To take a break he **stores his whole section**; he can deploy again when he wants, but **not before 24 hours** after his last unit left the field. (Decisions 120, 204)
 
 ## 2. Money safety net (minStartingMoney)
 - **SOC-10** When a commander **dies** or **loses all his units**, his money becomes:
@@ -32,7 +32,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-17** A war **ends when no more battle is planned** by the admin.
 - **SOC-18** A player's **section is created when he enters the war** and is **lost at the end of the war** (units, XP and evolution included).
 - **SOC-19** At the end of each battle, every unit of every section in the **winning team** gains **victoryXp**.
-- **SOC-20** At the start of each battle, **teams are created automatically**, **balanced by team power**; the **number of teams is a battle setting** (2 to 5). **Guild members always stay together** in the same team. (Decision 103)
+- **SOC-20** At the start of each battle, **teams are created automatically**, **balanced by team power**; the **number of teams is a battle setting** (2 to 5). **Guild members always stay together** in the same team, trainees included. (Decisions 103, 209)
 - **SOC-21** There is **no war winner**. (Decision 104)
 - **SOC-22** **War and battle statistics** are available during and after the war.
 
@@ -41,7 +41,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-25** **Game medals**: permanent, account-level.
 - **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Thresholds in `data/medals.yaml`. (Decision 105)
 - **SOC-27** **Cosmetics** for sections and units: bought with **real money** during a war, **kept after the war** and can be applied to other units later. They are **purely visual**. (Decision 106)
-- **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; on a tie, the one whose commander has the most XP. (Decision 121)
+- **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; on a tie, the one whose commander has the most XP; on an exact tie, a draw. (Decisions 121, 211)
 - **SOC-30** A player can **join a running war at any time**, entering the **current battle** (his commander arrives at the guild camp, or at the HQ if the guild has no camp, and he buys his units with the starting money; decisions 128, 129). (Decision 122)
 
 ## 3. Communication is fundamental

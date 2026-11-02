@@ -97,7 +97,7 @@ Acceptance criteria:
 - Three teams, two eliminated one after the other; a battle where 4 relics remain and only the HQ victory is possible.
 
 ## Issue 6: Teams, newcomers and the HQ manager
-Rules: SOC-01 to SOC-09, SOC-20, SOC-29, SOC-30, HQ-05 to HQ-08, UNIT-12, UNIT-13.
+Rules: SOC-01 to SOC-09, SOC-20, SOC-29, SOC-30, HQ-05 to HQ-08, UNIT-12, UNIT-13; decisions 209 to 211.
 Package: `battle_rules`.
 Depends on: 2.
 
