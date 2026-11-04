@@ -182,7 +182,7 @@ progression:
     extra_unit_every_levels: 5
     max_units_factor: 2
   guild_creation_min_level: 10    # commander level a section needs to create a guild (decision 155)
-  # Guild size (SOC-47; assumed, Q-SOC-18): the guild's level comes from every XP point its sections'
+  # Guild size (SOC-47, decision 221): the guild's level comes from every XP point its sections'
   # units earn while in the guild, on the commander_levels curve below. Placeholders.
   #   max sections = sections_at_level_1 + floor((level - 1) / extra_section_every_levels)   (16 at level 60)
   guild_size:

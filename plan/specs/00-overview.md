@@ -341,6 +341,8 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 217. **Objects stand on land.** Trees, buildings, walls, traps and roads never stand on water. Bridges stand only on water, with land at both ends. Nothing else limits where a map puts its objects.
 218. **The number of relics comes from the data.** A map places at least `relics_to_hold` relics, so they can win, and fewer than twice as many, so no tie is possible (RELIC-17).
 219. **Who chooses a pushed relic's path.** The player whose unit first tries to move the relic while its push pot is empty chooses the path. Later pushes add to the pot and follow that path until the pot is empty again.
+220. **The HQ manager is the first to log in, until a higher-ranking player logs in.** The first player of a team to log in to the battle becomes its HQ manager, so a team left empty at the battle start gets one with its first newcomer. Each time a player of the team logs in to the battle, the role passes to him if he ranks above the current manager (medal points, then commander XP, decision 121). The manager can still delegate the role (HQ-05). Revises HQ-07, which fixed the manager at the battle start.
+221. **Guild levels.** A guild's XP counts every XP point its sections' units earn while in the guild, and gives its level on the `commander_levels` curve. The guild holds 5 sections at level 1 and one more every 5 levels, 16 at level 60 (`progression.guild_size`, placeholders).
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

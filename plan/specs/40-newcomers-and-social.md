@@ -41,7 +41,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **SOC-25** **Game medals**: permanent, account-level.
 - **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Thresholds in `data/medals.yaml`. (Decision 105)
 - **SOC-27** **Cosmetics** for sections and units: bought with **real money** during a war, **kept after the war** and can be applied to other units later. They are **purely visual**. (Decision 106)
-- **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. The HQ manager is the player with the most points; on a tie, the one whose commander has the most XP; on an exact tie, a draw. (Decisions 121, 211)
+- **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. They rank the players for the HQ manager role (HQ-06, HQ-07): the most points first; on a tie, the one whose commander has the most XP; on an exact tie, a draw. (Decisions 121, 211, 220)
 - **SOC-30** A player can **join a running war at any time**, entering the **current battle** (his commander arrives at the guild camp, or at the HQ if the guild has no camp, and he buys his units with the starting money; decisions 128, 129). (Decision 122)
 
 ## 3. Communication is fundamental
@@ -71,7 +71,7 @@ Confirmed: a player account holds several commanders; each commander leads one s
 
 ## 5. Guilds (decision 108)
 - **SOC-46** The **creator of a guild is its chief** (the guild commander). He can **hand the role to another member** and can **disband the guild**. The chief **cannot leave** the guild while he is chief. On a handover the guild camp passes to the new chief's section; on disband it is destroyed (decision 214).
-- **SOC-47** **Maximum guild size depends on the guild level**, which rises with the **total XP earned by its sections while in the guild**. Trainees count toward the size (decision 213).
+- **SOC-47** **Maximum guild size depends on the guild level**, which rises with the **total XP earned by its sections while in the guild**, on the commander level curve: 5 sections at level 1, one more every 5 levels (`progression.guild_size`). Trainees count toward the size (decisions 213, 221).
 - **SOC-48** A guild can have **a single section**.
 - **SOC-49** A section can play **without a guild**; it then stores its units at the HQ.
 - **SOC-50** Guild roles (decision 146): **chief**, **member** and **trainee**. A trainee is a new member that the chief has not accepted yet.

@@ -103,7 +103,7 @@ Depends on: 2.
 
 - Team power is unit XP plus section XP. At each battle start, teams are formed balanced by power, `teams.count` of them, with each guild's sections kept together (decision 103). The balancing method is a code choice: document it and its worst case.
 - A newcomer joins the team of lowest power and is offered 4 guilds at random among those that opted in, filled with others when fewer opted in; a team with fewer than 4 guilds shows them all. The draw uses the injected seeded random.
-- The HQ manager: the player with the most medal points (bronze 1, silver 3, gold 10), on a tie the one whose commander has the most XP. Fixed at the battle start; it changes only by delegation; no fallback when he is offline.
+- The HQ manager: the player with the most medal points (bronze 1, silver 3, gold 10), on a tie the one whose commander has the most XP. The first player of the team to log in to the battle, then any player who logs in ranking above him; otherwise it changes only by delegation; no fallback when he is offline (decision 220).
 
 Acceptance criteria:
 - Balancing with a guild larger than an even share; 2 and 5 teams.
@@ -117,7 +117,7 @@ Depends on: 6.
 - A war is a series of battles with its settings (`min_starting_money` among them); it ends when no battle is planned; it has no winner.
 - A player has one commander per war, several wars at a time, and one commander per battle. A section belongs to one commander and one war; a player's sections share nothing.
 - Between battles of a war a section keeps its units, XP, evolution, weapons, money and prisoners; each battle starts with full AP and HP and base morale. The end of the war loses everything but logs, statistics, medals and cosmetics.
-- Guilds: created by a section without a guild whose commander is at `guild_creation_min_level`; roles chief, member and trainee; the chief hands over the role or disbands the guild and cannot leave; the chief accepts or refuses a trainee; a guild opts in or out of the newcomer list; the guild level, from the XP its sections earned while in it, sets its maximum size (`progression.guild_size`; assumed, Q-SOC-18).
+- Guilds: created by a section without a guild whose commander is at `guild_creation_min_level`; roles chief, member and trainee; the chief hands over the role or disbands the guild and cannot leave; the chief accepts or refuses a trainee; a guild opts in or out of the newcomer list; the guild level, from the XP its sections earned while in it, sets its maximum size (`progression.guild_size`, decision 221).
 
 Acceptance criteria:
 - A section carried through three battles of a war, and lost at its end.
@@ -166,7 +166,7 @@ Acceptance criteria:
 - The process starts, loads a map and runs a battle with no order for a simulated day.
 
 ## Issue 11: Orders for movement and combat
-Rules: AI-01, AI-02, AI-03, MAP-38, RELIC-27, HQ-09, HQ-10, HQ-12, HQ-17; decisions 156, 157, 183; stack decision 8.
+Rules: AI-01, AI-02, AI-03, MAP-38, RELIC-27, HQ-07, HQ-09, HQ-10, HQ-12, HQ-17; decisions 156, 157, 183, 220; stack decision 8.
 Package: `battle_host`.
 Depends on: 10.
 
@@ -175,6 +175,7 @@ Depends on: 10.
 - An order that waits for AP is checked again on the state at the time the wait ends, not at the time it was given (deferred from M4.11).
 - One sealed refusal type for the whole chain, replacing the three refusal enums of M4 (deferred from M4.11).
 - No order, no action: player units never act on their own; an offline player's units stay passive.
+- A player logging in to the battle is a logged command from the server: the first of his team becomes HQ manager, a later one takes the role if he ranks above the current manager (decision 220).
 
 Acceptance criteria:
 - Each check refuses at its link with its refusal; a refused order changes nothing.

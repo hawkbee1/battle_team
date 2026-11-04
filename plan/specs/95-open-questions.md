@@ -84,7 +84,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-15** Where a newcomer's units appear (decision 33 said the team's starting point). → decision 129
 - [x] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it. → decision 146 (a member awaiting the chief's acceptance)
 - [x] **Q-SOC-17** What happens to a trainee's section when the chief refuses it? → decision 153
-- [ ] **Q-SOC-18** How does a guild's level rise, and what maximum size does each level give (SOC-47)? Assumed: guild XP counts every XP point its sections' units earn while in the guild, and gives the level on the `commander_levels` curve; the guild holds 5 sections at level 1, one more every 5 levels, 16 at level 60 (`progression.guild_size` in `data/units.yaml`, placeholders).
+- [x] **Q-SOC-18** How does a guild's level rise, and what maximum size does each level give (SOC-47)? → decision 221
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)
@@ -97,6 +97,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-08** Is the arrival of new units at the camp or the HQ blocked by an enemy within 20 m, like deployment (HQ-36)? → decision 147 (yes)
 - [x] **Q-HQ-09** Can a pushed HQ go over the edge of a floating island and fall, like a relic (RELIC-22)? → decision 148 (yes)
 - [x] **Q-HQ-10** The HQ is not pushed: how does it move? → decision 177 (own AP, 0.2 AP per metre with the `push` profile, 5 m per hour; a unit in its path ends the order)
+- [x] **Q-HQ-11** A team left empty at the battle start has no HQ manager (HQ-07): who manages it once a newcomer joins? → decision 220 (the first player to log in, then any higher-ranking player who logs in)
+- [ ] **Q-HQ-12** Decision 220: does a player who logs in take the role from a manager the role was delegated to, and who keeps it on an exact tie? Assumed: he is compared with the current manager, delegated or not, and an exact tie is drawn with the battle's seeded random (decision 211).
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)

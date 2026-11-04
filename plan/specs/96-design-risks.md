@@ -52,7 +52,7 @@ The research note (`specs/90-research-topic-priority.md`) ranks it as the topic 
 - A war ends when no more battle is planned (SOC-17), so a battle that never ends blocks its war.
 
 ## R-07 One player or one unit can block a whole group
-- An absent HQ manager freezes HQ moves and team orders for as long as he is away; there is no fallback (HQ-08).
+- An absent HQ manager freezes HQ moves and team orders for as long as he is away, unless a higher-ranking player of the team logs in (HQ-07, HQ-08).
 - One enemy unit parked within 20 m of a guild camp keeps all the guild's stored units in storage, and they cannot deploy from the HQ instead (HQ-36, HQ-39). New units arriving at the camp are blocked too (decision 147).
 - One unit, friend or enemy, standing in the HQ's path ends its move order (HQ-12, decision 177): the manager must order again, around it.
 - Logging off safely means walking back within 10 m of the storage place or waiting for a 6-hour recall, and storing everything starts the 24-hour lock (HQ-35). That makes R-01 the easiest way to log off.

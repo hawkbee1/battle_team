@@ -19,6 +19,7 @@ Conventions:
 ### P-02 Simulation host, one 1,000-unit battle over one simulated day (M2 Issue 1)
 - Measure: CPU per tick at peak and on average, memory of one battle and of one map, and the number of battles one process holds.
 - Target: the estimate in `stack/01` (about 1 to 2 minutes of one core per simulated day; bursts of up to a few thousand hit rolls per second for a few seconds). Replace with the measured figures.
+- Measured (M5 Issue 8, `battle_map/benchmark_results`): one loaded 10 × 50 km map takes about 152 MB (40 MB ground, 111 MB objects) against the 35 MB of `stack/01`, from `battle_pathfinding`'s navigation model. Packing it is left to a later optimisation (designer, 2026-11-04).
 - Where: `stack/01`.
 
 ### P-03 Battle log volume (M2 Issue 2)
