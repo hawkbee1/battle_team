@@ -49,6 +49,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-21** Speed caps and evolution: does the cap of decision 174 apply to evolved speeds? → decision 178 (base speeds only; evolution follows the 300 % cap)
 - [x] **Q-UNIT-22** Capture XP (`xp_sources.capture`, 50) with a team pot (decision 170): who gets it? → decision 179 (shared by the AP each unit put in, paid on success)
 - [x] **Q-UNIT-23** Scout observe (+30 m, decision 119): added to `vision_range` before the weather and terrain factors, or after them? → decision 184 (to `vision_range`)
+- [ ] **Q-UNIT-24** A commander's final blow that takes its target prisoner or turns it (COMBAT-38): does it earn the kill's XP and money (UNIT-05, ECO-18), or only the hit's? Assumed: the kill's too; the target leaves its team like a dead one.
+- [ ] **Q-UNIT-25** Do hits on an HQ and its destruction earn XP (UNIT-05), or only money (ECO-18, HQ-04)? Assumed: money only; hit and kill XP scale with the target's XP, which an HQ has not.
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
