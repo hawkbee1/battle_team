@@ -24,6 +24,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-16** A relic or the HQ pushed or moved over a floating island's edge falls (RELIC-22, HQ-48): does the fall cost AP, and where can it land? → decision 193
 - [x] **Q-MAP-17** What shape does a crater give the ground, and what if craters overlap? → decision 194
 - [x] **Q-MAP-18** Can a unit move diagonally between two cells when one of the two cells it passes between is impassable for it (a wall's corner, a river's bend)? → decision 195
+- [ ] **Q-MAP-19** How big is the crater a shot digs (MAP-07, MAP-09)? `combat.yaml` says which weapons dig (`deforms_terrain`: artillery) but not the size. Assumed: a bowl at the impact point as wide as the weapon's `splash_radius_m`, `craters.depth_per_shot_m` deep at the centre (1.5 m, placeholder, `data/terrain.yaml`). Also assumed: an object takes a bombard shot's splash damage like a unit, and a first-person shot that stops on an object damages it.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
