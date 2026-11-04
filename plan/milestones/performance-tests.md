@@ -46,6 +46,7 @@ Conventions:
 ### P-07 World change applied on the host (M3 Issue 5, `stack/05`)
 - Measure: time from a construction or a destruction to its effect on the navigation model, and to its arrival at the clients.
 - Target: under 10 ms on the host, under 1 second to the clients.
+- Measured (M5 Issue 14, `battle_host/bin/world_change_bench.dart`, AOT): on a 10 × 50 km synthetic map, a battle's first change takes 7 to 8 ms (it copies the shared ground grid); each change after it takes 18 µs on average, 34 µs at p95, 353 µs at most. Under the 10 ms target.
 - Where: `stack/05`, `stack/03`.
 
 ## Order
