@@ -67,6 +67,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-REL-12** Push pot (decision 171): price per metre and slope factor. → decision 175 (10 AP per metre, a `push` profile for ground and slope)
 - [x] **Q-REL-13** Control loss (decision 173): what empties a partly filled pot? → decision 176 (a relic's push pot: capture by another team or a fall; a capture pot: an enemy entering the radius)
 - [x] **Q-REL-14** Who chooses the path of a pushed relic? → decision 219 (the player whose unit first tries to move it while its pot is empty)
+- [ ] **Q-REL-15** With a team push pot (decision 171), who are the 10 pushers a relic needs (RELIC-24)? Assumed: the units that put AP into its pot since the pot was last empty and are still on the field; whether they stay inside the radius does not matter.
 
 ## Newcomers, wars and social (40)
 - [x] **Q-SOC-01** Team power formula. → decision 93 (no notion of active players)
