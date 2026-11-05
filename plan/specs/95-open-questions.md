@@ -91,6 +91,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-SOC-16** Trainee (decision 129): what a trainee can and cannot do, when a section stops being one, whether it applies to every new section (veterans too, decision 101), and whether a player can refuse the guild or leave it. → decision 146 (a member awaiting the chief's acceptance)
 - [x] **Q-SOC-17** What happens to a trainee's section when the chief refuses it? → decision 153
 - [x] **Q-SOC-18** How does a guild's level rise, and what maximum size does each level give (SOC-47)? → decision 221
+- [ ] **Q-SOC-19** When a player reaches the gold threshold of a track, does the player hold the bronze and silver medals of that track too (SOC-26, SOC-29)? Assumed: yes, each tier reached is a medal of its own, so their points add up (1 + 3 + 10). War and game medals use the same thresholds: war medals count what the player did in that war, game medals what the player did in every war.
 
 ## HQ and storage (50)
 - [x] **Q-HQ-01** Can any team unit push the HQ? → decision 109 (yes)

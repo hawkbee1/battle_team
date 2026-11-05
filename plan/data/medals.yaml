@@ -1,4 +1,4 @@
-# Medals (decision 105). Thresholds are PLACEHOLDERS except the designer's example.
+# Medals and statistics (decisions 105, 143). Thresholds are PLACEHOLDERS except the designer's example.
 version: 1
 tiers: [bronze, silver, gold]
 points: { bronze: 1, silver: 3, gold: 10 }   # decision 121; HQ manager = most points, tie -> most commander XP
@@ -10,3 +10,13 @@ kills:
 actions:
   default:   { bronze: 50, silver: 250, gold: 1000 }
   kinds: [hit, build, repair, heal, capture, observe, push, hq_hit, prisoner_taken, defection_caused]
+
+# Friendly kills (decision 231): a track of their own; they never count toward a kill medal.
+friendly_kills: { bronze: 5, silver: 25, gold: 100 }   # placeholder
+
+# Hit rates far above the norm (decision 230), flagged for moderation: over a battle-day, a player's
+# hit rate with a weapon on first-person shots, this many standard deviations above the mean of all
+# players with that weapon, after at least min_shots shots.
+hit_rate_flag:
+  sigmas: 3
+  min_shots: 50
