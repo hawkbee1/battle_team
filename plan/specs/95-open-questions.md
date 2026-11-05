@@ -163,3 +163,5 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-AI-07** Server-managed units: besides the chance-based fire, can they move, hold, heal or capture? → decision 163 (same capabilities as a normal section)
 - [x] **Q-AI-08** Hit rule of a server-managed shot: the hit chance of COMBAT-15, or another rule? → decision 164 (same rules as a normal unit)
 - [x] **Q-AI-09** What chance does a server-managed unit fire with at each check (decision 160)? → decision 196
+- [ ] **Q-AI-10** At a server-managed unit's fire check (AI-07), which enemy does it fire at? Assumed: an enemy unit, not an HQ or an object: the nearest one it can fire at, the first by ID among those as near. It gives one `Fire` order, which waits for AP or is refused like any order. A unit carried in a transport does not fire at its check.
+- [ ] **Q-AI-11** When is a server-managed unit's first fire check (AI-07)? Assumed: 30 minutes after the battle starts, or after the unit joins the section (bought or turned); each unit then keeps its own 30-minute rhythm.
