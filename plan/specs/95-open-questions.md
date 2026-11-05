@@ -5,6 +5,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 ## General and technical
 - [x] **Q-GEN-01** ~~Tech and stack targets: engine, server architecture. The repository is a Flutter/Flame app with an Appwrite backend; confirm this fits a 3D, 100+ player, real-time game. (00)~~ Out of scope for the spec phase (designer, 2026-10-24). Decided in `stack/` (milestone M2, eight records, confirmed 2026-11-01).
 
+- [ ] **Q-GEN-02** When the server that runs a battle stops for a while (a crash, an upgrade), does the battle's time go on (decision 3)? Assumed: yes. The time it spent stopped counts as time with no order: AP recover, and the timers due then (captures, recalls, locks, the victory hold) end at once when it comes back. Orders sent while it was stopped are lost.
+
 ## Map and terrain (10)
 - [x] **Q-MAP-01** Typical map sizes and range of team counts per map. → decision 84
 - [x] **Q-MAP-02** Craters: can engineers fill them? Do trees and structures regrow? Deformation depth limits? → decision 85
