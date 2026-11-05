@@ -161,6 +161,8 @@ progression:
     kill: 20
     role_action: 5                # per completed build, repair, heal, spotting report
     capture: 50                   # shared by the AP each unit put into the pot, on success (decision 179)
+    hq_hit: 2                     # per hit on an enemy HQ, not scaled by target XP (decision 224)
+    hq_destruction: 10            # the shot that destroys an enemy HQ earns hq_hit too (decision 224)
                                   # no XP for time near the commander (decision 199)
   target_scaling:                 # hit/kill XP x min(cap, 1 + target_xp / max(attacker_xp, 1)), earned XP (decision 197)
     cap: 3.0

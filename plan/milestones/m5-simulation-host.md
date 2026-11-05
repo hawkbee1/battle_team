@@ -103,7 +103,7 @@ Depends on: 2.
 
 - Team power is unit XP plus section XP. At each battle start, teams are formed balanced by power, `teams.count` of them, with each guild's sections kept together (decision 103). The balancing method is a code choice: document it and its worst case.
 - A newcomer joins the team of lowest power and is offered 4 guilds at random among those that opted in, filled with others when fewer opted in; a team with fewer than 4 guilds shows them all. The draw uses the injected seeded random.
-- The HQ manager: the player with the most medal points (bronze 1, silver 3, gold 10), on a tie the one whose commander has the most XP. The first player of the team to log in to the battle, then any player who logs in ranking above him; otherwise it changes only by delegation; no fallback when he is offline (decision 220).
+- The HQ manager: the player with the most medal points (bronze 1, silver 3, gold 10), on a tie the one whose commander has the most XP. The first player of the team to log in to the battle, then any player who logs in ranking above the player who would hold the role had nobody delegated it; otherwise it changes only by delegation; no fallback when the manager is offline (decisions 220, 227).
 
 Acceptance criteria:
 - Balancing with a guild larger than an even share; 2 and 5 teams.
@@ -188,7 +188,7 @@ Package: `battle_host`.
 Depends on: 3, 4, 11.
 
 - Orders: store, recall, deploy, buy a unit, a weapon or the guild camp, transfer money, buy a tree node, offer, accept or refuse an exchange or a ransom.
-- XP and money earned on the events that give them (hits, kills, constructions, heals, captures, HQ hits and destruction).
+- XP and money earned on the events that give them (hits, kills, constructions, heals, captures, HQ hits and destruction). A prisoner or a defection earns the kill's XP, not its money (decision 223).
 - The commander's death applied to his section; the safety net.
 
 Acceptance criteria:

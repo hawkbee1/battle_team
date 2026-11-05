@@ -33,7 +33,7 @@ Already decided (overview):
 ## 6. Numbers (decision 112, `data/economy.yaml`)
 - **ECO-16** Currency: **w€**. Every amount is a whole number of w€ (decision 200).
 - **ECO-17** **Prices**: anything not priced costs **100 w€**; guild encampment **500 w€**. The designer adjusts prices over time.
-- **ECO-18** **Money earned** by the acting unit's section: hit 1, kill 5, construction 5, heal 5, HQ hit 10, HQ destruction 100.
+- **ECO-18** **Money earned** by the acting unit's section: hit 1, kill 5, construction 5, heal 5, HQ hit 10, HQ destruction 100. A final blow that takes its target prisoner or turns it earns no kill money (decision 223).
 - **ECO-19** **Transfer fees**: **2 %** inside a guild, **7 %** outside, taken from the amount sent and rounded to the nearest whole w€, halves up (decisions 200, 203).
 - **ECO-20** **Starting money** of a new section = minStartingMoney = **500 w€** (decision 102).
 - **ECO-21** **XP cannot be bought.**

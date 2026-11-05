@@ -26,7 +26,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-16** A relic or the HQ pushed or moved over a floating island's edge falls (RELIC-22, HQ-48): does the fall cost AP, and where can it land? → decision 193
 - [x] **Q-MAP-17** What shape does a crater give the ground, and what if craters overlap? → decision 194
 - [x] **Q-MAP-18** Can a unit move diagonally between two cells when one of the two cells it passes between is impassable for it (a wall's corner, a river's bend)? → decision 195
-- [ ] **Q-MAP-19** How big is the crater a shot digs (MAP-07, MAP-09)? `combat.yaml` says which weapons dig (`deforms_terrain`: artillery) but not the size. Assumed: a bowl at the impact point as wide as the weapon's `splash_radius_m`, `craters.depth_per_shot_m` deep at the centre (1.5 m, placeholder, `data/terrain.yaml`). Also assumed: an object takes a bombard shot's splash damage like a unit, and a first-person shot that stops on an object damages it.
+- [x] **Q-MAP-19** How big is the crater a shot digs (MAP-07, MAP-09), and do shots damage objects? → decision 226
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
@@ -52,8 +52,8 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-21** Speed caps and evolution: does the cap of decision 174 apply to evolved speeds? → decision 178 (base speeds only; evolution follows the 300 % cap)
 - [x] **Q-UNIT-22** Capture XP (`xp_sources.capture`, 50) with a team pot (decision 170): who gets it? → decision 179 (shared by the AP each unit put in, paid on success)
 - [x] **Q-UNIT-23** Scout observe (+30 m, decision 119): added to `vision_range` before the weather and terrain factors, or after them? → decision 184 (to `vision_range`)
-- [ ] **Q-UNIT-24** A commander's final blow that takes its target prisoner or turns it (COMBAT-38): does it earn the kill's XP and money (UNIT-05, ECO-18), or only the hit's? Assumed: the kill's too; the target leaves its team like a dead one.
-- [ ] **Q-UNIT-25** Do hits on an HQ and its destruction earn XP (UNIT-05), or only money (ECO-18, HQ-04)? Assumed: money only; hit and kill XP scale with the target's XP, which an HQ has not.
+- [x] **Q-UNIT-24** A commander's final blow that takes its target prisoner or turns it (COMBAT-38): does it earn the kill's XP and money (UNIT-05, ECO-18), or only the hit's? → decision 223 (the kill's XP, not its money)
+- [x] **Q-UNIT-25** Do hits on an HQ and its destruction earn XP (UNIT-05), or only money (ECO-18, HQ-04)? → decision 224 (2 XP a hit, 10 for the destruction)
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
@@ -70,7 +70,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-REL-12** Push pot (decision 171): price per metre and slope factor. → decision 175 (10 AP per metre, a `push` profile for ground and slope)
 - [x] **Q-REL-13** Control loss (decision 173): what empties a partly filled pot? → decision 176 (a relic's push pot: capture by another team or a fall; a capture pot: an enemy entering the radius)
 - [x] **Q-REL-14** Who chooses the path of a pushed relic? → decision 219 (the player whose unit first tries to move it while its pot is empty)
-- [ ] **Q-REL-15** With a team push pot (decision 171), who are the 10 pushers a relic needs (RELIC-24)? Assumed: the units that put AP into its pot since the pot was last empty and are still on the field; whether they stay inside the radius does not matter.
+- [x] **Q-REL-15** With a team push pot (decision 171), who are the 10 pushers a relic needs (RELIC-24)? → decision 225 (those that put AP in since the pot was last empty and stay inside the radius)
 
 ## Newcomers, wars and social (40)
 - [x] **Q-SOC-01** Team power formula. → decision 93 (no notion of active players)
@@ -104,7 +104,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-09** Can a pushed HQ go over the edge of a floating island and fall, like a relic (RELIC-22)? → decision 148 (yes)
 - [x] **Q-HQ-10** The HQ is not pushed: how does it move? → decision 177 (own AP, 0.2 AP per metre with the `push` profile, 5 m per hour; a unit in its path ends the order)
 - [x] **Q-HQ-11** A team left empty at the battle start has no HQ manager (HQ-07): who manages it once a newcomer joins? → decision 220 (the first player to log in, then any higher-ranking player who logs in)
-- [ ] **Q-HQ-12** Decision 220: does a player who logs in take the role from a manager the role was delegated to, and who keeps it on an exact tie? Assumed: he is compared with the current manager, delegated or not, and an exact tie is drawn with the battle's seeded random (decision 211).
+- [x] **Q-HQ-12** Decision 220: does a player who logs in take the role from a manager the role was delegated to, and who keeps it on an exact tie? → decision 227 (only if they would take it without the delegation)
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)
