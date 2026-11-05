@@ -57,8 +57,9 @@ storage:
   deploy_ap: 10              # AP a unit pays to deploy
   deploy_block_radius_m: 20  # an enemy this close to the storage place blocks deployment
 
-# Server-managed sections (decisions 160, 196): each unit that sees an enemy within its weapon's
-# range fires with fire_chance at each check, every check_interval_s; not when an enemy enters range.
+# Server-managed sections (decisions 160, 196, 228, 229): each unit that sees an enemy unit within its
+# weapon's range fires at the nearest with fire_chance at each check. Checks fall every
+# check_interval_s from the battle start; not when an enemy enters range.
 server_managed:
   fire_chance: 0.5           # placeholder
   check_interval_s: 1800     # 30 minutes (decision 160)

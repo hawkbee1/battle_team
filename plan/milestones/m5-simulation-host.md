@@ -241,7 +241,7 @@ Package: `battle_host`.
 Depends on: 11.
 
 - The server creates sections that look like any other and can do everything a player's section can.
-- Every 30 minutes, each of their units that sees an enemy within its weapon's range fires with the chance of `server_managed` in `data/battle.yaml` (50 %, decision 196), the same at each check; the shot follows the normal rules.
+- Every 30 minutes from the battle start, each of their units that sees an enemy unit within its weapon's range fires at the nearest with the chance of `server_managed` in `data/battle.yaml` (50 %, decisions 196, 228, 229), the same at each check; the shot follows the normal rules.
 - Their orders go through the same command handler as AI agents', with the origin `server`. The engine that decides their other orders is a later phase (decision 165).
 
 Acceptance criteria:
