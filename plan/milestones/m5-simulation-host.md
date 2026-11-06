@@ -103,7 +103,7 @@ Depends on: 2.
 
 - Team power is unit XP plus section XP. At each battle start, teams are formed balanced by power, `teams.count` of them, with each guild's sections kept together (decision 103). The balancing method is a code choice: document it and its worst case.
 - A newcomer joins the team of lowest power and is offered 4 guilds at random among those that opted in, filled with others when fewer opted in; a team with fewer than 4 guilds shows them all. The draw uses the injected seeded random.
-- The HQ manager: the player with the most medal points (bronze 1, silver 3, gold 10), on a tie the one whose commander has the most XP. The first player of the team to log in to the battle, then any player who logs in ranking above him; otherwise it changes only by delegation; no fallback when he is offline (decision 220).
+- The HQ manager: the player with the most medal points (bronze 1, silver 3, gold 10), on a tie the one whose commander has the most XP. The first player of the team to log in to the battle, then any player who logs in ranking above the player who would hold the role had nobody delegated it; otherwise it changes only by delegation; no fallback when the manager is offline (decisions 220, 227).
 
 Acceptance criteria:
 - Balancing with a guild larger than an even share; 2 and 5 teams.
@@ -188,7 +188,7 @@ Package: `battle_host`.
 Depends on: 3, 4, 11.
 
 - Orders: store, recall, deploy, buy a unit, a weapon or the guild camp, transfer money, buy a tree node, offer, accept or refuse an exchange or a ransom.
-- XP and money earned on the events that give them (hits, kills, constructions, heals, captures, HQ hits and destruction).
+- XP and money earned on the events that give them (hits, kills, constructions, heals, captures, HQ hits and destruction). A prisoner or a defection earns the kill's XP, not its money (decision 223).
 - The commander's death applied to his section; the safety net.
 
 Acceptance criteria:
@@ -241,7 +241,7 @@ Package: `battle_host`.
 Depends on: 11.
 
 - The server creates sections that look like any other and can do everything a player's section can.
-- Every 30 minutes, each of their units that sees an enemy within its weapon's range fires with the chance of `server_managed` in `data/battle.yaml` (50 %, decision 196), the same at each check; the shot follows the normal rules.
+- Every 30 minutes from the battle start, each of their units that sees an enemy unit within its weapon's range fires at the nearest with the chance of `server_managed` in `data/battle.yaml` (50 %, decisions 196, 228, 229), the same at each check; the shot follows the normal rules.
 - Their orders go through the same command handler as AI agents', with the origin `server`. The engine that decides their other orders is a later phase (decision 165).
 
 Acceptance criteria:

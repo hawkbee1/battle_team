@@ -25,6 +25,7 @@ Conventions:
 ### P-03 Battle log volume (M2 Issue 2)
 - Measure: bytes per logged event, events per second, and the upload size per 10-second batch.
 - Target: about 0.4 MB per battle per day, 2.4 MB at worst (estimates), in at most about 4,000 files a day (only 10-second intervals with new entries upload). The Appwrite limits must hold: the local instance in development, the Cloud plan's quotas live (`stack/02`).
+- Measured (M5 Issue 15, the scripted battle of `battle_host`'s tests: 38 entries over 34 hours, 28 of them in the first 8 minutes, about 0.06 a second): 57 bytes an entry in the binary log, 54 an event; one upload per 10-second interval with entries, 1 to 9 entries each, 53 to 312 bytes compressed (151 on average; gzip adds about 20 bytes to each file, so one-entry uploads barely shrink). At 4,000 entries a day that is about 0.23 MB, 1.4 MB at 24,000: under the targets. A snapshot of its 17 units is 8.9 kB, 1.8 kB compressed. The Appwrite limits are not checked yet: the local instance was not reachable from the dev container.
 - Where: `stack/02`.
 
 ### P-04 Network traffic of one section in a fight (M2 Issue 3)
@@ -46,6 +47,7 @@ Conventions:
 ### P-07 World change applied on the host (M3 Issue 5, `stack/05`)
 - Measure: time from a construction or a destruction to its effect on the navigation model, and to its arrival at the clients.
 - Target: under 10 ms on the host, under 1 second to the clients.
+- Measured (M5 Issue 14, `battle_host/bin/world_change_bench.dart`, AOT): on a 10 × 50 km synthetic map, a battle's first change takes 7 to 8 ms (it copies the shared ground grid); each change after it takes 18 µs on average, 34 µs at p95, 353 µs at most. Under the 10 ms target.
 - Where: `stack/05`, `stack/03`.
 
 ## Order

@@ -94,6 +94,9 @@ terrain:
 craters:
   max_depth_m: 20
   fillable_by_engineers: false
+  # A shot of a weapon with deforms_terrain digs a bowl at its impact point, as wide as its
+  # splash_radius_m, this deep at the centre (MAP-46, decision 226). Placeholder.
+  depth_per_shot_m: 1.5
 
 # Objects (decision 89: HP). Destroyed trees and structures never regrow (decision 85).
 # Every object has an armor type for the damage table: structure by default (decision 137).

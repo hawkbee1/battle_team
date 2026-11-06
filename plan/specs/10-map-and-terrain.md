@@ -24,8 +24,8 @@ Consequences for the build:
 - **MAP-07** Craters and destroyed objects change cover, pathing and line of sight.
 - **MAP-08** Late joiners and returning players must receive the delta layer.
 - **MAP-09** Engineers **cannot fill craters**. Destroyed trees and structures **never regrow**. A crater is at most **20 m deep**. (Decision 85)
-- **MAP-46** A crater is a **bowl**: at a distance *d* from its centre the ground is `depth × (1 − (d / radius)²)` lower. Where craters overlap, the deepest one counts. Craters dig the ground only, never a floating island. (Decision 194)
-- **MAP-10** Hit points: tree 100, building 500, wall 200, bridge 200, reinforced bridge 400 (decision 89, `data/terrain.yaml`).
+- **MAP-46** A crater is a **bowl**: at a distance *d* from its centre the ground is `depth × (1 − (d / radius)²)` lower. Where craters overlap, the deepest one counts. Craters dig the ground only, never a floating island. A shot that digs makes a crater as wide as its weapon's splash radius, `craters.depth_per_shot_m` deep (decisions 194, 226).
+- **MAP-10** Hit points: tree 100, building 500, wall 200, bridge 200, reinforced bridge 400 (decision 89, `data/terrain.yaml`). An object takes a bombard shot's splash damage like a unit, and a first-person shot that stops on it damages it (decision 226).
 - **MAP-40** Objects (trees, buildings, constructions) have an **armor type** for the damage table, `structure` by default (decision 137, `data/terrain.yaml`).
 - **MAP-48** Objects stand **only on land**: trees, buildings, walls, traps and roads never on water; bridges only on water, with land at both ends. (Decision 217)
 

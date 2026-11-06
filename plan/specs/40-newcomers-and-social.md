@@ -39,7 +39,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ### What a player keeps after a war
 - **SOC-24** **War medals**: earned during a war, attached to that war.
 - **SOC-25** **Game medals**: permanent, account-level.
-- **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Thresholds in `data/medals.yaml`. (Decision 105)
+- **SOC-26** Medals are **bronze, silver and gold** for **every kind of action and kill** (kills by target type: units, commanders, jeeps...), earned at **thresholds**. Example: bronze for killing 5 commanders. Friendly kills have a track of their own and never count toward a kill medal. Thresholds in `data/medals.yaml`. (Decisions 105, 231)
 - **SOC-27** **Cosmetics** for sections and units: bought with **real money** during a war, **kept after the war** and can be applied to other units later. They are **purely visual**. (Decision 106)
 - **SOC-29** **Medal points**: bronze 1, silver 3, gold 10. They rank the players for the HQ manager role (HQ-06, HQ-07): the most points first; on a tie, the one whose commander has the most XP; on an exact tie, a draw. (Decisions 121, 211, 220)
 - **SOC-30** A player can **join a running war at any time**, entering the **current battle** (his commander arrives at the guild camp, or at the HQ if the guild has no camp, and he buys his units with the starting money; decisions 128, 129). (Decision 122)
