@@ -24,29 +24,21 @@ AP is computed lazily: AP at time *t* is `min(ap_max, AP at the last update + ho
 - The rules core must run on the server and in the client (M4 acceptance). One Dart package serves both, so the numbers and rules cannot drift between two implementations.
 - Dart compiles ahead of time to a native executable (`dart compile exe`), with no VM at run time.
 - The workspace is already Dart and Flutter. The Appwrite Dart server SDK covers the admin side.
-- Rejected: Go or Rust for speed (the client would need a second implementation of the rules, and the speed margin is not needed at this scale, see the estimate). Node or TypeScript (same drift problem, and no shared code with the Flutter client).
+- Rejected: Go or Rust for speed (the client would need a second implementation of the rules, and the speed margin is not needed at this scale, see the load below). Node or TypeScript (same drift problem, and no shared code with the Flutter client).
 
-## Load estimate for one 1,000-unit battle over one day
-Assumptions (placeholders, to measure in M4 Issue 11 and M3 Issue 6). They hold for the default recovery rate; a special event with a faster rate raises the hit-roll and log figures in proportion.
-- 1,000 units, each with at most 30 AP and 1 AP per hour of recovery. The battle has about **24,000 AP a day** to spend, after the starting pools of 30,000 AP.
-- Every logged move or attack spends AP. Typical mix: half the events are attacks (rifles, 2 AP per shot), half are moves (10 m orders, 10 AP each). That gives about **4,000 events a day** (table in `02-persistence.md`).
-- Combat tick at 1 Hz. Units in contact check their visible targets each tick, with a spatial index (about 50 candidates per check).
-- One path request per move order: about 2,000 a day, about 15 ms each for a 2 km path (measured, P-01): about 30 s of one core a day.
-- Morale updated per minute, not per tick: about 17 updates per second.
-- AP is lazy (see Choice): no work per tick.
-- Server-managed units are checked every 30 minutes (decision 160): negligible.
-- First-person shots are traced on the host (decision 183): one ray march per shot against terrain, objects and nearby hit volumes, well under a millisecond each, within the shot counts below.
+## Load of one 1,000-unit battle over one day
+Measured 2026-11-06 (M5 Issue 19, P-02 and P-03 of `milestones/performance-tests.md`): `battle_host`'s load script on the real map `saint_lo` (10 × 50 km, 246,000 objects), AOT, one core of the development laptop. Two teams of 500 units in sections of 16 face each other 100 m apart. Each unit spends the AP it recovers (1 AP an hour, 24,000 AP a day for the battle): half its orders are shots at the nearest enemy it sees (rifles, and machine guns for two soldiers of each section), half are 10 m moves; 40 % of the units open fire together at the start. Default recovery rate; a faster rate raises the order and log figures in proportion.
 
-Results:
-- **Hit rolls:** typical about 2,000 shots a day, 0.02 per second on average. The AP budget caps it at 12,000 rifle shots a day (0.14 per second), or 24,000 machine-gun shots a day (0.28 per second).
-- **Bursts:** a rested unit holds 30 AP: 15 rifle shots, fired in about 22 s (40 rounds a minute, one 3 s reload), or 30 machine-gun shots, fired in about 4 s. If 400 units (40 %) open fire together, that is about **270 hit rolls per second for about 20 s with rifles**, or about **3,300 per second for about 4 s with machine guns**. The same burst happens whenever rested units meet, not only at battle start.
-- **CPU:** hit rolls cost little and path requests about 30 s a day. Target scans for units in contact (about 1 ms per tick on average) dominate. Total about **1 to 2 minutes of one core per simulated day**. Scans gated on units that have the AP for a shot would lower it further. Measured in M4 Issue 11.
-- **Memory:** the map is shared by all battles on it. A 10 × 50 km map at 10 m cells is 1,000 × 5,000 = 5 million cells, about 4 bytes each: about 20 MB, plus about 15 MB for about 200,000 objects. Each battle adds about 1 MB for its units. About 20 battles per process would fit in about 0.6 GB. The figure of 10 m per cell is a proposal (see stack decision 5).
-- **Logs:** about 4,000 events a day at about 100 bytes each: **about 0.4 MB of log per battle per day**. Worst case (1 m orders): 24,000 events, 2.4 MB. The battle-start burst adds up to 5,000 events once. Details in `02-persistence.md`.
+- **Orders:** about 7,300 a day (5,600 shots, 1,500 moves, 200 reloads), 7,800 log entries with the start. The opening burst sends up to 465 orders in one second.
+- **CPU:** about **3 seconds of one core per simulated day** (36 µs per second on average, 0.2 ms at p99). The busiest second takes about 80 ms. The first orders on a map pay once for its path searches (2.3 s); the host prepares them when it loads the map. Server-managed sections (25 % of them) change nothing measurable.
+- **Write-ahead log on disk:** each order waits for its own `fsync`, about 2.3 ms on the development laptop. That caps a battle at about 400 orders a second, and the burst's busiest second then takes about 1.1 s. Syncing the orders of one tick together (group commit) is the next step if a burst must fit in one second.
+- **Memory:** one map takes about 340 MB loaded and 390 MB with its searches prepared, up to about 650 MB once paths across the map have been priced for the main movers. It is shared by all its battles. Each battle adds about 3 MB.
+- **Battles per process:** the average load is small, so the limit is bursts that coincide. Ten battles that open fire in the same second took 0.9 s of one core. A process of one core holds **about 10 battles** whose bursts may meet, more if their starts are spread, in about 0.7 GB with one map.
+- **Logs:** see `02-persistence.md`.
 
 ## Consequences
 - Every input (order, time step, seed) must be logged before it is acknowledged, so that a crash does not lose an order (stack decision 2).
 - The rules core is pure Dart with no Flutter import; the host and the client both depend on it (M4 Issue 1).
-- **Hosting** (designer, 2026-11-01): each host process runs in a Docker container. In development everything is local, next to the self-hosted Appwrite. Live, Appwrite will probably be an Appwrite Cloud project, so the host containers run on a separate server, in the same region as that project (provider chosen in M5). Battle placement (which container hosts which battle) is a server concern, not a rule; it is recorded when it is built (M5).
-- Bursts, not the daily average, set the peak: up to a few thousand hit rolls per second for a few seconds when rested units open fire.
-- Benchmarks are required before the process size is fixed: the figures above are estimates, not measurements.
+- **Hosting** (designer, 2026-11-01): each host process runs in a Docker container. In development everything is local, next to the self-hosted Appwrite. Live, Appwrite will probably be an Appwrite Cloud project, so the host containers run on a separate server, in the same region as that project. The provider is still open (designer, 2026-11-06): the image runs on any linux/amd64 Docker host.
+- **Battle placement** (M5 Issue 19): a container serves fixed maps (`battle_host serve --map`). It claims each running battle of its maps that no host holds by writing its ID in the `host` column of the battle's row, and runs the battles whose row names it, recovering them from their snapshots after a restart. Two containers of one map may claim the same battle at once: the row keeps the last write and the other lets it go. When a battle ends, its host writes the result to its row, which starts `end_battle`.
+- Bursts, not the daily average, set the peak: hundreds of orders a second for a few seconds when rested units open fire.
