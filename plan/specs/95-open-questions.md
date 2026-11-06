@@ -27,6 +27,10 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-17** What shape does a crater give the ground, and what if craters overlap? → decision 194
 - [x] **Q-MAP-18** Can a unit move diagonally between two cells when one of the two cells it passes between is impassable for it (a wall's corner, a river's bend)? → decision 195
 - [x] **Q-MAP-19** How big is the crater a shot digs (MAP-07, MAP-09), and do shots damage objects? → decision 226
+- [ ] **Q-MAP-20** How do real places become terrain and objects when a map is made from real data (stack decision 5)? Assumed (M5.20): forests are `forest_floor` with one tree on each cell (forest concealment counts trees); built-up land is `town_street` with its roads painted through, so relics and the HQ cross a town only by road; wetlands are `mud`; rivers and canals are `river`, ponds and lakes `lake`; streams and ditches are left out (a line of water cells no ground unit crosses); hedges and tree rows are a tree on each cell (bocage gives cover, not walls); buildings and walls are objects, never on a road cell.
+- [ ] **Q-MAP-21** Which real bridges carry relics and the HQ? Assumed (M5.20): the bridges of motorways, trunk, primary and secondary roads are reinforced bridges, the others ordinary bridges; the author reinforces more by hand where a team's land would be cut off.
+- [ ] **Q-MAP-22** Where must a map's attribution be shown to players? The licences of its data ask for it (ODbL for OpenStreetMap, Licence Ouverte for IGN). Assumed (M5.20): each `map.yaml` carries it, and the client shows it wherever it shows the map (M7), for example in the map's credits.
+- [ ] **Q-MAP-23** Maps outside France take their heights from the Copernicus DEM (stack decision 5). Assumed (M5.20): its import comes with the first map outside France; the importer reads IGN RGE ALTI only.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
