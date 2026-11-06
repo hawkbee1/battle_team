@@ -15,7 +15,7 @@ Authority does not move. Whatever decides an outcome (a move, a hit, a capture, 
 Sources: [Appwrite Functions documentation](https://appwrite.io/docs/products/functions/functions.md), [Appwrite self-hosting, function runtimes](https://appwrite.io/docs/advanced/self-hosting/configuration/functions.md), [community thread on the 30-second limit](https://appwrite.io/threads/1261111233646690427).
 
 ## Where the load is
-The AP rules bound the work (stack decision 1). A 1,000-unit battle has about 24,000 AP a day to spend: about 4,000 logged events a day and 1 to 2 minutes of one core per simulated day. The peaks are short bursts when rested units open fire. The network costs are the open connections and those bursts (stack decision 3). Moving compute to the client would save little. The levers are fog per section, grouping shots per unit per tick, and the number of moving vehicles in view.
+The AP rules bound the work (stack decision 1). A 1,000-unit battle has about 24,000 AP a day to spend: about 4,000 logged events a day. Measured (M5 Issue 19): about 7,800 log entries with the opening burst and about 3 seconds of one core per simulated day. The peaks are short bursts when rested units open fire. The network costs are the open connections and those bursts (stack decision 3). Moving compute to the client would save little. The levers are fog per section, grouping shots per unit per tick, and the number of moving vehicles in view.
 
 ## Placement
 | Work | Runs in | Reason |
