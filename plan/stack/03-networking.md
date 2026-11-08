@@ -13,7 +13,35 @@ Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 3). Rules: deci
 2. **WebSocket with JSON messages.** Simple, works on iOS, Android, Web and Windows. JSON is large for positions, and parsing costs CPU on the client.
 3. **WebSocket with binary messages** for state (compact encoding with quantised positions, sent as deltas), and the same interface for orders. For AI agents and the server, the same order is also accepted over HTTPS with a JSON body, because they send single requests and do not need a socket.
 4. **UDP or WebRTC**. Not available uniformly in Flutter on the Web, and too much for this scale. Rejected.
-5. **dashwire, through `flutter_scene_net`**. A multiplayer library that already does replication and interpolation, and binds replicas to scene nodes. Its host runs inside the app and is native only (a stub on the web), so the dedicated Dart host of `01-simulation-host.md` would use dashwire's protocol, not its host. **Not evaluated yet.** It is a candidate for the M6 spike, against option 3.
+5. **dashwire, through `flutter_scene_net`**. A multiplayer library that already does replication and interpolation, and binds replicas to scene nodes. `flutter_scene_net`'s host runs inside the app and is native only, so the dedicated Dart host of `01-simulation-host.md` would run dashwire's own server library. Compared with option 3 in M6 Issue 1, below.
+
+### Option 5 against option 3 (M6 Issue 1, 2026-11-08)
+Checked on the code of `dashwire` 0.1.0 and `dashwire_replication` 0.2.1, the current releases:
+- **Pure Dart AOT host: yes.** The server pieces use `dart:io` (a WebSocket server) and `dart:isolate` (one room per isolate), no Flutter. A `dart compile exe` executable ran a room in an isolate behind a loopback WebSocket, refused a bad token and replicated a moving unit.
+- **Fog per section: for state, yes.** The host hands `ReplicationHost` a relevancy filter that returns, per connection, the IDs it sees: the host's own visible set fits. A field reaches everyone, its owner's connection only, or all but its owner. Events do not fit: an RPC reaches every connection that knows its replica, unchanged. An event cut down to what a section sees (COMBAT-57), an alert to one team (RELIC-10) and the delta layer (MAP-08) would be the app's own messages.
+- **Web client: yes.** The client compiles to JavaScript and to Wasm and uses the browser's WebSocket; the schema hash is the same on the VM and in JavaScript. Over a WebSocket its unreliable channel is reliable.
+- **Licence:** MIT for both; their dependencies `web` and `meta` are BSD-3.
+- **Maturity:** versions 0.x, one author, first release July 2026; 0.2.0 broke the API.
+
+The same scripted fight, seen by one section, encoded both ways. Binary, in bytes, without the WebSocket frame header; IDs of 6 to 14 characters as in M5.9's samples; option 3's position update is a stand-in until M6 Issue 2 defines it.
+
+| Message | Option 3 | dashwire |
+|---|---|---|
+| The position of one moving unit, one tick | 22 | 25 |
+| A tick with ten moving vehicles | 167 | 205 |
+| A rifle shot, one impact | 53 | 43 |
+| A machine-gun burst grouped, three impacts | 112 | 99 |
+| The whole view of 16 units | 649 | 784 |
+| A 2-second fight: a tank moving, four shots, a death | 469 | 431 |
+
+dashwire adds a clock-sync ping four times a second (10 bytes up, 21 down: about 0.3 kbit/s up and 0.7 down, adjustable) and a 4-byte acknowledgement per state update. Its positions cost 3 to 4 bytes more per unit (a version, a length and a 32-bit field mask); its events about 10 bytes less, because it names objects with numbers. A battle-wide ID table, which M5.9 named as a version 2 change, gives option 3 the same saving. Neither wins on size.
+
+What adopting dashwire would change:
+- **`battle_host`:** a replica for each unit, HQ and relic, mirroring the battle state and updated from the events after each tick, with a table from the battle's IDs to dashwire's that recovery rebuilds identically. Its token check answers only yes or no, so binding a socket to an account and its section needs a wrapper; a connection's number changes when it reconnects, so a section's replicas change owner. Commands do not fit its RPCs (no request ID, no answer, nothing waits for the write-ahead log, orders that act on no unit), so they stay `battle_protocol` commands in its raw messages. HTTPS for AI agents, the rate limit, alerts, the delta layer and the victory countdown are not in dashwire.
+- **`battle_protocol` version 1:** unchanged (commands, events, log). M6 Issue 2's view and tick update would become replica schemas, and a client would hold two kinds of ID: numbers for state, strings in events.
+- **What it brings:** a byte budget per connection that sends the longest-waiting changes first, so a burst spreads over a few ticks; clock sync; and, in M7, `flutter_scene_net`'s interpolation buffer and binding of replicas to scene nodes.
+
+**Recommendation: option 3** (awaiting the designer's confirmation). dashwire would carry only the replication of state: sign-in, orders, events, alerts and the delta layer stay this project's code either way, the sizes are even, and the library is young. Worth reusing in option 3: a byte budget per section that sends the moving units waiting longest first (M6 Issue 4), and clock sync for the AP shown between updates (M6 Issue 7). `flutter_scene_net`'s interpolation buffer is a model for M7.
 
 ## Choice
 **Option 3.** Orders are the same typed commands whatever their sender. A player sends them over the WebSocket; an AI agent or the server sends them over HTTPS with its key (AI-04). The host checks the sender, applies the same rules, and logs the origin (stack decision 2).

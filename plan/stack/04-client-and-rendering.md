@@ -44,7 +44,7 @@ The formats and components below were read from the package's source and documen
 - Physics and audio are separate packages with their own backends (`scene` contract). They are not needed for the rules, which decide everything on the host.
 - **There is no terrain component.** Terrain is a mesh built from a heightmap in code (`MeshGeometry`, as in the procedural skill), one tile at a time.
 
-**Networking.** `flutter_scene_net` binds replicated state to the scene graph: replicas become nodes, and an interpolation buffer renders remote poses a fixed delay in the past. It builds on the `dashwire` multiplayer library. Its host (`SceneHost`) runs a WebSocket listener inside the app, is **native only**, and is a stub on the web. Relevant to M6; see `03-networking.md`.
+**Networking.** `flutter_scene_net` binds replicated state to the scene graph: replicas become nodes, and an interpolation buffer renders remote poses a fixed delay in the past. It builds on the `dashwire` multiplayer library. Its host (`SceneHost`) runs a WebSocket listener inside the app, is **native only**, and is a stub on the web. M6 Issue 1 compared dashwire with option 3 of `03-networking.md`; its interpolation buffer is a model for M7.
 
 **Performance tools.** The `flutter_scene-performance` skill gives the method: measure in profile mode, read the UI thread and the raster thread separately, then apply the fixes in a fixed order (instancing, LOD, culling, post-processing, materials, static shadows). `examples/stress_bench` runs synthetic scenes (10,000 items, 50,000 instances, churn) and prints the timings of each frame phase. It is the model for Battle Team's rendering benchmarks (`milestones/performance-tests.md`).
 
