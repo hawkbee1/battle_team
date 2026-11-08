@@ -47,15 +47,18 @@ What adopting dashwire would change:
 ## Choice
 **Option 3.** Orders are the same typed commands whatever their sender. A player sends them over the WebSocket; an AI agent or the server sends them over HTTPS with its key (AI-04). The host checks the sender, applies the same rules, and logs the origin (stack decision 2).
 
-Update policy:
-- A unit that moves is sent at **5 Hz** while it moves. A unit that stands still sends nothing.
-- Events (a shot, a hit, a death, a capture progress change, a move order) are sent when they happen.
-- Things that do not change are not sent. Each client keeps the last state it received.
+Update policy (messages in `battle_protocol`, M6 Issue 2):
+- A unit that moves is sent at **5 Hz** while it moves, as its **position only**, quantised to the centimetre. Not its path nor its speed: a path would show a section where an enemy goes beyond what it sees (MAP-29), and its own units' paths are the ones it sent.
+- A unit that stands still sends nothing.
+- Events (a shot, a hit, a death, a capture progress change, a move order) are sent when they happen, in the update of their tick.
+- **A unit's shots of one tick are grouped into one burst**: its weapon, the shots fired and those that hit, and each unit hit once with the damage of all of them. The battle log keeps every shot.
+- A hit by a shooter the section does not see comes as the unit hit and its damage only (COMBAT-57).
+- Things that do not change are not sent. Each client keeps the last state it received; it asks for its whole view again when it lost track.
 - Client-side interpolation between updates hides the 200 ms cadence.
 
 Fog filter: the host computes each section's visible set once per tick (see stack decision 1) and sends each section only what it sees.
 
-What orders carry: a shot carries its aim direction and fire time (decision 183); a move order may carry the client's path, which the host checks (stack decision 8). First-person movement is a stream of short move orders, about 5 to 10 a second while the player holds a direction. It is small and bounded by AP (an infantry pool is a 30 m dash); the rate is set with the protocol (M6).
+What orders carry: a shot carries its aim direction and fire time (decision 183); a move order may carry the client's path, which the host checks (stack decision 8). First-person movement is a stream of short move orders, **5 a second** while the player holds a direction, the cadence of the position updates; the client moves its unit between them. It is small and bounded by AP (an infantry pool is a 30 m dash).
 
 ## Traffic estimate for one section during a fight
 Re-estimated 2026-11-01 from the AP rules (stack decision 1). Assumptions: a section has at most 16 units, so it holds 480 AP at battle start (16 × 30). A viewer sees up to 10 sections fighting at once. An event is about 40 bytes. A moving unit streams its position at 16 bytes × 5 Hz.
@@ -65,10 +68,23 @@ Re-estimated 2026-11-01 from the AP rules (stack decision 1). Assumptions: a sec
 - Total: about **7 to 9 kbit/s down and under 0.5 kbit/s up** during a fight. Between fights, close to zero.
 - **Peak:** rested units spend their pools in seconds (stack decision 1). If ten sections (160 units) open fire together, one event per shot gives about 110 events per second with rifles (**about 35 kbit/s down for about 20 s**) and about 1,300 with machine guns (**about 430 kbit/s for about 4 s**). Grouping each unit's shots into one event per tick (shots, hits, damage) caps it at 160 events per second, about 51 kbit/s.
 
+Measured (M6 Issue 2, `battle_protocol`'s committed samples, binary, without the WebSocket frame header; IDs of 6 to 14 characters):
+
+| Message | Measured | Estimate |
+|---|---|---|
+| A tick update with nothing but its time | 19 bytes | |
+| One moving unit in a tick | 18 bytes more | 16 bytes |
+| A tick with ten moving vehicles | 199 bytes | 160 bytes |
+| A rifle shot (one hit) as an event | 55 bytes; 73 as a whole tick | 40 bytes |
+| A hit by a shooter not seen, as a whole tick | 47 bytes | |
+| The whole view of a 16-unit section, its private state and 8 relics | 2,239 bytes (5,833 in JSON) | |
+
+Ten moving vehicles at 5 Hz are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.
+
 Late join: the visible state plus the delta layer. The delta layer is a list of changed objects (built structures, destroyed objects, craters), a few tens of thousands of entries at most, about 16 bytes each: a few hundred kilobytes, compressed. Terrain changes do not depend on AP. The estimate is to be checked against a real battle (M8).
 
 ## Consequences
 - The host needs a WebSocket endpoint for players and an HTTPS endpoint for AI agents and the server. Both feed the same command handler.
 - Players sign in with a short-lived Appwrite JWT (`account.createJWT`, valid 15 minutes) sent when the socket opens. The host checks it once with Appwrite (local in development, Appwrite Cloud live) and binds the socket to the account; orders never touch Appwrite. AI calls are checked with the account's API key (decision 158). The two checks produce the origin tag used in the log (decision 162).
 - The protocol (message formats, versions) becomes a contract between `battle_host` and the client. It is written down in M5 or M6, in the same package as the rules core.
-- The number of moving vehicles in view and the shape of fire bursts are now the main traffic levers, since infantry rarely moves. Grouping shots per unit per tick is decided with the protocol (M5 or M6). The 5 Hz cadence and fog per section are still tuned with the scenario harness (M4 Issue 11), not by guessing.
+- The number of moving vehicles in view and the shape of fire bursts are now the main traffic levers, since infantry rarely moves. Shots are grouped per unit per tick (M6 Issue 2). The 5 Hz cadence and fog per section are still tuned with the scenario harness (M4 Issue 11), not by guessing.
