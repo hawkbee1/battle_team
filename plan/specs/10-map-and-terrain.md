@@ -58,7 +58,7 @@ Rules:
 - **MAP-25** On water, engineers build **bridges only** (normal or reinforced).
 
 ## 5. Line of sight and fog of war
-- **MAP-26** **Mountains and buildings block line of sight.** Vision is computed in 3D, so height matters.
+- **MAP-26** **Mountains and buildings block line of sight.** Vision is computed in 3D, so height matters: a sight line runs from the top of the observer's hit volume to the top of the target's, and a hill blocks it where the ground rises above it. A unit carried by a transport sees from it but is not seen on its own. (Decision 235)
 - **MAP-27** **Forests conceal** (decision 87): each metre of forest the sight line crosses reduces the observer's effective vision. A flying observer's line crosses less forest, so it sees forest targets more easily than a ground observer.
 - **MAP-28** **Destroyed objects stop blocking** sight.
 - **MAP-29** Fog of war is shared per section (see overview). A unit's vision contributes to its own section only; radios relay scouts' information to all sections.

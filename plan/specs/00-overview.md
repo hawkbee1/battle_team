@@ -356,6 +356,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 232. **What every section knows.** Besides what its own units see and what radios relay, every section always knows the relics (position and owner), its own team's HQ, every team's victory countdown (RELIC-16) and the whole delta layer (MAP-08). It knows enemy HQs and every other section's units, allies included, only while its units see them or a scout reports them through a radio (MAP-49; refines decision 21).
 233. **The relic alert reaches the whole previous owner team.** Its players connected to the battle are alerted at once; the others receive the alert when they next connect (RELIC-10; refines decision 46b).
 234. **A hit by an unseen shooter.** When a unit is hit by a shooter its section does not see, the section learns the hit and its damage, not the shooter nor where the shot came from; the shooter shows only once one of its units sees it (COMBAT-57).
+235. **Sight lines in 3D.** A sight line runs from the top of the observer's hit volume (`hit_box_m.height`) to the top of the target's, the ground for a position aimed at; where the ground between them rises above the line, a hill blocks it. A unit carried by a transport sees from it but is not seen on its own: only its transport is (MAP-26, COMBAT-54).
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.
