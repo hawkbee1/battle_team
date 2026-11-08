@@ -60,6 +60,18 @@ Fog filter: the host computes each section's visible set once per tick (see stac
 
 What orders carry: a shot carries its aim direction and fire time (decision 183); a move order may carry the client's path, which the host checks (stack decision 8). First-person movement is a stream of short move orders, **5 a second** while the player holds a direction, the cadence of the position updates; the client moves its unit between them. It is small and bounded by AP (an infantry pool is a 30 m dash).
 
+## Endpoints (M6 Issue 5)
+One HTTP port per host process, behind the reverse proxy that ends TLS live (M6 Issue 6):
+- `GET /v1/socket`: the WebSocket of players **and AI agents** (AI agents get the same fog-filtered view as players, AI-03). Binary frames, or JSON in text frames for agents in other languages: the host answers in the encoding of the sign-in. A socket's sign-in is the account logging in to the battle (`EnterBattle`, HQ-07), whether it signs in with a JWT or a key.
+- `POST /v1/battles/<battle>/commands`: one `SendCommand` in JSON, the API key as a bearer token, checked on every call. 200 with the answer, 429 when throttled, 401, 403 and 404 for a refused sign-in, 400 for a body the host does not read, 413 past 256 KiB.
+
+Values of the host, not rules:
+- **Rate limit**, per account, players and AI agents alike (AI-03): **500 orders at once, then 10 a second**. A section can spend its whole AP at once: 16 units of 30 AP firing 1-AP machine-gun shots is 480 orders, so a section's burst is never throttled; a steady stream above a busy player's (first-person moves at 5 a second, orders between them) is. The server's own commands are not limited.
+- **Request IDs**: an answer is kept **15 minutes** (the life of a sign-in JWT), by battle, account and request ID, on the socket and HTTPS alike: a command resent within them gets its first answer again and runs once. A client chooses IDs that do not repeat within 15 minutes across its restarts (random, or from the time). The memory is not battle state: a host that restarts has none, so a command whose entry was written but not acknowledged before a crash runs again if it is resent (closing this needs the request ID in the log entry, a version 2 change).
+- **Heartbeat** every 20 s from the client; a socket silent for **60 s**, signed in or not, is closed. A key-signed socket's key is checked again every **60 s**; a revoked one gets a goodbye.
+- **Slow client**: up to **1 MiB** may wait behind the oldest waiting message (so a whole view of any size goes out); past it the client gets a goodbye and catches up with its whole view when it comes back. A socket that stays stuck is cut 5 s after it is closed.
+- No WebSocket compression yet (the handshake is the host's own, so it can cut a stuck socket); M6 Issue 8 measures whether the late join needs it.
+
 ## Traffic estimate for one section during a fight
 Re-estimated 2026-11-01 from the AP rules (stack decision 1). Assumptions: a section has at most 16 units, so it holds 480 AP at battle start (16 × 30). A viewer sees up to 10 sections fighting at once. An event is about 40 bytes. A moving unit streams its position at 16 bytes × 5 Hz.
 - **Events:** at the typical mix, 480 AP is about 80 events over 10 minutes (0.13 per second per section). At worst, with 1 m orders, it is 480 events (0.8 per second). Ten fighting sections give 1.3 to 8 events per second, about **0.4 to 2.6 kbit/s down**.
@@ -84,7 +96,7 @@ Ten moving vehicles at 5 Hz, once units follow their paths, are about 1 kB a sec
 Late join: the visible state plus the delta layer. The delta layer is a list of changed objects (built structures, destroyed objects, craters), a few tens of thousands of entries at most, about 16 bytes each: a few hundred kilobytes, compressed. Terrain changes do not depend on AP. The estimate is to be checked against a real battle (M8).
 
 ## Consequences
-- The host needs a WebSocket endpoint for players and an HTTPS endpoint for AI agents and the server. Both feed the same command handler.
+- The host has a WebSocket endpoint for players and AI agents, and an HTTPS endpoint for single commands. Both feed the same command handler.
 - Players sign in with a short-lived Appwrite JWT (`account.createJWT`, valid 15 minutes) sent when the socket opens. The host checks it once with Appwrite (local in development, Appwrite Cloud live) and binds the socket to the account; orders never touch Appwrite. AI calls are checked with the account's API key (decision 158). The two checks produce the origin tag used in the log (decision 162).
 - The protocol (message formats, versions) becomes a contract between `battle_host` and the client. It is written down in M5 or M6, in the same package as the rules core.
 - The number of moving vehicles in view and the shape of fire bursts are now the main traffic levers, since infantry rarely moves. Shots are grouped per unit per tick (M6 Issue 2). The 5 Hz cadence (once units follow their paths) and fog per section are still tuned with the scenario harness (M4 Issue 11), not by guessing.

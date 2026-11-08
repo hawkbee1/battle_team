@@ -176,3 +176,4 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-AI-09** What chance does a server-managed unit fire with at each check (decision 160)? → decision 196
 - [x] **Q-AI-10** At a server-managed unit's fire check (AI-07), which enemy does it fire at? → decision 228 (the nearest enemy unit it can fire at)
 - [x] **Q-AI-11** When is a server-managed unit's first fire check (AI-07)? → decision 229 (30 minutes after the battle starts, then every 30 minutes for all units together)
+- [ ] **Q-AI-12** Does an AI agent that connects to a battle with the account's API key log the player in to it (HQ-07: the first player of a team to log in manages its HQ, and a higher-ranking one takes the role when he logs in)? Assumed (M6.5): yes when it opens a socket, since the agent acts for the account (decisions 157, 158); a single HTTPS command is not a log-in.

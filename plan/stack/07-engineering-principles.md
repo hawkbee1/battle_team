@@ -14,7 +14,7 @@ Applied to Dart:
 - **Single responsibility.** A package has one reason to change. `battle_rules` does no I/O. `battle_host` owns sockets and storage. The client owns rendering and input.
 - **Open/closed.** A new unit, terrain or movement class is a data row plus a class that implements an existing interface.
 - **Liskov substitution.** Every implementation of a port passes the same contract tests. The in-memory and the Appwrite-backed snapshot store run one shared suite.
-- **Interface segregation.** Small ports, each used by few clients: `Clock`, `SeededRandom`, `CommandSink`, `SnapshotStore`, `LogSink`, `ErrorReporter` (Sentry, stack decision 6). A class depends only on the ports it calls.
+- **Interface segregation.** Small ports, each used by few clients: `Clock`, `SeededRandom`, `CommandSink`, `SnapshotStore`, `LogSink`, `WriteAheadLog`, `ErrorReporter` (Sentry, stack decision 6), `AccountCheck` (sign-in) and `ClientSocket` (the endpoints, M6). A class depends only on the ports it calls.
 - **Dependency inversion.** Rules depend on ports. Hosts inject the implementations through constructors, and the app wires them with `RepositoryProvider` (layered-architecture skill).
 - **Sealed types for variants.** Commands, events and unit states are sealed classes matched with an exhaustive `switch`. The compiler then lists every case left unhandled when a variant is added.
 - **No global mutable state.** Singletons are not used in rules or host code: they break determinism (stack decision 1) and test isolation.
