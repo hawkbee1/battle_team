@@ -1,6 +1,6 @@
 # Stack decision 3: networking
 
-Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 3). Rules: decisions 2, 3, 4, 5; MAP-08, MAP-29; RELIC-10 (alerts); decisions 161, 165, 166, 172, 183; AI-03, AI-09.
+Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 3), and again after the comparison with dashwire (designer, 2026-11-08; milestone M6, Issue 1). Rules: decisions 2, 3, 4, 5; MAP-08, MAP-29; RELIC-10 (alerts); decisions 161, 165, 166, 172, 183; AI-03, AI-09.
 
 ## What the rules require
 - Orders reach the server and state reaches the players in **real time**, for 100+ players per battle (decisions 2 and 4).
@@ -19,7 +19,8 @@ Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 3). Rules: deci
 Checked on the code of `dashwire` 0.1.0 and `dashwire_replication` 0.2.1, the current releases:
 - **Pure Dart AOT host: yes.** The server pieces use `dart:io` (a WebSocket server) and `dart:isolate` (one room per isolate), no Flutter. A `dart compile exe` executable ran a room in an isolate behind a loopback WebSocket, refused a bad token and replicated a moving unit.
 - **Fog per section: for state, yes.** The host hands `ReplicationHost` a relevancy filter that returns, per connection, the IDs it sees: the host's own visible set fits. A field reaches everyone, its owner's connection only, or all but its owner. Events do not fit: an RPC reaches every connection that knows its replica, unchanged. An event cut down to what a section sees (COMBAT-57), an alert to one team (RELIC-10) and the delta layer (MAP-08) would be the app's own messages.
-- **Web client: yes.** The client compiles to JavaScript and to Wasm and uses the browser's WebSocket; the schema hash is the same on the VM and in JavaScript. Over a WebSocket its unreliable channel is reliable.
+- **Web client: yes.** The client compiles to JavaScript and to Wasm, runs under both, and uses the browser's WebSocket through `package:web`; the schema hash is the same on the VM, in JavaScript and in Wasm. Over a WebSocket its unreliable channel is reliable.
+- **Option 3 on the web:** `battle_protocol` compiled to JavaScript and to Wasm decodes and re-encodes every committed sample of version 1 to the same bytes and JSON, as on the VM, integers up to 2^52 − 1 included. Its client socket (M6 Issue 7) uses `package:web`, not `dart:html`, which Wasm lacks.
 - **Licence:** MIT for both; their dependencies `web` and `meta` are BSD-3.
 - **Maturity:** versions 0.x, one author, first release July 2026; 0.2.0 broke the API.
 
@@ -41,7 +42,7 @@ What adopting dashwire would change:
 - **`battle_protocol` version 1:** unchanged (commands, events, log). M6 Issue 2's view and tick update would become replica schemas, and a client would hold two kinds of ID: numbers for state, strings in events.
 - **What it brings:** a byte budget per connection that sends the longest-waiting changes first, so a burst spreads over a few ticks; clock sync; and, in M7, `flutter_scene_net`'s interpolation buffer and binding of replicas to scene nodes.
 
-**Recommendation: option 3** (awaiting the designer's confirmation). dashwire would carry only the replication of state: sign-in, orders, events, alerts and the delta layer stay this project's code either way, the sizes are even, and the library is young. Worth reusing in option 3: a byte budget per section that sends the moving units waiting longest first (M6 Issue 4), and clock sync for the AP shown between updates (M6 Issue 7). `flutter_scene_net`'s interpolation buffer is a model for M7.
+**Choice: option 3, confirmed** (designer, 2026-11-08). dashwire would carry only the replication of state: sign-in, orders, events, alerts and the delta layer stay this project's code either way, the sizes are even, and the library is young. Worth reusing in option 3: a byte budget per section that sends the moving units waiting longest first (M6 Issue 4), and clock sync for the AP shown between updates (M6 Issue 7). `flutter_scene_net`'s interpolation buffer is a model for M7.
 
 ## Choice
 **Option 3.** Orders are the same typed commands whatever their sender. A player sends them over the WebSocket; an AI agent or the server sends them over HTTPS with its key (AI-04). The host checks the sender, applies the same rules, and logs the origin (stack decision 2).
