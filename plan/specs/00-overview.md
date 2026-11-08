@@ -357,6 +357,7 @@ Status: **ready**. Built through Q&A. Open questions live in `specs/95-open-ques
 233. **The relic alert reaches the whole previous owner team.** Its players connected to the battle are alerted at once; the others receive the alert when they next connect (RELIC-10; refines decision 46b).
 234. **A hit by an unseen shooter.** When a unit is hit by a shooter its section does not see, the section learns the hit and its damage, not the shooter nor where the shot came from; the shooter shows only once one of its units sees it (COMBAT-57).
 235. **Sight lines in 3D.** A sight line runs from the top of the observer's hit volume (`hit_box_m.height`) to the top of the target's, the ground for a position aimed at; where the ground between them rises above the line, a hill blocks it. A unit carried by a transport sees from it but is not seen on its own: only its transport is (MAP-26, COMBAT-54).
+236. **A moving unit is at its destination.** As its move starts, a unit stands at its destination for sight, shots and what other sections are sent. The client shows it moving there from where it was, arriving at its move's arrival time. Following units along their paths on the host is planned for later (Q-MAP-26).
 
 ## Open questions
 All open questions are tracked in `specs/95-open-questions.md`. Design risks are tracked in `specs/96-design-risks.md`.

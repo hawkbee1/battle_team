@@ -48,7 +48,7 @@ What adopting dashwire would change:
 **Option 3.** Orders are the same typed commands whatever their sender. A player sends them over the WebSocket; an AI agent or the server sends them over HTTPS with its key (AI-04). The host checks the sender, applies the same rules, and logs the origin (stack decision 2).
 
 Update policy (messages in `battle_protocol`, M6 Issue 2):
-- A unit that moves is sent at **5 Hz** while it moves, as its **position only**, quantised to the centimetre. Not its path nor its speed: a path would show a section where an enemy goes beyond what it sees (MAP-29), and its own units' paths are the ones it sent.
+- A unit that moves is sent as its **position only**, quantised to the centimetre, when it changes. The host places a moving unit at its destination as its move starts (decision 236), so it is sent once per move; the client animates it there by its move's arrival time. Following units along their paths, at **5 Hz**, is planned for later (M8). Not a path nor a speed: a path would show a section where an enemy goes beyond what it sees (MAP-29), and its own units' paths are the ones it sent.
 - A unit that stands still sends nothing.
 - Events (a shot, a hit, a death, a capture progress change, a move order) are sent when they happen, in the update of their tick.
 - **A unit's shots of one tick are grouped into one burst**: its weapon, the shots fired and those that hit, and each unit hit once with the damage of all of them. The battle log keeps every shot.
@@ -79,7 +79,7 @@ Measured (M6 Issue 2, `battle_protocol`'s committed samples, binary, without the
 | A hit by a shooter not seen, as a whole tick | 47 bytes | |
 | The whole view of a 16-unit section, its private state and 8 relics | 2,239 bytes (5,833 in JSON) | |
 
-Ten moving vehicles at 5 Hz are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.
+Ten moving vehicles at 5 Hz, once units follow their paths, are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.
 
 Late join: the visible state plus the delta layer. The delta layer is a list of changed objects (built structures, destroyed objects, craters), a few tens of thousands of entries at most, about 16 bytes each: a few hundred kilobytes, compressed. Terrain changes do not depend on AP. The estimate is to be checked against a real battle (M8).
 
@@ -87,4 +87,4 @@ Late join: the visible state plus the delta layer. The delta layer is a list of 
 - The host needs a WebSocket endpoint for players and an HTTPS endpoint for AI agents and the server. Both feed the same command handler.
 - Players sign in with a short-lived Appwrite JWT (`account.createJWT`, valid 15 minutes) sent when the socket opens. The host checks it once with Appwrite (local in development, Appwrite Cloud live) and binds the socket to the account; orders never touch Appwrite. AI calls are checked with the account's API key (decision 158). The two checks produce the origin tag used in the log (decision 162).
 - The protocol (message formats, versions) becomes a contract between `battle_host` and the client. It is written down in M5 or M6, in the same package as the rules core.
-- The number of moving vehicles in view and the shape of fire bursts are now the main traffic levers, since infantry rarely moves. Shots are grouped per unit per tick (M6 Issue 2). The 5 Hz cadence and fog per section are still tuned with the scenario harness (M4 Issue 11), not by guessing.
+- The number of moving vehicles in view and the shape of fire bursts are now the main traffic levers, since infantry rarely moves. Shots are grouped per unit per tick (M6 Issue 2). The 5 Hz cadence (once units follow their paths) and fog per section are still tuned with the scenario harness (M4 Issue 11), not by guessing.
