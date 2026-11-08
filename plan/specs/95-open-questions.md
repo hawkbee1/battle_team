@@ -33,6 +33,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [ ] **Q-MAP-23** Maps outside France take their heights from the Copernicus DEM (stack decision 5). Assumed (M5.20): its import comes with the first map outside France; the importer reads IGN RGE ALTI only.
 - [x] **Q-MAP-24** What does a section know besides what its own units see and what radios relay (decision 21, MAP-29)? → decision 232 (relics, its own HQ, every victory countdown and the delta layer always; enemy HQs and other sections' units only when seen or reported)
 - [x] **Q-MAP-25** Vision in 3D (MAP-26): from what height does a unit look, at what height is it seen, and does a unit in a transport see or show? → decision 235 (from the top of the observer's hit volume to the top of the target's, the ground blocks where it rises above the line; a carried unit sees from its transport and is not seen on its own)
+- [ ] **Q-MAP-26** Where is a moving unit while it moves, for what others see of it? M5 places it at its destination as its move starts (sight and shots use that cell), and stack decision 3 streams a moving unit's position at 5 Hz. Assumed (M6.4): the update stream sends the position the host holds, once when a move starts. Following the unit along its path, for sight, shots and the stream alike, needs the host to keep each move's path with its times: proposed as a later issue.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
@@ -161,6 +162,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-36** Friendly fire and the own HQ: COMBAT-34 hurts allies, HQ-16 says enemy units damage the HQ. Does own fire damage the own HQ? → decision 186 (yes)
 - [x] **Q-CBT-37** Is a weapon taken from storage or picked up loaded? → decision 187 (unloaded; a new unit's default weapon comes loaded)
 - [x] **Q-CBT-38** What does a section learn when one of its units is hit by a shooter it does not see? → decision 234 (the hit and its damage, not the shooter nor where the shot came from)
+- [ ] **Q-CBT-39** What does a section learn of a shot whose shooter or target it does not see, when neither is its own unit? COMBAT-57 covers a hit on its own unit. Assumed (M6.4): a hit by an unseen shooter on any unit the section sees shows as that unit's hit and damage, as for its own (COMBAT-57); a shot by a unit it sees at a unit it does not see shows the shooter firing, without that hit; a weapon dropped where none of its units sees is not shown.
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).
