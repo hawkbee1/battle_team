@@ -1,0 +1,26 @@
+import 'package:battle_map/battle_map.dart';
+import 'package:flutter/services.dart';
+
+/// The built map [mapId] from the app's assets (`assets/maps/<mapId>/`,
+/// as `battle_map`'s builder writes it).
+///
+/// Throws a [MapFormatException] for a map out of the format.
+Future<MapData> loadMapAsset(AssetBundle bundle, String mapId) async {
+  final base = 'assets/maps/$mapId';
+  final mapYaml = await bundle.loadString('$base/map.yaml');
+  final spec = MapSpec.parse(mapYaml);
+  final tiles = <String, TileFiles>{};
+  for (final (column, row) in tilesOf(
+    spec.width ?? 0,
+    spec.depth ?? 0,
+    spec.tileSize,
+  )) {
+    final tile = '$base/tiles/${column}_$row';
+    tiles['${column}_$row'] = TileFiles(
+      heightsPng: (await bundle.load('$tile/heights.png')).buffer.asUint8List(),
+      terrainPng: (await bundle.load('$tile/terrain.png')).buffer.asUint8List(),
+      objectsYaml: await bundle.loadString('$tile/objects.yaml'),
+    );
+  }
+  return MapData.fromBuilt(BuiltMapFiles(mapYaml: mapYaml, tiles: tiles));
+}

@@ -12,6 +12,9 @@ dependencies:
   appwrite_api_client: ^0.1.0
   audioplayers: ^6.8.1
   backend_status_repository: ^0.1.0
+  battle_client: ^0.1.0
+  battle_map: ^0.1.0
+  battle_protocol: ^0.1.0
   bloc: ^9.2.1
   equatable: ^3.0.0
   flame: ^1.38.2
@@ -22,9 +25,11 @@ dependencies:
   flutter_bloc: ^9.1.1
   flutter_localizations:
     sdk: flutter
+  flutter_scene: ^0.24.0
   google_fonts: ^8.2.1
   intl: ^0.20.2
   material_ui: ^1.1.1
+  vector_math: ^2.1.4
 
 dev_dependencies:
   bloc_lint: ^0.4.2
@@ -44,3 +49,8 @@ flutter:
     - assets/audio/
     - assets/images/
     - assets/licenses/poppins/
+    # A built map of battle_map (maps/built), for the playtest. Its data is
+    # under the ODbL 1.0 and the Licence Ouverte 2.0: its attribution shows
+    # on screen.
+    - assets/maps/saint_lo_1km/
+    - assets/maps/saint_lo_1km/tiles/0_0/
