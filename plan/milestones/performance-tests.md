@@ -22,7 +22,7 @@ Conventions:
 - Target: the estimate in `stack/01` before the measurement: about 1 to 2 minutes of one core per simulated day, and bursts of up to a few thousand hit rolls per second for a few seconds.
 - Measured (M5 Issue 8, `battle_map/benchmark_results`): one loaded synthetic 10 × 50 km map takes about 152 MB (40 MB ground, 111 MB objects), from `battle_pathfinding`'s navigation model. Packing it is left to a later optimisation (designer, 2026-11-04).
 - Measured (M5 Issue 19, `battle_host/bin/load_test.dart`, AOT, the real map `saint_lo`; method and figures in `stack/01`): about 3 s of one core per simulated day; 36 µs per second on average, 0.2 ms at p99, about 80 ms in the busiest second of the opening burst (465 orders). The map takes about 340 MB loaded and 390 MB with its searches prepared; each battle adds about 3 MB; ten battles bursting in the same second take 0.9 s, so a one-core process holds about 10 battles. With the write-ahead log on disk, one `fsync` per order (2.3 ms on the development laptop) makes the burst's busiest second take 1.1 s. The first run took 14 s a day: two listeners scanned every unit for each section after each order; they now make one pass. Copying the state's unit map on each change is the next cost (about 30 % of an order).
-- For M6: a section's machine guns fire 8 shots a second each, so the host's default rate limit (10 orders a second, 20 at once, per sender) throttles a section's burst. The load test lifts it.
+- For M6 Issue 5: a section's machine guns fire 8 shots a second each, so the host's default rate limit (10 orders a second, 20 at once, per sender) throttles a section's burst. The load test lifts it.
 - Where: `stack/01`.
 
 ### P-03 Battle log volume (M2 Issue 2)
@@ -57,7 +57,7 @@ Conventions:
 ## Order
 1. P-01 with M3 Issue 6 (done), and again with M5 when the host shares the search data between movers.
 2. P-02 and P-03 with M5, when the simulation host exists.
-3. P-04 with M6, when the protocol exists.
+3. P-04 with M6 Issue 8, over the network.
 4. P-05 and P-06 as the first M7 task, before the client is built.
 5. P-07 with M3 Issue 5 and again with M5.
 

@@ -55,6 +55,7 @@ Not used: Singleton (see above) and Visitor (sealed types cover it in Dart).
 | `battle_protocol` (commands and messages between host and client) | M5, M6 | `dart_package` |
 | `battle_map` (map loader and builder, stack decision 5; M3 uses its own test fixture format) | M5 | `dart_package` |
 | `battle_stats` (statistics and medals from logs, stack decision 8) | M5 | `dart_package` |
+| `battle_client` (the client side of a battle connection, for the app and Dart AI agents) | M6 | `dart_package` |
 | `battle_host` (simulation host, native executable) | M5 | `dart_cli` |
 | `battle_discord_bridge` (Discord bridge, stack decision 6, native executable) | M7 | `dart_cli` |
 
