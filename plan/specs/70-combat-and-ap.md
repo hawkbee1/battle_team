@@ -20,6 +20,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 ### Targets
 - **COMBAT-11** A unit fires only at targets **it sees itself**, up to its weapon's range. Seeing is limited by vision range, weather, terrain and height (see `specs/10-map-and-terrain.md`, section 5). Scouts and radios share information for awareness, not for aiming. (Decision 59)
 - **COMBAT-12** **Exception: indirect fire** (artillery, `indirect_fire: true`). It may target a **ground position** that a unit of its own section currently sees, or that a scout reports through a radio in range. Its hit chance is lower than direct fire (`indirect_factor`). (Decision 62) Splash: COMBAT-55.
+- **COMBAT-57** A section whose unit is **hit by a shooter it does not see** learns the hit and its damage, **not the shooter nor where the shot came from**. The shooter shows only once one of the section's units sees it. (Decision 234)
 - **COMBAT-13** A unit with **no weapon** (radio, truck) cannot attack. (Decision 64)
 
 ### Hit resolution: hybrid

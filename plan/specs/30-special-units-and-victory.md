@@ -14,7 +14,7 @@ Status: **ready**. Decisions come from the Q&A with the game designer; changes g
 - **RELIC-07** **Every unit inside the radius counts**, whatever its state: carried, flying, offline or passive. (Stored units are not on the map.) An owner's offline units still block a capture.
 - **RELIC-08** If an enemy enters the radius during a capture, the capture stops and **its progress and its pot are lost** (exception to decision 67, decision 170). A capture is under way from the first AP in the pot, even while no unit of its team is inside the radius (decision 176). Otherwise the progress belongs to the team (RELIC-29).
 - **RELIC-09** Capture duration, pot size, contribution and radius (default **30 m**) are **battle settings** (`data/battle.yaml`).
-- **RELIC-10** When a relic changes owner, the **previous owner team is alerted** at once.
+- **RELIC-10** When a relic changes owner, the **previous owner team is alerted** at once: its players connected to the battle at once, the others when they next connect (decision 233).
 - **RELIC-11** Once captured, the relic is **owned** by the capturing team until another team captures it.
 - **RELIC-12** No protection time after a capture: a relic can be retaken as soon as no enemy of the attacker is near.
 - **RELIC-29** **Capture progress belongs to the team** (decision 140). When the capturing unit leaves the radius or dies, another unit of its team inside the radius can resume by adding to the pot (COMBAT-07, COMBAT-09).

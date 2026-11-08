@@ -31,7 +31,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [ ] **Q-MAP-21** Which real bridges carry relics and the HQ? Assumed (M5.20): the bridges of motorways, trunk, primary and secondary roads are reinforced bridges, the others ordinary bridges; the author reinforces more by hand where a team's land would be cut off.
 - [ ] **Q-MAP-22** Where must a map's attribution be shown to players? The licences of its data ask for it (ODbL for OpenStreetMap, Licence Ouverte for IGN). Assumed (M5.20): each `map.yaml` carries it, and the client shows it wherever it shows the map (M7), for example in the map's credits.
 - [ ] **Q-MAP-23** Maps outside France take their heights from the Copernicus DEM (stack decision 5). Assumed (M5.20): its import comes with the first map outside France; the importer reads IGN RGE ALTI only.
-- [ ] **Q-MAP-24** What does a section know besides what its own units see and what radios relay (decision 21, MAP-29)? Assumed (M6 plan): every section always knows the relics (position and owner), its own team's HQ, every team's victory countdown (RELIC-16) and the whole delta layer (MAP-08); enemy HQs and every other section's units, allies included, only while its units see them or a scout reports them through a radio.
+- [x] **Q-MAP-24** What does a section know besides what its own units see and what radios relay (decision 21, MAP-29)? → decision 232 (relics, its own HQ, every victory countdown and the delta layer always; enemy HQs and other sections' units only when seen or reported)
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
@@ -76,7 +76,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-REL-13** Control loss (decision 173): what empties a partly filled pot? → decision 176 (a relic's push pot: capture by another team or a fall; a capture pot: an enemy entering the radius)
 - [x] **Q-REL-14** Who chooses the path of a pushed relic? → decision 219 (the player whose unit first tries to move it while its pot is empty)
 - [x] **Q-REL-15** With a team push pot (decision 171), who are the 10 pushers a relic needs (RELIC-24)? → decision 225 (those that put AP in since the pot was last empty and stay inside the radius)
-- [ ] **Q-REL-16** Who receives the alert of RELIC-10, and how? Assumed (M6 plan): every player of the previous owner team connected to the battle, at once; it is not kept for players who connect later, who see the new owner in their view. Push notifications to players who are away are not part of it.
+- [x] **Q-REL-16** Who receives the alert of RELIC-10, and how? → decision 233 (the whole previous owner team: connected players at once, the others when they next connect)
 
 ## Newcomers, wars and social (40)
 - [x] **Q-SOC-01** Team power formula. → decision 93 (no notion of active players)
@@ -159,7 +159,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-35** Crushing with 10 + *n* pushers and more than *n* units in the path: does the relic crush *n* of them and stop at the next, or stop at once? → decision 185 (crushes the first *n* it meets, stops at the next)
 - [x] **Q-CBT-36** Friendly fire and the own HQ: COMBAT-34 hurts allies, HQ-16 says enemy units damage the HQ. Does own fire damage the own HQ? → decision 186 (yes)
 - [x] **Q-CBT-37** Is a weapon taken from storage or picked up loaded? → decision 187 (unloaded; a new unit's default weapon comes loaded)
-- [ ] **Q-CBT-38** What does a section learn when one of its units is hit by a shooter it does not see? Assumed (M6 plan): the hit and its damage, not the shooter nor where the shot came from; the shooter shows only once one of its units sees it (decision 21).
+- [x] **Q-CBT-38** What does a section learn when one of its units is hit by a shooter it does not see? → decision 234 (the hit and its damage, not the shooter nor where the shot came from)
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).

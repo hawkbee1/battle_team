@@ -34,7 +34,7 @@ Acceptance criteria:
 - A comparison in `stack/03`, option 5, with the measured sizes and a recommendation. The designer confirms the choice. Until then the next issues follow option 3, the confirmed choice.
 
 ## Issue 2: Messages between the host and its clients
-Rules: MAP-08, MAP-29, RELIC-10, RELIC-16, AI-03, AI-05; decisions 21, 162, 183; stack decision 3.
+Rules: MAP-08, MAP-29, MAP-49, RELIC-10, RELIC-16, COMBAT-57, AI-03, AI-05; decisions 21, 162, 183, 232 to 234; stack decision 3.
 Package: `battle_protocol`.
 Depends on: 1.
 
@@ -50,12 +50,12 @@ Acceptance criteria:
 - Encoded sizes of a moving unit's position, an event, a tick with ten moving vehicles and the view of a 16-unit section, next to `stack/03`'s estimates.
 
 ## Issue 3: Fog of war per section
-Rules: MAP-27, MAP-29, MAP-33, UNIT-34, UNIT-36, HQ-29, COMBAT-11, COMBAT-12; decisions 21, 59, 184.
+Rules: MAP-27, MAP-29, MAP-33, MAP-49, UNIT-34, UNIT-36, HQ-29, COMBAT-11, COMBAT-12; decisions 21, 59, 184, 232.
 Package: `battle_host`.
 Depends on: M5 (not on Issue 1).
 
 - Once per tick, each section's visible set: what its own units see (the vision rules of M4.5 with effective stats: range, weather, forest, height, observe), and the enemies its team's scouts spot, relayed by a radio in range to every section of the team (UNIT-34, UNIT-36). Stored units are seen by nobody but their section (HQ-29).
-- What every section knows whatever it sees: Q-MAP-24.
+- What every section knows whatever it sees (MAP-49).
 - The scouts' reports artillery may fire at (COMBAT-12, M5.11) and this relay are one computation.
 - The cost: only what moved, appeared or changed sight since the last tick is checked again. The cost per tick of a 1,000-unit battle is measured with M5.19's load test.
 
@@ -65,20 +65,20 @@ Acceptance criteria:
 - The cost per tick at 1,000 units, peak and average, added to P-02.
 
 ## Issue 4: The update stream of a section
-Rules: MAP-08, MAP-29, RELIC-10, RELIC-16, HQ-29; decisions 21, 100; stack decision 3 (update policy).
+Rules: MAP-08, MAP-29, MAP-49, RELIC-10, RELIC-16, HQ-29, COMBAT-57; decisions 21, 100, 232 to 234; stack decision 3 (update policy).
 Package: `battle_host`.
 Depends on: 2, 3.
 
 - Each section has a subscriber (Observer): after each tick and each accepted order, the host builds the section's update from the battle's events and the change of its visible set, with the policy of `stack/03` (a moving unit at 5 Hz, a still unit nothing, events when they happen, nothing unchanged).
-- An event about something the section does not see is cut down to what it sees, or not sent (Q-CBT-38).
+- An event about something the section does not see is cut down to what it sees, or not sent (COMBAT-57).
 - Private state goes to its own section only.
-- The alert of RELIC-10 goes to the previous owner team (Q-REL-16). The victory countdown goes to every section.
+- The alert of RELIC-10 goes to the previous owner team: at once to its connected players, and to each of the others when they next connect (decision 233). The victory countdown goes to every section.
 - A section that subscribes late, or again, gets its whole view first, the delta layer included (MAP-08), then the updates.
 
 Acceptance criteria:
 - On the scripted battle of M5.15, a subscriber that joins halfway holds the same view at the end as one present from the start.
-- Over the same battle, no update to a section names a unit outside its visible set at that time, except its own units and what Q-MAP-24 makes known to all.
-- A relic captured alerts the previous owner team and nobody else.
+- Over the same battle, no update to a section names a unit outside its visible set at that time, except its own units and what MAP-49 makes known to all.
+- A relic captured alerts the previous owner team and nobody else; a player of that team who connects afterwards receives the alert once.
 
 ## Issue 5: Endpoints and sign-in
 Rules: AI-02, AI-03, AI-04, AI-05, HQ-07; decisions 157, 158, 161, 162, 220; stack decisions 3, 6.

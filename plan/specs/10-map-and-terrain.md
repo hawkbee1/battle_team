@@ -62,6 +62,7 @@ Rules:
 - **MAP-27** **Forests conceal** (decision 87): each metre of forest the sight line crosses reduces the observer's effective vision. A flying observer's line crosses less forest, so it sees forest targets more easily than a ground observer.
 - **MAP-28** **Destroyed objects stop blocking** sight.
 - **MAP-29** Fog of war is shared per section (see overview). A unit's vision contributes to its own section only; radios relay scouts' information to all sections.
+- **MAP-49** **What every section knows**, whatever it sees: the relics (position and owner), its own team's HQ, every team's victory countdown (RELIC-16) and the whole delta layer (MAP-08). Enemy HQs and every other section's units, allies included, are known only while one of its units sees them or a scout reports them through a radio. (Decision 232)
 - **MAP-30** **A unit fires only at what it sees itself** (decision 59). Shared vision is for awareness, not for aiming.
 
 ### Effective vision (decision 59)
