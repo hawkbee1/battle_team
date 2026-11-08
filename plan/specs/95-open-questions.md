@@ -34,6 +34,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-24** What does a section know besides what its own units see and what radios relay (decision 21, MAP-29)? → decision 232 (relics, its own HQ, every victory countdown and the delta layer always; enemy HQs and other sections' units only when seen or reported)
 - [x] **Q-MAP-25** Vision in 3D (MAP-26): from what height does a unit look, at what height is it seen, and does a unit in a transport see or show? → decision 235 (from the top of the observer's hit volume to the top of the target's, the ground blocks where it rises above the line; a carried unit sees from its transport and is not seen on its own)
 - [x] **Q-MAP-26** Where is a moving unit while it moves, for what others see of it? → decision 236 (at its destination from the start of its move; the client shows it moving there; following units along their paths on the host is planned for later, milestone M8)
+- [ ] **Q-MAP-27** Does a section know which team a unit it sees belongs to (an ally's or an enemy's), and is the team of each section public? Assumed (M6.7): yes, a unit seen shows its team, as a hit already shows whether it was friendly fire; the host sends each unit it shows with its section's team.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)

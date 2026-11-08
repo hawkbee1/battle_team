@@ -72,6 +72,14 @@ Values of the host, not rules:
 - **Slow client**: up to **1 MiB** may wait behind the oldest waiting message (so a whole view of any size goes out); past it the client gets a goodbye and catches up with its whole view when it comes back. A socket that stays stuck is cut 5 s after it is closed.
 - No WebSocket compression yet (the handshake is the host's own, so it can cut a stuck socket); M6 Issue 8 measures whether the late join needs it.
 
+## Client (M6 Issue 7)
+`battle_client`, shared by the app and AI agents written in Dart, on every target (JavaScript and Wasm included):
+- **Sign-in** with a fresh credential at each connection (a JWT lasts 15 minutes), then the section's whole view; the client keeps it from the updates. A unit it sees carries its section's team (Q-MAP-27, assumed).
+- **Request IDs**: the wall time in milliseconds × 1,024 plus a random number below 1,024, always above the last one. A restarted client starts from a later millisecond; two clients of one account collide only on the same millisecond and random number. Below 2^52 until 2109.
+- **Heartbeat** every **20 s** while signed in.
+- **Reconnection**: a lost socket, a broken one, a frame the client does not read, a goodbye for a slow or idle client, or a sign-in refused because the battle is not on that host (it may have moved, M6 Issue 6) is a lost host. The client waits **0.5 s, doubling up to 30 s**, each wait between half and all of it at random so that clients dropped together come back apart; it asks for the host's address and a credential again, signs in, takes its whole view and resends every unanswered command with its request ID. A refused credential or section, and a goodbye for a battle that ended, a revoked key or an unknown protocol version, stop it for good.
+- **Battle time and AP shown**: the time of the host's last message plus the wall time since; AP from its last value and rate (stack decision 8).
+
 ## Traffic estimate for one section during a fight
 Re-estimated 2026-11-01 from the AP rules (stack decision 1). Assumptions: a section has at most 16 units, so it holds 480 AP at battle start (16 × 30). A viewer sees up to 10 sections fighting at once. An event is about 40 bytes. A moving unit streams its position at 16 bytes × 5 Hz.
 - **Events:** at the typical mix, 480 AP is about 80 events over 10 minutes (0.13 per second per section). At worst, with 1 m orders, it is 480 events (0.8 per second). Ten fighting sections give 1.3 to 8 events per second, about **0.4 to 2.6 kbit/s down**.
@@ -87,9 +95,9 @@ Measured (M6 Issue 2, `battle_protocol`'s committed samples, binary, without the
 | A tick update with nothing but its time | 20 bytes | |
 | One moving unit in a tick | 18 bytes more | 16 bytes |
 | A tick with ten moving vehicles | 200 bytes | 160 bytes |
-| A rifle shot (one hit) as an event | 55 bytes; 73 as a whole tick | 40 bytes |
+| A rifle shot (one hit) as an event | 55 bytes; 74 as a whole tick | 40 bytes |
 | A hit by a shooter not seen, as a whole tick | 39 bytes | |
-| The whole view of a 16-unit section, its private state and 8 relics | 2,239 bytes (5,833 in JSON) | |
+| The whole view of a 16-unit section, its private state and 8 relics | 2,383 bytes (6,121 in JSON) | |
 
 Ten moving vehicles at 5 Hz, once units follow their paths, are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.
 
