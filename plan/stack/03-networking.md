@@ -52,7 +52,7 @@ Update policy (messages in `battle_protocol`, M6 Issue 2):
 - A unit that stands still sends nothing.
 - Events (a shot, a hit, a death, a capture progress change, a move order) are sent when they happen, in the update of their tick.
 - **A unit's shots of one tick are grouped into one burst**: its weapon, the shots fired and those that hit, and each unit hit once with the damage of all of them. The battle log keeps every shot.
-- A hit by a shooter the section does not see comes as the unit hit and its damage only (COMBAT-57).
+- A hit by a shooter the section does not see comes as the unit hit and its damage only (COMBAT-57). A shot of a unit it sees whose target or outcome it does not see comes as that unit firing, with only the hits it sees (COMBAT-58).
 - Things that do not change are not sent. Each client keeps the last state it received; it asks for its whole view again when it lost track.
 - Client-side interpolation between updates hides the 200 ms cadence.
 
@@ -72,11 +72,11 @@ Measured (M6 Issue 2, `battle_protocol`'s committed samples, binary, without the
 
 | Message | Measured | Estimate |
 |---|---|---|
-| A tick update with nothing but its time | 19 bytes | |
+| A tick update with nothing but its time | 20 bytes | |
 | One moving unit in a tick | 18 bytes more | 16 bytes |
-| A tick with ten moving vehicles | 199 bytes | 160 bytes |
+| A tick with ten moving vehicles | 200 bytes | 160 bytes |
 | A rifle shot (one hit) as an event | 55 bytes; 73 as a whole tick | 40 bytes |
-| A hit by a shooter not seen, as a whole tick | 47 bytes | |
+| A hit by a shooter not seen, as a whole tick | 39 bytes | |
 | The whole view of a 16-unit section, its private state and 8 relics | 2,239 bytes (5,833 in JSON) | |
 
 Ten moving vehicles at 5 Hz are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.
