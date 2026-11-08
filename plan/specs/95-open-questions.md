@@ -162,7 +162,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-CBT-36** Friendly fire and the own HQ: COMBAT-34 hurts allies, HQ-16 says enemy units damage the HQ. Does own fire damage the own HQ? → decision 186 (yes)
 - [x] **Q-CBT-37** Is a weapon taken from storage or picked up loaded? → decision 187 (unloaded; a new unit's default weapon comes loaded)
 - [x] **Q-CBT-38** What does a section learn when one of its units is hit by a shooter it does not see? → decision 234 (the hit and its damage, not the shooter nor where the shot came from)
-- [ ] **Q-CBT-39** What does a section learn of a shot whose shooter or target it does not see, when neither is its own unit? COMBAT-57 covers a hit on its own unit. Assumed (M6.4): a hit by an unseen shooter on any unit the section sees shows as that unit's hit and damage, as for its own (COMBAT-57); a shot by a unit it sees at a unit it does not see shows the shooter firing, without that hit; a weapon dropped where none of its units sees is not shown.
+- [x] **Q-CBT-39** What does a section learn of a shot whose shooter or target it does not see, when neither is its own unit? → decision 237 (no clue about what it does not see: an unseen shooter's hit shows the hit and damage only; a seen shooter at an unseen target shows as firing, outcome unknown; an unseen dropped weapon is not shown)
 
 ## Section AI and automation (80)
 - [x] **Q-AI-01** ~~A player unit with no order: stays still, or follows a simple behaviour?~~ Dropped by the designer (2026-10-31).
