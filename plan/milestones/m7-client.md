@@ -119,7 +119,7 @@ Packages: `battle_client` (pre-check), `battle_team`.
 Depends on: 1 (and 2 for fast testing).
 
 - The order pre-check of stack decision 8, in `battle_client` (as M6.7 planned): before sending a move, the path and its AP cost from `battle_rules` on the client's map data, for display only.
-- The preview drawn before confirming; the moving unit keeps gliding to its arrival (decision 236); the cost against the unit's AP, and the wait COMBAT-06 implies when AP run short.
+- The preview drawn before confirming; the moving unit keeps gliding to its arrival (decision 236); the cost against the unit's AP, and the wait COMBAT-06 implies when AP run short. A destination taken by a unit the section sees is shown as refused before sending (MAP-50); the pre-check knows nothing of unseen units.
 - The host's answer wins: a divergence is shown, not argued.
 
 Acceptance criteria:
