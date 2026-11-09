@@ -15,6 +15,7 @@ Estimated 2026-11-01 from the AP rules (stack decision 1 has the derivation). De
 |---|---|---|
 | Typical: half attacks, half moves (10 m orders) | about 4,000 | about 0.4 MB |
 | Worst: 1 m orders with machine guns | about 24,000 | about 2.4 MB |
+| Measured (M5 Issue 19, 1,000 units on `saint_lo`, opening burst included) | 7,837 entries, 8,635 events | 0.86 MB, 0.24 MB uploaded compressed |
 
 - Battle-start burst: up to 5,000 events, once per battle.
 - What is logged: inputs (orders with their time, seeds) and, in the same entry as each attack, its outcome (hit or miss, damage, kill), so the statistics batch reads the log without replaying the battle. Tick times are implicit (1 Hz from the battle start) and are not logged.
@@ -44,3 +45,4 @@ Recovery: load the latest snapshot, replay the uploaded and local logs after it.
 - Battle logs are the source of statistics and medals (decision 143), so their format is a data contract: it is versioned from the start.
 - If log volume ever outgrows Appwrite Storage, the next step is a dedicated database (option 2). At the current volumes this trigger is far away.
 - Every action in the log carries its origin: player, AI or server (decisions 162, 166).
+- **Resource IDs.** The Hawkbee apps share one Appwrite project and its `hawkbee` database, so Battle Team's tables, buckets and functions have IDs prefixed `bt_` (`bt_wars`, `bt_battle_logs`, `bt_end_battle`). Its admin label is `btadmin`, because labels allow only letters and digits. This plan names them without the prefix.

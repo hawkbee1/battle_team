@@ -163,6 +163,6 @@ Acceptance criteria:
 
 ## Later milestones (outline, for the chosen stack)
 - **M5 – Simulation host and persistence**: `milestones/m5-simulation-host.md`.
-- **M6 – Networking** (`stack/03`): WebSocket for players, HTTPS for AI agents and the server, one command handler. Fog of war per section (MAP-29) filtered on the host, 5 Hz position updates, alerts (RELIC-10), late joiners get the delta layer (MAP-08).
-- **M7 – Client** (`stack/04`, `stack/06`): flutter_scene for the 3D world, Flutter widgets for the interface, top-down and first-person control, pings, map markers and team chat (decision 123). Discord account linking (decision 126) through the bridge service. Starts with the rendering spike on the slowest target device.
+- **M6 – Networking**: `milestones/m6-networking.md`.
+- **M7 – Client** (`stack/04`, `stack/06`): flutter_scene for the 3D world, Flutter widgets for the interface, top-down and first-person control, pings, map markers and team chat (decision 123). A moving unit drawn with Flutter's animation system, from where it was to its destination, arriving at its move's arrival time (decision 236). Discord account linking (decision 126) through the bridge service. Starts with the rendering spike on the slowest target device.
 - **M8 – Revision after real battles**: `milestones/m8-revision-after-real-battles.md`.

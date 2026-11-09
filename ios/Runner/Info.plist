@@ -81,5 +81,7 @@
 			</array>
 		</dict>
 	</dict>
+	<key>FLTEnableFlutterGPU</key>
+	<true/>
 </dict>
 </plist>

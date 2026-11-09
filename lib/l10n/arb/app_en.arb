@@ -56,5 +56,92 @@
   "backendStatusRetryButton": "Check again",
   "@backendStatusRetryButton": {
     "description": "Tooltip of the button that checks the Appwrite connection again"
+  },
+  "playtestTitle": "Battle Team playtest",
+  "@playtestTitle": {
+    "description": "Title of the playtest app"
+  },
+  "playtestStatus": "{status, select, signingIn{Signing in…} connecting{Finding the host…} playing{In battle} lost{Host lost, coming back…} stopped{Stopped} failed{Sign-in failed} other{ }}",
+  "@playtestStatus": {
+    "description": "Where the playtest stands",
+    "placeholders": {
+      "status": {}
+    }
+  },
+  "playtestPlayingAs": "{team} · {section}",
+  "@playtestPlayingAs": {
+    "description": "The player's team and section",
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "playtestHelp": "Drag to pan · scroll or pinch to zoom · Q/E or two fingers to turn · tap one of your units, then tap the ground to move it",
+  "@playtestHelp": {
+    "description": "How to use the playtest view"
+  },
+  "playtestUnit": "{type} · HP {hp} · AP {ap}",
+  "@playtestUnit": {
+    "description": "The selected unit",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "hp": {
+        "type": "String"
+      },
+      "ap": {
+        "type": "String"
+      }
+    }
+  },
+  "playtestOrderAccepted": "{order} accepted",
+  "@playtestOrderAccepted": {
+    "description": "The host accepted the last order",
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "playtestOrderRefused": "{order} refused: {reason}",
+  "@playtestOrderRefused": {
+    "description": "The host refused the last order",
+    "placeholders": {
+      "order": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "playtestMissingSettings": "Run battle_host's tool/playtest.dart, then start the app with --dart-define-from-file=env/playtest.json.",
+  "@playtestMissingSettings": {
+    "description": "Shown when the playtest settings are missing"
+  },
+  "playtestUnits": "Your units",
+  "@playtestUnits": {
+    "description": "Heading of the list of the section's units"
+  },
+  "playtestInField": "in the field",
+  "@playtestInField": {
+    "description": "A unit out on the map"
+  },
+  "playtestStored": "stored",
+  "@playtestStored": {
+    "description": "A unit kept in storage, not on the map"
+  },
+  "playtestDeploy": "Deploy",
+  "@playtestDeploy": {
+    "description": "Brings a stored unit out to the HQ"
+  },
+  "playtestCentre": "Centre",
+  "@playtestCentre": {
+    "description": "Looks at the section's units again"
   }
 }

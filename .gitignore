@@ -110,3 +110,6 @@ app.*.map.json
 
 # Generated l10n files
 lib/l10n/gen/
+
+# The playtest player sign-in, written by battle_host tool/playtest.dart.
+env/playtest.json

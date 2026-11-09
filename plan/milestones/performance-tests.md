@@ -13,18 +13,23 @@ Conventions:
 ### P-01 Path search on a 10 × 50 km map (M3 Issue 6)
 - Measure: time per path, and the AP cost of the fast search against the exact search.
 - Target: at most 10 % more AP than the exact search (M3 Issue 6). With 10 m cells, on the host, compiled ahead of time: at most **50 ms** for a 2 km path and **500 ms** for a path across the map, once the search is prepared for the mover (designer, 2026-11-02).
-- Measured (M3 Issue 6, `battle_pathfinding/benchmark_results`): median 15 ms for 2 km and about 150 ms across the map, at most 0.6 % more AP than the exact search. A hierarchical search with precomputed paths between blocks would be the next step if the target tightens.
+- Measured (M3 Issue 6, `battle_pathfinding/benchmark_results`, synthetic map): median 15 ms for 2 km and about 150 ms across the map, at most 0.6 % more AP than the exact search.
+- Measured again (M5 Issue 19, `battle_host/bin/load_test.dart`, the real map `saint_lo`, search data shared by the movers of the map, 20 paths of 2 km and 3 across the map per mover): 2 km paths take 21 to 30 ms at the median but up to 0.35 s (jeep) to 1.1 s (soldier). Across the map: jeep 0.23 s, soldier 1.3 to 2.5 s, tank 1.5 to 6.6 s, and one jeep path 7.5 s. **The across-map target is missed on real data**: hedges, rivers and towns make the fast search explore far more than on the synthetic map. A hierarchical search with precomputed paths between blocks is the next step.
 - Where: `stack/01`, `stack/05`.
 
 ### P-02 Simulation host, one 1,000-unit battle over one simulated day (M2 Issue 1)
 - Measure: CPU per tick at peak and on average, memory of one battle and of one map, and the number of battles one process holds.
-- Target: the estimate in `stack/01` (about 1 to 2 minutes of one core per simulated day; bursts of up to a few thousand hit rolls per second for a few seconds). Replace with the measured figures.
-- Measured (M5 Issue 8, `battle_map/benchmark_results`): one loaded 10 × 50 km map takes about 152 MB (40 MB ground, 111 MB objects) against the 35 MB of `stack/01`, from `battle_pathfinding`'s navigation model. Packing it is left to a later optimisation (designer, 2026-11-04).
+- Target: the estimate in `stack/01` before the measurement: about 1 to 2 minutes of one core per simulated day, and bursts of up to a few thousand hit rolls per second for a few seconds.
+- Measured (M5 Issue 8, `battle_map/benchmark_results`): one loaded synthetic 10 × 50 km map takes about 152 MB (40 MB ground, 111 MB objects), from `battle_pathfinding`'s navigation model. Packing it is left to a later optimisation (designer, 2026-11-04).
+- Measured (M5 Issue 19, `battle_host/bin/load_test.dart`, AOT, the real map `saint_lo`; method and figures in `stack/01`): about 3 s of one core per simulated day; 36 µs per second on average, 0.2 ms at p99, about 80 ms in the busiest second of the opening burst (465 orders). The map takes about 340 MB loaded and 390 MB with its searches prepared; each battle adds about 3 MB; ten battles bursting in the same second take 0.9 s, so a one-core process holds about 10 battles. With the write-ahead log on disk, one `fsync` per order (2.3 ms on the development laptop) makes the burst's busiest second take 1.1 s. The first run took 14 s a day: two listeners scanned every unit for each section after each order; they now make one pass. Copying the state's unit map on each change is the next cost (about 30 % of an order).
+- Measured (M6 Issue 3, the same load test, same machine): the fog of war of the 1,000-unit battle costs about **1.3 s of one core per simulated day**: 15 µs per tick on average, 0.43 ms at p99, 1.0 ms at p99.9, 22 ms at the busiest tick of the opening burst; 402,000 sight lines checked in the day. Its first tick computes every set at once: 0.35 s, as after a recovery. The hill check makes the host's own work about 5 % dearer (4.0 s a day against 3.8 s measured again on the same machine).
+- A section's machine guns fire 8 shots a second each: the host's rate limit (M6 Issue 5, `stack/03`) lets a whole section's AP through at once. The load test lifts it all the same.
 - Where: `stack/01`.
 
 ### P-03 Battle log volume (M2 Issue 2)
 - Measure: bytes per logged event, events per second, and the upload size per 10-second batch.
 - Target: about 0.4 MB per battle per day, 2.4 MB at worst (estimates), in at most about 4,000 files a day (only 10-second intervals with new entries upload). The Appwrite limits must hold: the local instance in development, the Cloud plan's quotas live (`stack/02`).
+- Measured (M5 Issue 19, the load test's 1,000-unit day on `saint_lo`): 7,837 entries (8,635 events), 115 bytes an entry, 0.86 MB a day; 836 uploads, 91 bytes compressed at the median, 301 on average, 73 kB for the opening burst's busiest interval; 0.24 MB uploaded a day. The snapshot of 1,000 units is 442 kB, 38 kB compressed. Under the targets.
 - Measured (M5 Issue 15, the scripted battle of `battle_host`'s tests: 38 entries over 34 hours, 28 of them in the first 8 minutes, about 0.06 a second): 57 bytes an entry in the binary log, 54 an event; one upload per 10-second interval with entries, 1 to 9 entries each, 53 to 312 bytes compressed (151 on average; gzip adds about 20 bytes to each file, so one-entry uploads barely shrink). At 4,000 entries a day that is about 0.23 MB, 1.4 MB at 24,000: under the targets. A snapshot of its 17 units is 8.9 kB, 1.8 kB compressed. The Appwrite limits are not checked yet: the local instance was not reachable from the dev container.
 - Where: `stack/02`.
 
@@ -53,9 +58,9 @@ Conventions:
 ## Order
 1. P-01 with M3 Issue 6 (done), and again with M5 when the host shares the search data between movers.
 2. P-02 and P-03 with M5, when the simulation host exists.
-3. P-04 with M6, when the protocol exists.
+3. P-04 with M6 Issue 8, over the network.
 4. P-05 and P-06 as the first M7 task, before the client is built.
 5. P-07 with M3 Issue 5 and again with M5.
 
 ## Open
-- The number of battles per process (after P-02).
+- P-01 across the map on real data (above).

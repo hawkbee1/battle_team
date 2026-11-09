@@ -14,7 +14,7 @@ The game design lives in `plan/`. **Read it before writing game logic.**
 - `plan/specs/00-overview.md`: numbered design decisions (the history of why).
 - `plan/specs/95-open-questions.md` and `plan/specs/96-design-risks.md`: what is still open.
 - `plan/data/*.yaml`: every number of the game (stats, costs, tables, battle-setting defaults).
-- `plan/milestones/*.md`: milestones and their issues. M2 to M4 are done; M5 (simulation host and persistence) comes next.
+- `plan/milestones/*.md`: milestones and their issues. M2 to M5 are done; M6 (networking) comes next.
 - `plan/stack/*.md`: technical stack decision records.
 - Work sessions, one per milestone issue: hawkbee `docs/battle_team/`.
 
