@@ -96,6 +96,15 @@ class PlaytestState extends Equatable {
   /// The selected unit, while the section sees it.
   UnitView? get selected => units[selectedId];
 
+  /// The player's section's units, deployed or stored, in ID order.
+  List<UnitView> get sectionUnits {
+    final mine = [
+      for (final unit in units.values)
+        if (unit.sectionId == sectionId) unit,
+    ];
+    return mine..sort((a, b) => a.unitId.compareTo(b.unitId));
+  }
+
   /// This state with the values given; [selectedId] and [notice] are
   /// functions so that they can be cleared.
   PlaytestState copyWith({

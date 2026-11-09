@@ -37,6 +37,24 @@ const redSoldier = UnitView(
   position: Position(50500, 20000, 3000),
 );
 
+/// A blue soldier in storage: no place on the map (HQ-33).
+const storedSoldier = UnitView(
+  unitId: 's-1',
+  unitType: 'soldier',
+  sectionId: 's-blue',
+  team: 'blue',
+  hp: 100,
+  maxHp: 100,
+  private: UnitPrivate(
+    place: UnitPlace.stored,
+    ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
+    morale: 100,
+    rounds: 10,
+    xpEarned: 0,
+    xpUnspent: 0,
+  ),
+);
+
 /// The blue section's whole view.
 const blueView = SectionView(
   at: Duration(hours: 1),

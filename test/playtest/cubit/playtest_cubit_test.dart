@@ -101,6 +101,56 @@ void main() {
       expect(cubit.state.notice!.accepted, isFalse);
     });
 
+    test(
+      'deploys a stored unit of the section, and shows the answer',
+      () async {
+        await cubit.start();
+        await until((state) => state.units.isNotEmpty);
+
+        await cubit.deploy('nobody');
+        await cubit.deploy('r-1');
+        expect(host.orders, isEmpty);
+
+        host.refusal = 'not_in_storage';
+        await cubit.deploy('c-1');
+
+        expect(host.orders.single, const Deploy(unitId: 'c-1'));
+        expect(
+          cubit.state.notice,
+          const OrderNotice(
+            order: 'deploy',
+            unitId: 'c-1',
+            refusal: 'not_in_storage',
+          ),
+        );
+      },
+    );
+
+    test('lists the units of its section, deployed or stored', () async {
+      host = FakeHost(
+        view: const SectionView(
+          at: Duration(hours: 1),
+          section: SectionPrivate(money: 0, xp: 0),
+          units: [blueCommander, storedSoldier, redSoldier],
+          hqs: [],
+          relics: [],
+          world: [],
+        ),
+      );
+      cubit = cubitOf(fakeClient(host));
+      await cubit.start();
+      await until((state) => state.units.length == 3);
+
+      expect(cubit.state.sectionUnits.map((unit) => unit.unitId), [
+        'c-1',
+        's-1',
+      ]);
+      cubit.select('s-1');
+      expect(cubit.state.selectedId, 's-1');
+      cubit.select('r-1');
+      expect(cubit.state.selectedId, isNull);
+    });
+
     test('shows why it stopped', () async {
       await cubit.start();
       await until((state) => state.status == PlaytestStatus.playing);

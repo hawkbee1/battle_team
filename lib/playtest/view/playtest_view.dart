@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:battle_map/battle_map.dart';
+import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/playtest/cubit/playtest_cubit.dart';
 import 'package:battle_team/playtest/world/battle_space.dart';
@@ -86,24 +87,33 @@ class _PlaytestViewState extends State<PlaytestView> {
     if (centreOnUnits) _centreOnSection(state);
   }
 
-  /// Looks at the section's units the first time it sees them.
+  /// Looks at the section's units the first time it sees them, or at its
+  /// HQ while none is out; `force` looks again (the Centre button).
   bool _centred = false;
-  void _centreOnSection(PlaytestState state) {
-    if (_centred) return;
+  void _centreOnSection(PlaytestState state, {bool force = false}) {
+    if (_centred && !force) return;
     final mine = [
-      for (final unit in state.units.values)
-        if (unit.sectionId == state.sectionId && unit.position != null)
-          worldOf(unit.position!),
+      for (final unit in state.sectionUnits)
+        if (unit.position != null) worldOf(unit.position!),
     ];
-    if (mine.isEmpty) return;
-    _centred = true;
+    final home = [
+      for (final hq in state.hqs)
+        if (hq.team == state.team) worldOf(hq.position),
+    ];
+    final points = mine.isNotEmpty ? mine : home;
+    if (points.isEmpty) return;
+    if (mine.isNotEmpty) _centred = true;
     final sum =
-        mine.fold(Vector3.zero(), (a, b) => a + b) / mine.length.toDouble();
+        points.fold(Vector3.zero(), (a, b) => a + b) / points.length.toDouble();
     sum.y = widget.world.surface.heightAt(sum.x, -sum.z);
     _camera
       ..target = sum
       ..distance = 120;
+    _frame.value++;
   }
+
+  void _centreNow() =>
+      _centreOnSection(context.read<PlaytestCubit>().state, force: true);
 
   void _tick(double seconds) {
     widget.world.tick(seconds);
@@ -246,6 +256,11 @@ class _PlaytestViewState extends State<PlaytestView> {
               child: _Header(help: context.l10n.playtestHelp),
             ),
             Positioned(
+              right: 12,
+              top: 96,
+              child: _UnitsPanel(onCentre: _centreNow),
+            ),
+            Positioned(
               left: 12,
               bottom: 12,
               child: ValueListenableBuilder(
@@ -295,6 +310,67 @@ class _Header extends StatelessWidget {
             child: Text(help, style: const TextStyle(fontSize: 12)),
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// The section's units, deployed or stored: a tap selects one, Deploy
+/// brings a stored one out to the HQ, Centre looks at the section again.
+class _UnitsPanel extends StatelessWidget {
+  const new({required this.onCentre});
+
+  final VoidCallback onCentre;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final cubit = context.watch<PlaytestCubit>();
+    final units = cubit.state.sectionUnits;
+    return _Panel(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.playtestUnits),
+              TextButton(onPressed: onCentre, child: Text(l10n.playtestCentre)),
+            ],
+          ),
+          for (final unit in units) _UnitRow(unit: unit),
+        ],
+      ),
+    );
+  }
+}
+
+class _UnitRow extends StatelessWidget {
+  const new({required this.unit});
+
+  final UnitView unit;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final cubit = context.read<PlaytestCubit>();
+    final stored = unit.private?.place == UnitPlace.stored;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(
+          onPressed: () => cubit.select(unit.unitId),
+          child: Text(
+            '${unit.unitType} · '
+            '${stored ? l10n.playtestStored : l10n.playtestInField}',
+          ),
+        ),
+        if (stored)
+          TextButton(
+            onPressed: () => cubit.deploy(unit.unitId),
+            child: Text(l10n.playtestDeploy),
+          ),
       ],
     );
   }

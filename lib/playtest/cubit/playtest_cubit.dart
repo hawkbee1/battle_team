@@ -87,19 +87,30 @@ class PlaytestCubit extends Cubit<PlaytestState> {
   /// Selects [unitId] when it is one of the section's units; anything else
   /// clears the selection.
   void select(String? unitId) {
-    final unit = state.units[unitId];
-    final mine = unit != null && unit.sectionId == state.sectionId;
+    final mine = state.sectionUnits.any((unit) => unit.unitId == unitId);
     emit(state.copyWith(selectedId: () => mine ? unitId : null));
   }
 
   /// Orders the selected unit to move to [to].
   Future<void> moveSelectedTo(Position to) async {
     final unit = state.selected;
-    if (unit == null || state.status != PlaytestStatus.playing) return;
+    if (unit == null) return;
+    await _order(unit.unitId, 'move', Move(unitId: unit.unitId, to: to));
+  }
+
+  /// Brings the stored unit [unitId] of the section out next to its storage
+  /// place, the HQ (HQ-33). Nothing happens for another section's unit.
+  Future<void> deploy(String unitId) async {
+    if (!state.sectionUnits.any((unit) => unit.unitId == unitId)) return;
+    await _order(unitId, 'deploy', Deploy(unitId: unitId));
+  }
+
+  /// Sends [order] for [unitId] while playing, and shows the host's answer.
+  Future<void> _order(String unitId, String name, Order order) async {
+    if (state.status != PlaytestStatus.playing) return;
     String? refusal;
     try {
-      final answer = await client.send(Move(unitId: unit.unitId, to: to));
-      refusal = answer.refusal;
+      refusal = (await client.send(order)).refusal;
     } on Object catch (error) {
       refusal = '$error';
     }
@@ -107,7 +118,7 @@ class PlaytestCubit extends Cubit<PlaytestState> {
     emit(
       state.copyWith(
         notice: () =>
-            OrderNotice(order: 'move', unitId: unit.unitId, refusal: refusal),
+            OrderNotice(order: name, unitId: unitId, refusal: refusal),
       ),
     );
   }

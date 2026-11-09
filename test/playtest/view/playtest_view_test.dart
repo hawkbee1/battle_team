@@ -191,6 +191,45 @@ void main() {
       );
     });
 
+    testWidgets("lists the section's units, and deploys a stored one", (
+      tester,
+    ) async {
+      when(() => cubit.state).thenReturn(
+        _playing.copyWith(
+          units: {
+            'c-1': blueCommander,
+            's-1': storedSoldier,
+            'r-1': redSoldier,
+          },
+        ),
+      );
+      when(() => cubit.deploy(any())).thenAnswer((_) async {});
+      await pump(tester);
+
+      expect(find.textContaining('commander · in the field'), findsOneWidget);
+      expect(find.textContaining('soldier · stored'), findsOneWidget);
+      expect(find.textContaining('soldier · in the field'), findsNothing);
+      // Only the stored unit can be deployed.
+      expect(find.text('Deploy'), findsOneWidget);
+
+      await tester.tap(find.text('Deploy'));
+      verify(() => cubit.deploy('s-1')).called(1);
+    });
+
+    testWidgets(
+      'Centre looks at the section again, and selects from its list',
+      (tester) async {
+        await pump(tester);
+        await tester.tap(find.text('Centre'));
+        await tester.pump();
+
+        expect(find.text('commander'), findsOneWidget);
+
+        await tester.tap(find.textContaining('commander · in the field'));
+        verify(() => cubit.select('c-1')).called(1);
+      },
+    );
+
     testWidgets('pans, zooms and turns with the mouse, fingers and keys', (
       tester,
     ) async {
