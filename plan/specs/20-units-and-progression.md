@@ -109,6 +109,7 @@ XP belongs to the unit and persists across the battles of a **war**. A section (
 - **UNIT-36** **Radio**: purchasable by a commander. Gathers info from team scouts in its area (evolvable range) and shares it with all sections. Slow, not transportable.
 - **UNIT-37** **Transports** (truck, boat): carry units **by weight**: each unit has a weight; a transport has a total weight capacity and a maximum weight per carried unit (decision 91). Carried units **take a share of every hit** on the transport, computed with their own armor type, and are **ejected with explosion damage** when it is destroyed. (Decision 81) Stored units can never be harmed.
 - **UNIT-42** **Guild camp** (encampment, decision 141): a unit of the guild chief's section, outside his cap and never stored except between battles and at its team's elimination (decisions 208, 212). It moves slowly on its own, cannot fly, cannot reach floating islands (decision 88) and heals friendly units. Price, HP and armor: HQ-43.
+- **UNIT-44** **Test unit** (decision 239): a unit type for **testing battles only**, with `ap_max` **10,000** and **every action and ability** of the game. It exists only in a battle whose settings allow test units, never in a public war (Q-UNIT-26). It is the exception to decision 167's equal `ap_max`.
 
 ## 9. Open questions
 See `specs/95-open-questions.md`, section "Units and progression".
