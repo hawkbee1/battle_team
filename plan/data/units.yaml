@@ -154,6 +154,28 @@ units:
     actions: [capture]          # water only: does not push (decision 145)
     role: { max_total_weight: 4, max_unit_weight: 2 }   # boards/unloads next to the shore (decision 86)
 
+  # Testing battles only (UNIT-44, decision 239, Q-UNIT-26): bought where the battle setting
+  # test_units is on (data/battle.yaml), price 0 (data/economy.yaml). The one unit whose ap_max is
+  # not ap.max. A soldier's values, with every action and role of the roster, the roster's best
+  # sight (the scout's) and the longest range a unit can carry and still move (the rifle's).
+  test_unit:
+    category: soldier
+    movement_class: foot        # a unit has one movement class: infantry
+    armor_type: infantry
+    hit_box_m: { width: 0.6, length: 0.6, height: 1.8 }
+    base: { weight: 1, hp: 100, ap_max: 10000, ap_per_m: 1.0, attack: 12, defense: 5, move_speed: 5, vision_range: 300 }
+    weapons: { default: rifle, allowed: [rifle, machine_gun, anti_tank, artillery, anti_air, explosive] }
+    actions: [capture, push, build, repair, heal, observe]
+    role:
+      build: [bridge, reinforced_bridge, ladder, wall, road_segment, trap]   # the engineer's
+      repair: true
+      reports_to_radio: true                                                  # the scout's
+      observe: { vision_bonus_m: 30, duration_s: 1800, ap: 10, can_move: false }
+      heal: 20                                                                # the medic's
+      heal_ap: 10
+      relay_range: 150                                                        # the radio's
+      shares_with: all_sections_of_team
+
 # Progression (decisions 77-79)
 progression:
   xp_sources:                     # placeholders

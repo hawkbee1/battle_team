@@ -145,7 +145,7 @@ weapon_swap:
   time_s: 5
 
 ap:
-  # AP recovery rate: ap.recovery_per_hour in data/battle.yaml (decisions 168, 172).
+  # AP recovery rate: ap.recovery_delay_s in data/battle.yaml (decisions 168, 172, 238).
   at_zero: act_at_regen_rate    # decision 56: movement continues at the AP recovery speed; paid actions wait for enough AP
   # An action that is not in the unit's units.yaml `actions` is refused (decision 132).
   costs_ap: [shot, move, push, pickup_weapon, role_actions]
