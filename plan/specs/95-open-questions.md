@@ -117,6 +117,9 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-HQ-10** The HQ is not pushed: how does it move? → decision 177 (own AP, 0.2 AP per metre with the `push` profile, 5 m per hour; a unit in its path ends the order)
 - [x] **Q-HQ-11** A team left empty at the battle start has no HQ manager (HQ-07): who manages it once a newcomer joins? → decision 220 (the first player to log in, then any higher-ranking player who logs in)
 - [x] **Q-HQ-12** Decision 220: does a player who logs in take the role from a manager the role was delegated to, and who keeps it on an exact tie? → decision 227 (only if they would take it without the delegation)
+- [ ] **Q-HQ-13** Which storage place does a section's storage view show when its guild has a camp (HQ-27)? Assumed (M7.6): the team's HQ, the only storage place a section's view holds as such; the host decides the real portal (`portalOf`) and its refusals show as the host's. The view needs the portal's position if the camp is to be shown.
+- [ ] **Q-HQ-14** COMBAT-28 says a weapon is swapped while the unit is stored or next to its storage place, but the host's order chain refuses every unit order of a unit that is not on the field, `SwapWeapon` included. Assumed (M7.6): the host stays as it is and the app mirrors it (`not_on_field`); a swap from storage is a host change first (M8).
+- [ ] **Q-HQ-15** The recall in progress (HQ-32) reaches a client once, as `RecallBegan`; the whole view does not hold it, so a client that reconnects forgets when its recalls end. Assumed (M7.6): `HeldView` remembers `RecallBegan` until `UnitStored`, `UnitDeployed` or the unit's disappearance; a new sign-in shows no recall until a field unit is recalled again (the host then refuses it, `already_recalled`, if one runs). Proposal for M8: `UnitPrivate.recalledUntil`.
 
 ## Economy (60)
 - [x] **Q-ECO-01** Prices of each troop type, radio and encampment. → decision 112 (default 100 w€)

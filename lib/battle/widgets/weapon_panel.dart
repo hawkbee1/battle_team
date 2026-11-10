@@ -1,6 +1,7 @@
 import 'package:battle_client/battle_client.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
+import 'package:battle_team/battle/widgets/wait_format.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
@@ -112,7 +113,7 @@ class WeaponPanel extends StatelessWidget {
       switch (firing) {
         PreCheckRefused() => _refusal(l10n, firing),
         PreCheckPassed(:final apWait) when apWait > Duration.zero =>
-          l10n.battleApWait(_format(apWait)),
+          l10n.battleApWait(formatWait(apWait)),
         PreCheckPassed() => null,
       };
 
@@ -121,14 +122,6 @@ class WeaponPanel extends StatelessWidget {
         PreCheckRefused(:final reason) => l10n.battleRefusal(reason.code),
         PreCheckPassed() => null,
       };
-
-  /// A wait, in the largest unit that fits (the symbols are the same in
-  /// English and French).
-  static String _format(Duration wait) => switch (wait) {
-    Duration(inHours: >= 1) => '${(wait.inMinutes / 60).toStringAsFixed(1)} h',
-    Duration(inMinutes: >= 1) => '${wait.inMinutes} min',
-    _ => '${wait.inSeconds} s',
-  };
 }
 
 /// {@template aim_reticle}

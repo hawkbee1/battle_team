@@ -10,7 +10,7 @@ OrderPreCheck testPreCheck() => OrderPreCheck(
     File('plan/data/combat.yaml').readAsStringSync(),
   ),
   units: rules.UnitsData.parse(File('plan/data/units.yaml').readAsStringSync()),
-  storeRadiusM: rules.BattleSettings.parse(
+  storage: rules.BattleSettings.parse(
     File('plan/data/battle.yaml').readAsStringSync(),
-  ).storage.storeRadiusM,
+  ).storage,
 );

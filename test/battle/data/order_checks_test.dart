@@ -8,7 +8,7 @@ void main() {
 
   group('loadOrderPreCheck', () {
     test(
-      'M7.5 reads the weapons, the unit types and the storage radius',
+      'M7.5 reads the weapons, the unit types and the storage numbers',
       () async {
         final check = await loadOrderPreCheck(rootBundle);
 
@@ -16,6 +16,9 @@ void main() {
         expect(check.weaponType('rifle')?.rangeM, 400);
         expect(check.units.unitTypes, contains('soldier'));
         expect(check.storeRadiusM, 10);
+        expect(check.storage.recallS, 21600);
+        expect(check.storage.deployAp, 10);
+        expect(check.storage.deployBlockRadiusM, 20);
         expect(check, isA<OrderPreCheck>());
       },
     );

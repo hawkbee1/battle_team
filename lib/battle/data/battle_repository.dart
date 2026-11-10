@@ -92,6 +92,7 @@ class BattleRepository {
       hqs: view.hqs.values.toList(),
       relics: view.relics.values.toList(),
       section: view.section,
+      recalls: Map.of(view.recalls),
       team: seat?.team,
       sectionId: seat?.sectionId,
     );

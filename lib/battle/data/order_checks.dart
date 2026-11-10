@@ -10,7 +10,7 @@ const combatAsset = 'plan/data/combat.yaml';
 const battleAsset = 'plan/data/battle.yaml';
 
 /// The order pre-check (stack decision 8) from the app's assets: the plan's
-/// own weapons, unit types and default storage radius. A battle that
+/// own weapons, unit types and default storage numbers. A battle that
 /// overrides a setting may differ from it; the pre-check is for display and
 /// the host's answer wins (decision 3).
 ///
@@ -19,7 +19,6 @@ Future<OrderPreCheck> loadOrderPreCheck(AssetBundle bundle) async =>
     OrderPreCheck(
       combat: rules.CombatData.parse(await bundle.loadString(combatAsset)),
       units: rules.UnitsData.parse(await bundle.loadString(unitsAsset)),
-      storeRadiusM: rules.BattleSettings.parse(
-        await bundle.loadString(battleAsset),
-      ).storage.storeRadiusM,
+      storage: rules.BattleSettings.parse(await bundle.loadString(battleAsset))
+          .storage,
     );

@@ -107,15 +107,11 @@
   "@battleStored": {
     "description": "A unit kept in storage, not on the map"
   },
-  "battleDeploy": "Deploy",
-  "@battleDeploy": {
-    "description": "Brings a stored unit out to the HQ"
-  },
   "battleCentre": "Centre",
   "@battleCentre": {
     "description": "Looks at the section's units again"
   },
-  "battleOrderName": "{order, select, move{move} deploy{deploy} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} other{order}}",
+  "battleOrderName": "{order, select, move{move} deploy{deploy} store{store} recall{recall} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} other{order}}",
   "@battleOrderName": {
     "description": "An order, as a word, in the host's answer to it",
     "placeholders": {
@@ -209,7 +205,7 @@
       }
     }
   },
-  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} other{{code}}}",
+  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} not_stored{The unit is not in storage} is_prisoner{A prisoner cannot be deployed} section_locked{The section is locked} blocked_by_enemy{An enemy is near the portal} never_stored{This unit is never stored} carries_units{Unload the passengers first} already_recalled{Already recalled} other{{code}}}",
   "@battleRefusal": {
     "description": "Why an order is refused, as the host or the pre-check says it",
     "placeholders": {
@@ -219,5 +215,148 @@
   "battleHelpFireAtPosition": "Tap the ground to fire there · press the button again or Esc to cancel",
   "@battleHelpFireAtPosition": {
     "description": "Shown while the next tap on the ground fires"
+  },
+  "storageOpen": "Storage ({count})",
+  "@storageOpen": {
+    "description": "Opens the storage view; the number of units in storage",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "storageTitle": "Storage",
+  "@storageTitle": {
+    "description": "Heading of the storage view"
+  },
+  "storageClose": "Close",
+  "@storageClose": {
+    "description": "Closes the storage view"
+  },
+  "storagePortal": "Portal: the HQ. Units deploy next to it.",
+  "@storagePortal": {
+    "description": "Where stored units are deployed"
+  },
+  "storageDeployCost": "Deploying costs {ap} AP",
+  "@storageDeployCost": {
+    "description": "What a deployment costs a unit",
+    "placeholders": {
+      "ap": {
+        "type": "String"
+      }
+    }
+  },
+  "storageLocked": "Locked for {time}: no unit can deploy",
+  "@storageLocked": {
+    "description": "The section's full storage lock and the time it has left (HQ-35)",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "storageBlocked": "Blocked: an enemy is within {metres} m of the portal",
+  "@storageBlocked": {
+    "description": "An enemy the section sees blocks deployment (HQ-36)",
+    "placeholders": {
+      "metres": {
+        "type": "String"
+      }
+    }
+  },
+  "storageEmpty": "No unit in storage",
+  "@storageEmpty": {
+    "description": "The storage holds no unit"
+  },
+  "storageUnit": "{type} · HP {hp}/{max} · AP {ap}",
+  "@storageUnit": {
+    "description": "A stored unit",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "hp": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      },
+      "ap": {
+        "type": "String"
+      }
+    }
+  },
+  "storageDeploy": "Deploy",
+  "@storageDeploy": {
+    "description": "Brings a stored unit out next to the portal"
+  },
+  "storageDeployUnit": "Deploy {type}",
+  "@storageDeployUnit": {
+    "description": "Screen reader label of a deploy button",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "storageRecalls": "Recalls in progress",
+  "@storageRecalls": {
+    "description": "Heading of the units on their way to storage"
+  },
+  "storageRecall": "{type}: stored in {time}",
+  "@storageRecall": {
+    "description": "A recalled unit and the time its recall has left",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "storagePrisoners": "Prisoners ({count})",
+  "@storagePrisoners": {
+    "description": "Heading of the prisoners the section holds",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "storageStoreNow": "Store now",
+  "@storageStoreNow": {
+    "description": "Stores a unit next to its portal at once (HQ-31)"
+  },
+  "storageRecallIn": "Recall ({time})",
+  "@storageRecallIn": {
+    "description": "Recalls a unit from afar; the time it takes (HQ-32)",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "storageRecalling": "Recalled: stored in {time}",
+  "@storageRecalling": {
+    "description": "A unit whose recall runs",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "storageStoreUnit": "Store {type}",
+  "@storageStoreUnit": {
+    "description": "Screen reader label of a store button",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "storageNotInSight": "The portal is not in sight",
+  "@storageNotInSight": {
+    "description": "The HQ is not in the section's view"
   }
 }
