@@ -233,6 +233,228 @@ void main() {
       });
     });
 
+    group('view from a unit', () {
+      /// The blue commander as a later update shows it.
+      UnitView commanderWith({
+        double hp = 200,
+        UnitPlace place = UnitPlace.deployed,
+        bool onMap = true,
+        Position at = const Position(50900, 5900, 3000),
+      }) => UnitView(
+        unitId: 'c-1',
+        unitType: 'commander',
+        sectionId: 's-blue',
+        team: 'blue',
+        hp: hp,
+        maxHp: 200,
+        position: onMap ? at : null,
+        private: UnitPrivate(
+          place: place,
+          ap: blueCommander.private!.ap,
+          morale: 100,
+          rounds: 10,
+          xpEarned: 0,
+          xpUnspent: 0,
+        ),
+      );
+
+      BattleSnapshot withCommander(UnitView? commander) => BattleSnapshot(
+        units: {'c-1': ?commander, 'r-1': redSoldier},
+        hqs: _snapshot.hqs,
+        relics: _snapshot.relics,
+        team: 'blue',
+        sectionId: 's-blue',
+      );
+
+      blocTest<BattleCubit, BattleState>(
+        'decision 5 first person enters from an own unit and leaves to '
+        'top-down',
+        build: () => cubit,
+        act: (cubit) async {
+          await play();
+          cubit
+            ..select('c-1')
+            ..enterFirstPerson()
+            ..leaveFirstPerson();
+        },
+        skip: 2,
+        expect: () => [
+          isA<BattleState>().having(
+            (state) => state.selectedId,
+            'selected',
+            'c-1',
+          ),
+          isA<BattleState>()
+              .having(
+                (state) => state.viewMode,
+                'mode',
+                const FirstPersonMode('c-1'),
+              )
+              .having((state) => state.seenFrom, 'seen from', blueCommander),
+          isA<BattleState>()
+              .having((state) => state.viewMode, 'mode', const TopDownMode())
+              .having((state) => state.seenFrom, 'seen from', isNull),
+        ],
+      );
+
+      test('decision 5 starts and stays in top-down until asked', () async {
+        await play();
+
+        expect(cubit.state.viewMode, const TopDownMode());
+        cubit.leaveFirstPerson();
+        expect(cubit.state.viewMode, const TopDownMode());
+      });
+
+      test('decision 5 cannot enter first person without a unit of the '
+          'section on the field', () async {
+        await play();
+        cubit.enterFirstPerson();
+        expect(cubit.state.viewMode, const TopDownMode());
+
+        // A stored unit is selectable but has no eyes on the field.
+        snapshots.add(
+          BattleSnapshot(
+            units: const {'s-1': storedSoldier, 'r-1': redSoldier},
+            hqs: _snapshot.hqs,
+            relics: _snapshot.relics,
+            team: 'blue',
+            sectionId: 's-blue',
+          ),
+        );
+        cubit
+          ..select('s-1')
+          ..enterFirstPerson();
+        expect(cubit.state.selectedId, 's-1');
+        expect(cubit.state.viewMode, const TopDownMode());
+      });
+
+      for (final (name, commander) in [
+        ('is stored', commanderWith(place: UnitPlace.stored, onMap: false)),
+        ('is carried', commanderWith(place: UnitPlace.carried)),
+        ('dies', commanderWith(hp: 0)),
+        ('has no place on the map', commanderWith(onMap: false)),
+        ('leaves the section sight', null),
+      ]) {
+        test('decision 5 first person ends when the unit $name', () async {
+          await play();
+          cubit
+            ..select('c-1')
+            ..enterFirstPerson();
+          expect(cubit.state.viewMode, const FirstPersonMode('c-1'));
+
+          snapshots.add(withCommander(commander));
+
+          expect(cubit.state.viewMode, const TopDownMode());
+        });
+      }
+
+      test('decision 5 first person goes on while the unit moves and fights, '
+          'and the view follows it', () async {
+        await play();
+        cubit
+          ..select('c-1')
+          ..enterFirstPerson();
+
+        snapshots.add(withCommander(commanderWith(hp: 120)));
+
+        expect(cubit.state.viewMode, const FirstPersonMode('c-1'));
+        expect(cubit.state.seenFrom?.hp, 120);
+        expect(
+          cubit.state.seenFrom?.position,
+          const Position(50900, 5900, 3000),
+        );
+      });
+
+      test('decision 5 first person ends when another unit is selected or '
+          'the selection clears, and goes on for the same unit', () async {
+        await play();
+        snapshots.add(
+          BattleSnapshot(
+            units: const {
+              'c-1': blueCommander,
+              's-1': storedSoldier,
+              'r-1': redSoldier,
+            },
+            hqs: _snapshot.hqs,
+            relics: _snapshot.relics,
+            team: 'blue',
+            sectionId: 's-blue',
+          ),
+        );
+        cubit
+          ..select('c-1')
+          ..enterFirstPerson()
+          ..select('c-1');
+        expect(cubit.state.viewMode, const FirstPersonMode('c-1'));
+
+        cubit.select('s-1');
+        expect(cubit.state.viewMode, const TopDownMode());
+        expect(cubit.state.selectedId, 's-1');
+
+        cubit
+          ..select('c-1')
+          ..enterFirstPerson()
+          ..select(null);
+        expect(cubit.state.viewMode, const TopDownMode());
+        expect(cubit.state.selectedId, isNull);
+      });
+
+      test('decision 5 a move order from first person is the same Move '
+          'order', () async {
+        await play();
+        cubit
+          ..select('c-1')
+          ..enterFirstPerson();
+
+        await cubit.moveSelectedTo(const Position(52000, 9000, 3100));
+
+        verify(
+          () => repository.send(
+            const Move(unitId: 'c-1', to: Position(52000, 9000, 3100)),
+          ),
+        ).called(1);
+        expect(cubit.state.viewMode, const FirstPersonMode('c-1'));
+        expect(cubit.state.notice?.accepted, isTrue);
+      });
+
+      group('logs', () {
+        late LogCapture log;
+
+        setUp(() => log = LogCapture());
+
+        tearDown(() => log.cancel());
+
+        test('M7.4 enters, leaves and ends, and names no unit', () async {
+          await play();
+          log.records.clear();
+          cubit
+            ..select('c-1')
+            ..enterFirstPerson()
+            ..leaveFirstPerson()
+            ..enterFirstPerson()
+            ..select(null)
+            ..select('c-1')
+            ..enterFirstPerson();
+          snapshots.add(withCommander(null));
+
+          expect(
+            log.lines,
+            equals([
+              'INFO first person entered',
+              'INFO first person left',
+              'INFO first person entered',
+              'INFO first person ended: the selection changed',
+              'INFO first person entered',
+              'INFO first person ended: the unit is gone',
+            ]),
+          );
+          for (final text in log.texts) {
+            expect(text, isNot(contains('c-1')));
+          }
+        });
+      });
+    });
+
     test('M7.1 shows the battle time and the AP between updates', () async {
       when(() => repository.battleTime).thenReturn(const Duration(hours: 1));
       when(() => repository.apNow(any())).thenReturn(30);

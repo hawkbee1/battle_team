@@ -65,16 +65,22 @@ class BattleCubit extends Cubit<BattleState> {
     );
   }
 
-  void _onSnapshot(BattleSnapshot snapshot) => emit(
-    state.copyWith(
+  void _onSnapshot(BattleSnapshot snapshot) {
+    final next = state.copyWith(
       units: snapshot.units,
       hqs: snapshot.hqs,
       relics: snapshot.relics,
       team: snapshot.team,
       sectionId: snapshot.sectionId,
       revision: state.revision + 1,
-    ),
-  );
+    );
+    // The unit whose eyes the player looks through died, was stored or left
+    // the section's sight: back to the overview.
+    final lost =
+        next.viewMode is FirstPersonMode && !next.canSeeFrom(next.seenFrom);
+    if (lost) _log.info('first person ended: the unit is gone');
+    emit(lost ? next.copyWith(viewMode: const TopDownMode()) : next);
+  }
 
   /// The battle time now, as the client shows it.
   Duration? get battleTime => repository.battleTime;
@@ -86,10 +92,36 @@ class BattleCubit extends Cubit<BattleState> {
   };
 
   /// Selects [unitId] when it is one of the section's units; anything else
-  /// clears the selection.
+  /// clears the selection. Selecting another unit than the one the battle is
+  /// seen from goes back to the overview.
   void select(String? unitId) {
     final mine = state.sectionUnits.any((unit) => unit.unitId == unitId);
-    emit(state.copyWith(selectedId: () => mine ? unitId : null));
+    final selected = mine ? unitId : null;
+    final mode = state.viewMode;
+    final leaves = mode is FirstPersonMode && mode.unitId != selected;
+    if (leaves) _log.info('first person ended: the selection changed');
+    emit(
+      state.copyWith(
+        selectedId: () => selected,
+        viewMode: leaves ? const TopDownMode() : null,
+      ),
+    );
+  }
+
+  /// Sees the battle through the eyes of the selected unit (decision 5),
+  /// when it is one of the section's, alive and on the field.
+  void enterFirstPerson() {
+    final unit = state.selected;
+    if (unit == null || !state.canSeeFrom(unit)) return;
+    _log.info('first person entered');
+    emit(state.copyWith(viewMode: FirstPersonMode(unit.unitId)));
+  }
+
+  /// Back to the overview from a unit's eyes.
+  void leaveFirstPerson() {
+    if (state.viewMode is! FirstPersonMode) return;
+    _log.info('first person left');
+    emit(state.copyWith(viewMode: const TopDownMode()));
   }
 
   /// Orders the selected unit to move to [to].

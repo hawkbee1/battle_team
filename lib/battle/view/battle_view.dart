@@ -4,13 +4,17 @@ import 'dart:math' as math;
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
+import 'package:battle_team/battle/data/unit_bodies.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:vector_math/vector_math.dart' show Vector3, degrees2Radians;
 
@@ -19,15 +23,21 @@ import 'package:vector_math/vector_math.dart' show Vector3, degrees2Radians;
 typedef BattleSceneBuilder = Widget Function(
   BuildContext context,
   BattleWorld world,
-  TopDownCamera camera,
+  BattleCamera camera,
   void Function(double seconds) onTick,
 );
 
 /// {@template battle_view}
-/// The battle seen from above: the map of [map] in [world], the units the
-/// section sees, and the orders of the player. Drag to pan, scroll or pinch
-/// to zoom, Q/E or two fingers to turn; tap one of your units, then the
-/// ground, to move it there.
+/// The battle seen from above, or through the eyes of one of the section's
+/// units (decision 5): the map of [map] in [world], the units the section
+/// sees, and the orders of the player. From above, drag to pan, scroll or
+/// pinch to zoom, Q/E or two fingers to turn; tap one of your units, then the
+/// ground, to move it there. From a unit, drag to look and tap the ground to
+/// move there.
+///
+/// The cubit's view mode picks the camera (Strategy, `BattleCamera`): the
+/// view keeps one of each, so that coming back from a unit finds the overview
+/// where it was. The world draws the same units from either.
 /// {@endtemplate}
 class BattleView extends StatefulWidget {
   /// {@macro battle_view}
@@ -35,6 +45,7 @@ class BattleView extends StatefulWidget {
     required this.map,
     required this.world,
     required this.sceneBuilder,
+    required this.bodies,
     super.key,
   });
 
@@ -47,12 +58,18 @@ class BattleView extends StatefulWidget {
   /// Builds the 3D area.
   final BattleSceneBuilder sceneBuilder;
 
+  /// The unit types' bodies, which the eyes of a unit are placed by.
+  final UnitBodies bodies;
+
   @override
   State<BattleView> createState() => _BattleViewState();
 }
 
 class _BattleViewState extends State<BattleView> {
-  late final TopDownCamera _camera;
+  static final _log = Logger('battle_team.BattleView');
+
+  late final TopDownCamera _topDown;
+  FirstPersonCamera? _firstPerson;
   final _frame = ValueNotifier<int>(0);
   final _focus = FocusNode();
   double _lastScale = 1;
@@ -65,9 +82,13 @@ class _BattleViewState extends State<BattleView> {
     final surface = widget.world.surface;
     final centre = Vector3(surface.widthM / 2, 0, -surface.depthM / 2);
     centre.y = surface.heightAt(centre.x, -centre.z);
-    _camera = TopDownCamera(target: centre, distance: 700);
+    _topDown = TopDownCamera(target: centre, distance: 700);
+    widget.world.useCamera(_topDown);
     _show(context.read<BattleCubit>().state, centreOnUnits: true);
   }
+
+  /// The camera of the view mode now.
+  BattleCamera get _camera => _firstPerson ?? _topDown;
 
   @override
   void dispose() {
@@ -106,10 +127,41 @@ class _BattleViewState extends State<BattleView> {
     final sum =
         points.fold(Vector3.zero(), (a, b) => a + b) / points.length.toDouble();
     sum.y = widget.world.surface.heightAt(sum.x, -sum.z);
-    _camera
+    _topDown
       ..target = sum
       ..distance = 120;
     _frame.value++;
+  }
+
+  /// Follows the cubit's view mode: sees through the eyes of its unit, or
+  /// goes back to the overview.
+  void _syncCamera(BattleState state) {
+    final mode = state.viewMode;
+    if (mode is FirstPersonMode && _firstPerson?.unitId != mode.unitId) {
+      _enterFirstPerson(state, mode.unitId);
+    } else if (mode is TopDownMode && _firstPerson != null) {
+      setState(() => _firstPerson = null);
+      widget.world.useCamera(_topDown);
+    }
+  }
+
+  void _enterFirstPerson(BattleState state, String unitId) {
+    final unit = state.units[unitId]!;
+    final eye = widget.bodies.eyeHeightOf(unit.unitType);
+    if (eye == null) {
+      // Data the app does not know (an older client): stay above.
+      _log.warning('first person unavailable: no body for the unit type');
+      context.read<BattleCubit>().leaveFirstPerson();
+      return;
+    }
+    final camera = FirstPersonCamera(
+      unitId: unitId,
+      eyeHeightM: eye,
+      feet: widget.world.drawn[unitId]!,
+      yaw: _topDown.heading,
+    );
+    setState(() => _firstPerson = camera);
+    widget.world.useCamera(camera);
   }
 
   void _centreNow() =>
@@ -117,6 +169,13 @@ class _BattleViewState extends State<BattleView> {
 
   void _tick(double seconds) {
     widget.world.tick(seconds);
+    // The eyes go where the unit is drawn: gliding to its destination
+    // (decision 236).
+    final inside = _firstPerson;
+    if (inside != null) {
+      final feet = widget.world.drawn[inside.unitId];
+      if (feet != null) inside.standAt(feet);
+    }
     _frame.value++;
   }
 
@@ -127,6 +186,7 @@ class _BattleViewState extends State<BattleView> {
     String? nearest;
     var best = 28.0;
     for (final MapEntry(key: id, value: drawn) in widget.world.drawn.entries) {
+      if (id == _camera.insideUnit) continue;
       final onScreen = view.project(drawn + Vector3(0, 3, 0));
       if (onScreen == null) continue;
       final distance = (onScreen - at).distance;
@@ -151,34 +211,69 @@ class _BattleViewState extends State<BattleView> {
 
   KeyEventResult _key(FocusNode node, KeyEvent event) {
     if (event is KeyUpEvent) return KeyEventResult.ignored;
-    const step = 60.0;
     final key = event.logicalKey;
-    final done = switch (key) {
+    final done = switch (_firstPerson) {
+      final inside? => _keyFirstPerson(inside, key),
+      null => _keyTopDown(key),
+    };
+    return done ? KeyEventResult.handled : KeyEventResult.ignored;
+  }
+
+  bool _keyTopDown(LogicalKeyboardKey key) {
+    const step = 60.0;
+    return switch (key) {
       LogicalKeyboardKey.arrowLeft => _do(
-        () => _camera.pan(const Offset(step, 0), _size),
+        () => _topDown.pan(const Offset(step, 0), _size),
       ),
       LogicalKeyboardKey.arrowRight => _do(
-        () => _camera.pan(const Offset(-step, 0), _size),
+        () => _topDown.pan(const Offset(-step, 0), _size),
       ),
       LogicalKeyboardKey.arrowUp => _do(
-        () => _camera.pan(const Offset(0, step), _size),
+        () => _topDown.pan(const Offset(0, step), _size),
       ),
       LogicalKeyboardKey.arrowDown => _do(
-        () => _camera.pan(const Offset(0, -step), _size),
+        () => _topDown.pan(const Offset(0, -step), _size),
       ),
-      LogicalKeyboardKey.keyQ => _do(() => _camera.turn(-15 * degrees2Radians)),
-      LogicalKeyboardKey.keyE => _do(() => _camera.turn(15 * degrees2Radians)),
+      LogicalKeyboardKey.keyQ => _do(
+        () => _topDown.turn(-15 * degrees2Radians),
+      ),
+      LogicalKeyboardKey.keyE => _do(() => _topDown.turn(15 * degrees2Radians)),
       LogicalKeyboardKey.equal ||
       LogicalKeyboardKey.add ||
-      LogicalKeyboardKey.numpadAdd => _do(() => _camera.zoom(1.25)),
+      LogicalKeyboardKey.numpadAdd => _do(() => _topDown.zoom(1.25)),
       LogicalKeyboardKey.minus ||
-      LogicalKeyboardKey.numpadSubtract => _do(() => _camera.zoom(0.8)),
+      LogicalKeyboardKey.numpadSubtract => _do(() => _topDown.zoom(0.8)),
       LogicalKeyboardKey.escape => _do(
         () => context.read<BattleCubit>().select(null),
       ),
       _ => false,
     };
-    return done ? KeyEventResult.handled : KeyEventResult.ignored;
+  }
+
+  /// From a unit's eyes: the arrows look around a little, Q/E turn, Escape
+  /// goes back above and keeps the unit selected.
+  bool _keyFirstPerson(FirstPersonCamera inside, LogicalKeyboardKey key) {
+    const step = 30.0;
+    return switch (key) {
+      LogicalKeyboardKey.arrowLeft => _do(
+        () => inside.look(const Offset(-step, 0)),
+      ),
+      LogicalKeyboardKey.arrowRight => _do(
+        () => inside.look(const Offset(step, 0)),
+      ),
+      LogicalKeyboardKey.arrowUp => _do(
+        () => inside.look(const Offset(0, -step)),
+      ),
+      LogicalKeyboardKey.arrowDown => _do(
+        () => inside.look(const Offset(0, step)),
+      ),
+      LogicalKeyboardKey.keyQ => _do(() => inside.turn(-15 * degrees2Radians)),
+      LogicalKeyboardKey.keyE => _do(() => inside.turn(15 * degrees2Radians)),
+      LogicalKeyboardKey.escape => _do(
+        context.read<BattleCubit>().leaveFirstPerson,
+      ),
+      _ => false,
+    };
   }
 
   bool _do(void Function() action) {
@@ -190,7 +285,10 @@ class _BattleViewState extends State<BattleView> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<BattleCubit, BattleState>(
-      listener: (context, state) => _show(state, centreOnUnits: true),
+      listener: (context, state) {
+        _show(state, centreOnUnits: true);
+        _syncCamera(state);
+      },
       child: Focus(
         focusNode: _focus,
         autofocus: true,
@@ -203,9 +301,10 @@ class _BattleViewState extends State<BattleView> {
                   _size = constraints.biggest;
                   return Listener(
                     onPointerSignal: (signal) {
-                      if (signal is PointerScrollEvent) {
+                      if (signal is PointerScrollEvent &&
+                          _firstPerson == null) {
                         _do(
-                          () => _camera.zoom(
+                          () => _topDown.zoom(
                             math.pow(1.0015, -signal.scrollDelta.dy).toDouble(),
                           ),
                         );
@@ -219,7 +318,13 @@ class _BattleViewState extends State<BattleView> {
                         _lastRotation = 0;
                       },
                       onScaleUpdate: (details) => _do(() {
-                        _camera
+                        // From a unit's eyes a drag, with one finger or
+                        // two, looks around.
+                        if (_firstPerson case final inside?) {
+                          inside.look(details.focalPointDelta);
+                          return;
+                        }
+                        _topDown
                           ..pan(details.focalPointDelta, _size)
                           ..zoom(details.scale / _lastScale)
                           ..turn(_lastRotation - details.rotation);
@@ -244,7 +349,8 @@ class _BattleViewState extends State<BattleView> {
                   builder: (context, _, _) => _UnitLabels(
                     world: widget.world,
                     view: _camera.view(_size),
-                    all: _camera.distance < 200,
+                    all: _firstPerson != null || _topDown.distance < 200,
+                    hide: _camera.insideUnit,
                   ),
                 ),
               ),
@@ -253,7 +359,11 @@ class _BattleViewState extends State<BattleView> {
               left: 12,
               top: 12,
               right: 12,
-              child: _Header(help: context.l10n.battleHelp),
+              child: _Header(
+                help: _firstPerson == null
+                    ? context.l10n.battleHelp
+                    : context.l10n.battleHelpFirstPerson,
+              ),
             ),
             Positioned(
               right: 12,
@@ -376,6 +486,8 @@ class _UnitRow extends StatelessWidget {
   }
 }
 
+/// The selected unit and the host's answer to the last order, with the
+/// button that sees the battle through the unit's eyes, or goes back above.
 class _SelectedUnit extends StatelessWidget {
   const new();
 
@@ -402,19 +514,47 @@ class _SelectedUnit extends StatelessWidget {
           ),
         },
     ];
+    final fromAbove = state.viewMode is TopDownMode;
+    final seeable = fromAbove && state.canSeeFrom(unit);
     if (lines.isEmpty) return const SizedBox.shrink();
-    return _Panel(child: Text(lines.join('\n')));
+    return _Panel(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(lines.join('\n')),
+          if (seeable)
+            TextButton(
+              onPressed: cubit.enterFirstPerson,
+              child: Text(l10n.battleFirstPerson),
+            ),
+          if (!fromAbove)
+            TextButton(
+              onPressed: cubit.leaveFirstPerson,
+              child: Text(l10n.battleTopDown),
+            ),
+        ],
+      ),
+    );
   }
 }
 
 class _UnitLabels extends StatelessWidget {
-  const new({required this.world, required this.view, required this.all});
+  const new({
+    required this.world,
+    required this.view,
+    required this.all,
+    required this.hide,
+  });
 
   final BattleWorld world;
   final ViewProjection view;
 
   /// Whether every unit is named, or only the selected one.
   final bool all;
+
+  /// The unit whose eyes the view is, which has no name over its head.
+  final String? hide;
 
   @override
   Widget build(BuildContext context) {
@@ -424,7 +564,7 @@ class _UnitLabels extends StatelessWidget {
         for (final MapEntry(key: id, value: at) in world.drawn.entries)
           if ((state.units[id], view.project(at + Vector3(0, 7.5, 0)))
               case (final unit?, final onScreen?)
-              when all || id == state.selectedId)
+              when id != hide && (all || id == state.selectedId))
             Positioned(
               left: onScreen.dx - 40,
               top: onScreen.dy - 16,

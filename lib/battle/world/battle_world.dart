@@ -1,4 +1,5 @@
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -23,6 +24,12 @@ abstract interface class BattleWorld {
     required String? selected,
     required Duration? battleTime,
   });
+
+  /// Draws from [camera] from now on: the body of the unit the eye is
+  /// inside (`BattleCamera.insideUnit`) is not drawn. It changes how the
+  /// world is seen, never what it shows: the same units are drawn from
+  /// either camera (decision 237).
+  void useCamera(BattleCamera camera);
 
   /// Moves on by [seconds].
   void tick(double seconds);

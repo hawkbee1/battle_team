@@ -14,6 +14,7 @@ dependencies:
   battle_client: ^0.1.0
   battle_map: ^0.1.0
   battle_protocol: ^0.1.0
+  battle_rules: ^0.1.0
   bloc: ^9.2.1
   equatable: ^3.0.0
   flutter:
@@ -48,3 +49,6 @@ flutter:
     # on screen (the battle's credits).
     - assets/maps/saint_lo_1km/
     - assets/maps/saint_lo_1km/tiles/0_0/
+    # The unit types' data: the first-person view looks from the top of the
+    # unit's hit volume (decision 235). The same file as the plan's.
+    - plan/data/units.yaml

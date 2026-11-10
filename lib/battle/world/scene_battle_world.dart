@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:flutter_scene/scene.dart';
@@ -46,6 +47,7 @@ class SceneBattleWorld implements BattleWorld {
   final _hqs = <String, Node>{};
   final _relics = <String, Node>{};
   double _clock = 0;
+  String? _insideUnit;
 
   @override
   Map<String, Vector3> get drawn => {
@@ -145,6 +147,7 @@ class SceneBattleWorld implements BattleWorld {
           ? Vector4(1, 1, 0.3, 1)
           : null;
     }
+    _hideInsideUnit();
     for (final id in _units.keys.toList()) {
       if (!targets.containsKey(id)) scene.remove(_units.remove(id)!.node);
     }
@@ -155,6 +158,19 @@ class SceneBattleWorld implements BattleWorld {
       for (final relic in relics) relic.relicId: (relic.position, relic.owner),
     }, (owner) => _pillar(teamColor(owner)));
     tick(0);
+  }
+
+  @override
+  void useCamera(BattleCamera camera) {
+    _insideUnit = camera.insideUnit;
+    _hideInsideUnit();
+  }
+
+  /// The body the eye is inside would fill the view: it is not drawn.
+  void _hideInsideUnit() {
+    for (final MapEntry(:key, :value) in _units.entries) {
+      value.node.visible = key != _insideUnit;
+    }
   }
 
   @override

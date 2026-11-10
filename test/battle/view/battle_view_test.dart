@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
+import 'package:battle_team/battle/data/unit_bodies.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
+import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:bloc_test/bloc_test.dart';
@@ -15,6 +20,7 @@ import 'package:vector_math/vector_math.dart' show Vector3;
 
 import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
+import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
 
 class _MockBattleCubit extends MockCubit<BattleState> implements BattleCubit;
@@ -26,12 +32,48 @@ const _playing = BattleState(
   sectionId: 's-blue',
 );
 
+/// The section's commander 100 m from the north-west corner, and a soldier of
+/// the section 50 m north of it: seen from the commander's eyes facing north,
+/// the soldier is ahead.
+final UnitView _eyesCommander = UnitView(
+  unitId: 'c-1',
+  unitType: 'commander',
+  sectionId: 's-blue',
+  team: 'blue',
+  hp: 200,
+  maxHp: 200,
+  position: const Position(100000, 100000, 3000),
+  private: blueCommander.private,
+);
+
+final UnitView _eyesSoldier = UnitView(
+  unitId: 's-2',
+  unitType: 'soldier',
+  sectionId: 's-blue',
+  team: 'blue',
+  hp: 100,
+  maxHp: 100,
+  position: const Position(100000, 50000, 3000),
+  private: blueCommander.private,
+);
+
+final BattleState _fromAbove = _playing.copyWith(
+  units: {'c-1': _eyesCommander, 's-2': _eyesSoldier, 'r-1': redSoldier},
+  selectedId: () => 'c-1',
+);
+
+final BattleState _fromCommander = _fromAbove.copyWith(
+  viewMode: const FirstPersonMode('c-1'),
+);
+
 void main() {
   late MapData map;
+  late UnitBodies bodies;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     map = await loadMapAsset(rootBundle, 'saint_lo_1km');
+    bodies = await loadUnitBodies(rootBundle);
     registerFallbackValue(const Position(0, 0, 0));
     registerFallbackValue(blueCommander);
   });
@@ -40,34 +82,56 @@ void main() {
     late _MockBattleCubit cubit;
     late FakeWorld world;
     late void Function(double) tick;
+    late BattleCamera sceneCamera;
+    late StreamController<BattleState> states;
 
     setUp(() {
       cubit = _MockBattleCubit();
       world = FakeWorld(map);
+      states = StreamController<BattleState>.broadcast();
+      addTearDown(states.close);
       when(() => cubit.state).thenReturn(_playing);
+      when(() => cubit.stream).thenAnswer((_) => states.stream);
       when(() => cubit.battleTime).thenReturn(const Duration(hours: 1));
       when(() => cubit.apNow(any())).thenReturn(30);
       when(() => cubit.moveSelectedTo(any())).thenAnswer((_) async {});
     });
 
-    Future<void> pump(WidgetTester tester) async {
+    Future<void> pump(
+      WidgetTester tester, {
+      Locale? locale,
+      UnitBodies? unitBodies,
+    }) async {
       await tester.pumpWidget(
         MaterialApp(
+          locale: locale,
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: BlocProvider<BattleCubit>.value(
             value: cubit,
             child: BattleView(
               map: map,
+              bodies: unitBodies ?? bodies,
               world: world,
               sceneBuilder: (context, world, camera, onTick) {
                 tick = onTick;
+                sceneCamera = camera;
                 return const SizedBox.expand();
               },
             ),
           ),
         ),
       );
+      await tester.pump();
+    }
+
+    /// The cubit now holds [state]: the view hears of it and rebuilds.
+    Future<void> show(WidgetTester tester, BattleState state) async {
+      when(() => cubit.state).thenReturn(state);
+      states.add(state);
+      // The stream reaches the view's listener after the frame that was
+      // pumped, so the rebuild it asks for needs a second one.
+      await tester.pump();
       await tester.pump();
     }
 
@@ -301,6 +365,287 @@ void main() {
         expect(find.text('soldier'), findsNothing);
       },
     );
+    group('seen from a unit', () {
+      FirstPersonCamera eyes() => world.camera! as FirstPersonCamera;
+
+      /// Plays from above, then enters the commander's eyes.
+      Future<void> enter(WidgetTester tester) async {
+        when(() => cubit.state).thenReturn(_fromAbove);
+        await pump(tester);
+        await show(tester, _fromCommander);
+      }
+
+      testWidgets(
+        'decision 5 sees through the eyes of the unit the state names, and '
+        'goes back to the camera it left',
+        (tester) async {
+          when(() => cubit.state).thenReturn(_fromAbove);
+          await pump(tester);
+          final above = world.camera;
+          expect(above, isA<TopDownCamera>());
+          expect(sceneCamera, same(above));
+
+          await show(tester, _fromCommander);
+
+          expect(eyes().unitId, 'c-1');
+          expect(sceneCamera, same(world.camera));
+          expect(sceneCamera.insideUnit, 'c-1');
+
+          await show(tester, _fromAbove);
+
+          expect(world.camera, same(above));
+          expect(sceneCamera, same(above));
+          expect(sceneCamera.insideUnit, isNull);
+        },
+      );
+
+      testWidgets(
+        'decision 235 the eye sits at the top of the unit hit volume, where '
+        'the unit is drawn, and follows it',
+        (tester) async {
+          await enter(tester);
+          final height = bodies.eyeHeightOf('commander')!;
+          final feet = world.drawn['c-1']!;
+
+          expect(eyes().eyeHeightM, height);
+          expect(eyes().position.y, closeTo(feet.y + height, 1e-5));
+          expect(eyes().position.x, feet.x);
+          expect(eyes().position.z, feet.z);
+
+          // The unit glides: the eyes go where it is drawn on each frame.
+          world.drawn['c-1'] = Vector3(feet.x + 5, feet.y + 1, feet.z - 5);
+          tick(0.1);
+          await tester.pump();
+
+          expect(eyes().position.x, feet.x + 5);
+          expect(eyes().position.y, closeTo(feet.y + 1 + height, 1e-5));
+          expect(eyes().position.z, feet.z - 5);
+        },
+      );
+
+      testWidgets('decision 237 entering first person draws the same units as '
+          'top-down', (tester) async {
+        when(() => cubit.state).thenReturn(_fromAbove);
+        await pump(tester);
+        final before = {...world.drawn};
+        expect(before.keys, unorderedEquals(['c-1', 's-2', 'r-1']));
+
+        await show(tester, _fromCommander);
+        expect(world.drawn, before);
+
+        await show(tester, _fromAbove);
+        expect(world.drawn, before);
+
+        // Another section's unit the section stops seeing is not drawn
+        // from the eyes either.
+        await show(
+          tester,
+          _fromCommander.copyWith(
+            units: {'c-1': _eyesCommander, 's-2': _eyesSoldier},
+          ),
+        );
+        expect(world.drawn.keys, unorderedEquals(['c-1', 's-2']));
+      });
+
+      testWidgets('decision 5 faces where the overview faced', (tester) async {
+        when(() => cubit.state).thenReturn(_fromAbove);
+        await pump(tester);
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+
+        await show(tester, _fromCommander);
+
+        expect(eyes().yaw, closeTo(30 * 3.141592653589793 / 180, 1e-9));
+        expect(eyes().pitch, 0);
+      });
+
+      testWidgets('decision 5 looks around with a drag, the arrows and Q/E', (
+        tester,
+      ) async {
+        await enter(tester);
+
+        await tester.dragFrom(const Offset(400, 300), const Offset(100, -40));
+        await tester.pump();
+        final dragged = eyes().yaw;
+        // The touch slop takes the first pixels of the drag.
+        expect(dragged, inInclusiveRange(0.3, 0.5));
+        expect(eyes().pitch, greaterThan(0));
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+        expect(eyes().yaw, greaterThan(dragged));
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+        expect(eyes().yaw, closeTo(dragged, 1e-9));
+        final level = eyes().pitch;
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        expect(eyes().pitch, lessThan(level));
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        expect(eyes().pitch, closeTo(level, 1e-9));
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyQ);
+        expect(eyes().yaw, closeTo(dragged, 1e-9));
+      });
+
+      testWidgets(
+        'decision 5 does not zoom or pan the overview from a unit, and '
+        'ignores the other keys',
+        (tester) async {
+          await enter(tester);
+          final above = world.cameras.first as TopDownCamera;
+          final distance = above.distance;
+          final target = above.target.clone();
+          final yaw = eyes().yaw;
+
+          await tester.sendEventToBinding(
+            const PointerScrollEvent(
+              position: Offset(400, 300),
+              scrollDelta: Offset(0, 100),
+            ),
+          );
+          await tester.sendKeyEvent(LogicalKeyboardKey.equal);
+          await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+          await tester.pump();
+
+          expect(above.distance, distance);
+          expect(above.target, target);
+          expect(eyes().yaw, yaw);
+        },
+      );
+
+      testWidgets('decision 5 Escape goes back above and keeps the unit', (
+        tester,
+      ) async {
+        when(() => cubit.leaveFirstPerson()).thenReturn(null);
+        await enter(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+
+        verify(() => cubit.leaveFirstPerson()).called(1);
+        verifyNever(() => cubit.select(any()));
+      });
+
+      testWidgets(
+        'decision 5 a tap on the ground orders the same move from the eyes',
+        (tester) async {
+          await enter(tester);
+
+          // Below the horizon, ahead of the eyes.
+          await tester.tapAt(const Offset(400, 500));
+
+          final to =
+              verify(() => cubit.moveSelectedTo(captureAny())).captured.single
+                  as Position;
+          expect(to.y, lessThan(_eyesCommander.position!.y));
+          expect((to.x - _eyesCommander.position!.x).abs(), lessThan(5000));
+
+          // The sky is no ground.
+          await tester.tapAt(const Offset(400, 2));
+          verifyNever(() => cubit.moveSelectedTo(any()));
+        },
+      );
+
+      testWidgets(
+        'decision 5 a tap on another unit of the section selects it, and '
+        'a tap where the unit stands selects nothing',
+        (tester) async {
+          await enter(tester);
+          final view = world.camera!.view(
+            tester.getSize(find.byType(BattleView)),
+          );
+
+          final soldier = view.project(world.drawn['s-2']! + Vector3(0, 3, 0))!;
+          await tester.tapAt(soldier);
+          verify(() => cubit.select('s-2')).called(1);
+          // The unit the eyes are in is not picked from inside.
+          verifyNever(() => cubit.select('c-1'));
+        },
+      );
+
+      testWidgets('M7.4 names the units in sight, not the unit it looks from', (
+        tester,
+      ) async {
+        await enter(tester);
+
+        // The soldier of the section and the red one are in sight.
+        expect(find.text('soldier'), findsNWidgets(2));
+        expect(find.text('commander'), findsNothing);
+      });
+
+      testWidgets(
+        'M7.4 the unit panel offers the view from the unit and the way back',
+        (tester) async {
+          when(() => cubit.enterFirstPerson()).thenReturn(null);
+          when(() => cubit.leaveFirstPerson()).thenReturn(null);
+          when(() => cubit.state).thenReturn(_fromAbove);
+          await pump(tester);
+
+          expect(find.text('Top-down view'), findsNothing);
+          await tester.tap(find.text('View from unit'));
+          verify(() => cubit.enterFirstPerson()).called(1);
+
+          await show(tester, _fromCommander);
+
+          expect(find.text('View from unit'), findsNothing);
+          // The AP between updates stays on the unit panel.
+          expect(find.textContaining('AP 30.0'), findsOneWidget);
+          expect(find.textContaining('Drag to look'), findsOneWidget);
+          expect(find.textContaining('Drag to pan'), findsNothing);
+          await tester.tap(find.text('Top-down view'));
+          verify(() => cubit.leaveFirstPerson()).called(1);
+        },
+      );
+
+      testWidgets('M7.4 offers no view from a unit that is not on the field', (
+        tester,
+      ) async {
+        when(() => cubit.state).thenReturn(
+          _fromAbove.copyWith(
+            units: {'s-1': storedSoldier, 'r-1': redSoldier},
+            selectedId: () => 's-1',
+          ),
+        );
+        await pump(tester);
+
+        expect(find.textContaining('soldier · HP 100'), findsOneWidget);
+        expect(find.text('View from unit'), findsNothing);
+        expect(find.text('Top-down view'), findsNothing);
+      });
+
+      testWidgets('M7.4 the buttons and the help are in French', (
+        tester,
+      ) async {
+        when(() => cubit.state).thenReturn(_fromAbove);
+        await pump(tester, locale: const Locale('fr'));
+        expect(find.text("Vue depuis l'unité"), findsOneWidget);
+        expect(find.textContaining('Glisser pour déplacer'), findsOneWidget);
+
+        await show(tester, _fromCommander);
+
+        expect(find.text('Vue de dessus'), findsOneWidget);
+        expect(find.textContaining('Glisser pour regarder'), findsOneWidget);
+      });
+
+      testWidgets('M7.4 stays above for a unit type the app has no body for', (
+        tester,
+      ) async {
+        final log = LogCapture();
+        addTearDown(log.cancel);
+        when(() => cubit.leaveFirstPerson()).thenReturn(null);
+        when(() => cubit.state).thenReturn(_fromAbove);
+        await pump(tester, unitBodies: const UnitBodies({}));
+
+        await show(tester, _fromCommander);
+
+        verify(() => cubit.leaveFirstPerson()).called(1);
+        expect(world.camera, isA<TopDownCamera>());
+        expect(sceneCamera, isA<TopDownCamera>());
+        expect(log.lines, [
+          'WARNING first person unavailable: no body for the unit type',
+        ]);
+        // Decision 237: the record names no unit.
+        expect(log.texts.single, isNot(contains('c-1')));
+        expect(log.texts.single, isNot(contains('commander')));
+      });
+    });
   });
 
   group('$BattleView over a recorded stream', () {
@@ -356,6 +701,7 @@ void main() {
             value: cubit,
             child: BattleView(
               map: map,
+              bodies: bodies,
               world: world,
               sceneBuilder: (_, _, _, _) => const SizedBox.expand(),
             ),

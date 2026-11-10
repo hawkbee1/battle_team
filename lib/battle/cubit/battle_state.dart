@@ -21,6 +21,37 @@ enum BattleStatus {
   failed,
 }
 
+/// {@template view_mode}
+/// How the battle is seen (decision 5): from above, or through the eyes of
+/// one of the section's units. The view picks the camera of the mode (the
+/// camera Strategy); the state holds no camera.
+/// {@endtemplate}
+sealed class ViewMode extends Equatable {
+  /// {@macro view_mode}
+  const new();
+}
+
+/// The battle seen from above.
+final class TopDownMode extends ViewMode {
+  /// Seen from above.
+  const new();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// The battle seen through the eyes of the section's unit [unitId].
+final class FirstPersonMode extends ViewMode {
+  /// Through the eyes of [unitId].
+  const new(this.unitId);
+
+  /// The unit whose eyes these are.
+  final String unitId;
+
+  @override
+  List<Object?> get props => [unitId];
+}
+
 /// {@template order_notice}
 /// The host's answer to the player's last order.
 /// {@endtemplate}
@@ -58,6 +89,7 @@ class BattleState extends Equatable {
     this.team,
     this.sectionId,
     this.selectedId,
+    this.viewMode = const TopDownMode(),
     this.notice,
     this.problem,
     this.revision = 0,
@@ -84,6 +116,9 @@ class BattleState extends Equatable {
   /// The selected unit, one of the section's.
   final String? selectedId;
 
+  /// How the battle is seen.
+  final ViewMode viewMode;
+
   /// The host's answer to the last order.
   final OrderNotice? notice;
 
@@ -95,6 +130,23 @@ class BattleState extends Equatable {
 
   /// The selected unit, while the section sees it.
   UnitView? get selected => units[selectedId];
+
+  /// The unit whose eyes the battle is seen through, while the section has
+  /// it; null from above.
+  UnitView? get seenFrom => switch (viewMode) {
+    FirstPersonMode(:final unitId) => units[unitId],
+    TopDownMode() => null,
+  };
+
+  /// Whether [unit] can be seen from: one of the section's, alive and on the
+  /// field. A stored or carried unit has no view of its own, and a unit the
+  /// section no longer sees is gone.
+  bool canSeeFrom(UnitView? unit) =>
+      unit != null &&
+      unit.sectionId == sectionId &&
+      unit.hp > 0 &&
+      unit.position != null &&
+      unit.private?.place == UnitPlace.deployed;
 
   /// The player's section's units, deployed or stored, in ID order.
   List<UnitView> get sectionUnits {
@@ -115,6 +167,7 @@ class BattleState extends Equatable {
     String? team,
     String? sectionId,
     String? Function()? selectedId,
+    ViewMode? viewMode,
     OrderNotice? Function()? notice,
     String? problem,
     int? revision,
@@ -126,6 +179,7 @@ class BattleState extends Equatable {
     team: team ?? this.team,
     sectionId: sectionId ?? this.sectionId,
     selectedId: selectedId == null ? this.selectedId : selectedId(),
+    viewMode: viewMode ?? this.viewMode,
     notice: notice == null ? this.notice : notice(),
     problem: problem ?? this.problem,
     revision: revision ?? this.revision,
@@ -140,6 +194,7 @@ class BattleState extends Equatable {
     team,
     sectionId,
     selectedId,
+    viewMode,
     notice,
     problem,
     revision,

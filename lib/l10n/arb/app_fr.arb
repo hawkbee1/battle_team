@@ -10,6 +10,7 @@
   "battleStatus": "{status, select, signingIn{Connexion…} connecting{Recherche de l’hôte…} playing{En bataille} lost{Hôte perdu, reconnexion…} stopped{Arrêté} failed{Échec de la connexion} other{ }}",
   "battlePlayingAs": "{team} · {section}",
   "battleHelp": "Glisser pour déplacer · molette ou pincement pour zoomer · Q/E ou deux doigts pour tourner · touchez une de vos unités, puis le sol pour la déplacer",
+  "battleHelpFirstPerson": "Glisser pour regarder · Q/E ou les flèches pour tourner · touchez le sol pour s'y rendre · Échap ou le bouton pour revenir à la vue de dessus",
   "battleUnit": "{type} · PV {hp} · PA {ap}",
   "battleOrderAccepted": "{order} accepté",
   "battleOrderRefused": "{order} refusé : {reason}",
@@ -20,6 +21,8 @@
   "battleDeploy": "Déployer",
   "battleCentre": "Centrer",
   "battleOrderName": "{order, select, move{déplacement} deploy{déploiement} other{ordre}}",
+  "battleFirstPerson": "Vue depuis l'unité",
+  "battleTopDown": "Vue de dessus",
   "battleCredits": "Crédits",
   "battleCreditsClose": "Fermer"
 }

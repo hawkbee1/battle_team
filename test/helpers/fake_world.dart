@@ -1,5 +1,6 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:vector_math/vector_math.dart';
@@ -42,6 +43,16 @@ class FakeWorld implements BattleWorld {
             unit.unitId: worldOf(position)
               ..y = surface.heightAt(position.x, position.y),
       });
+  }
+
+  /// The camera last given, and every camera given in order.
+  BattleCamera? camera;
+  final cameras = <BattleCamera>[];
+
+  @override
+  void useCamera(BattleCamera camera) {
+    this.camera = camera;
+    cameras.add(camera);
   }
 
   @override

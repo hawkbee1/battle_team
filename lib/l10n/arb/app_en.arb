@@ -51,6 +51,10 @@
   "@battleHelp": {
     "description": "How to use the battle view"
   },
+  "battleHelpFirstPerson": "Drag to look · Q/E or arrow keys to turn · tap the ground to move there · Esc or the button to go back to the top-down view",
+  "@battleHelpFirstPerson": {
+    "description": "How to use the battle view seen through a unit's eyes"
+  },
   "battleUnit": "{type} · HP {hp} · AP {ap}",
   "@battleUnit": {
     "description": "The selected unit",
@@ -117,6 +121,14 @@
     "placeholders": {
       "order": {}
     }
+  },
+  "battleFirstPerson": "View from unit",
+  "@battleFirstPerson": {
+    "description": "Sees the battle through the eyes of the selected unit"
+  },
+  "battleTopDown": "Top-down view",
+  "@battleTopDown": {
+    "description": "Goes back from a unit's eyes to the view from above"
   },
   "battleCredits": "Credits",
   "@battleCredits": {
