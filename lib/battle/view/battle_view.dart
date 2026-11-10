@@ -409,10 +409,24 @@ class _BattleViewState extends State<BattleView> {
                 left: 12,
                 top: 96,
                 width: 300,
-                child: _Panel(
-                  child: SingleChildScrollView(
-                    child: StoragePanel(
-                      onClose: () => setState(() => _storageOpen = false),
+                // Short enough to leave the selected unit's panel below.
+                child: BlocSelector<BattleCubit, BattleState, bool>(
+                  selector: (state) => state.selectedId != null,
+                  builder: (context, selected) => ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: math.max(
+                        80,
+                        MediaQuery.sizeOf(context).height -
+                            96 -
+                            (selected ? 200 : 12),
+                      ),
+                    ),
+                    child: _Panel(
+                      child: SingleChildScrollView(
+                        child: StoragePanel(
+                          onClose: () => setState(() => _storageOpen = false),
+                        ),
+                      ),
                     ),
                   ),
                 ),
