@@ -1,12 +1,12 @@
 // Built at run time, so that coverage sees the constructors.
 // ignore_for_file: prefer_const_constructors
-import 'package:battle_team/playtest/playtest.dart';
+import 'package:battle_team/battle/battle.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(PlaytestSettings, () {
+  group(BattleSettings, () {
     test('is complete with every setting', () {
-      final settings = PlaytestSettings(
+      final settings = BattleSettings(
         endpoint: 'http://localhost/v1',
         projectId: 'hawkbee',
         email: 'blue@battleteam.local',
@@ -18,7 +18,7 @@ void main() {
       expect(settings.mapId, 'saint_lo_1km');
       expect(
         settings,
-        PlaytestSettings(
+        BattleSettings(
           endpoint: 'http://localhost/v1',
           projectId: 'hawkbee',
           email: 'blue@battleteam.local',
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('is not complete without its build settings', () {
-      expect(PlaytestSettings.fromEnvironment().complete, isFalse);
+      expect(BattleSettings.fromEnvironment().complete, isFalse);
     });
   });
 }

@@ -5,17 +5,17 @@ import 'package:battle_protocol/battle_protocol.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-part 'playtest_state.dart';
+part 'battle_state.dart';
 
-/// {@template playtest_cubit}
+/// {@template battle_cubit}
 /// Plays one battle as one player through [client]: signs in to Appwrite
 /// ([signIn]), then keeps the section's view and sends the player's moves.
 /// The host checks every order (stack decision 8).
 /// {@endtemplate}
-class PlaytestCubit extends Cubit<PlaytestState> {
-  /// {@macro playtest_cubit}
+class BattleCubit extends Cubit<BattleState> {
+  /// {@macro battle_cubit}
   new({required this.client, required this.signIn})
-    : super(const PlaytestState());
+    : super(const BattleState());
 
   /// The connection to the battle's host.
   final BattleClient client;
@@ -30,7 +30,7 @@ class PlaytestCubit extends Cubit<PlaytestState> {
     try {
       await signIn();
     } on Object catch (error) {
-      emit(state.copyWith(status: PlaytestStatus.failed, problem: '$error'));
+      emit(state.copyWith(status: BattleStatus.failed, problem: '$error'));
       return;
     }
     _subscriptions
@@ -41,10 +41,10 @@ class PlaytestCubit extends Cubit<PlaytestState> {
 
   void _onStatus(ClientStatus status) {
     final next = switch (status) {
-      ClientStatus.idle || ClientStatus.connecting => PlaytestStatus.connecting,
-      ClientStatus.signedIn => PlaytestStatus.playing,
-      ClientStatus.waiting => PlaytestStatus.lost,
-      ClientStatus.stopped => PlaytestStatus.stopped,
+      ClientStatus.idle || ClientStatus.connecting => BattleStatus.connecting,
+      ClientStatus.signedIn => BattleStatus.playing,
+      ClientStatus.waiting => BattleStatus.lost,
+      ClientStatus.stopped => BattleStatus.stopped,
     };
     final problem = switch (status) {
       ClientStatus.stopped => switch ((
@@ -107,7 +107,7 @@ class PlaytestCubit extends Cubit<PlaytestState> {
 
   /// Sends [order] for [unitId] while playing, and shows the host's answer.
   Future<void> _order(String unitId, String name, Order order) async {
-    if (state.status != PlaytestStatus.playing) return;
+    if (state.status != BattleStatus.playing) return;
     String? refusal;
     try {
       refusal = (await client.send(order)).refusal;

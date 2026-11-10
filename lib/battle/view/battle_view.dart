@@ -3,11 +3,11 @@ import 'dart:math' as math;
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/cubit/battle_cubit.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
-import 'package:battle_team/playtest/cubit/playtest_cubit.dart';
-import 'package:battle_team/playtest/world/battle_space.dart';
-import 'package:battle_team/playtest/world/playtest_world.dart';
-import 'package:battle_team/playtest/world/top_down_camera.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,21 +16,21 @@ import 'package:vector_math/vector_math.dart' show Vector3, degrees2Radians;
 
 /// Builds the 3D area of [world] seen from [camera]; [onTick] is called on
 /// each frame with the seconds since the last one.
-typedef PlaytestSceneBuilder = Widget Function(
+typedef BattleSceneBuilder = Widget Function(
   BuildContext context,
-  PlaytestWorld world,
+  BattleWorld world,
   TopDownCamera camera,
   void Function(double seconds) onTick,
 );
 
-/// {@template playtest_view}
+/// {@template battle_view}
 /// The battle seen from above: the map of [map] in [world], the units the
 /// section sees, and the orders of the player. Drag to pan, scroll or pinch
 /// to zoom, Q/E or two fingers to turn; tap one of your units, then the
 /// ground, to move it there.
 /// {@endtemplate}
-class PlaytestView extends StatefulWidget {
-  /// {@macro playtest_view}
+class BattleView extends StatefulWidget {
+  /// {@macro battle_view}
   const new({
     required this.map,
     required this.world,
@@ -42,16 +42,16 @@ class PlaytestView extends StatefulWidget {
   final MapData map;
 
   /// The 3D world.
-  final PlaytestWorld world;
+  final BattleWorld world;
 
   /// Builds the 3D area.
-  final PlaytestSceneBuilder sceneBuilder;
+  final BattleSceneBuilder sceneBuilder;
 
   @override
-  State<PlaytestView> createState() => _PlaytestViewState();
+  State<BattleView> createState() => _BattleViewState();
 }
 
-class _PlaytestViewState extends State<PlaytestView> {
+class _BattleViewState extends State<BattleView> {
   late final TopDownCamera _camera;
   final _frame = ValueNotifier<int>(0);
   final _focus = FocusNode();
@@ -66,7 +66,7 @@ class _PlaytestViewState extends State<PlaytestView> {
     final centre = Vector3(surface.widthM / 2, 0, -surface.depthM / 2);
     centre.y = surface.heightAt(centre.x, -centre.z);
     _camera = TopDownCamera(target: centre, distance: 700);
-    _show(context.read<PlaytestCubit>().state, centreOnUnits: true);
+    _show(context.read<BattleCubit>().state, centreOnUnits: true);
   }
 
   @override
@@ -76,13 +76,13 @@ class _PlaytestViewState extends State<PlaytestView> {
     super.dispose();
   }
 
-  void _show(PlaytestState state, {bool centreOnUnits = false}) {
+  void _show(BattleState state, {bool centreOnUnits = false}) {
     widget.world.show(
       units: state.units.values,
       hqs: state.hqs,
       relics: state.relics,
       selected: state.selectedId,
-      battleTime: context.read<PlaytestCubit>().battleTime,
+      battleTime: context.read<BattleCubit>().battleTime,
     );
     if (centreOnUnits) _centreOnSection(state);
   }
@@ -90,7 +90,7 @@ class _PlaytestViewState extends State<PlaytestView> {
   /// Looks at the section's units the first time it sees them, or at its
   /// HQ while none is out; `force` looks again (the Centre button).
   bool _centred = false;
-  void _centreOnSection(PlaytestState state, {bool force = false}) {
+  void _centreOnSection(BattleState state, {bool force = false}) {
     if (_centred && !force) return;
     final mine = [
       for (final unit in state.sectionUnits)
@@ -113,7 +113,7 @@ class _PlaytestViewState extends State<PlaytestView> {
   }
 
   void _centreNow() =>
-      _centreOnSection(context.read<PlaytestCubit>().state, force: true);
+      _centreOnSection(context.read<BattleCubit>().state, force: true);
 
   void _tick(double seconds) {
     widget.world.tick(seconds);
@@ -121,7 +121,7 @@ class _PlaytestViewState extends State<PlaytestView> {
   }
 
   void _tap(Offset at) {
-    final cubit = context.read<PlaytestCubit>();
+    final cubit = context.read<BattleCubit>();
     final state = cubit.state;
     final view = _camera.view(_size);
     String? nearest;
@@ -174,7 +174,7 @@ class _PlaytestViewState extends State<PlaytestView> {
       LogicalKeyboardKey.minus ||
       LogicalKeyboardKey.numpadSubtract => _do(() => _camera.zoom(0.8)),
       LogicalKeyboardKey.escape => _do(
-        () => context.read<PlaytestCubit>().select(null),
+        () => context.read<BattleCubit>().select(null),
       ),
       _ => false,
     };
@@ -189,7 +189,7 @@ class _PlaytestViewState extends State<PlaytestView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PlaytestCubit, PlaytestState>(
+    return BlocListener<BattleCubit, BattleState>(
       listener: (context, state) => _show(state, centreOnUnits: true),
       child: Focus(
         focusNode: _focus,
@@ -253,7 +253,7 @@ class _PlaytestViewState extends State<PlaytestView> {
               left: 12,
               top: 12,
               right: 12,
-              child: _Header(help: context.l10n.playtestHelp),
+              child: _Header(help: context.l10n.battleHelp),
             ),
             Positioned(
               right: 12,
@@ -288,7 +288,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final state = context.watch<PlaytestCubit>().state;
+    final state = context.watch<BattleCubit>().state;
     final team = state.team;
     final section = state.sectionId;
     return Row(
@@ -297,9 +297,9 @@ class _Header extends StatelessWidget {
         _Panel(
           child: Text(
             [
-              l10n.playtestStatus(state.status.name),
+              l10n.battleStatus(state.status.name),
               if (team != null && section != null)
-                l10n.playtestPlayingAs(team, section),
+                l10n.battlePlayingAs(team, section),
               ?state.problem,
             ].join('\n'),
           ),
@@ -325,7 +325,7 @@ class _UnitsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final cubit = context.watch<PlaytestCubit>();
+    final cubit = context.watch<BattleCubit>();
     final units = cubit.state.sectionUnits;
     return _Panel(
       child: Column(
@@ -335,8 +335,8 @@ class _UnitsPanel extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l10n.playtestUnits),
-              TextButton(onPressed: onCentre, child: Text(l10n.playtestCentre)),
+              Text(l10n.battleUnits),
+              TextButton(onPressed: onCentre, child: Text(l10n.battleCentre)),
             ],
           ),
           for (final unit in units) _UnitRow(unit: unit),
@@ -354,7 +354,7 @@ class _UnitRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final cubit = context.read<PlaytestCubit>();
+    final cubit = context.read<BattleCubit>();
     final stored = unit.private?.place == UnitPlace.stored;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -363,13 +363,13 @@ class _UnitRow extends StatelessWidget {
           onPressed: () => cubit.select(unit.unitId),
           child: Text(
             '${unit.unitType} · '
-            '${stored ? l10n.playtestStored : l10n.playtestInField}',
+            '${stored ? l10n.battleStored : l10n.battleInField}',
           ),
         ),
         if (stored)
           TextButton(
             onPressed: () => cubit.deploy(unit.unitId),
-            child: Text(l10n.playtestDeploy),
+            child: Text(l10n.battleDeploy),
           ),
       ],
     );
@@ -382,21 +382,21 @@ class _SelectedUnit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final cubit = context.watch<PlaytestCubit>();
+    final cubit = context.watch<BattleCubit>();
     final state = cubit.state;
     final unit = state.selected;
     final notice = state.notice;
     final lines = [
       if (unit != null)
-        l10n.playtestUnit(
+        l10n.battleUnit(
           unit.unitType,
           unit.hp.toStringAsFixed(0),
           cubit.apNow(unit)?.toStringAsFixed(1) ?? '–',
         ),
       if (notice != null)
         switch (notice.refusal) {
-          null => l10n.playtestOrderAccepted(notice.order),
-          final reason => l10n.playtestOrderRefused(notice.order, reason),
+          null => l10n.battleOrderAccepted(notice.order),
+          final reason => l10n.battleOrderRefused(notice.order, reason),
         },
     ];
     if (lines.isEmpty) return const SizedBox.shrink();
@@ -407,7 +407,7 @@ class _SelectedUnit extends StatelessWidget {
 class _UnitLabels extends StatelessWidget {
   const new({required this.world, required this.view, required this.all});
 
-  final PlaytestWorld world;
+  final BattleWorld world;
   final ViewProjection view;
 
   /// Whether every unit is named, or only the selected one.
@@ -415,7 +415,7 @@ class _UnitLabels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<PlaytestCubit>().state;
+    final state = context.watch<BattleCubit>().state;
     return Stack(
       children: [
         for (final MapEntry(key: id, value: at) in world.drawn.entries)

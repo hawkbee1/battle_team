@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
-/// {@template playtest_settings}
+/// {@template battle_settings}
 /// What the playtest signs in with and plays: the Appwrite project, the
 /// blue player's account and the battle, given at build time with
 /// `--dart-define-from-file=../../env/development.json
 /// --dart-define-from-file=env/playtest.json`. battle_host's
 /// `tool/playtest.dart` writes `env/playtest.json`.
 /// {@endtemplate}
-class PlaytestSettings extends Equatable {
-  /// {@macro playtest_settings}
+class BattleSettings extends Equatable {
+  /// {@macro battle_settings}
   const new({
     required this.endpoint,
     required this.projectId,

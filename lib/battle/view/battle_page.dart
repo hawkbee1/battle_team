@@ -4,36 +4,36 @@ import 'dart:math';
 import 'package:appwrite_api_client/appwrite_api_client.dart';
 import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
-import 'package:battle_team/playtest/cubit/playtest_cubit.dart';
-import 'package:battle_team/playtest/map_assets.dart';
-import 'package:battle_team/playtest/playtest_settings.dart';
-import 'package:battle_team/playtest/view/playtest_view.dart';
-import 'package:battle_team/playtest/world/battle_world.dart';
-import 'package:battle_team/playtest/world/playtest_world.dart';
-import 'package:battle_team/playtest/world/top_down_camera.dart';
+import 'package:battle_team/battle/battle_settings.dart';
+import 'package:battle_team/battle/cubit/battle_cubit.dart';
+import 'package:battle_team/battle/map_assets.dart';
+import 'package:battle_team/battle/view/battle_view.dart';
+import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/scene_battle_world.dart';
+import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// {@template playtest_page}
+/// {@template battle_page}
 /// Opens the battle of [settings] as its player: loads the map, signs in
 /// with [apiClient], finds the battle's host and plays.
 /// {@endtemplate}
-class PlaytestPage extends StatefulWidget {
-  /// {@macro playtest_page}
+class BattlePage extends StatefulWidget {
+  /// {@macro battle_page}
   const new({
     required this.settings,
     required this.apiClient,
     super.key,
     this.loadMap = loadMapAsset,
     this.initialize = Scene.initializeStaticResources,
-    this.worldBuilder = BattleWorld.new,
-    this.sceneBuilder = buildPlaytestScene,
+    this.worldBuilder = SceneBattleWorld.new,
+    this.sceneBuilder = buildBattleScene,
     this.clientBuilder = playtestClient,
   });
 
   /// What to play.
-  final PlaytestSettings settings;
+  final BattleSettings settings;
 
   /// The Appwrite project.
   final AppwriteApiClient apiClient;
@@ -45,23 +45,23 @@ class PlaytestPage extends StatefulWidget {
   final Future<void> Function() initialize;
 
   /// The 3D world of a map.
-  final PlaytestWorld Function(MapData map) worldBuilder;
+  final BattleWorld Function(MapData map) worldBuilder;
 
   /// Builds the 3D area.
-  final PlaytestSceneBuilder sceneBuilder;
+  final BattleSceneBuilder sceneBuilder;
 
   /// The connection to the battle's host.
   final BattleClient Function(
-    PlaytestSettings settings,
+    BattleSettings settings,
     AppwriteApiClient apiClient,
   )
   clientBuilder;
 
   @override
-  State<PlaytestPage> createState() => _PlaytestPageState();
+  State<BattlePage> createState() => _BattlePageState();
 }
 
-class _PlaytestPageState extends State<PlaytestPage> {
+class _BattlePageState extends State<BattlePage> {
   late final Future<MapData> _ready = () async {
     final map = await widget.loadMap(
       DefaultAssetBundle.of(context),
@@ -80,7 +80,7 @@ class _PlaytestPageState extends State<PlaytestPage> {
         AsyncSnapshot(:final MapData data) => BlocProvider(
           create: (_) {
             final settings = widget.settings;
-            final cubit = PlaytestCubit(
+            final cubit = BattleCubit(
               client: widget.clientBuilder(settings, widget.apiClient),
               signIn: () => widget.apiClient.signIn(
                 email: settings.email,
@@ -90,7 +90,7 @@ class _PlaytestPageState extends State<PlaytestPage> {
             unawaited(cubit.start());
             return cubit;
           },
-          child: PlaytestView(
+          child: BattleView(
             map: data,
             world: widget.worldBuilder(data),
             sceneBuilder: widget.sceneBuilder,
@@ -108,7 +108,7 @@ class _PlaytestPageState extends State<PlaytestPage> {
 /// The connection of the player of [settings]: it finds the battle's host
 /// through Appwrite and signs in with a fresh JWT each time.
 BattleClient playtestClient(
-  PlaytestSettings settings,
+  BattleSettings settings,
   AppwriteApiClient apiClient,
 ) {
   final finder = AppwriteHostFinder(
@@ -129,13 +129,13 @@ BattleClient playtestClient(
 // Draws through flutter_scene, which needs a GPU context.
 
 /// The 3D area: [world]'s scene seen from [camera].
-Widget buildPlaytestScene(
+Widget buildBattleScene(
   BuildContext context,
-  PlaytestWorld world,
+  BattleWorld world,
   TopDownCamera camera,
   void Function(double seconds) onTick,
 ) => SceneView(
-  (world as BattleWorld).scene,
+  (world as SceneBattleWorld).scene,
   cameraBuilder: (_) => PerspectiveCamera(
     position: camera.position,
     target: camera.target,

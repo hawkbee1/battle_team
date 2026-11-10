@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
-import 'package:battle_team/playtest/map_assets.dart';
-import 'package:battle_team/playtest/world/battle_space.dart';
+import 'package:battle_team/battle/map_assets.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math.dart';

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:battle_team/playtest/world/top_down_camera.dart';
+import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math.dart';
 

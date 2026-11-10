@@ -6,8 +6,8 @@ import 'dart:math' as math;
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
-import 'package:battle_team/playtest/world/battle_space.dart';
-import 'package:battle_team/playtest/world/playtest_world.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -28,7 +28,7 @@ const _vehicles = {'jeep', 'tank', 'truck', 'artillery'};
 /// 236). Units are drawn about three times their size so they show from
 /// above.
 /// {@endtemplate}
-class BattleWorld implements PlaytestWorld {
+class SceneBattleWorld implements BattleWorld {
   /// {@macro battle_world}
   new(this.map) : surface = TerrainSurface(map);
 

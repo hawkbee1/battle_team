@@ -1,23 +1,22 @@
 import 'package:battle_client/battle_client.dart';
 import 'package:battle_protocol/battle_protocol.dart';
-import 'package:battle_team/playtest/playtest.dart';
+import 'package:battle_team/battle/battle.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers/fake_host.dart';
 
 void main() {
-  group(PlaytestCubit, () {
+  group(BattleCubit, () {
     late FakeHost host;
-    late PlaytestCubit cubit;
+    late BattleCubit cubit;
     var signedIn = 0;
 
-    PlaytestCubit cubitOf(
+    BattleCubit cubitOf(
       BattleClient client, {
       Future<void> Function()? signIn,
-    }) =>
-        PlaytestCubit(client: client, signIn: signIn ?? () async => signedIn++);
+    }) => BattleCubit(client: client, signIn: signIn ?? () async => signedIn++);
 
-    Future<PlaytestState> until(bool Function(PlaytestState) test) async {
+    Future<BattleState> until(bool Function(BattleState) test) async {
       if (test(cubit.state)) return cubit.state;
       return await cubit.stream
           .firstWhere(test)
@@ -33,12 +32,12 @@ void main() {
     tearDown(() => cubit.close());
 
     test('signs in, then plays with the section view', () async {
-      expect(cubit.state.status, PlaytestStatus.signingIn);
+      expect(cubit.state.status, BattleStatus.signingIn);
 
       await cubit.start();
       final state = await until(
         (state) =>
-            state.status == PlaytestStatus.playing && state.units.isNotEmpty,
+            state.status == BattleStatus.playing && state.units.isNotEmpty,
       );
 
       expect(signedIn, 1);
@@ -60,7 +59,7 @@ void main() {
 
       await cubit.start();
 
-      expect(cubit.state.status, PlaytestStatus.failed);
+      expect(cubit.state.status, BattleStatus.failed);
       expect(cubit.state.problem, contains('no account'));
     });
 
@@ -153,11 +152,11 @@ void main() {
 
     test('shows why it stopped', () async {
       await cubit.start();
-      await until((state) => state.status == PlaytestStatus.playing);
+      await until((state) => state.status == BattleStatus.playing);
 
       host.sockets.last.deliver(const Goodbye(GoodbyeReason.battleEnded));
       final state = await until(
-        (state) => state.status == PlaytestStatus.stopped,
+        (state) => state.status == BattleStatus.stopped,
       );
 
       expect(state.problem, contains('battleEnded'));
@@ -174,7 +173,7 @@ void main() {
 
       await cubit.start();
       final state = await until(
-        (state) => state.status == PlaytestStatus.stopped,
+        (state) => state.status == BattleStatus.stopped,
       );
 
       expect(state.problem, 'not_your_battle');
@@ -186,10 +185,10 @@ void main() {
       );
 
       await cubit.start();
-      await until((state) => state.status == PlaytestStatus.lost);
+      await until((state) => state.status == BattleStatus.lost);
       await cubit.client.close();
       final state = await until(
-        (state) => state.status == PlaytestStatus.stopped,
+        (state) => state.status == BattleStatus.stopped,
       );
 
       expect(state.problem, isNull);
@@ -210,9 +209,9 @@ void main() {
     });
   });
 
-  group(PlaytestState, () {
+  group(BattleState, () {
     test('clears the selection and the notice', () {
-      const state = PlaytestState(
+      const state = BattleState(
         selectedId: 'c-1',
         notice: OrderNotice(order: 'move', unitId: 'c-1'),
       );

@@ -1,7 +1,7 @@
-part of 'playtest_cubit.dart';
+part of 'battle_cubit.dart';
 
 /// Where the playtest stands.
-enum PlaytestStatus {
+enum BattleStatus {
   /// Signing in to Appwrite.
   signingIn,
 
@@ -44,14 +44,14 @@ class OrderNotice extends Equatable {
   List<Object?> get props => [order, unitId, refusal];
 }
 
-/// {@template playtest_state}
+/// {@template battle_state}
 /// What the playtest shows: the section's view, the selected unit and the
 /// last answer.
 /// {@endtemplate}
-class PlaytestState extends Equatable {
-  /// {@macro playtest_state}
+class BattleState extends Equatable {
+  /// {@macro battle_state}
   const new({
-    this.status = PlaytestStatus.signingIn,
+    this.status = BattleStatus.signingIn,
     this.units = const {},
     this.hqs = const [],
     this.relics = const [],
@@ -64,7 +64,7 @@ class PlaytestState extends Equatable {
   });
 
   /// Where it stands.
-  final PlaytestStatus status;
+  final BattleStatus status;
 
   /// The units the section sees, by ID.
   final Map<String, UnitView> units;
@@ -107,8 +107,8 @@ class PlaytestState extends Equatable {
 
   /// This state with the values given; [selectedId] and [notice] are
   /// functions so that they can be cleared.
-  PlaytestState copyWith({
-    PlaytestStatus? status,
+  BattleState copyWith({
+    BattleStatus? status,
     Map<String, UnitView>? units,
     List<HqView>? hqs,
     List<RelicView>? relics,
@@ -118,7 +118,7 @@ class PlaytestState extends Equatable {
     OrderNotice? Function()? notice,
     String? problem,
     int? revision,
-  }) => PlaytestState(
+  }) => BattleState(
     status: status ?? this.status,
     units: units ?? this.units,
     hqs: hqs ?? this.hqs,

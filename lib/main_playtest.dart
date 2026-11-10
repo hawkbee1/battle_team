@@ -1,7 +1,7 @@
+import 'package:battle_team/battle/battle.dart';
+import 'package:battle_team/battle/trust_host_stub.dart'
+    if (dart.library.io) 'package:battle_team/battle/trust_host_io.dart';
 import 'package:battle_team/bootstrap.dart';
-import 'package:battle_team/playtest/playtest.dart';
-import 'package:battle_team/playtest/trust_host_stub.dart'
-    if (dart.library.io) 'package:battle_team/playtest/trust_host_io.dart';
 
 /// The playtest: straight into a battle as its player (battle_host's
 /// `tool/playtest.dart` sets it up). Run it with
@@ -15,11 +15,11 @@ import 'package:battle_team/playtest/trust_host_stub.dart'
 /// `SameSite=None`, which `dart:io` only accepts with `Secure`, so over
 /// plain http the SDK keeps no session.
 Future<void> main() async {
-  const settings = PlaytestSettings.fromEnvironment();
+  const settings = BattleSettings.fromEnvironment();
   final host = Uri.tryParse(settings.endpoint)?.host;
   if (host != null && host.isNotEmpty) trustHost(host);
   await bootstrap(
-    (apiClient) => PlaytestApp(settings: settings, apiClient: apiClient),
+    (apiClient) => BattleApp(settings: settings, apiClient: apiClient),
     trustSelfSigned: true,
   );
 }

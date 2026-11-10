@@ -1,11 +1,11 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
-import 'package:battle_team/playtest/world/battle_space.dart';
-import 'package:battle_team/playtest/world/playtest_world.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:vector_math/vector_math.dart';
 
 /// A world without a GPU: it draws each unit where the battle puts it.
-class FakeWorld implements PlaytestWorld {
+class FakeWorld implements BattleWorld {
   new(MapData map) : surface = TerrainSurface(map);
 
   @override

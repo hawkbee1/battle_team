@@ -1,5 +1,5 @@
 import 'package:appwrite_api_client/appwrite_api_client.dart';
-import 'package:battle_team/playtest/playtest.dart';
+import 'package:battle_team/battle/battle.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,7 +9,7 @@ import '../../helpers/fake_world.dart';
 
 class _MockAppwriteApiClient extends Mock implements AppwriteApiClient;
 
-const _settings = PlaytestSettings(
+const _settings = BattleSettings(
   endpoint: 'http://127.0.0.1:9/v1',
   projectId: 'hawkbee',
   email: 'blue@battleteam.local',
@@ -31,14 +31,14 @@ void main() {
     when(() => apiClient.createJwt()).thenAnswer((_) async => 'jwt');
   });
 
-  group(PlaytestPage, () {
+  group(BattlePage, () {
     testWidgets('loads the map, signs in and plays', (tester) async {
       final host = FakeHost();
       await tester.pumpWidget(
-        PlaytestApp(
+        BattleApp(
           settings: _settings,
           apiClient: apiClient,
-          home: PlaytestPage(
+          home: BattlePage(
             settings: _settings,
             apiClient: apiClient,
             initialize: () async {},
@@ -75,7 +75,7 @@ void main() {
     testWidgets('says why the map did not load', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: PlaytestPage(
+          home: BattlePage(
             settings: _settings,
             apiClient: apiClient,
             loadMap: (_, _) async => throw StateError('no map'),
@@ -103,13 +103,13 @@ void main() {
     });
   });
 
-  group(PlaytestApp, () {
+  group(BattleApp, () {
     testWidgets('says how to set the playtest up without settings', (
       tester,
     ) async {
       await tester.pumpWidget(
-        PlaytestApp(
-          settings: const PlaytestSettings.fromEnvironment(),
+        BattleApp(
+          settings: const BattleSettings.fromEnvironment(),
           apiClient: apiClient,
         ),
       );
@@ -120,10 +120,10 @@ void main() {
 
     testWidgets('opens the battle with its settings', (tester) async {
       await tester.pumpWidget(
-        PlaytestApp(settings: _settings, apiClient: apiClient),
+        BattleApp(settings: _settings, apiClient: apiClient),
       );
 
-      expect(find.byType(PlaytestPage), findsOneWidget);
+      expect(find.byType(BattlePage), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
     });
   });

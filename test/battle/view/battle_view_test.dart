@@ -1,9 +1,9 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/battle.dart';
+import 'package:battle_team/battle/map_assets.dart';
+import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
-import 'package:battle_team/playtest/map_assets.dart';
-import 'package:battle_team/playtest/playtest.dart';
-import 'package:battle_team/playtest/world/top_down_camera.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -16,11 +16,10 @@ import 'package:vector_math/vector_math.dart' show Vector3;
 import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
 
-class _MockPlaytestCubit extends MockCubit<PlaytestState>
-    implements PlaytestCubit;
+class _MockBattleCubit extends MockCubit<BattleState> implements BattleCubit;
 
-const _playing = PlaytestState(
-  status: PlaytestStatus.playing,
+const _playing = BattleState(
+  status: BattleStatus.playing,
   units: {'c-1': blueCommander, 'r-1': redSoldier},
   team: 'blue',
   sectionId: 's-blue',
@@ -36,13 +35,13 @@ void main() {
     registerFallbackValue(blueCommander);
   });
 
-  group(PlaytestView, () {
-    late _MockPlaytestCubit cubit;
+  group(BattleView, () {
+    late _MockBattleCubit cubit;
     late FakeWorld world;
     late void Function(double) tick;
 
     setUp(() {
-      cubit = _MockPlaytestCubit();
+      cubit = _MockBattleCubit();
       world = FakeWorld(map);
       when(() => cubit.state).thenReturn(_playing);
       when(() => cubit.battleTime).thenReturn(const Duration(hours: 1));
@@ -55,9 +54,9 @@ void main() {
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BlocProvider<PlaytestCubit>.value(
+          home: BlocProvider<BattleCubit>.value(
             value: cubit,
-            child: PlaytestView(
+            child: BattleView(
               map: map,
               world: world,
               sceneBuilder: (context, world, camera, onTick) {
@@ -76,7 +75,7 @@ void main() {
     Offset onScreen(WidgetTester tester, String unitId) {
       final commander = world.drawn['c-1']!;
       final camera = TopDownCamera(target: commander, distance: 120);
-      final size = tester.getSize(find.byType(PlaytestView));
+      final size = tester.getSize(find.byType(BattleView));
       return camera
           .view(size)
           .project(world.drawn[unitId]! + Vector3(0, 3, 0))!;
