@@ -60,6 +60,8 @@ Fog filter: the host computes each section's visible set once per tick (see stac
 
 What orders carry: a shot carries its aim direction and fire time (decision 183); a move order may carry the client's path, which the host checks (stack decision 8). First-person movement is a stream of short move orders, **5 a second** while the player holds a direction, the cadence of the position updates; the client moves its unit between them. It is small and bounded by AP (an infantry pool is a 30 m dash).
 
+First-person movement, measured (M7.4; real codec over a simulated minute at 5 moves a second, a 1 m step each; not a live host): a move order is **56 bytes up** (2.2 kbit/s), the mover is sent **12 bytes** to accept it and **140 bytes** for its own unit whole, with its AP (**6.1 kbit/s down**), and a section that watches it **37 bytes** an update (1.5 kbit/s; the table below has 38). The host puts a unit in a 10 m cell and sends its position when the cell changes, so today the app sends one move per tap: the 5 a second applies once units follow their paths (M8).
+
 ## Endpoints (M6 Issue 5)
 One HTTP port per host process, behind the reverse proxy that ends TLS live (below):
 - `GET /v1/socket`: the WebSocket of players **and AI agents** (AI agents get the same fog-filtered view as players, AI-03). Binary frames, or JSON in text frames for agents in other languages: the host answers in the encoding of the sign-in. A socket's sign-in is the account logging in to the battle (`EnterBattle`, HQ-07), whether it signs in with a JWT or a key.
