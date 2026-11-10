@@ -134,8 +134,59 @@ const armedView = SectionView(
   world: [],
 );
 
+/// What a battle without test units lets a section buy, as the host lists it.
+const shopRoster = Roster(
+  units: [
+    RosterUnit(
+      unitType: 'soldier',
+      category: 'soldier',
+      price: 100,
+      weapons: ['rifle', 'machine_gun', 'anti_tank', 'anti_air'],
+    ),
+    RosterUnit(unitType: 'radio', category: 'radio', price: 100),
+    RosterUnit(
+      unitType: 'jeep',
+      category: 'vehicle',
+      price: 1500,
+      weapons: ['machine_gun'],
+    ),
+  ],
+  weapons: [
+    RosterWeapon(weapon: 'rifle', price: 100),
+    RosterWeapon(weapon: 'machine_gun', price: 150),
+    RosterWeapon(weapon: 'anti_tank', price: 400),
+    RosterWeapon(weapon: 'anti_air', price: 300),
+  ],
+);
+
+/// [shopRoster] in a battle that allows test units (UNIT-44).
+const shopRosterWithTestUnit = Roster(
+  units: [
+    ...[
+      RosterUnit(
+        unitType: 'soldier',
+        category: 'soldier',
+        price: 100,
+        weapons: ['rifle', 'machine_gun', 'anti_tank', 'anti_air'],
+      ),
+      RosterUnit(unitType: 'radio', category: 'radio', price: 100),
+    ],
+    RosterUnit(
+      unitType: 'test_unit',
+      category: 'soldier',
+      price: 0,
+      weapons: ['rifle', 'machine_gun'],
+    ),
+  ],
+  weapons: [
+    RosterWeapon(weapon: 'rifle', price: 100),
+    RosterWeapon(weapon: 'machine_gun', price: 150),
+  ],
+);
+
 /// A battle's host in memory: it signs the client in as the seat of [view]
-/// (blue by default), sends [view] then [updates], answers each command
+/// (blue by default), sends [view], [roster] then [updates], answers each
+/// command
 /// ([refusal] refuses them, [silent] leaves them unanswered) and keeps their
 /// orders.
 final class FakeHost implements Transport {
@@ -143,6 +194,7 @@ final class FakeHost implements Transport {
   new({
     this.view = blueView,
     this.updates = const [],
+    this.roster,
     this.accountId = 'bt-blue',
     this.sectionId = 's-blue',
     this.team = 'blue',
@@ -174,6 +226,10 @@ final class FakeHost implements Transport {
 
   /// What it sends after the whole view.
   final List<HostMessage> updates;
+
+  /// What the battle lets the section buy, sent right after the whole view;
+  /// none when null.
+  final Roster? roster;
 
   /// The account, section and team it signs the client in as.
   final String accountId;
@@ -232,6 +288,7 @@ final class FakeHostSocket implements TransportSocket {
           ),
         );
         deliver(_host.view);
+        if (_host.roster case final roster?) deliver(roster);
         _host.updates.forEach(deliver);
       case SendCommand(:final requestId, :final command):
         _host.orders.add(command.order);

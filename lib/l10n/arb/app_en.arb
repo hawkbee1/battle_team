@@ -111,7 +111,7 @@
   "@battleCentre": {
     "description": "Looks at the section's units again"
   },
-  "battleOrderName": "{order, select, move{move} deploy{deploy} store{store} recall{recall} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} other{order}}",
+  "battleOrderName": "{order, select, move{move} deploy{deploy} store{store} recall{recall} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} buy_unit{unit purchase} buy_weapon{weapon purchase} other{order}}",
   "@battleOrderName": {
     "description": "An order, as a word, in the host's answer to it",
     "placeholders": {
@@ -205,7 +205,7 @@
       }
     }
   },
-  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} not_stored{The unit is not in storage} is_prisoner{A prisoner cannot be deployed} section_locked{The section is locked} blocked_by_enemy{An enemy is near the portal} never_stored{This unit is never stored} carries_units{Unload the passengers first} already_recalled{Already recalled} other{{code}}}",
+  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} not_stored{The unit is not in storage} is_prisoner{A prisoner cannot be deployed} section_locked{The section is locked} blocked_by_enemy{An enemy is near the portal} never_stored{This unit is never stored} carries_units{Unload the passengers first} already_recalled{Already recalled} no_room{No room for one more unit} arrival_blocked{An enemy is near the portal} not_enough_money{Not enough money} test_units_off{Test units are not allowed in this battle} unknown_type{Unknown unit type} not_for_sale{Not for sale} other{{code}}}",
   "@battleRefusal": {
     "description": "Why an order is refused, as the host or the pre-check says it",
     "placeholders": {
@@ -358,5 +358,102 @@
   "storageNotInSight": "The portal is not in sight",
   "@storageNotInSight": {
     "description": "The HQ is not in the section's view"
+  },
+  "unitTypeName": "{type, select, soldier{Soldier} engineer{Engineer} scout{Scout} medic{Medic} artillery{Artillery} radio{Radio} jeep{Jeep} tank{Tank} truck{Truck} helicopter{Helicopter} boat{Boat} test_unit{Test unit} commander{Commander} other{{type}}}",
+  "@unitTypeName": {
+    "description": "A unit type, by name",
+    "placeholders": {
+      "type": {}
+    }
+  },
+  "shopOpen": "Shop",
+  "@shopOpen": {
+    "description": "Opens the shop"
+  },
+  "shopTitle": "Shop",
+  "@shopTitle": {
+    "description": "Heading of the shop"
+  },
+  "shopClose": "Close",
+  "@shopClose": {
+    "description": "Closes the shop"
+  },
+  "shopWaiting": "Waiting for the host’s list…",
+  "@shopWaiting": {
+    "description": "Shown until the host has sent what can be bought"
+  },
+  "shopMoney": "Money: {amount} w€",
+  "@shopMoney": {
+    "description": "The section's money",
+    "placeholders": {
+      "amount": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "shopPrice": "{amount} w€",
+  "@shopPrice": {
+    "description": "A price in whole w€",
+    "placeholders": {
+      "amount": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "shopLocked": "Locked for {time}: nothing can be bought",
+  "@shopLocked": {
+    "description": "The section's lock stops purchases",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "shopUnits": "Units",
+  "@shopUnits": {
+    "description": "Heading of the units on sale"
+  },
+  "shopWeaponsFor": "Weapons for {unit}",
+  "@shopWeaponsFor": {
+    "description": "Heading of the weapons the selected unit can use",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "shopWeaponsNote": "A weapon goes to the section’s storage.",
+  "@shopWeaponsNote": {
+    "description": "Where a bought weapon goes"
+  },
+  "shopPickUnit": "Select one of your units to see the weapons it can use.",
+  "@shopPickUnit": {
+    "description": "Shown when no own unit is selected"
+  },
+  "shopNoWeapons": "This unit uses no weapon.",
+  "@shopNoWeapons": {
+    "description": "The selected unit's type carries no weapon"
+  },
+  "shopBuy": "Buy",
+  "@shopBuy": {
+    "description": "Buys a unit or a weapon"
+  },
+  "shopBuyItem": "Buy {item} for {price}",
+  "@shopBuyItem": {
+    "description": "Spoken label of a buy button",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "shopWeapons": "Weapons",
+  "@shopWeapons": {
+    "description": "Heading of the weapons on sale"
   }
 }

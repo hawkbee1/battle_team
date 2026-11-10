@@ -4,7 +4,8 @@ import 'package:equatable/equatable.dart';
 /// {@template battle_snapshot}
 /// What the section's view holds at one moment: the units it knows, the HQs
 /// it sees, the relics, its own state (its spare weapons, its lock, its
-/// prisoners), the recalls it runs, and the seat the
+/// prisoners), the recalls it runs, what the battle lets it buy (the host's
+/// `Roster`), and the seat the
 /// player signed in as. The host sends only what the section sees (decision
 /// 237): a snapshot holds nothing more.
 /// {@endtemplate}
@@ -16,6 +17,7 @@ class BattleSnapshot extends Equatable {
     required this.relics,
     this.section,
     this.recalls = const {},
+    this.roster,
     this.team,
     this.sectionId,
   });
@@ -36,6 +38,10 @@ class BattleSnapshot extends Equatable {
   /// stored, by unit ID.
   final Map<String, Duration> recalls;
 
+  /// What the battle lets the section buy, once the host sent it (ECO-04,
+  /// COMBAT-27).
+  final Roster? roster;
+
   /// The player's team, once signed in.
   final String? team;
 
@@ -49,6 +55,7 @@ class BattleSnapshot extends Equatable {
     relics,
     section,
     recalls,
+    roster,
     team,
     sectionId,
   ];
