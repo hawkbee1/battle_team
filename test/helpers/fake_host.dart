@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -74,15 +75,51 @@ const blueView = SectionView(
   world: [],
 );
 
-/// A battle's host in memory: it signs the client in as blue with
-/// [view], answers each command ([refusal] refuses them, [silent] leaves
-/// them unanswered) and keeps their orders.
+/// A battle's host in memory: it signs the client in as the seat of [view]
+/// (blue by default), sends [view] then [updates], answers each command
+/// ([refusal] refuses them, [silent] leaves them unanswered) and keeps their
+/// orders.
 final class FakeHost implements Transport {
   /// A host that shows [view].
-  new({this.view = blueView});
+  new({
+    this.view = blueView,
+    this.updates = const [],
+    this.accountId = 'bt-blue',
+    this.sectionId = 's-blue',
+    this.team = 'blue',
+  });
 
-  /// The section's view it sends.
+  /// A host that plays the recorded stream [name] of `battle_client`'s
+  /// fixtures (what `battle_host` really sent that section over a scripted
+  /// battle): its whole view, then its updates.
+  factory recorded(String name) {
+    final messages = [
+      for (final line in File(
+        '../../packages/battle_client/test/fixtures/streams/$name.hex',
+      ).readAsLinesSync())
+        if (line.isNotEmpty) _codec.decodeHostMessage(_bytesOfHex(line)),
+    ];
+    final view = messages.first as SectionView;
+    final own = view.units.firstWhere((unit) => unit.private != null);
+    return FakeHost(
+      view: view,
+      updates: messages.skip(1).toList(),
+      accountId: 'bt-${own.sectionId}',
+      sectionId: own.sectionId,
+      team: own.team,
+    );
+  }
+
+  /// The section's whole view it sends.
   final SectionView view;
+
+  /// What it sends after the whole view.
+  final List<HostMessage> updates;
+
+  /// The account, section and team it signs the client in as.
+  final String accountId;
+  final String sectionId;
+  final String team;
 
   /// The refusal of every command; null accepts them.
   String? refusal;
@@ -104,6 +141,11 @@ final class FakeHost implements Transport {
   }
 }
 
+Uint8List _bytesOfHex(String line) => Uint8List.fromList([
+  for (var i = 0; i < line.length; i += 2)
+    int.parse(line.substring(i, i + 2), radix: 16),
+]);
+
 /// One socket of a [FakeHost].
 final class FakeHostSocket implements TransportSocket {
   new(this._host);
@@ -123,14 +165,15 @@ final class FakeHostSocket implements TransportSocket {
     switch (_codec.decodeClientMessage(frame)) {
       case SignIn():
         deliver(
-          const SignInAccepted(
-            accountId: 'bt-blue',
-            sectionId: 's-blue',
-            team: 'blue',
-            battleTime: Duration(hours: 1),
+          SignInAccepted(
+            accountId: _host.accountId,
+            sectionId: _host.sectionId,
+            team: _host.team,
+            battleTime: _host.view.at,
           ),
         );
         deliver(_host.view);
+        _host.updates.forEach(deliver);
       case SendCommand(:final requestId, :final command):
         _host.orders.add(command.order);
         if (_host.silent) return;

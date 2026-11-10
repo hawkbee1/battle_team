@@ -271,7 +271,7 @@ class _BattleViewState extends State<BattleView> {
             Positioned(
               right: 12,
               bottom: 12,
-              child: _Attribution(lines: widget.map.spec.attribution),
+              child: _Credits(lines: widget.map.spec.attribution),
             ),
           ],
         ),
@@ -395,8 +395,11 @@ class _SelectedUnit extends StatelessWidget {
         ),
       if (notice != null)
         switch (notice.refusal) {
-          null => l10n.battleOrderAccepted(notice.order),
-          final reason => l10n.battleOrderRefused(notice.order, reason),
+          null => l10n.battleOrderAccepted(l10n.battleOrderName(notice.order)),
+          final reason => l10n.battleOrderRefused(
+            l10n.battleOrderName(notice.order),
+            reason,
+          ),
         },
     ];
     if (lines.isEmpty) return const SizedBox.shrink();
@@ -444,18 +447,35 @@ class _UnitLabels extends StatelessWidget {
   }
 }
 
-class _Attribution extends StatelessWidget {
+/// The map's credits: its data is under licences that ask for an
+/// attribution (Q-MAP-22), which a tap on the entry shows.
+class _Credits extends StatelessWidget {
   const new({required this.lines});
 
   final List<String> lines;
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: 420),
-    child: _Panel(
-      child: Text(lines.join('\n'), style: const TextStyle(fontSize: 9)),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return _Panel(
+      child: TextButton(
+        onPressed: () => showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.battleCredits),
+            content: SingleChildScrollView(child: Text(lines.join('\n\n'))),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.battleCreditsClose),
+              ),
+            ],
+          ),
+        ),
+        child: Text(l10n.battleCredits),
+      ),
+    );
+  }
 }
 
 class _Panel extends StatelessWidget {

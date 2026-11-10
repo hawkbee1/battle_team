@@ -1,9 +1,5 @@
 {
   "@@locale": "en",
-  "startVeryGoodGame": "Start the Very Good Game",
-  "@startVeryGoodGame": {
-    "description": "The initial start button of the game application"
-  },
   "titleAppBarTitle": "Battle Team",
   "@titleAppBarTitle": {
     "description": "Text shown in the AppBar of the Title Page"
@@ -11,35 +7,6 @@
   "titleButtonStart": "Start",
   "@titleButtonStart": {
     "description": "Text shown in the start Button of the Title Page"
-  },
-  "loading": "Loading {label}...",
-  "@loading": {
-    "description": "Text for the loading page",
-    "placeholders": {
-      "label": {
-        "type": "String",
-        "example": "Stuff",
-        "description": "Label for what is being loaded"
-      }
-    }
-  },
-  "loadingPhaseLabel": "{loadingPhase, select, audio{Delightful music} images{Beautiful scenery} other{ }}",
-  "@loadingPhaseLabel": {
-    "description": "Loading phases",
-    "placeholders": {
-      "loadingPhase": {}
-    }
-  },
-  "counterText": "Unicorn taps: {count}",
-  "@counterText": {
-    "description": "Text for the counter component",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "10",
-        "description": "The current count"
-      }
-    }
   },
   "backendStatusChecking": "Contacting Appwrite…",
   "@backendStatusChecking": {
@@ -57,13 +24,13 @@
   "@backendStatusRetryButton": {
     "description": "Tooltip of the button that checks the Appwrite connection again"
   },
-  "battleTitle": "Battle Team playtest",
+  "battleTitle": "Battle Team",
   "@battleTitle": {
-    "description": "Title of the playtest app"
+    "description": "Title of the app"
   },
   "battleStatus": "{status, select, signingIn{Signing in…} connecting{Finding the host…} playing{In battle} lost{Host lost, coming back…} stopped{Stopped} failed{Sign-in failed} other{ }}",
   "@battleStatus": {
-    "description": "Where the playtest stands",
+    "description": "Where the battle screen stands",
     "placeholders": {
       "status": {}
     }
@@ -82,7 +49,7 @@
   },
   "battleHelp": "Drag to pan · scroll or pinch to zoom · Q/E or two fingers to turn · tap one of your units, then tap the ground to move it",
   "@battleHelp": {
-    "description": "How to use the playtest view"
+    "description": "How to use the battle view"
   },
   "battleUnit": "{type} · HP {hp} · AP {ap}",
   "@battleUnit": {
@@ -122,7 +89,7 @@
   },
   "battleMissingSettings": "Run battle_host's tool/playtest.dart, then start the app with --dart-define-from-file=env/playtest.json.",
   "@battleMissingSettings": {
-    "description": "Shown when the playtest settings are missing"
+    "description": "Shown when the battle settings are missing"
   },
   "battleUnits": "Your units",
   "@battleUnits": {
@@ -143,5 +110,20 @@
   "battleCentre": "Centre",
   "@battleCentre": {
     "description": "Looks at the section's units again"
+  },
+  "battleOrderName": "{order, select, move{move} deploy{deploy} other{order}}",
+  "@battleOrderName": {
+    "description": "An order, as a word, in the host's answer to it",
+    "placeholders": {
+      "order": {}
+    }
+  },
+  "battleCredits": "Credits",
+  "@battleCredits": {
+    "description": "Entry of the battle screen that shows the map's attribution"
+  },
+  "battleCreditsClose": "Close",
+  "@battleCreditsClose": {
+    "description": "Closes the map's credits"
   }
 }

@@ -4,7 +4,10 @@ import 'package:vector_math/vector_math.dart';
 
 /// What the view needs of the 3D world: it shows the section's view, moves
 /// on with time, and tells where its units are drawn and where the ground
-/// is. `SceneBattleWorld` draws it; tests use a fake, having no GPU.
+/// is. A Strategy for swappable renderers (Gang of Four): `SceneBattleWorld`
+/// draws it with flutter_scene, tests use a fake, having no GPU, and a
+/// renderer chosen after the benchmarks of M7 Issue 13 replaces it without
+/// touching the view.
 abstract interface class BattleWorld {
   /// The ground.
   TerrainSurface get surface;

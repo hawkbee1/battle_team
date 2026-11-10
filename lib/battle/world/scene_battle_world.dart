@@ -21,15 +21,15 @@ Vector4 teamColor(String? team) => switch (team) {
 
 const _vehicles = {'jeep', 'tank', 'truck', 'artillery'};
 
-/// {@template battle_world}
-/// The battle in 3D for the playtest: the map's ground, its trees and
-/// buildings, and what the section sees (units, HQs, relics), each unit
-/// gliding to where the host put it by its move's arrival time (decision
-/// 236). Units are drawn about three times their size so they show from
-/// above.
+/// {@template scene_battle_world}
+/// The battle in 3D with flutter_scene, the renderer behind the `BattleWorld`
+/// Strategy: the map's ground, its trees and buildings, and what the section
+/// sees (units, HQs, relics), each unit gliding to where the host put it by
+/// its move's arrival time (decision 236). Units are drawn about three times
+/// their size so they show from above.
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
-  /// {@macro battle_world}
+  /// {@macro scene_battle_world}
   new(this.map) : surface = TerrainSurface(map);
 
   /// The map.

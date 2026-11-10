@@ -1,17 +1,13 @@
 import 'dart:async';
 
 import 'package:battle_team/backend_status/backend_status.dart';
-import 'package:battle_team/game/game.dart';
+import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 class TitlePage extends StatelessWidget {
   const new({super.key});
-
-  static Route<void> route() {
-    return MaterialPageRoute<void>(builder: (_) => const TitlePage());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +46,7 @@ class TitleView extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () async {
                 await Navigator.of(context)
-                    .pushReplacement<void, void>(GamePage.route());
+                    .pushReplacement<void, void>(BattlePage.route());
               },
               child: Center(child: Text(l10n.titleButtonStart)),
             ),

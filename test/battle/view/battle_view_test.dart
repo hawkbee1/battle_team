@@ -1,7 +1,7 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/battle.dart';
-import 'package:battle_team/battle/map_assets.dart';
+import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:bloc_test/bloc_test.dart';
@@ -15,6 +15,7 @@ import 'package:vector_math/vector_math.dart' show Vector3;
 
 import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
+import '../../helpers/mocks.dart';
 
 class _MockBattleCubit extends MockCubit<BattleState> implements BattleCubit;
 
@@ -52,7 +53,7 @@ void main() {
     Future<void> pump(WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: BlocProvider<BattleCubit>.value(
             value: cubit,
@@ -81,9 +82,7 @@ void main() {
           .project(world.drawn[unitId]! + Vector3(0, 3, 0))!;
     }
 
-    testWidgets('shows where it stands, its help and the attribution', (
-      tester,
-    ) async {
+    testWidgets('M7.1 shows where it stands and its help', (tester) async {
       when(() => cubit.state)
           .thenReturn(_playing.copyWith(problem: 'the host is far'));
       await pump(tester);
@@ -92,11 +91,31 @@ void main() {
       expect(find.textContaining('blue · s-blue'), findsOneWidget);
       expect(find.textContaining('the host is far'), findsOneWidget);
       expect(find.textContaining('Drag to pan'), findsOneWidget);
-      expect(find.textContaining('OpenStreetMap'), findsOneWidget);
       expect(world.drawn.keys, unorderedEquals(['c-1', 'r-1']));
     });
 
-    testWidgets('names the units close up, and moves on each frame', (
+    testWidgets("Q-MAP-22 the credits entry shows the map's attribution", (
+      tester,
+    ) async {
+      await pump(tester);
+      // The attribution is behind the entry, not on the map.
+      expect(find.textContaining('OpenStreetMap'), findsNothing);
+
+      await tester.tap(find.text('Credits'));
+      await tester.pumpAndSettle();
+
+      expect(map.spec.attribution, isNotEmpty);
+      for (final line in map.spec.attribution) {
+        expect(find.textContaining(line), findsOneWidget);
+      }
+
+      await tester.tap(find.text('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('OpenStreetMap'), findsNothing);
+    });
+
+    testWidgets('M7.1 names the units close up, and moves on each frame', (
       tester,
     ) async {
       await pump(tester);
@@ -107,7 +126,7 @@ void main() {
       expect(find.text('commander'), findsOneWidget);
     });
 
-    testWidgets('selects a unit of its section, and lets it go', (
+    testWidgets('M7.1 selects a unit of its section, and lets it go', (
       tester,
     ) async {
       await pump(tester);
@@ -121,7 +140,7 @@ void main() {
       verify(() => cubit.select(null)).called(1);
     });
 
-    testWidgets('moves the selected unit where the ground is tapped', (
+    testWidgets('M7.1 moves the selected unit where the ground is tapped', (
       tester,
     ) async {
       when(() => cubit.state)
@@ -137,7 +156,7 @@ void main() {
       verifyNever(() => cubit.select(any()));
     });
 
-    testWidgets('does nothing with the ground and no selection', (
+    testWidgets('M7.1 does nothing with the ground and no selection', (
       tester,
     ) async {
       await pump(tester);
@@ -149,7 +168,7 @@ void main() {
       verifyNever(() => cubit.moveSelectedTo(any()));
     });
 
-    testWidgets('shows the selected unit and the answer to its order', (
+    testWidgets('M7.1 shows the selected unit and the answer to its order', (
       tester,
     ) async {
       when(() => cubit.state).thenReturn(
@@ -167,7 +186,7 @@ void main() {
       expect(find.textContaining('move accepted'), findsOneWidget);
     });
 
-    testWidgets('shows a refused order and an AP it does not know', (
+    testWidgets('M7.1 shows a refused order and an AP it does not know', (
       tester,
     ) async {
       when(() => cubit.apNow(any())).thenReturn(null);
@@ -190,7 +209,7 @@ void main() {
       );
     });
 
-    testWidgets("lists the section's units, and deploys a stored one", (
+    testWidgets("M7.1 lists the section's units, and deploys a stored one", (
       tester,
     ) async {
       when(() => cubit.state).thenReturn(
@@ -216,7 +235,7 @@ void main() {
     });
 
     testWidgets(
-      'Centre looks at the section again, and selects from its list',
+      'M7.1 Centre looks at the section again, and selects from its list',
       (tester) async {
         await pump(tester);
         await tester.tap(find.text('Centre'));
@@ -229,7 +248,7 @@ void main() {
       },
     );
 
-    testWidgets('pans, zooms and turns with the mouse, fingers and keys', (
+    testWidgets('M7.1 pans, zooms and turns with the mouse, fingers and keys', (
       tester,
     ) async {
       when(() => cubit.state)
@@ -269,6 +288,81 @@ void main() {
       verify(() => cubit.select(null)).called(1);
       expect(find.text('commander'), findsOneWidget);
       expect(find.text('soldier'), findsNothing);
+    });
+  });
+
+  group('$BattleView over a recorded stream', () {
+    testWidgets('decision 237 draws and lists only what the section sees', (
+      tester,
+    ) async {
+      // Section 2 in clear weather, and in fog: fog hides some of what the
+      // host showed it.
+      final clear = FakeHost.recorded('clear_s-2_host').view;
+      final fog = FakeHost.recorded('fog_s-2_host').view;
+      final seen = {for (final unit in fog.units) unit.unitId};
+      final hidden = {
+        for (final unit in clear.units)
+          if (!seen.contains(unit.unitId)) unit.unitId,
+      };
+      expect(hidden, isNotEmpty, reason: 'the recordings must differ');
+
+      final apiClient = MockAppwriteApiClient();
+      when(
+        () => apiClient.signIn(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer((_) async {});
+      when(apiClient.createJwt).thenAnswer((_) async => 'jwt');
+      final host = FakeHost.recorded('fog_s-2');
+      final cubit = BattleCubit(
+        repository: BattleRepository(
+          settings: const BattleSettings(
+            endpoint: 'http://127.0.0.1:9/v1',
+            projectId: 'hawkbee',
+            email: 'a@battleteam.local',
+            password: 'secret',
+            battleId: 'b-1',
+          ),
+          apiClient: apiClient,
+          transport: host,
+          address: (_) async => Uri.parse('ws://host/v1/socket'),
+        ),
+      );
+      addTearDown(cubit.close);
+      await tester.runAsync(() async {
+        await cubit.start();
+        await pumpEventQueue(times: 500);
+      });
+      final world = FakeWorld(map);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: BlocProvider<BattleCubit>.value(
+            value: cubit,
+            child: BattleView(
+              map: map,
+              world: world,
+              sceneBuilder: (_, _, _, _) => const SizedBox.expand(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(cubit.state.status, BattleStatus.playing);
+      expect(world.drawn.keys, isNotEmpty);
+      expect(world.drawn.keys.toSet().difference(seen), isEmpty);
+      expect(world.drawn.keys.toSet().intersection(hidden), isEmpty);
+      // The list names the section's own units and no other.
+      expect(
+        find.textContaining(RegExp('in the field|stored')),
+        findsNWidgets(
+          fog.units.where((unit) => unit.sectionId == host.sectionId).length,
+        ),
+      );
     });
   });
 }

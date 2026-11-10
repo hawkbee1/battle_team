@@ -1,86 +1,76 @@
 import 'dart:async';
 
-import 'package:battle_client/battle_client.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/data/battle_repository.dart';
+import 'package:battle_team/battle/data/battle_snapshot.dart';
+import 'package:battle_team/battle/data/connection_status.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 part 'battle_state.dart';
 
 /// {@template battle_cubit}
-/// Plays one battle as one player through [client]: signs in to Appwrite
-/// ([signIn]), then keeps the section's view and sends the player's moves.
-/// The host checks every order (stack decision 8).
+/// Plays one battle as one player through [repository]: signs in, then keeps
+/// the section's view and sends the player's orders. The host checks every
+/// order (stack decision 8). The 3D view listens to it (Observer).
 /// {@endtemplate}
 class BattleCubit extends Cubit<BattleState> {
   /// {@macro battle_cubit}
-  new({required this.client, required this.signIn})
-    : super(const BattleState());
+  new({required this.repository}) : super(const BattleState());
 
-  /// The connection to the battle's host.
-  final BattleClient client;
-
-  /// Signs the player in to Appwrite, so that the client gets JWTs.
-  final Future<void> Function() signIn;
+  /// Where the battle's data comes from.
+  final BattleRepository repository;
 
   final _subscriptions = <StreamSubscription<Object?>>[];
 
   /// Signs in, then connects to the battle.
   Future<void> start() async {
     try {
-      await signIn();
+      await repository.signIn();
     } on Object catch (error) {
       emit(state.copyWith(status: BattleStatus.failed, problem: '$error'));
       return;
     }
     _subscriptions
-      ..add(client.statuses.listen(_onStatus))
-      ..add(client.messages.listen((_) => _refresh()));
-    client.start();
+      ..add(repository.connection.listen(_onConnection))
+      ..add(repository.snapshots.listen(_onSnapshot));
+    repository.start();
   }
 
-  void _onStatus(ClientStatus status) {
-    final next = switch (status) {
-      ClientStatus.idle || ClientStatus.connecting => BattleStatus.connecting,
-      ClientStatus.signedIn => BattleStatus.playing,
-      ClientStatus.waiting => BattleStatus.lost,
-      ClientStatus.stopped => BattleStatus.stopped,
+  void _onConnection(ConnectionStatus connection) {
+    final next = switch (connection) {
+      ConnectionStatus.connecting => BattleStatus.connecting,
+      ConnectionStatus.connected => BattleStatus.playing,
+      ConnectionStatus.lost => BattleStatus.lost,
+      ConnectionStatus.stopped => BattleStatus.stopped,
     };
-    final problem = switch (status) {
-      ClientStatus.stopped => switch ((
-        client.stoppedBy,
-        client.lookupRefused,
-      )) {
-        (final HostMessage message?, _) => '$message',
-        (_, final HostLookupException refused?) => refused.code,
-        _ => null,
-      },
-      _ => null,
-    };
-    emit(state.copyWith(status: next, problem: problem));
-  }
-
-  void _refresh() {
-    final view = client.view;
-    final seat = client.seat;
     emit(
       state.copyWith(
-        units: Map.of(view.units),
-        hqs: view.hqs.values.toList(),
-        relics: view.relics.values.toList(),
-        team: seat?.team,
-        sectionId: seat?.sectionId,
-        revision: state.revision + 1,
+        status: next,
+        problem: connection == ConnectionStatus.stopped
+            ? repository.stopReason
+            : null,
       ),
     );
   }
 
+  void _onSnapshot(BattleSnapshot snapshot) => emit(
+    state.copyWith(
+      units: snapshot.units,
+      hqs: snapshot.hqs,
+      relics: snapshot.relics,
+      team: snapshot.team,
+      sectionId: snapshot.sectionId,
+      revision: state.revision + 1,
+    ),
+  );
+
   /// The battle time now, as the client shows it.
-  Duration? get battleTime => client.battleTime;
+  Duration? get battleTime => repository.battleTime;
 
   /// The AP of [unit] now, when the section owns it.
   double? apNow(UnitView unit) => switch (unit.private) {
-    final private? => client.apNow(private.ap),
+    final private? => repository.apNow(private.ap),
     null => null,
   };
 
@@ -110,7 +100,7 @@ class BattleCubit extends Cubit<BattleState> {
     if (state.status != BattleStatus.playing) return;
     String? refusal;
     try {
-      refusal = (await client.send(order)).refusal;
+      refusal = await repository.send(order);
     } on Object catch (error) {
       refusal = '$error';
     }
@@ -123,13 +113,13 @@ class BattleCubit extends Cubit<BattleState> {
     );
   }
 
-  /// Closes, then the client: an order it cuts off shows nothing.
+  /// Closes, then the repository: an order it cuts off shows nothing.
   @override
   Future<void> close() async {
     for (final subscription in _subscriptions) {
       await subscription.cancel();
     }
     await super.close();
-    await client.close();
+    await repository.close();
   }
 }

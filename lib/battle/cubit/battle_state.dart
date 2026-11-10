@@ -1,6 +1,6 @@
 part of 'battle_cubit.dart';
 
-/// Where the playtest stands.
+/// Where the battle screen stands.
 enum BattleStatus {
   /// Signing in to Appwrite.
   signingIn,
@@ -45,7 +45,7 @@ class OrderNotice extends Equatable {
 }
 
 /// {@template battle_state}
-/// What the playtest shows: the section's view, the selected unit and the
+/// What the battle screen shows: the section's view, the selected unit and the
 /// last answer.
 /// {@endtemplate}
 class BattleState extends Equatable {
