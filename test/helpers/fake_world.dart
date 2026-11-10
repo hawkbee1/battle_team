@@ -67,6 +67,18 @@ class FakeWorld implements BattleWorld {
   @override
   void showShots(Iterable<ShotEffect> effects) => shots.addAll(effects);
 
+  /// The path last shown; null when none.
+  List<Position>? path;
+
+  /// Every call of `showPath`, in order.
+  final paths = <List<Position>?>[];
+
+  @override
+  void showPath(List<Position>? points) {
+    path = points;
+    paths.add(points);
+  }
+
   @override
   void tick(double seconds) => this.seconds += seconds;
 }

@@ -20,13 +20,21 @@ part 'battle_state.dart';
 /// for display only, and an order it expects refused is not sent. The 3D view
 /// listens to it (Observer), and to [shots], the shots the section sees.
 ///
+/// A move is previewed before it is sent (M7 Issue 8): [movePreviewer] plans
+/// its path and AP cost on the map, for display only, and a refusal it expects
+/// is shown and not sent; the player confirms, and the order goes with the
+/// path it planned, which the host checks cell by cell. The host's answer
+/// wins: a refusal shows as the host's, and an arrival that differs from the
+/// preview's is said, never argued. Without a previewer a move goes straight
+/// to the host, which searches the path.
+///
 /// It logs on `battle_team.BattleCubit`: the sign-in, each change of the
 /// connection, each order and the answer, with its refusal code. Never a
 /// unit, a position or any part of the state (decision 237).
 /// {@endtemplate}
 class BattleCubit extends Cubit<BattleState> {
   /// {@macro battle_cubit}
-  new({required this.repository, required this.preCheck})
+  new({required this.repository, required this.preCheck, this.movePreviewer})
     : super(const BattleState());
 
   /// Where the battle's data comes from.
@@ -35,7 +43,14 @@ class BattleCubit extends Cubit<BattleState> {
   /// What the client expects the host to refuse (stack decision 8).
   final OrderPreCheck preCheck;
 
+  /// What the client expects of a move: its path and cost (stack decision 8).
+  final MovePreviewer? movePreviewer;
+
   static final _log = Logger('battle_team.BattleCubit');
+
+  /// A confirmed move whose arrival the host has not told yet: the unit, the
+  /// arrival the preview showed and the end of its move before the order.
+  ({String unitId, Duration expected, Duration? before})? _awaiting;
 
   final _subscriptions = <StreamSubscription<Object?>>[];
 
@@ -91,11 +106,45 @@ class BattleCubit extends Cubit<BattleState> {
     if (lost) _log.info('first person ended: the unit is gone');
     // A target the section stops seeing is no target any more.
     final targetGone = next.targetId != null && next.target == null;
+    // A preview of a unit that moved, left or is no longer selected is stale.
+    final pending = next.pendingMove;
+    final stale =
+        pending != null &&
+        (next.selectedId != pending.unitId ||
+            next.units[pending.unitId]?.position != pending.from);
+    final note = _arrivalNote(next);
     emit(
       next.copyWith(
         viewMode: lost ? const TopDownMode() : null,
         targetId: targetGone ? () => null : null,
+        pendingMove: stale ? () => null : null,
+        arrivalNote: note == null ? null : () => note,
       ),
+    );
+  }
+
+  /// The arrival the host gave a confirmed move, when it differs from the
+  /// preview's by more than a second (stack decision 8).
+  ArrivalNote? _arrivalNote(BattleState next) {
+    final awaiting = _awaiting;
+    if (awaiting == null) return null;
+    final unit = next.units[awaiting.unitId];
+    if (unit == null) {
+      _awaiting = null;
+      return null;
+    }
+    final host = unit.private?.movingUntil;
+    // Not told yet: the view still holds the end of the previous move.
+    if (host == null || host == awaiting.before) return null;
+    _awaiting = null;
+    if ((host - awaiting.expected).abs() <= const Duration(seconds: 1)) {
+      return null;
+    }
+    _log.warning('move arrival differs from the preview');
+    return ArrivalNote(
+      unitId: awaiting.unitId,
+      expected: awaiting.expected,
+      host: host,
     );
   }
 
@@ -126,6 +175,8 @@ class BattleCubit extends Cubit<BattleState> {
         selectedId: () => selected,
         targetId: () => null,
         groundFire: false,
+        pendingMove: () => null,
+        arrivalNote: () => null,
         viewMode: leaves ? const TopDownMode() : null,
       ),
     );
@@ -164,11 +215,108 @@ class BattleCubit extends Cubit<BattleState> {
     emit(state.copyWith(viewMode: const TopDownMode()));
   }
 
-  /// Orders the selected unit to move to [to].
+  /// Plans the move of the selected unit to [to] and shows it, sending
+  /// nothing: the path and its AP cost, or why the client expects the host to
+  /// refuse it (COMBAT-03, COMBAT-06, MAP-47, MAP-50). [confirmMove] sends
+  /// it. A move the client cannot plan goes straight to the host.
+  Future<void> previewMoveTo(Position to) async {
+    final unit = state.selected;
+    final time = battleTime;
+    if (state.status != BattleStatus.playing || unit == null || time == null) {
+      return;
+    }
+    final plan = _plan(unit, to, time);
+    if (plan is MoveUnplanned) {
+      await _sendMove(unit, to);
+      return;
+    }
+    _log.info(
+      plan is MoveRefused
+          ? 'move not previewable: ${plan.reason.code}'
+          : 'move previewed',
+    );
+    emit(
+      state.copyWith(
+        pendingMove: () => PendingMove(
+          unitId: unit.unitId,
+          from: unit.position ?? const Position(0, 0, 0),
+          plan: plan,
+        ),
+        arrivalNote: () => null,
+      ),
+    );
+  }
+
+  /// Sends the previewed move, with the path it planned (stack decision 8).
+  Future<void> confirmMove() async {
+    final pending = state.pendingMove;
+    final unit = state.units[pending?.unitId];
+    final plan = pending?.plan;
+    emit(state.copyWith(pendingMove: () => null));
+    if (unit == null || plan is! MovePreview) return;
+    await _sendMove(unit, plan.destination, plan: plan);
+  }
+
+  /// Drops the previewed move.
+  void cancelMove() {
+    if (state.pendingMove == null) return;
+    emit(state.copyWith(pendingMove: () => null));
+  }
+
+  /// Orders the selected unit to move to [to] at once, without a preview:
+  /// from first person, where a move is a step of a stream (stack decision
+  /// 3). An order the client expects refused is not sent.
   Future<void> moveSelectedTo(Position to) async {
     final unit = state.selected;
+    final time = battleTime;
     if (unit == null) return;
-    await _order(unit.unitId, 'move', Move(unitId: unit.unitId, to: to));
+    final plan = time == null ? const MoveUnplanned() : _plan(unit, to, time);
+    if (plan is MoveRefused) {
+      _log.warning('order move not sent: ${plan.reason.code}');
+      emit(
+        state.copyWith(
+          notice: () => OrderNotice(
+            order: 'move',
+            unitId: unit.unitId,
+            refusal: plan.reason.code,
+          ),
+        ),
+      );
+      return;
+    }
+    await _sendMove(unit, to, plan: plan is MovePreview ? plan : null);
+  }
+
+  MovePlan _plan(UnitView unit, Position to, Duration time) =>
+      movePreviewer?.preview(
+        unit: unit,
+        destination: to,
+        seen: state.units.values,
+        time: time,
+      ) ??
+      const MoveUnplanned();
+
+  /// Sends the move of [unit] to [to], along the path of [plan] when there is
+  /// one, and waits for the host to say when it arrives.
+  Future<void> _sendMove(
+    UnitView unit,
+    Position to, {
+    MovePreview? plan,
+  }) async {
+    if (state.status != BattleStatus.playing) return;
+    final before = unit.private?.movingUntil;
+    final refusal = await _order(
+      unit.unitId,
+      'move',
+      Move(unitId: unit.unitId, to: to, path: plan?.cells),
+    );
+    if (refusal == null && plan != null && !isClosed) {
+      _awaiting = (
+        unitId: unit.unitId,
+        expected: plan.arrivesAt,
+        before: before,
+      );
+    }
   }
 
   // The weapon: what the buttons show (stack decision 8, display only) ...
@@ -330,17 +478,20 @@ class BattleCubit extends Cubit<BattleState> {
     await _order(unit.unitId, name, build(unit));
   }
 
-  /// Sends [order] for [unitId] while playing, and shows the host's answer.
-  Future<void> _order(String unitId, String name, Order order) async {
-    if (state.status != BattleStatus.playing) return;
+  /// Sends [order] for [unitId] while playing, and shows the host's answer;
+  /// completes with the host's refusal code, or null when it accepted it (and
+  /// when nothing was sent).
+  Future<String?> _order(String unitId, String name, Order order) async {
+    if (state.status != BattleStatus.playing) return null;
     final refusal = await sendOrder(_log, repository, name, order);
-    if (isClosed) return;
+    if (isClosed) return refusal;
     emit(
       state.copyWith(
         notice: () =>
             OrderNotice(order: name, unitId: unitId, refusal: refusal),
       ),
     );
+    return refusal;
   }
 
   /// Closes, then the repository: an order it cuts off shows nothing.

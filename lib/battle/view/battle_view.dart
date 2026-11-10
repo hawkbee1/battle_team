@@ -5,6 +5,7 @@ import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
+import 'package:battle_team/battle/widgets/move_panel.dart';
 import 'package:battle_team/battle/widgets/weapon_panel.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
@@ -120,6 +121,7 @@ class _BattleViewState extends State<BattleView> {
       target: state.target?.unitId,
       battleTime: context.read<BattleCubit>().battleTime,
     );
+    widget.world.showPath(state.pendingMove?.points);
     if (centreOnUnits) _centreOnSection(state);
   }
 
@@ -226,10 +228,14 @@ class _BattleViewState extends State<BattleView> {
     );
     if (ground != null && state.selected != null) {
       final there = positionOf(ground);
+      // From above a move is previewed and confirmed (M7 Issue 8); from a
+      // unit's eyes it is a step of a stream and goes at once.
       unawaited(
         state.groundFire
             ? cubit.fireSelectedAt(there)
-            : cubit.moveSelectedTo(there),
+            : _firstPerson != null
+            ? cubit.moveSelectedTo(there)
+            : cubit.previewMoveTo(there),
       );
     }
   }
@@ -273,10 +279,13 @@ class _BattleViewState extends State<BattleView> {
     };
   }
 
-  /// Gives up firing at a position, else clears the selection.
+  /// Gives up a previewed move, else firing at a position, else clears the
+  /// selection.
   void _escape() {
     final cubit = context.read<BattleCubit>();
-    if (cubit.state.groundFire) {
+    if (cubit.state.pendingMove != null) {
+      cubit.cancelMove();
+    } else if (cubit.state.groundFire) {
       cubit.toggleGroundFire();
     } else {
       cubit.select(null);
@@ -638,6 +647,21 @@ class _SelectedUnit extends StatelessWidget {
         children: [
           Text(lines.join('\n')),
           if (unit != null) WeaponPanel(unit: unit, aim: aim),
+          if (unit != null)
+            MovePanel(
+              pending: switch (state.pendingMove) {
+                final pending? when pending.unitId == unit.unitId => pending,
+                _ => null,
+              },
+              note: switch (state.arrivalNote) {
+                final note? when note.unitId == unit.unitId => note,
+                _ => null,
+              },
+              ap: cubit.apNow(unit),
+              time: cubit.battleTime,
+              onConfirm: () => unawaited(cubit.confirmMove()),
+              onCancel: cubit.cancelMove,
+            ),
           if (unit != null && unit.private?.place == UnitPlace.deployed)
             StoreButton(unit: unit),
           if (seeable)

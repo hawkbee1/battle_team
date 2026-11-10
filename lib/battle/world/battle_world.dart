@@ -40,6 +40,12 @@ abstract interface class BattleWorld {
   /// (decisions 234 and 237).
   void showShots(Iterable<ShotEffect> effects);
 
+  /// Draws the move the player is previewing as a line through [points] on
+  /// the ground (M7 Issue 8), until it is called again; null or none clears
+  /// it. Only the path of the section's own unit: nothing the section does
+  /// not see (decision 237).
+  void showPath(List<Position>? points);
+
   /// Moves on by [seconds].
   void tick(double seconds);
 }

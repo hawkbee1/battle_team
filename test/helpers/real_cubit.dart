@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:battle_client/battle_client.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:mocktail/mocktail.dart';
@@ -11,7 +12,7 @@ import 'pre_check.dart';
 /// A cubit over the real repository, client and codec, with [host] for the
 /// battle's host: what the app does, minus the network. The caller starts it
 /// and closes it.
-BattleCubit realCubit(FakeHost host) {
+BattleCubit realCubit(FakeHost host, {MovePreviewer? previewer}) {
   final apiClient = MockAppwriteApiClient();
   when(
     () => apiClient.signIn(
@@ -35,6 +36,7 @@ BattleCubit realCubit(FakeHost host) {
       random: Random(1),
     ),
     preCheck: testPreCheck(),
+    movePreviewer: previewer,
   );
 }
 

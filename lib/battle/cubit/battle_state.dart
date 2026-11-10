@@ -76,6 +76,61 @@ class OrderNotice extends Equatable {
   List<Object?> get props => [order, unitId, refusal];
 }
 
+/// {@template pending_move}
+/// A move the player has previewed and not yet confirmed (M7 Issue 8): the
+/// [unitId] it is for, where the unit stood ([from]) when it was planned, and
+/// the [plan], which is a path and its cost, or the refusal the client
+/// expects. Nothing has been sent.
+/// {@endtemplate}
+class PendingMove extends Equatable {
+  /// {@macro pending_move}
+  const new({required this.unitId, required this.from, required this.plan});
+
+  /// The unit.
+  final String unitId;
+
+  /// Where it stood when the move was planned: a preview of a unit that has
+  /// moved since is dropped.
+  final Position from;
+
+  /// What the client expects.
+  final MovePlan plan;
+
+  /// The points of the path to draw; none for a refusal.
+  List<Position>? get points => switch (plan) {
+    MovePreview(:final points) => points,
+    _ => null,
+  };
+
+  @override
+  List<Object?> get props => [unitId, from, plan];
+}
+
+/// {@template arrival_note}
+/// The host's arrival for a confirmed move differs from the preview's (stack
+/// decision 8): the host's answer counts, and this says by how much. [host]
+/// and [expected] are battle times.
+/// {@endtemplate}
+class ArrivalNote extends Equatable {
+  /// {@macro arrival_note}
+  const new({required this.unitId, required this.expected, required this.host});
+
+  /// The unit that moves.
+  final String unitId;
+
+  /// The arrival the preview showed.
+  final Duration expected;
+
+  /// The arrival the host gave.
+  final Duration host;
+
+  /// How much later the host has the unit arrive; negative when earlier.
+  Duration get difference => host - expected;
+
+  @override
+  List<Object?> get props => [unitId, expected, host];
+}
+
 /// {@template battle_state}
 /// What the battle screen shows: the section's view, the selected unit and the
 /// last answer.
@@ -92,6 +147,8 @@ class BattleState extends Equatable {
     this.selectedId,
     this.targetId,
     this.groundFire = false,
+    this.pendingMove,
+    this.arrivalNote,
     this.storedWeapons = const [],
     this.viewMode = const TopDownMode(),
     this.notice,
@@ -127,6 +184,13 @@ class BattleState extends Equatable {
   /// Whether the next tap on the ground fires there (COMBAT-12) instead of
   /// moving.
   final bool groundFire;
+
+  /// The move the player previewed and has not confirmed.
+  final PendingMove? pendingMove;
+
+  /// Where the host's arrival differs from the preview's, once a confirmed
+  /// move is under way.
+  final ArrivalNote? arrivalNote;
 
   /// The section's spare weapons (decision 151).
   final List<String> storedWeapons;
@@ -178,8 +242,9 @@ class BattleState extends Equatable {
     return mine..sort((a, b) => a.unitId.compareTo(b.unitId));
   }
 
-  /// This state with the values given; [selectedId] and [notice] are
-  /// functions so that they can be cleared.
+  /// This state with the values given; [selectedId], [notice],
+  /// [pendingMove] and [arrivalNote] are functions so that they can be
+  /// cleared.
   BattleState copyWith({
     BattleStatus? status,
     Map<String, UnitView>? units,
@@ -190,6 +255,8 @@ class BattleState extends Equatable {
     String? Function()? selectedId,
     String? Function()? targetId,
     bool? groundFire,
+    PendingMove? Function()? pendingMove,
+    ArrivalNote? Function()? arrivalNote,
     List<String>? storedWeapons,
     ViewMode? viewMode,
     OrderNotice? Function()? notice,
@@ -205,6 +272,8 @@ class BattleState extends Equatable {
     selectedId: selectedId == null ? this.selectedId : selectedId(),
     targetId: targetId == null ? this.targetId : targetId(),
     groundFire: groundFire ?? this.groundFire,
+    pendingMove: pendingMove == null ? this.pendingMove : pendingMove(),
+    arrivalNote: arrivalNote == null ? this.arrivalNote : arrivalNote(),
     storedWeapons: storedWeapons ?? this.storedWeapons,
     viewMode: viewMode ?? this.viewMode,
     notice: notice == null ? this.notice : notice(),
@@ -223,6 +292,8 @@ class BattleState extends Equatable {
     selectedId,
     targetId,
     groundFire,
+    pendingMove,
+    arrivalNote,
     storedWeapons,
     viewMode,
     notice,
