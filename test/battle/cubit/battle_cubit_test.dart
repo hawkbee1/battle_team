@@ -10,6 +10,7 @@ import 'package:mocktail/mocktail.dart';
 import '../../helpers/fake_host.dart';
 import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
+import '../../helpers/pre_check.dart';
 
 const _snapshot = BattleSnapshot(
   units: {'c-1': blueCommander, 'r-1': redSoldier},
@@ -48,7 +49,7 @@ void main() {
       when(repository.start).thenReturn(null);
       when(() => repository.send(any())).thenAnswer((_) async => null);
       when(repository.close).thenAnswer((_) async {});
-      cubit = BattleCubit(repository: repository);
+      cubit = BattleCubit(repository: repository, preCheck: testPreCheck());
     });
 
     tearDown(() async {
@@ -620,7 +621,10 @@ void main() {
             transport: host,
             address: (_) async => Uri.parse('ws://host/v1/socket'),
           );
-          final cubit = BattleCubit(repository: repository);
+          final cubit = BattleCubit(
+            repository: repository,
+            preCheck: testPreCheck(),
+          );
           addTearDown(cubit.close);
 
           await cubit.start();

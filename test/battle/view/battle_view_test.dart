@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/battle.dart';
@@ -22,6 +23,7 @@ import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
 import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
+import '../../helpers/pre_check.dart';
 
 class _MockBattleCubit extends MockCubit<BattleState> implements BattleCubit;
 
@@ -95,6 +97,19 @@ void main() {
       when(() => cubit.battleTime).thenReturn(const Duration(hours: 1));
       when(() => cubit.apNow(any())).thenReturn(30);
       when(() => cubit.moveSelectedTo(any())).thenAnswer((_) async {});
+      // The weapon panel of M7.5 asks the cubit what the buttons may do; these
+      // tests are about the view, so nothing may fire.
+      when(() => cubit.shots).thenAnswer((_) => const Stream.empty());
+      when(cubit.checkFire)
+          .thenReturn(const PreCheckRefused(PreCheckRefusal.targetNotSeen));
+      when(cubit.checkFireAimed)
+          .thenReturn(const PreCheckRefused(PreCheckRefusal.noWeapon));
+      when(cubit.checkFireAtPosition)
+          .thenReturn(const PreCheckRefused(PreCheckRefusal.noWeapon));
+      when(cubit.checkReload)
+          .thenReturn(const PreCheckRefused(PreCheckRefusal.noWeapon));
+      when(() => cubit.swappableWeapons).thenReturn(const []);
+      when(() => cubit.magazineOf(any())).thenReturn(10);
     });
 
     Future<void> pump(
@@ -221,7 +236,7 @@ void main() {
           .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
       await pump(tester);
 
-      await tester.tapAt(const Offset(400, 500));
+      await tester.tapAt(const Offset(600, 500));
       final to =
           verify(() => cubit.moveSelectedTo(captureAny())).captured.single
               as Position;
@@ -528,8 +543,8 @@ void main() {
         (tester) async {
           await enter(tester);
 
-          // Below the horizon, ahead of the eyes.
-          await tester.tapAt(const Offset(400, 500));
+          // Below the horizon, ahead of the eyes, above the panels.
+          await tester.tapAt(const Offset(400, 360));
 
           final to =
               verify(() => cubit.moveSelectedTo(captureAny())).captured.single
@@ -685,6 +700,7 @@ void main() {
           transport: host,
           address: (_) async => Uri.parse('ws://host/v1/socket'),
         ),
+        preCheck: testPreCheck(),
       );
       addTearDown(cubit.close);
       await tester.runAsync(() async {

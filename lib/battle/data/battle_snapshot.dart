@@ -3,8 +3,9 @@ import 'package:equatable/equatable.dart';
 
 /// {@template battle_snapshot}
 /// What the section's view holds at one moment: the units it knows, the HQs
-/// it sees, the relics, and the seat the player signed in as. The host sends
-/// only what the section sees (decision 237): a snapshot holds nothing more.
+/// it sees, the relics, its own state (its spare weapons), and the seat the
+/// player signed in as. The host sends only what the section sees (decision
+/// 237): a snapshot holds nothing more.
 /// {@endtemplate}
 class BattleSnapshot extends Equatable {
   /// {@macro battle_snapshot}
@@ -12,6 +13,7 @@ class BattleSnapshot extends Equatable {
     required this.units,
     required this.hqs,
     required this.relics,
+    this.section,
     this.team,
     this.sectionId,
   });
@@ -25,6 +27,9 @@ class BattleSnapshot extends Equatable {
   /// The relics.
   final List<RelicView> relics;
 
+  /// The section's own state, once the host's whole view came.
+  final SectionPrivate? section;
+
   /// The player's team, once signed in.
   final String? team;
 
@@ -32,5 +37,5 @@ class BattleSnapshot extends Equatable {
   final String? sectionId;
 
   @override
-  List<Object?> get props => [units, hqs, relics, team, sectionId];
+  List<Object?> get props => [units, hqs, relics, section, team, sectionId];
 }

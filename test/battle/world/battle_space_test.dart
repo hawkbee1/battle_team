@@ -26,6 +26,33 @@ void main() {
     });
   });
 
+  group('directionOf', () {
+    test(
+      'COMBAT-14 turns a look in the world into a direction of the battle',
+      () {
+        // East stays east, north is toward smaller y, up stays up.
+        expect(directionOf(Vector3(1, 0, 0)), Direction.of(1, 0, 0));
+        expect(directionOf(Vector3(0, 0, 1)), Direction.of(0, -1, 0));
+        expect(directionOf(Vector3(0, 1, 0)), Direction.of(0, 0, 1));
+      },
+    );
+
+    test(
+      'COMBAT-14 is the direction between two positions, as the world sees it',
+      () {
+        const from = Position(1000, 2000, 300);
+        const to = Position(1000, 1000, 300);
+        final look = worldOf(to) - worldOf(from);
+
+        final aim = directionOf(look.normalized());
+
+        expect(aim.x, closeTo(0, 1e-6));
+        expect(aim.y, closeTo(-1, 1e-6));
+        expect(aim.z, closeTo(0, 1e-6));
+      },
+    );
+  });
+
   group('fanOut', () {
     test('spreads units on one spot around it, and leaves the others', () {
       final placed = {

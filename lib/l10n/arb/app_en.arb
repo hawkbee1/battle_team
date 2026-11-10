@@ -47,11 +47,11 @@
       }
     }
   },
-  "battleHelp": "Drag to pan · scroll or pinch to zoom · Q/E or two fingers to turn · tap one of your units, then tap the ground to move it",
+  "battleHelp": "Drag to pan · scroll or pinch to zoom · Q/E or two fingers to turn · tap one of your units, then tap the ground to move it · tap an enemy to target it, then Fire",
   "@battleHelp": {
     "description": "How to use the battle view"
   },
-  "battleHelpFirstPerson": "Drag to look · Q/E or arrow keys to turn · tap the ground to move there · Esc or the button to go back to the top-down view",
+  "battleHelpFirstPerson": "Drag to look · Q/E or arrow keys to turn · tap the ground to move there · Fire shoots where the reticle points · Esc or the button to go back to the top-down view",
   "@battleHelpFirstPerson": {
     "description": "How to use the battle view seen through a unit's eyes"
   },
@@ -115,7 +115,7 @@
   "@battleCentre": {
     "description": "Looks at the section's units again"
   },
-  "battleOrderName": "{order, select, move{move} deploy{deploy} other{order}}",
+  "battleOrderName": "{order, select, move{move} deploy{deploy} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} other{order}}",
   "@battleOrderName": {
     "description": "An order, as a word, in the host's answer to it",
     "placeholders": {
@@ -137,5 +137,87 @@
   "battleCreditsClose": "Close",
   "@battleCreditsClose": {
     "description": "Closes the map's credits"
+  },
+  "battleWeapon": "{weapon, select, rifle{Rifle} machine_gun{Machine gun} anti_tank{Anti-tank} artillery{Artillery} anti_air{Anti-air} explosive{Explosive charge} other{{weapon}}}",
+  "@battleWeapon": {
+    "description": "A weapon type, by name",
+    "placeholders": {
+      "weapon": {}
+    }
+  },
+  "battleNoWeapon": "No weapon",
+  "@battleNoWeapon": {
+    "description": "The selected unit carries no weapon"
+  },
+  "battleRounds": "Rounds {rounds}/{capacity}",
+  "@battleRounds": {
+    "description": "The rounds in the magazine and what it holds",
+    "placeholders": {
+      "rounds": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      }
+    }
+  },
+  "battleWeaponBusy": "Busy for {seconds} s",
+  "@battleWeaponBusy": {
+    "description": "The weapon is being reloaded, unloaded or swapped",
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "battleFire": "Fire",
+  "@battleFire": {
+    "description": "Fires at the target, or toward the reticle from first person"
+  },
+  "battleFireAtPosition": "Fire at position",
+  "@battleFireAtPosition": {
+    "description": "Fires at a ground position the next tap chooses"
+  },
+  "battleReload": "Reload",
+  "@battleReload": {
+    "description": "Reloads the weapon"
+  },
+  "battleSwapTo": "Swap to {weapon}",
+  "@battleSwapTo": {
+    "description": "Takes a spare weapon from the section's storage",
+    "placeholders": {
+      "weapon": {
+        "type": "String"
+      }
+    }
+  },
+  "battleTarget": "Target: {type}",
+  "@battleTarget": {
+    "description": "The unit the selected one would fire at",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "battleApWait": "Waits {time} for AP",
+  "@battleApWait": {
+    "description": "The shot waits for the unit to regain the AP it costs",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} other{{code}}}",
+  "@battleRefusal": {
+    "description": "Why an order is refused, as the host or the pre-check says it",
+    "placeholders": {
+      "code": {}
+    }
+  },
+  "battleHelpFireAtPosition": "Tap the ground to fire there · press the button again or Esc to cancel",
+  "@battleHelpFireAtPosition": {
+    "description": "Shown while the next tap on the ground fires"
   }
 }

@@ -1,5 +1,6 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
@@ -18,6 +19,9 @@ class FakeWorld implements BattleWorld {
   /// The selected unit last shown.
   String? selected;
 
+  /// The target last shown.
+  String? target;
+
   /// The battle time last shown, which units glide to their destination by
   /// (decision 236).
   Duration? battleTime;
@@ -31,9 +35,11 @@ class FakeWorld implements BattleWorld {
     required Iterable<HqView> hqs,
     required Iterable<RelicView> relics,
     required String? selected,
+    required String? target,
     required Duration? battleTime,
   }) {
     this.selected = selected;
+    this.target = target;
     this.battleTime = battleTime;
     drawn
       ..clear()
@@ -54,6 +60,12 @@ class FakeWorld implements BattleWorld {
     this.camera = camera;
     cameras.add(camera);
   }
+
+  /// Every shot effect it was told to draw, in order.
+  final shots = <ShotEffect>[];
+
+  @override
+  void showShots(Iterable<ShotEffect> effects) => shots.addAll(effects);
 
   @override
   void tick(double seconds) => this.seconds += seconds;

@@ -38,6 +38,47 @@ const redSoldier = UnitView(
   position: Position(50500, 20000, 3000),
 );
 
+/// A blue rifleman 5 m from the HQ, with 30 AP at 1 AP an hour and a loaded
+/// rifle: it fires at [redSoldier], 135 m away, and may swap its weapon.
+const blueRifleman = UnitView(
+  unitId: 'u-1',
+  unitType: 'soldier',
+  sectionId: 's-blue',
+  team: 'blue',
+  hp: 100,
+  maxHp: 100,
+  position: Position(50500, 6000, 3000),
+  weapon: 'rifle',
+  private: UnitPrivate(
+    place: UnitPlace.deployed,
+    ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
+    morale: 100,
+    rounds: 10,
+    xpEarned: 0,
+    xpUnspent: 0,
+  ),
+);
+
+/// The blue section's artillery, 5 m from the HQ: it fires at positions.
+const blueGun = UnitView(
+  unitId: 'g-1',
+  unitType: 'artillery',
+  sectionId: 's-blue',
+  team: 'blue',
+  hp: 100,
+  maxHp: 100,
+  position: Position(50500, 6000, 3000),
+  weapon: 'artillery',
+  private: UnitPrivate(
+    place: UnitPlace.deployed,
+    ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
+    morale: 100,
+    rounds: 1,
+    xpEarned: 0,
+    xpUnspent: 0,
+  ),
+);
+
 /// A blue soldier in storage: no place on the map (HQ-33).
 const storedSoldier = UnitView(
   unitId: 's-1',
@@ -72,6 +113,24 @@ const blueView = SectionView(
   relics: [
     RelicView(relicId: 'relic-1', position: Position(20500, 30500, 3000)),
   ],
+  world: [],
+);
+
+/// The blue section's whole view with an armed rifleman and a gun, and a
+/// machine gun in the section's storage.
+const armedView = SectionView(
+  at: Duration(hours: 1),
+  section: SectionPrivate(money: 0, xp: 0, storedWeapons: ['machine_gun']),
+  units: [blueCommander, blueRifleman, blueGun, redSoldier],
+  hqs: [
+    HqView(
+      team: 'blue',
+      position: Position(50500, 5500, 3000),
+      hp: 1000,
+      maxHp: 1000,
+    ),
+  ],
+  relics: [],
   world: [],
 );
 
