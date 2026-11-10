@@ -193,30 +193,33 @@ void main() {
       expect(cubit.state.selectedId, 's-1');
     });
 
-    test('M7.1 moves the selected unit and shows the answer', () async {
-      await play();
-      const to = Position(52000, 9000, 3100);
+    test(
+      'decision 3 moves the selected unit and shows the host answer',
+      () async {
+        await play();
+        const to = Position(52000, 9000, 3100);
 
-      // Nothing is selected: nothing goes out.
-      await cubit.moveSelectedTo(to);
-      verifyNever(() => repository.send(any()));
+        // Nothing is selected: nothing goes out.
+        await cubit.moveSelectedTo(to);
+        verifyNever(() => repository.send(any()));
 
-      cubit.select('c-1');
-      await cubit.moveSelectedTo(to);
-      verify(() => repository.send(const Move(unitId: 'c-1', to: to)))
-          .called(1);
-      expect(
-        cubit.state.notice,
-        const OrderNotice(order: 'move', unitId: 'c-1'),
-      );
-      expect(cubit.state.notice!.accepted, isTrue);
+        cubit.select('c-1');
+        await cubit.moveSelectedTo(to);
+        verify(() => repository.send(const Move(unitId: 'c-1', to: to)))
+            .called(1);
+        expect(
+          cubit.state.notice,
+          const OrderNotice(order: 'move', unitId: 'c-1'),
+        );
+        expect(cubit.state.notice!.accepted, isTrue);
 
-      when(() => repository.send(any()))
-          .thenAnswer((_) async => 'not_enough_ap');
-      await cubit.moveSelectedTo(to);
-      expect(cubit.state.notice!.refusal, 'not_enough_ap');
-      expect(cubit.state.notice!.accepted, isFalse);
-    });
+        when(() => repository.send(any()))
+            .thenAnswer((_) async => 'not_enough_ap');
+        await cubit.moveSelectedTo(to);
+        expect(cubit.state.notice!.refusal, 'not_enough_ap');
+        expect(cubit.state.notice!.accepted, isFalse);
+      },
+    );
 
     test('M7.1 shows the error of an order that could not go out', () async {
       await play();
@@ -283,9 +286,16 @@ void main() {
   });
 
   group('$BattleCubit over a recorded stream', () {
-    for (final name in ['clear_s-1', 'clear_s-2', 'fog_s-1', 'fog_s-2']) {
+    // What each section got from the start, and what a player who joins
+    // the running battle later gets (`_late`).
+    for (final name in [
+      for (final weather in ['clear', 'fog'])
+        for (final section in ['s-1', 's-2'])
+          for (final from in ['', '_late']) '${weather}_$section$from',
+    ]) {
       test(
-        'decision 237 $name holds the units its section sees, no more',
+        'decision 3 and decision 237 $name ends with the section view the host '
+        'holds, no more',
         () async {
           final host = FakeHost.recorded(name);
           final repository = BattleRepository(
@@ -307,7 +317,7 @@ void main() {
           await pumpEventQueue(times: 500);
 
           // What the host holds for that section at the end of its stream.
-          final end = FakeHost.recorded('${name}_host');
+          final end = FakeHost.recorded('${name.replaceAll('_late', '')}_host');
           expect(cubit.state.status, BattleStatus.playing);
           expect(
             cubit.state.units.keys,

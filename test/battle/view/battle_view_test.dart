@@ -115,6 +115,16 @@ void main() {
       expect(find.textContaining('OpenStreetMap'), findsNothing);
     });
 
+    testWidgets(
+      'decision 236 hands the battle time to the world, which glides the '
+      'units to their destination',
+      (tester) async {
+        await pump(tester);
+
+        expect(world.battleTime, const Duration(hours: 1));
+      },
+    );
+
     testWidgets('M7.1 names the units close up, and moves on each frame', (
       tester,
     ) async {
@@ -248,47 +258,49 @@ void main() {
       },
     );
 
-    testWidgets('M7.1 pans, zooms and turns with the mouse, fingers and keys', (
-      tester,
-    ) async {
-      when(() => cubit.state)
-          .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
-      await pump(tester);
+    testWidgets(
+      'decision 5 pans, zooms and turns the top-down view with the mouse, '
+      'fingers and keys',
+      (tester) async {
+        when(() => cubit.state)
+            .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
+        await pump(tester);
 
-      await tester.dragFrom(const Offset(400, 300), const Offset(50, 0));
-      await tester.sendEventToBinding(
-        const PointerScrollEvent(
-          position: Offset(400, 300),
-          scrollDelta: Offset(0, 100),
-        ),
-      );
-      for (final key in [
-        LogicalKeyboardKey.arrowLeft,
-        LogicalKeyboardKey.arrowRight,
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.keyQ,
-        LogicalKeyboardKey.keyE,
-        LogicalKeyboardKey.equal,
-        LogicalKeyboardKey.minus,
-        LogicalKeyboardKey.keyZ,
-      ]) {
-        await tester.sendKeyEvent(key);
-      }
-      // Far away, only the selected unit is named.
-      await tester.sendEventToBinding(
-        const PointerScrollEvent(
-          position: Offset(400, 300),
-          scrollDelta: Offset(0, 2000),
-        ),
-      );
-      await tester.pump();
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.dragFrom(const Offset(400, 300), const Offset(50, 0));
+        await tester.sendEventToBinding(
+          const PointerScrollEvent(
+            position: Offset(400, 300),
+            scrollDelta: Offset(0, 100),
+          ),
+        );
+        for (final key in [
+          LogicalKeyboardKey.arrowLeft,
+          LogicalKeyboardKey.arrowRight,
+          LogicalKeyboardKey.arrowUp,
+          LogicalKeyboardKey.arrowDown,
+          LogicalKeyboardKey.keyQ,
+          LogicalKeyboardKey.keyE,
+          LogicalKeyboardKey.equal,
+          LogicalKeyboardKey.minus,
+          LogicalKeyboardKey.keyZ,
+        ]) {
+          await tester.sendKeyEvent(key);
+        }
+        // Far away, only the selected unit is named.
+        await tester.sendEventToBinding(
+          const PointerScrollEvent(
+            position: Offset(400, 300),
+            scrollDelta: Offset(0, 2000),
+          ),
+        );
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
 
-      verify(() => cubit.select(null)).called(1);
-      expect(find.text('commander'), findsOneWidget);
-      expect(find.text('soldier'), findsNothing);
-    });
+        verify(() => cubit.select(null)).called(1);
+        expect(find.text('commander'), findsOneWidget);
+        expect(find.text('soldier'), findsNothing);
+      },
+    );
   });
 
   group('$BattleView over a recorded stream', () {

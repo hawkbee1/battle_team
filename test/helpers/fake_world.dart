@@ -17,6 +17,10 @@ class FakeWorld implements BattleWorld {
   /// The selected unit last shown.
   String? selected;
 
+  /// The battle time last shown, which units glide to their destination by
+  /// (decision 236).
+  Duration? battleTime;
+
   /// The seconds it moved on by.
   double seconds = 0;
 
@@ -29,6 +33,7 @@ class FakeWorld implements BattleWorld {
     required Duration? battleTime,
   }) {
     this.selected = selected;
+    this.battleTime = battleTime;
     drawn
       ..clear()
       ..addAll({
