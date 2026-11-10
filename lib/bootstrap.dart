@@ -27,9 +27,12 @@ class AppBlocObserver extends BlocObserver {
 const _appwriteEndpoint = String.fromEnvironment('APPWRITE_ENDPOINT');
 const _appwriteProjectId = String.fromEnvironment('APPWRITE_PROJECT_ID');
 
+/// [trustSelfSigned] accepts the Appwrite endpoint's self-signed certificate
+/// (the local Appwrite behind Traefik's default one).
 Future<void> bootstrap(
-  FutureOr<Widget> Function(AppwriteApiClient apiClient) builder,
-) async {
+  FutureOr<Widget> Function(AppwriteApiClient apiClient) builder, {
+  bool trustSelfSigned = false,
+}) async {
   // The Appwrite client reads the documents directory as soon as it is built.
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -54,6 +57,7 @@ Future<void> bootstrap(
   final apiClient = AppwriteApiClient(
     endpoint: _appwriteEndpoint,
     projectId: _appwriteProjectId,
+    selfSigned: trustSelfSigned,
   );
 
   runApp(await builder(apiClient));

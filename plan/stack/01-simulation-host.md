@@ -18,7 +18,7 @@ Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 1). Rules: deci
 ## Choice
 **Option 3, on long-running processes.** Each process hosts a set of battles that share a map. A battle stays on one process for its whole life. Recovery after a crash: load the latest snapshot, then replay the inputs logged after it (see stack decision 2).
 
-AP is computed lazily: AP at time *t* is `min(ap_max, AP at the last update + hours since then × recovery_per_hour)`.
+AP is computed lazily: AP at time *t* is `min(ap_max, AP at the last update + seconds since then / recovery_delay_s)` (decision 238).
 
 **Language: Dart**, for the simulation host and for the rules core (`battle_rules`, M3 and M4). Reasons:
 - The rules core must run on the server and in the client (M4 acceptance). One Dart package serves both, so the numbers and rules cannot drift between two implementations.

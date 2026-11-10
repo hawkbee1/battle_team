@@ -35,6 +35,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-25** Vision in 3D (MAP-26): from what height does a unit look, at what height is it seen, and does a unit in a transport see or show? → decision 235 (from the top of the observer's hit volume to the top of the target's, the ground blocks where it rises above the line; a carried unit sees from its transport and is not seen on its own)
 - [x] **Q-MAP-26** Where is a moving unit while it moves, for what others see of it? → decision 236 (at its destination from the start of its move; the client shows it moving there; following units along their paths on the host is planned for later, milestone M8)
 - [ ] **Q-MAP-27** Does a section know which team a unit it sees belongs to (an ally's or an enemy's), and is the team of each section public? Assumed (M6.7): yes, a unit seen shows its team, as a hit already shows whether it was friendly fire; the host sends each unit it shows with its section's team.
+- [x] **Q-MAP-28** Can two units stand on the same cell? → decision 240 (one unit per place, the place being the hit volume; width per cell and per bridge; friend and enemy both solid, airborne units above; refusal only for a seen blocker, a stop short of an unseen one). Host work: M8 topic 6.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)
@@ -62,6 +63,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-UNIT-23** Scout observe (+30 m, decision 119): added to `vision_range` before the weather and terrain factors, or after them? → decision 184 (to `vision_range`)
 - [x] **Q-UNIT-24** A commander's final blow that takes its target prisoner or turns it (COMBAT-38): does it earn the kill's XP and money (UNIT-05, ECO-18), or only the hit's? → decision 223 (the kill's XP, not its money)
 - [x] **Q-UNIT-25** Do hits on an HQ and its destruction earn XP (UNIT-05), or only money (ECO-18, HQ-04)? → decision 224 (2 XP a hit, 10 for the destruction)
+- [ ] **Q-UNIT-26** What exactly does the test unit hold (decision 239, UNIT-44), and where is it allowed? Assumed (M7): one battle setting `test_units` (default off, never on in a public war) allows buying it; it has every action of UNIT-38, the scout's observe, the medic's heal, the engineer's build and repair, a radio, and the best sight and range values of the roster; it moves as infantry (a unit has one movement class); its price is 0 w€.
 
 ## Relics and victory (30)
 - [x] **Q-REL-01** Name and lore of the relics. → decision 96
