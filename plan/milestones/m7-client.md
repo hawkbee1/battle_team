@@ -103,9 +103,10 @@ Acceptance criteria:
 
 ## Issue 7: Buy
 Rules: ECO-04 to ECO-07, HQ-42, HQ-46; COMBAT-27; decisions 129, 130, 147, 205, 210.
-Package: `battle_team`.
+Packages: `battle_protocol`, `battle_host`, `battle_client`, `battle_team`.
 Depends on: 6.
 
+- What can be bought comes from the host, never from data in the app (designer, 2026-11-10): a `Roster` message with the whole view — the unit types the battle allows (the test unit only when `test_units` is on), their prices, the weapons and theirs — under M6's conventions (samples, both encodings, sizes).
 - The section's money shown; `BuyUnit` from the roster with prices, `BuyWeapon` for a unit. The guild camp (`BuyGuildCamp`) and the skill tree (`BuyNode`) wait for a later progression session.
 - Refusals (money, room, lock, enemy at the portal) surfaced.
 
@@ -128,10 +129,10 @@ Acceptance criteria:
 
 ## Issue 9: Fog shading and alerts
 Rules: MAP-27, MAP-29, MAP-33, MAP-49; RELIC-10, RELIC-16; decisions 232, 233, 235, 237.
-Package: `battle_team`.
+Packages: `battle_protocol`, `battle_host`, `battle_client`, `battle_team`.
 Depends on: 4.
 
-- The ground shaded by what the section sees now; what it has never seen against what it saw once may differ; units out of sight disappear (they already do).
+- The ground shaded by what the section sees now. Sight depends on the terrain (MAP-26, decision 235), so the client runs `battle_rules`' vision — the host's own code, for display only (stack decision 8) — over the map heights it already holds, from inputs the host sends for its own units: each one's effective sight range and the weather, added to the private view under M6's conventions. Nothing of other units feeds the shading (decision 237). Never-seen differs from seen-once; units out of sight disappear (they already do).
 - Alerts surfaced: the relic alert (also on connect, decision 233) and the victory countdown (RELIC-16), with what MAP-49 makes known to all.
 
 Acceptance criteria:
