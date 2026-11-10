@@ -1,0 +1,36 @@
+import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:vector_math/vector_math.dart';
+
+/// What the view needs of the 3D world: it shows the section's view, moves
+/// on with time, and tells where its units are drawn and where the ground
+/// is. A Strategy for swappable renderers (Gang of Four): `SceneBattleWorld`
+/// draws it with flutter_scene, tests use a fake, having no GPU, and a
+/// renderer chosen after the benchmarks of M7 Issue 13 replaces it without
+/// touching the view.
+abstract interface class BattleWorld {
+  /// The ground.
+  TerrainSurface get surface;
+
+  /// Where each unit is drawn now.
+  Map<String, Vector3> get drawn;
+
+  /// Shows what the section sees.
+  void show({
+    required Iterable<UnitView> units,
+    required Iterable<HqView> hqs,
+    required Iterable<RelicView> relics,
+    required String? selected,
+    required Duration? battleTime,
+  });
+
+  /// Draws from [camera] from now on: the body of the unit the eye is
+  /// inside (`BattleCamera.insideUnit`) is not drawn. It changes how the
+  /// world is seen, never what it shows: the same units are drawn from
+  /// either camera (decision 237).
+  void useCamera(BattleCamera camera);
+
+  /// Moves on by [seconds].
+  void tick(double seconds);
+}

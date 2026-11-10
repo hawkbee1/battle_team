@@ -1,5 +1,5 @@
 name: battle_team
-description: Battle Team, a Flame game backed by the shared Hawkbee Appwrite project.
+description: Battle Team, a 3D team battle game backed by the shared Hawkbee Appwrite project.
 version: 1.0.0+1
 publish_to: none
 resolution: workspace
@@ -10,16 +10,13 @@ environment:
 
 dependencies:
   appwrite_api_client: ^0.1.0
-  audioplayers: ^6.8.1
   backend_status_repository: ^0.1.0
   battle_client: ^0.1.0
   battle_map: ^0.1.0
   battle_protocol: ^0.1.0
+  battle_rules: ^0.1.0
   bloc: ^9.2.1
   equatable: ^3.0.0
-  flame: ^1.38.2
-  flame_audio: ^2.12.2
-  flame_behaviors: ^1.4.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
@@ -28,6 +25,7 @@ dependencies:
   flutter_scene: ^0.24.0
   google_fonts: ^8.2.1
   intl: ^0.20.2
+  logging: ^1.3.0
   material_ui: ^1.1.1
   vector_math: ^2.1.4
 
@@ -35,7 +33,6 @@ dev_dependencies:
   bloc_lint: ^0.4.2
   bloc_test: ^10.0.0
   bloc_tools: ^0.1.0-dev.24
-  flame_test: ^2.3.1
   flutter_test:
     sdk: flutter
   mockingjay: ^2.1.0
@@ -46,11 +43,12 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/audio/
-    - assets/images/
     - assets/licenses/poppins/
-    # A built map of battle_map (maps/built), for the playtest. Its data is
+    # A built map of battle_map (maps/built), for the battle. Its data is
     # under the ODbL 1.0 and the Licence Ouverte 2.0: its attribution shows
-    # on screen.
+    # on screen (the battle's credits).
     - assets/maps/saint_lo_1km/
     - assets/maps/saint_lo_1km/tiles/0_0/
+    # The unit types' data: the first-person view looks from the top of the
+    # unit's hit volume (decision 235). The same file as the plan's.
+    - plan/data/units.yaml

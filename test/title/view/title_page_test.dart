@@ -54,7 +54,9 @@ void main() {
       expect(find.byType(BackendStatusIndicator), findsOneWidget);
     });
 
-    testWidgets('starts the game when start button is tapped', (tester) async {
+    testWidgets('M7.1 opens the battle when start button is tapped', (
+      tester,
+    ) async {
       final navigator = MockNavigator();
       when(navigator.canPop).thenReturn(true);
       when(() => navigator.pushReplacement<void, void>(any()))

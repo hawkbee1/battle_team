@@ -1,11 +1,12 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
-import 'package:battle_team/playtest/world/battle_space.dart';
-import 'package:battle_team/playtest/world/playtest_world.dart';
+import 'package:battle_team/battle/world/battle_camera.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:vector_math/vector_math.dart';
 
 /// A world without a GPU: it draws each unit where the battle puts it.
-class FakeWorld implements PlaytestWorld {
+class FakeWorld implements BattleWorld {
   new(MapData map) : surface = TerrainSurface(map);
 
   @override
@@ -16,6 +17,10 @@ class FakeWorld implements PlaytestWorld {
 
   /// The selected unit last shown.
   String? selected;
+
+  /// The battle time last shown, which units glide to their destination by
+  /// (decision 236).
+  Duration? battleTime;
 
   /// The seconds it moved on by.
   double seconds = 0;
@@ -29,6 +34,7 @@ class FakeWorld implements PlaytestWorld {
     required Duration? battleTime,
   }) {
     this.selected = selected;
+    this.battleTime = battleTime;
     drawn
       ..clear()
       ..addAll({
@@ -37,6 +43,16 @@ class FakeWorld implements PlaytestWorld {
             unit.unitId: worldOf(position)
               ..y = surface.heightAt(position.x, position.y),
       });
+  }
+
+  /// The camera last given, and every camera given in order.
+  BattleCamera? camera;
+  final cameras = <BattleCamera>[];
+
+  @override
+  void useCamera(BattleCamera camera) {
+    this.camera = camera;
+    cameras.add(camera);
   }
 
   @override
