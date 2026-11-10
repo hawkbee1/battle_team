@@ -52,3 +52,8 @@ flutter:
     # The unit types' data: the first-person view looks from the top of the
     # unit's hit volume (decision 235). The same file as the plan's.
     - plan/data/units.yaml
+    # What the order pre-check reads, to say "out of range" before an order
+    # goes: the weapons, and where a unit swaps its weapon (display only; the
+    # host decides).
+    - plan/data/combat.yaml
+    - plan/data/battle.yaml

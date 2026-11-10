@@ -70,6 +70,7 @@ void main() {
           transport: host,
           address: (_) async => Uri.parse('ws://host/v1/socket'),
         ),
+        preCheck: testPreCheck(),
       );
       addTearDown(cubit.close);
 

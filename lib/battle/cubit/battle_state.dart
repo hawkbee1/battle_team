@@ -53,13 +53,14 @@ final class FirstPersonMode extends ViewMode {
 }
 
 /// {@template order_notice}
-/// The host's answer to the player's last order.
+/// The answer to the player's last order: the host's, or the pre-check's when
+/// it expected a refusal and the order was not sent.
 /// {@endtemplate}
 class OrderNotice extends Equatable {
   /// {@macro order_notice}
   const new({required this.order, required this.unitId, this.refusal});
 
-  /// The order, as a word: `move`.
+  /// The order, as a word: `move`, `fire`, `reload`.
   final String order;
 
   /// The unit it was for.
@@ -89,6 +90,9 @@ class BattleState extends Equatable {
     this.team,
     this.sectionId,
     this.selectedId,
+    this.targetId,
+    this.groundFire = false,
+    this.storedWeapons = const [],
     this.viewMode = const TopDownMode(),
     this.notice,
     this.problem,
@@ -116,6 +120,17 @@ class BattleState extends Equatable {
   /// The selected unit, one of the section's.
   final String? selectedId;
 
+  /// The unit the selected one would fire at: one the section sees, of
+  /// another section (COMBAT-11).
+  final String? targetId;
+
+  /// Whether the next tap on the ground fires there (COMBAT-12) instead of
+  /// moving.
+  final bool groundFire;
+
+  /// The section's spare weapons (decision 151).
+  final List<String> storedWeapons;
+
   /// How the battle is seen.
   final ViewMode viewMode;
 
@@ -130,6 +145,12 @@ class BattleState extends Equatable {
 
   /// The selected unit, while the section sees it.
   UnitView? get selected => units[selectedId];
+
+  /// The target, while the section sees it on the field.
+  UnitView? get target => switch (units[targetId]) {
+    final unit? when unit.position != null => unit,
+    _ => null,
+  };
 
   /// The unit whose eyes the battle is seen through, while the section has
   /// it; null from above.
@@ -167,6 +188,9 @@ class BattleState extends Equatable {
     String? team,
     String? sectionId,
     String? Function()? selectedId,
+    String? Function()? targetId,
+    bool? groundFire,
+    List<String>? storedWeapons,
     ViewMode? viewMode,
     OrderNotice? Function()? notice,
     String? problem,
@@ -179,6 +203,9 @@ class BattleState extends Equatable {
     team: team ?? this.team,
     sectionId: sectionId ?? this.sectionId,
     selectedId: selectedId == null ? this.selectedId : selectedId(),
+    targetId: targetId == null ? this.targetId : targetId(),
+    groundFire: groundFire ?? this.groundFire,
+    storedWeapons: storedWeapons ?? this.storedWeapons,
     viewMode: viewMode ?? this.viewMode,
     notice: notice == null ? this.notice : notice(),
     problem: problem ?? this.problem,
@@ -194,6 +221,9 @@ class BattleState extends Equatable {
     team,
     sectionId,
     selectedId,
+    targetId,
+    groundFire,
+    storedWeapons,
     viewMode,
     notice,
     problem,

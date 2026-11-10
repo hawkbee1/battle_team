@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/battle/data/battle_repository.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
+import 'package:battle_team/battle/data/order_checks.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/view/battle_view.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
@@ -16,7 +18,8 @@ import 'package:material_ui/material_ui.dart';
 
 /// {@template battle_page}
 /// Opens the battle of the [BattleRepository] in the tree as its player:
-/// loads the map and the unit types' bodies, signs in, finds the battle's
+/// loads the map, the unit types' bodies and what the order pre-check reads,
+/// signs in, finds the battle's
 /// host and plays. Its map, its 3D world and its scene are built by the
 /// functions it is given, so that tests run without a GPU.
 /// {@endtemplate}
@@ -26,6 +29,7 @@ class BattlePage extends StatefulWidget {
     super.key,
     this.loadMap = loadMapAsset,
     this.loadBodies = loadUnitBodies,
+    this.loadPreCheck = loadOrderPreCheck,
     this.initialize = Scene.initializeStaticResources,
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
@@ -41,6 +45,9 @@ class BattlePage extends StatefulWidget {
   /// Loads the unit types' bodies from the assets.
   final Future<UnitBodies> Function(AssetBundle bundle) loadBodies;
 
+  /// Loads what the order pre-check reads from the assets.
+  final Future<OrderPreCheck> Function(AssetBundle bundle) loadPreCheck;
+
   /// Loads flutter_scene's shaders and shared resources.
   final Future<void> Function() initialize;
 
@@ -55,15 +62,17 @@ class BattlePage extends StatefulWidget {
 }
 
 class _BattlePageState extends State<BattlePage> {
-  late final Future<({MapData map, UnitBodies bodies})> _ready = () async {
+  late final Future<({MapData map, UnitBodies bodies, OrderPreCheck preCheck})>
+  _ready = () async {
     final bundle = DefaultAssetBundle.of(context);
     final map = await widget.loadMap(
       bundle,
       context.read<BattleRepository>().mapId,
     );
     final bodies = await widget.loadBodies(bundle);
+    final preCheck = await widget.loadPreCheck(bundle);
     await widget.initialize();
-    return (map: map, bodies: bodies);
+    return (map: map, bodies: bodies, preCheck: preCheck);
   }();
 
   @override
@@ -76,7 +85,10 @@ class _BattlePageState extends State<BattlePage> {
               builder: (context, snapshot) => switch (snapshot) {
                 AsyncSnapshot(:final data?) => BlocProvider(
                   create: (_) {
-                    final cubit = BattleCubit(repository: repository);
+                    final cubit = BattleCubit(
+                      repository: repository,
+                      preCheck: data.preCheck,
+                    );
                     unawaited(cubit.start());
                     return cubit;
                   },

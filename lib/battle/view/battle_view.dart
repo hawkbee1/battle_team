@@ -5,6 +5,7 @@ import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
+import 'package:battle_team/battle/widgets/weapon_panel.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
@@ -32,8 +33,11 @@ typedef BattleSceneBuilder = Widget Function(
 /// units (decision 5): the map of [map] in [world], the units the section
 /// sees, and the orders of the player. From above, drag to pan, scroll or
 /// pinch to zoom, Q/E or two fingers to turn; tap one of your units, then the
-/// ground, to move it there. From a unit, drag to look and tap the ground to
-/// move there.
+/// ground, to move it there, or an enemy to target it. From a unit, drag to
+/// look, tap the ground to move there, and fire where the reticle points.
+///
+/// It draws the shots the cubit announces (Observer): the world shows each
+/// for a moment, and nothing of them is kept in the state.
 ///
 /// The cubit's view mode picks the camera (Strategy, `BattleCamera`): the
 /// view keeps one of each, so that coming back from a unit finds the overview
@@ -70,6 +74,7 @@ class _BattleViewState extends State<BattleView> {
 
   late final TopDownCamera _topDown;
   FirstPersonCamera? _firstPerson;
+  late final StreamSubscription<Object?> _shots;
   final _frame = ValueNotifier<int>(0);
   final _focus = FocusNode();
   double _lastScale = 1;
@@ -84,7 +89,9 @@ class _BattleViewState extends State<BattleView> {
     centre.y = surface.heightAt(centre.x, -centre.z);
     _topDown = TopDownCamera(target: centre, distance: 700);
     widget.world.useCamera(_topDown);
-    _show(context.read<BattleCubit>().state, centreOnUnits: true);
+    final cubit = context.read<BattleCubit>();
+    _shots = cubit.shots.listen(widget.world.showShots);
+    _show(cubit.state, centreOnUnits: true);
   }
 
   /// The camera of the view mode now.
@@ -92,6 +99,7 @@ class _BattleViewState extends State<BattleView> {
 
   @override
   void dispose() {
+    unawaited(_shots.cancel());
     _frame.dispose();
     _focus.dispose();
     super.dispose();
@@ -103,6 +111,7 @@ class _BattleViewState extends State<BattleView> {
       hqs: state.hqs,
       relics: state.relics,
       selected: state.selectedId,
+      target: state.target?.unitId,
       battleTime: context.read<BattleCubit>().battleTime,
     );
     if (centreOnUnits) _centreOnSection(state);
@@ -200,12 +209,22 @@ class _BattleViewState extends State<BattleView> {
       cubit.select(unit.unitId == state.selectedId ? null : unit.unitId);
       return;
     }
+    // A unit of another section is a target (COMBAT-11), not a place to go.
+    if (unit != null) {
+      cubit.target(unit.unitId);
+      return;
+    }
     final ground = widget.world.surface.hit(
       view.position,
       view.directionAt(at),
     );
     if (ground != null && state.selected != null) {
-      unawaited(cubit.moveSelectedTo(positionOf(ground)));
+      final there = positionOf(ground);
+      unawaited(
+        state.groundFire
+            ? cubit.fireSelectedAt(there)
+            : cubit.moveSelectedTo(there),
+      );
     }
   }
 
@@ -243,11 +262,19 @@ class _BattleViewState extends State<BattleView> {
       LogicalKeyboardKey.numpadAdd => _do(() => _topDown.zoom(1.25)),
       LogicalKeyboardKey.minus ||
       LogicalKeyboardKey.numpadSubtract => _do(() => _topDown.zoom(0.8)),
-      LogicalKeyboardKey.escape => _do(
-        () => context.read<BattleCubit>().select(null),
-      ),
+      LogicalKeyboardKey.escape => _do(_escape),
       _ => false,
     };
+  }
+
+  /// Gives up firing at a position, else clears the selection.
+  void _escape() {
+    final cubit = context.read<BattleCubit>();
+    if (cubit.state.groundFire) {
+      cubit.toggleGroundFire();
+    } else {
+      cubit.select(null);
+    }
   }
 
   /// From a unit's eyes: the arrows look around a little, Q/E turn, Escape
@@ -370,12 +397,18 @@ class _BattleViewState extends State<BattleView> {
               top: 96,
               child: _UnitsPanel(onCentre: _centreNow),
             ),
+            if (_firstPerson != null) const AimReticle(),
             Positioned(
               left: 12,
               bottom: 12,
               child: ValueListenableBuilder(
                 valueListenable: _frame,
-                builder: (context, _, _) => const _SelectedUnit(),
+                builder: (context, _, _) => _SelectedUnit(
+                  aim: switch (_firstPerson) {
+                    final inside? => () => directionOf(inside.forward),
+                    null => null,
+                  },
+                ),
               ),
             ),
             Positioned(
@@ -486,10 +519,13 @@ class _UnitRow extends StatelessWidget {
   }
 }
 
-/// The selected unit and the host's answer to the last order, with the
+/// The selected unit, its weapon and the answer to the last order, with the
 /// button that sees the battle through the unit's eyes, or goes back above.
 class _SelectedUnit extends StatelessWidget {
-  const new();
+  const new({required this.aim});
+
+  /// The direction the eyes look along, from first person.
+  final Direction Function()? aim;
 
   @override
   Widget build(BuildContext context) {
@@ -505,12 +541,14 @@ class _SelectedUnit extends StatelessWidget {
           unit.hp.toStringAsFixed(0),
           cubit.apNow(unit)?.toStringAsFixed(1) ?? '–',
         ),
-      if (notice != null)
+      // The answer to an order of the selected unit, or to one given with no
+      // unit selected (deploying): not the answer to another unit's.
+      if (notice != null && (unit == null || notice.unitId == unit.unitId))
         switch (notice.refusal) {
           null => l10n.battleOrderAccepted(l10n.battleOrderName(notice.order)),
           final reason => l10n.battleOrderRefused(
             l10n.battleOrderName(notice.order),
-            reason,
+            l10n.battleRefusal(reason),
           ),
         },
     ];
@@ -523,6 +561,7 @@ class _SelectedUnit extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(lines.join('\n')),
+          if (unit != null) WeaponPanel(unit: unit, aim: aim),
           if (seeable)
             TextButton(
               onPressed: cubit.enterFirstPerson,
@@ -564,7 +603,8 @@ class _UnitLabels extends StatelessWidget {
         for (final MapEntry(key: id, value: at) in world.drawn.entries)
           if ((state.units[id], view.project(at + Vector3(0, 7.5, 0)))
               case (final unit?, final onScreen?)
-              when id != hide && (all || id == state.selectedId))
+              when id != hide &&
+                  (all || id == state.selectedId || id == state.targetId))
             Positioned(
               left: onScreen.dx - 40,
               top: onScreen.dy - 16,
@@ -574,10 +614,13 @@ class _UnitLabels extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 11,
-                  fontWeight: id == state.selectedId
+                  fontWeight: id == state.selectedId || id == state.targetId
                       ? FontWeight.bold
                       : FontWeight.normal,
-                  color: Colors.white,
+                  // The target is named in orange, to tell it from the rest.
+                  color: id == state.targetId
+                      ? Colors.deepOrangeAccent
+                      : Colors.white,
                   shadows: const [Shadow(blurRadius: 3)],
                 ),
               ),

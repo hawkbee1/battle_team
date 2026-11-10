@@ -140,6 +140,7 @@ void main() {
           units: const {'c-1': blueCommander, 'r-1': redSoldier},
           hqs: blueView.hqs,
           relics: blueView.relics,
+          section: blueView.section,
           team: 'blue',
           sectionId: 's-blue',
         ),

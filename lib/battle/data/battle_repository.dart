@@ -6,6 +6,8 @@ import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/data/battle_settings.dart';
 import 'package:battle_team/battle/data/battle_snapshot.dart';
 import 'package:battle_team/battle/data/connection_status.dart';
+import 'package:battle_team/battle/shots/shot_effect.dart';
+import 'package:battle_team/battle/shots/shot_effects.dart';
 
 /// {@template battle_repository}
 /// The data the battle screen lives on, for one battle: it signs the player
@@ -89,10 +91,22 @@ class BattleRepository {
       units: Map.of(view.units),
       hqs: view.hqs.values.toList(),
       relics: view.relics.values.toList(),
+      section: view.section,
       team: seat?.team,
       sectionId: seat?.sectionId,
     );
   });
+
+  /// The shots the section sees, after each update of the host: the effects
+  /// to draw for a moment (Observer; `ShotEffects` cuts them down to what the
+  /// section was told, decisions 234 and 237). A stream of its own on each
+  /// call, to listen to once, as [snapshots]; nothing is replayed.
+  Stream<List<ShotEffect>> get shots {
+    final effects = ShotEffects();
+    return _client.messages
+        .map((message) => effects.of(message, _client.view))
+        .where((effects) => effects.isNotEmpty);
+  }
 
   /// Why the connection stopped for good: the host's last word or the
   /// lasting refusal to give its address. Null while it runs, and when the

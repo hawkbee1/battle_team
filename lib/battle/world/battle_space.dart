@@ -18,6 +18,11 @@ Vector3 worldOf(Position position) =>
 Position positionOf(Vector3 world) =>
     Position.metres(world.x, -world.z, world.y);
 
+/// The battle direction of the world vector [world], the way [positionOf]
+/// turns a point: what a first-person shot is aimed along.
+Direction directionOf(Vector3 world) =>
+    Direction.of(world.x, -world.z, world.y);
+
 /// Where to draw units that stand on the same spot: [placed] by ID, those
 /// within [near] metres of each other on a ring of [radius] metres around
 /// their middle, in ID order, so that each shows and can be tapped. Only
