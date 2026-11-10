@@ -6,6 +6,7 @@ import 'package:battle_team/battle/data/battle_snapshot.dart';
 import 'package:battle_team/battle/data/connection_status.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:logging/logging.dart';
 
 part 'battle_state.dart';
 
@@ -13,6 +14,10 @@ part 'battle_state.dart';
 /// Plays one battle as one player through [repository]: signs in, then keeps
 /// the section's view and sends the player's orders. The host checks every
 /// order (stack decision 8). The 3D view listens to it (Observer).
+///
+/// It logs on `battle_team.BattleCubit`: the sign-in, each change of the
+/// connection, each order and the host's answer, with its refusal code. Never
+/// a unit, a position or any part of the state (decision 237).
 /// {@endtemplate}
 class BattleCubit extends Cubit<BattleState> {
   /// {@macro battle_cubit}
@@ -21,13 +26,18 @@ class BattleCubit extends Cubit<BattleState> {
   /// Where the battle's data comes from.
   final BattleRepository repository;
 
+  static final _log = Logger('battle_team.BattleCubit');
+
   final _subscriptions = <StreamSubscription<Object?>>[];
 
   /// Signs in, then connects to the battle.
   Future<void> start() async {
+    _log.info('signing in');
     try {
       await repository.signIn();
-    } on Object catch (error) {
+      _log.info('signed in');
+    } on Object catch (error, stackTrace) {
+      _log.severe('sign-in failed', error, stackTrace);
       emit(state.copyWith(status: BattleStatus.failed, problem: '$error'));
       return;
     }
@@ -38,6 +48,7 @@ class BattleCubit extends Cubit<BattleState> {
   }
 
   void _onConnection(ConnectionStatus connection) {
+    _log.info('connection ${connection.name}');
     final next = switch (connection) {
       ConnectionStatus.connecting => BattleStatus.connecting,
       ConnectionStatus.connected => BattleStatus.playing,
@@ -99,9 +110,16 @@ class BattleCubit extends Cubit<BattleState> {
   Future<void> _order(String unitId, String name, Order order) async {
     if (state.status != BattleStatus.playing) return;
     String? refusal;
+    _log.info('order $name sent');
     try {
       refusal = await repository.send(order);
-    } on Object catch (error) {
+      if (refusal == null) {
+        _log.info('order $name accepted');
+      } else {
+        _log.warning('order $name refused $refusal');
+      }
+    } on Object catch (error, stackTrace) {
+      _log.severe('order $name failed', error, stackTrace);
       refusal = '$error';
     }
     if (isClosed) return;

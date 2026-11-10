@@ -4,9 +4,11 @@ import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../helpers/fake_host.dart';
+import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
 
 const _snapshot = BattleSnapshot(
@@ -143,6 +145,92 @@ void main() {
 
       expect(cubit.state.status, BattleStatus.stopped);
       expect(cubit.state.problem, isNull);
+    });
+
+    group('logs', () {
+      late LogCapture log;
+
+      setUp(() => log = LogCapture());
+
+      tearDown(() => log.cancel());
+
+      test('M7.3 the sign-in, the connection and an accepted order', () async {
+        await play();
+        cubit.select('c-1');
+        await cubit.moveSelectedTo(const Position(52000, 9000, 3100));
+
+        expect(
+          log.lines,
+          equals([
+            'INFO signing in',
+            'INFO signed in',
+            'INFO connection connected',
+            'INFO order move sent',
+            'INFO order move accepted',
+          ]),
+        );
+        expect(
+          log.records.map((record) => record.loggerName).toSet(),
+          equals({'battle_team.BattleCubit'}),
+        );
+      });
+
+      test('M7.3 a refused order as a WARNING with its code', () async {
+        await play();
+        when(() => repository.send(any()))
+            .thenAnswer((_) async => 'not_enough_ap');
+        cubit.select('c-1');
+
+        await cubit.moveSelectedTo(const Position(0, 0, 0));
+
+        expect(
+          log.records.last,
+          isA<LogRecord>()
+              .having((record) => record.level, 'level', Level.WARNING)
+              .having(
+                (record) => record.message,
+                'message',
+                'order move refused not_enough_ap',
+              ),
+        );
+      });
+
+      test('M7.3 an order that could not go out as SEVERE', () async {
+        await play();
+        when(() => repository.send(any())).thenThrow(StateError('stopped'));
+        cubit.select('c-1');
+
+        await cubit.deploy('c-1');
+
+        final failed = log.records.last;
+        expect(failed.level, Level.SEVERE);
+        expect(failed.message, 'order deploy failed');
+        expect(failed.error, isA<StateError>());
+        expect(failed.stackTrace, isNotNull);
+      });
+
+      test('M7.3 a sign-in that failed as SEVERE', () async {
+        when(repository.signIn).thenThrow(StateError('no account'));
+
+        await cubit.start();
+
+        final failed = log.records.last;
+        expect(failed.level, Level.SEVERE);
+        expect(failed.message, 'sign-in failed');
+        expect(failed.error, isA<StateError>());
+      });
+
+      test('decision 237 names no unit and no position of the state', () async {
+        await play();
+        cubit.select('c-1');
+        await cubit.moveSelectedTo(const Position(52000, 9000, 3100));
+
+        for (final text in log.texts) {
+          expect(text, isNot(contains('c-1')));
+          expect(text, isNot(contains('r-1')));
+          expect(text, isNot(contains('52000')));
+        }
+      });
     });
 
     test('M7.1 shows the battle time and the AP between updates', () async {

@@ -1,26 +1,12 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:appwrite_api_client/appwrite_api_client.dart';
 import 'package:battle_team/gen/assets.gen.dart';
+import 'package:battle_team/logging/logging.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-
-class AppBlocObserver extends BlocObserver {
-  @override
-  void onChange(BlocBase<dynamic> bloc, Change<dynamic> change) {
-    super.onChange(bloc, change);
-    log('onChange(${bloc.runtimeType}, $change)');
-  }
-
-  @override
-  void onError(BlocBase<dynamic> bloc, Object error, StackTrace stackTrace) {
-    log('onError(${bloc.runtimeType}, $error, $stackTrace)');
-    super.onError(bloc, error, stackTrace);
-  }
-}
 
 /// Appwrite settings passed at build time with
 /// `--dart-define-from-file=../../env/<flavor>.json`.
@@ -36,9 +22,8 @@ Future<void> bootstrap(
   // The Appwrite client reads the documents directory as soon as it is built.
   WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterError.onError = (details) {
-    log(details.exceptionAsString(), stackTrace: details.stack);
-  };
+  configureLogging(release: kReleaseMode);
+  FlutterError.onError = logFlutterError;
 
   Bloc.observer = AppBlocObserver();
 

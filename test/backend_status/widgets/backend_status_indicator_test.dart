@@ -18,7 +18,9 @@ void main() {
     Future<void> pumpIndicator(WidgetTester tester, BackendStatusState state) {
       when(() => cubit.state).thenReturn(state);
       return tester.pumpApp(
-        BlocProvider.value(value: cubit, child: const BackendStatusIndicator()),
+        // Built at run time, so that its constructor shows in the coverage.
+        // ignore: prefer_const_constructors
+        BlocProvider.value(value: cubit, child: BackendStatusIndicator()),
       );
     }
 
