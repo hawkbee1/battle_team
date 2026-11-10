@@ -107,6 +107,7 @@ Measured (M6 Issue 2, `battle_protocol`'s committed samples, binary, without the
 | A rifle shot (one hit) as an event | 55 bytes; 74 as a whole tick | 40 bytes |
 | A hit by a shooter not seen, as a whole tick | 39 bytes | |
 | The whole view of a 16-unit section, its private state and 8 relics | 2,383 bytes (6,121 in JSON) | |
+| The roster after each whole view (M7.7): 11 unit types with their prices and allowed weapons, 6 weapons | 417 bytes (1,178 in JSON) | |
 
 Ten moving vehicles at 5 Hz, once units follow their paths, are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.
 

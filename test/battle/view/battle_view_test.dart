@@ -10,6 +10,7 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/shop/cubit/shop_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/gestures.dart';
@@ -26,6 +27,7 @@ import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
 import '../../helpers/pre_check.dart';
 import '../../helpers/real_cubit.dart';
+import '../../helpers/shop_cubit.dart';
 import '../../helpers/storage_cubit.dart';
 
 class _MockBattleCubit extends MockCubit<BattleState> implements BattleCubit;
@@ -91,12 +93,15 @@ void main() {
     late StreamController<BattleState> states;
     late StreamController<BattleSnapshot> snapshots;
     late StorageCubit storage;
+    late ShopCubit shop;
 
     setUp(() {
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
       addTearDown(snapshots.close);
       storage = storageCubit(snapshots.stream);
       addTearDown(storage.close);
+      shop = shopCubit(snapshots.stream);
+      addTearDown(shop.close);
       cubit = _MockBattleCubit();
       world = FakeWorld(map);
       states = StreamController<BattleState>.broadcast();
@@ -134,6 +139,7 @@ void main() {
           home: MultiBlocProvider(
             providers: [
               BlocProvider<StorageCubit>.value(value: storage),
+              BlocProvider<ShopCubit>.value(value: shop),
               BlocProvider<BattleCubit>.value(value: cubit),
             ],
             child: BattleView(
@@ -370,6 +376,97 @@ void main() {
       await tester.tap(find.text('Close'));
       await tester.pump();
       expect(find.text('Deploy'), findsNothing);
+    });
+
+    testWidgets('M7.7 the Shop button opens the shop, which lists what the '
+        'host lets the section buy; Storage and Shop take turns', (
+      tester,
+    ) async {
+      await pump(tester);
+      snapshots.add(
+        const BattleSnapshot(
+          units: {'c-1': blueCommander, 's-1': storedSoldier},
+          hqs: [
+            HqView(
+              team: 'blue',
+              position: Position(50500, 5500, 3000),
+              hp: 1000,
+              maxHp: 1000,
+            ),
+          ],
+          relics: [],
+          section: SectionPrivate(money: 500, xp: 0),
+          roster: shopRoster,
+          team: 'blue',
+          sectionId: 's-blue',
+        ),
+      );
+      await tester.runAsync(pumpEventQueue);
+      await tester.pump();
+      expect(find.text('Money: 500 w€'), findsNothing);
+
+      await tester.tap(find.text('Shop'));
+      await tester.pump();
+      expect(find.text('Money: 500 w€'), findsOneWidget);
+      expect(find.text('Soldier · 100 w€'), findsOneWidget);
+      // No unit selected: the weapons wait for one.
+      expect(
+        find.text('Select one of your units to see the weapons it can use.'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Storage (1)'));
+      await tester.pump();
+      expect(find.text('Money: 500 w€'), findsNothing);
+      expect(find.text('Deploy'), findsOneWidget);
+
+      await tester.tap(find.text('Shop'));
+      await tester.pump();
+      expect(find.text('Deploy'), findsNothing);
+      await tester.tap(find.text('Buy').first);
+      await tester.runAsync(pumpEventQueue);
+      await tester.pump();
+      expect(find.text('unit purchase accepted'), findsOneWidget);
+
+      await tester.tap(find.text('Close'));
+      await tester.pump();
+      expect(find.text('Money: 500 w€'), findsNothing);
+    });
+
+    testWidgets('M7.7 with a unit selected the shop lists the weapons it '
+        'uses', (tester) async {
+      when(() => cubit.state)
+          .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
+      await pump(tester);
+      snapshots.add(
+        const BattleSnapshot(
+          units: {'c-1': blueCommander},
+          hqs: [],
+          relics: [],
+          section: SectionPrivate(money: 500, xp: 0),
+          roster: Roster(
+            units: [
+              RosterUnit(
+                unitType: 'commander',
+                category: 'commander',
+                price: 0,
+                weapons: ['rifle'],
+              ),
+            ],
+            weapons: [RosterWeapon(weapon: 'rifle', price: 100)],
+          ),
+          team: 'blue',
+          sectionId: 's-blue',
+        ),
+      );
+      await tester.runAsync(pumpEventQueue);
+      await tester.pump();
+
+      await tester.tap(find.text('Shop'));
+      await tester.pump();
+
+      expect(find.text('Weapons for Commander'), findsOneWidget);
+      expect(find.text('Rifle · 100 w€'), findsOneWidget);
     });
 
     testWidgets('M7.6 the selected unit on the field has a store button', (

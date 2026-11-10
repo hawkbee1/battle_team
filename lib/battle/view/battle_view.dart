@@ -12,6 +12,7 @@ import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/shop/widgets/shop_panel.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:battle_team/storage/widgets/storage_panel.dart';
 import 'package:battle_team/storage/widgets/store_button.dart';
@@ -81,6 +82,7 @@ class _BattleViewState extends State<BattleView> {
   final _frame = ValueNotifier<int>(0);
   final _focus = FocusNode();
   bool _storageOpen = false;
+  bool _shopOpen = false;
   double _lastScale = 1;
   double _lastRotation = 0;
   Size _size = Size.zero;
@@ -401,7 +403,14 @@ class _BattleViewState extends State<BattleView> {
               top: 96,
               child: _UnitsPanel(
                 onCentre: _centreNow,
-                onStorage: () => setState(() => _storageOpen = !_storageOpen),
+                onStorage: () => setState(() {
+                  _storageOpen = !_storageOpen;
+                  _shopOpen = false;
+                }),
+                onShop: () => setState(() {
+                  _shopOpen = !_shopOpen;
+                  _storageOpen = false;
+                }),
               ),
             ),
             if (_storageOpen)
@@ -425,6 +434,34 @@ class _BattleViewState extends State<BattleView> {
                       child: SingleChildScrollView(
                         child: StoragePanel(
                           onClose: () => setState(() => _storageOpen = false),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (_shopOpen)
+              Positioned(
+                left: 12,
+                top: 96,
+                width: 300,
+                // Short enough to leave the selected unit's panel below.
+                child: BlocSelector<BattleCubit, BattleState, UnitView?>(
+                  selector: (state) => state.selected,
+                  builder: (context, selected) => ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: math.max(
+                        80,
+                        MediaQuery.sizeOf(context).height -
+                            96 -
+                            (selected != null ? 200 : 12),
+                      ),
+                    ),
+                    child: _Panel(
+                      child: SingleChildScrollView(
+                        child: ShopPanel(
+                          selected: selected,
+                          onClose: () => setState(() => _shopOpen = false),
                         ),
                       ),
                     ),
@@ -493,12 +530,18 @@ class _Header extends StatelessWidget {
 }
 
 /// The section's units, deployed or stored: a tap selects one, Storage opens
-/// the storage view (M7 Issue 6), Centre looks at the section again.
+/// the storage view (M7 Issue 6), Shop the shop (M7 Issue 7), Centre looks at
+/// the section again.
 class _UnitsPanel extends StatelessWidget {
-  const new({required this.onCentre, required this.onStorage});
+  const new({
+    required this.onCentre,
+    required this.onStorage,
+    required this.onShop,
+  });
 
   final VoidCallback onCentre;
   final VoidCallback onStorage;
+  final VoidCallback onShop;
 
   @override
   Widget build(BuildContext context) {
@@ -523,6 +566,7 @@ class _UnitsPanel extends StatelessWidget {
                       Text(l10n.storageOpen('$stored')),
                 ),
               ),
+              TextButton(onPressed: onShop, child: Text(l10n.shopOpen)),
             ],
           ),
           for (final unit in units) _UnitRow(unit: unit),

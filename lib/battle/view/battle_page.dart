@@ -12,6 +12,7 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/scene_battle_world.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/shop/cubit/shop_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_scene/scene.dart';
@@ -92,6 +93,13 @@ class _BattlePageState extends State<BattlePage> {
                     BlocProvider(
                       lazy: false,
                       create: (_) => StorageCubit(
+                        repository: repository,
+                        preCheck: data.preCheck,
+                      )..start(),
+                    ),
+                    BlocProvider(
+                      lazy: false,
+                      create: (_) => ShopCubit(
                         repository: repository,
                         preCheck: data.preCheck,
                       )..start(),
