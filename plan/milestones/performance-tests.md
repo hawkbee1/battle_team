@@ -38,13 +38,13 @@ Conventions:
 - Target: about 7 to 9 kbit/s down per section during a fight, with bursts of about 35 kbit/s (rifles) to 430 kbit/s (machine guns, one event per shot) for a few seconds (estimates, `stack/03`); late-join transfer of a few hundred kilobytes, compressed.
 - Where: `stack/03`.
 
-### P-05 Rendering spike: 1,000 units on screen (M7, before the client)
+### P-05 Rendering benchmark: 1,000 units on screen (M7 Issue 13)
 - Measure: frame time in profile mode, split into UI thread and raster thread (the method of the `flutter_scene-performance` skill), for each platform: iOS, Android, macOS, Windows, Linux and Web.
 - Devices: the designer's, listed in `stack/04` (iPhone 11, Pixel 6, the Mac, the main laptop under Linux and Windows, an old Lenovo laptop, a browser on both laptops). The slowest measured one becomes the reference device.
 - Target: 16.6 ms per frame (60 fps) on desktop. Phones and web: at least 30 fps in top-down and 60 fps in first person (`stack/04`).
 - Where: `stack/04`.
 
-### P-06 Terrain tiles and map loading (M7)
+### P-06 Terrain tiles and map loading (M7 Issue 13)
 - Measure: time to load a tile near the camera, time to first frame on a new map, memory of the tiles in view, and the time to add a crater patch or a construction to a tile in view (stack decision 5).
 - Target: to be set after P-05. Adding a crater or a construction must fit in the frame budget or run off the frame.
 - Where: `stack/05`.
@@ -59,7 +59,7 @@ Conventions:
 1. P-01 with M3 Issue 6 (done), and again with M5 when the host shares the search data between movers.
 2. P-02 and P-03 with M5, when the simulation host exists.
 3. P-04 with M6 Issue 8, over the network.
-4. P-05 and P-06 as the first M7 task, before the client is built.
+4. P-05 and P-06 with M7 Issue 13, once the interface shows a battle (designer, 2026-11-09).
 5. P-07 with M3 Issue 5 and again with M5.
 
 ## Open

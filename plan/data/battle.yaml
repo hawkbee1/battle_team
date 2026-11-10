@@ -12,8 +12,9 @@ commander_death:
 
 ap:
   max: 30                    # AP maximum of every unit; each unit's ap_max in data/units.yaml equals it (decision 167)
-  # AP recovery (decisions 168, 172): AP every unit recovers per hour. Special events may use another rate.
-  recovery_per_hour: 1
+  # AP recovery (decisions 168, 172, 238): the delay for a unit to gain one AP.
+  # 3600 s = 1 AP per hour. A battle's settings can override it (testing battles use a short delay).
+  recovery_delay_s: 3600
 
 # Start of every battle of a war (decision 83)
 battle_start:
@@ -40,7 +41,7 @@ capture:
 # HQ (decisions 109, 177): moves on its own on the manager's order, paying from its own AP.
 hq:
   hp: 1000                   # armor type: hq (decision 114)
-  ap_max: 30                 # recovers at ap.recovery_per_hour
+  ap_max: 30                 # recovers at ap.recovery_delay_s
   ap_per_m: 0.2              # placeholder: flat grass, times the push profile (data/terrain.yaml)
   speed_m_per_h: 5           # placeholder: slower than any unit
   hit_box_m: { width: 20, length: 20, height: 8 }   # placeholder: first-person shots (decision 183)

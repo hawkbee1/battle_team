@@ -15,7 +15,7 @@ Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 4). Rules: deci
 4. **A web 3D library inside a WebView** (for example three.js). One code path on Web, but separate paths on the other platforms, and a bridge for the interface. Rejected.
 
 ## Choice
-**Option 2, flutter_scene**, for the world, the units and both camera modes. Flutter widgets for the interface: orders, map markers, team chat, alerts. Flame is not needed for the 3D game. Whether it stays in the app for other purposes is a question for M7.
+**Option 2, flutter_scene**, for the world, the units and both camera modes. Flutter widgets for the interface: orders, map markers, team chat, alerts. Flame is not needed: it leaves the app in M7 Issue 1 (designer, 2026-11-09).
 
 ## What flutter_scene provides (checked in `packages/flutter_scene`)
 The formats and components below were read from the package's source and documentation on 2026-10-31. They are checked against the real code only when M7 starts.
@@ -67,6 +67,6 @@ The slowest one measured becomes the reference for the budget, and the floors ab
 
 ## Consequences
 - The client depends on `battle_rules` for display maths and on the network protocol (stack decision 3). It never runs its own combat resolution.
-- The 3D code lives beside the app's Flame scaffold until M7 decides what stays.
-- The spike is the first M7 task, so the choice can be reversed cheaply if it fails.
+- M7 Issue 1 removes the app's Flame scaffold (designer, 2026-11-09).
+- P-05 and P-06 run once the interface shows a battle (M7 Issue 13; designer, 2026-11-09: see how it behaves first, optimize from measurements). The playtest already showed flutter_scene drawing a 1 km map; the rendering seams of M7's conventions keep implementations swappable if the measurements demand it.
 - Linux and macOS need their platform folders added to the app (the repository has `macos/` but no `linux/` yet). This is an M7 task.

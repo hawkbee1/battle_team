@@ -106,8 +106,9 @@ objects:
   tree:      { armor_type: structure, blocks_los: false, conceals: forest, destructible: true, hp: 100 }
   building:  { armor_type: structure, blocks_los: true,  destructible: true, hp: 500 }
   wall:      { armor_type: structure, blocks_los: true,  destructible: true, hp: 200, built_by: engineer, ap: 10, build_time_s: 300 }
-  bridge:    { armor_type: structure, blocks_los: false, destructible: true, hp: 200, built_by: engineer, relic_crossable: false, ap: 10, build_time_s: 300 }
-  reinforced_bridge: { armor_type: structure, blocks_los: false, destructible: true, hp: 400, built_by: engineer, relic_crossable: true, ap: 20, build_time_s: 600 }  # decision 99
+  # width_m: the passable width of the deck (MAP-50, decision 240); a cell of open ground offers its 10 m. Placeholders.
+  bridge:    { armor_type: structure, blocks_los: false, destructible: true, hp: 200, built_by: engineer, relic_crossable: false, ap: 10, build_time_s: 300, width_m: 4 }
+  reinforced_bridge: { armor_type: structure, blocks_los: false, destructible: true, hp: 400, built_by: engineer, relic_crossable: true, ap: 20, build_time_s: 600, width_m: 8 }  # decision 99
   ladder:    { armor_type: structure, blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
   road_segment: { armor_type: structure, blocks_los: false, destructible: true, hp: 100, built_by: engineer, ap: 5, build_time_s: 120 }
   trap:      { armor_type: structure, blocks_los: false, destructible: true, hp: 50, built_by: engineer, hidden_from_enemies: true, ap: 5, build_time_s: 60 }
