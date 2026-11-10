@@ -147,6 +147,23 @@ void main() {
       );
     });
 
+    test('HQ-32 gives the recalls the host announced', () async {
+      final first = await play();
+      expect(first.recalls, isEmpty);
+
+      final next = repository.snapshots.first;
+      host.sockets.single.deliver(
+        TickUpdate(
+          at: blueView.at + const Duration(minutes: 1),
+          events: const [
+            RecallBegan(unitId: 'c-1', storedAt: Duration(hours: 8)),
+          ],
+        ),
+      );
+
+      expect((await next).recalls, {'c-1': const Duration(hours: 8)});
+    });
+
     test('M7.1 shows the battle time and the AP between updates', () async {
       expect(repository.battleTime, isNull);
       expect(repository.apNow(blueCommander.private!.ap), isNull);

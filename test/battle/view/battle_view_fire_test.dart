@@ -8,6 +8,7 @@ import 'package:battle_team/battle/widgets/weapon_panel.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,6 +61,8 @@ void main() {
     Future<void> play(WidgetTester tester) async {
       host = FakeHost(view: _view);
       cubit = realCubit(host);
+      final storage = realStorageCubit(cubit);
+      addTearDown(storage.close);
       addTearDown(cubit.close);
       await tester.runAsync(() async {
         await cubit.start();
@@ -70,8 +73,11 @@ void main() {
         MaterialApp(
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BlocProvider<BattleCubit>.value(
-            value: cubit,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<StorageCubit>.value(value: storage),
+              BlocProvider<BattleCubit>.value(value: cubit),
+            ],
             child: BattleView(
               map: map,
               bodies: bodies,

@@ -201,11 +201,11 @@ void main() {
         when(() => repository.send(any())).thenThrow(StateError('stopped'));
         cubit.select('c-1');
 
-        await cubit.deploy('c-1');
+        await cubit.moveSelectedTo(const Position(0, 0, 0));
 
         final failed = log.records.last;
         expect(failed.level, Level.SEVERE);
-        expect(failed.message, 'order deploy failed');
+        expect(failed.message, 'order move failed');
         expect(failed.error, isA<StateError>());
         expect(failed.stackTrace, isNotNull);
       });
@@ -549,36 +549,10 @@ void main() {
       cubit.select('c-1');
 
       await cubit.moveSelectedTo(const Position(0, 0, 0));
-      await cubit.deploy('c-1');
 
       verifyNever(() => repository.send(any()));
       expect(cubit.state.notice, isNull);
     });
-
-    test(
-      'M7.1 deploys a stored unit of the section, and shows the answer',
-      () async {
-        await play();
-
-        await cubit.deploy('nobody');
-        await cubit.deploy('r-1');
-        verifyNever(() => repository.send(any()));
-
-        when(() => repository.send(any()))
-            .thenAnswer((_) async => 'not_in_storage');
-        await cubit.deploy('c-1');
-
-        verify(() => repository.send(const Deploy(unitId: 'c-1'))).called(1);
-        expect(
-          cubit.state.notice,
-          const OrderNotice(
-            order: 'deploy',
-            unitId: 'c-1',
-            refusal: 'not_in_storage',
-          ),
-        );
-      },
-    );
 
     test('M7.1 drops the answer of an order once closed', () async {
       await play();

@@ -10,6 +10,7 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +25,8 @@ import '../../helpers/fake_world.dart';
 import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
 import '../../helpers/pre_check.dart';
+import '../../helpers/real_cubit.dart';
+import '../../helpers/storage_cubit.dart';
 
 class _MockBattleCubit extends MockCubit<BattleState> implements BattleCubit;
 
@@ -86,8 +89,14 @@ void main() {
     late void Function(double) tick;
     late BattleCamera sceneCamera;
     late StreamController<BattleState> states;
+    late StreamController<BattleSnapshot> snapshots;
+    late StorageCubit storage;
 
     setUp(() {
+      snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
+      addTearDown(snapshots.close);
+      storage = storageCubit(snapshots.stream);
+      addTearDown(storage.close);
       cubit = _MockBattleCubit();
       world = FakeWorld(map);
       states = StreamController<BattleState>.broadcast();
@@ -122,8 +131,11 @@ void main() {
           locale: locale,
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BlocProvider<BattleCubit>.value(
-            value: cubit,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<StorageCubit>.value(value: storage),
+              BlocProvider<BattleCubit>.value(value: cubit),
+            ],
             child: BattleView(
               map: map,
               bodies: unitBodies ?? bodies,
@@ -298,7 +310,7 @@ void main() {
       );
     });
 
-    testWidgets("M7.1 lists the section's units, and deploys a stored one", (
+    testWidgets("M7.1 lists the section's units, deployed or stored", (
       tester,
     ) async {
       when(() => cubit.state).thenReturn(
@@ -310,17 +322,64 @@ void main() {
           },
         ),
       );
-      when(() => cubit.deploy(any())).thenAnswer((_) async {});
       await pump(tester);
 
       expect(find.textContaining('commander · in the field'), findsOneWidget);
       expect(find.textContaining('soldier · stored'), findsOneWidget);
       expect(find.textContaining('soldier · in the field'), findsNothing);
-      // Only the stored unit can be deployed.
+      // Deploying moved to the storage view (M7.6).
+      expect(find.text('Deploy'), findsNothing);
+    });
+
+    testWidgets('M7.6 the Storage button opens the storage view, where a '
+        'stored unit deploys, and closes it', (tester) async {
+      await pump(tester);
+      snapshots.add(
+        const BattleSnapshot(
+          units: {'c-1': blueCommander, 's-1': storedSoldier},
+          hqs: [
+            HqView(
+              team: 'blue',
+              position: Position(50500, 5500, 3000),
+              hp: 1000,
+              maxHp: 1000,
+            ),
+          ],
+          relics: [],
+          section: SectionPrivate(money: 0, xp: 0),
+          team: 'blue',
+          sectionId: 's-blue',
+        ),
+      );
+      // The cubit lives in the real zone: let its stream deliver.
+      await tester.runAsync(pumpEventQueue);
+      await tester.pump();
+
+      expect(find.text('Storage (1)'), findsOneWidget);
+      expect(find.text('Deploy'), findsNothing);
+
+      await tester.tap(find.text('Storage (1)'));
+      await tester.pump();
       expect(find.text('Deploy'), findsOneWidget);
+      expect(find.textContaining('Deploying costs 10 AP'), findsOneWidget);
 
       await tester.tap(find.text('Deploy'));
-      verify(() => cubit.deploy('s-1')).called(1);
+      await tester.pump();
+      expect(find.textContaining('deploy accepted'), findsOneWidget);
+
+      await tester.tap(find.text('Close'));
+      await tester.pump();
+      expect(find.text('Deploy'), findsNothing);
+    });
+
+    testWidgets('M7.6 the selected unit on the field has a store button', (
+      tester,
+    ) async {
+      when(() => cubit.state)
+          .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
+      await pump(tester);
+
+      expect(find.textContaining('Recall'), findsOneWidget);
     });
 
     testWidgets(
@@ -702,6 +761,8 @@ void main() {
         ),
         preCheck: testPreCheck(),
       );
+      final storage = realStorageCubit(cubit);
+      addTearDown(storage.close);
       addTearDown(cubit.close);
       await tester.runAsync(() async {
         await cubit.start();
@@ -713,8 +774,11 @@ void main() {
         MaterialApp(
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BlocProvider<BattleCubit>.value(
-            value: cubit,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<StorageCubit>.value(value: storage),
+              BlocProvider<BattleCubit>.value(value: cubit),
+            ],
             child: BattleView(
               map: map,
               bodies: bodies,

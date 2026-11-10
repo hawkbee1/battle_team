@@ -12,6 +12,7 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/scene_battle_world.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:material_ui/material_ui.dart';
@@ -83,15 +84,29 @@ class _BattlePageState extends State<BattlePage> {
           ? FutureBuilder(
               future: _ready,
               builder: (context, snapshot) => switch (snapshot) {
-                AsyncSnapshot(:final data?) => BlocProvider(
-                  create: (_) {
-                    final cubit = BattleCubit(
-                      repository: repository,
-                      preCheck: data.preCheck,
-                    );
-                    unawaited(cubit.start());
-                    return cubit;
-                  },
+                AsyncSnapshot(:final data?) => MultiBlocProvider(
+                  providers: [
+                    // First, and not lazy: it follows the view from the
+                    // first message the battle cubit makes the repository
+                    // fetch.
+                    BlocProvider(
+                      lazy: false,
+                      create: (_) => StorageCubit(
+                        repository: repository,
+                        preCheck: data.preCheck,
+                      )..start(),
+                    ),
+                    BlocProvider(
+                      create: (_) {
+                        final cubit = BattleCubit(
+                          repository: repository,
+                          preCheck: data.preCheck,
+                        );
+                        unawaited(cubit.start());
+                        return cubit;
+                      },
+                    ),
+                  ],
                   child: BattleView(
                     map: data.map,
                     world: widget.worldBuilder(data.map),

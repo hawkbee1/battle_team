@@ -5,6 +5,7 @@ import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/data/battle_repository.dart';
 import 'package:battle_team/battle/data/battle_snapshot.dart';
 import 'package:battle_team/battle/data/connection_status.dart';
+import 'package:battle_team/battle/data/order_sender.dart';
 import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -329,29 +330,10 @@ class BattleCubit extends Cubit<BattleState> {
     await _order(unit.unitId, name, build(unit));
   }
 
-  /// Brings the stored unit [unitId] of the section out next to its storage
-  /// place, the HQ (HQ-33). Nothing happens for another section's unit.
-  Future<void> deploy(String unitId) async {
-    if (!state.sectionUnits.any((unit) => unit.unitId == unitId)) return;
-    await _order(unitId, 'deploy', Deploy(unitId: unitId));
-  }
-
   /// Sends [order] for [unitId] while playing, and shows the host's answer.
   Future<void> _order(String unitId, String name, Order order) async {
     if (state.status != BattleStatus.playing) return;
-    String? refusal;
-    _log.info('order $name sent');
-    try {
-      refusal = await repository.send(order);
-      if (refusal == null) {
-        _log.info('order $name accepted');
-      } else {
-        _log.warning('order $name refused $refusal');
-      }
-    } on Object catch (error, stackTrace) {
-      _log.severe('order $name failed', error, stackTrace);
-      refusal = '$error';
-    }
+    final refusal = await sendOrder(_log, repository, name, order);
     if (isClosed) return;
     emit(
       state.copyWith(

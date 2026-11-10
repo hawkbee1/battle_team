@@ -12,6 +12,9 @@ import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/storage/cubit/storage_cubit.dart';
+import 'package:battle_team/storage/widgets/storage_panel.dart';
+import 'package:battle_team/storage/widgets/store_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,6 +80,7 @@ class _BattleViewState extends State<BattleView> {
   late final StreamSubscription<Object?> _shots;
   final _frame = ValueNotifier<int>(0);
   final _focus = FocusNode();
+  bool _storageOpen = false;
   double _lastScale = 1;
   double _lastRotation = 0;
   Size _size = Size.zero;
@@ -395,8 +399,24 @@ class _BattleViewState extends State<BattleView> {
             Positioned(
               right: 12,
               top: 96,
-              child: _UnitsPanel(onCentre: _centreNow),
+              child: _UnitsPanel(
+                onCentre: _centreNow,
+                onStorage: () => setState(() => _storageOpen = !_storageOpen),
+              ),
             ),
+            if (_storageOpen)
+              Positioned(
+                left: 12,
+                top: 96,
+                width: 300,
+                child: _Panel(
+                  child: SingleChildScrollView(
+                    child: StoragePanel(
+                      onClose: () => setState(() => _storageOpen = false),
+                    ),
+                  ),
+                ),
+              ),
             if (_firstPerson != null) const AimReticle(),
             Positioned(
               left: 12,
@@ -458,12 +478,13 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// The section's units, deployed or stored: a tap selects one, Deploy
-/// brings a stored one out to the HQ, Centre looks at the section again.
+/// The section's units, deployed or stored: a tap selects one, Storage opens
+/// the storage view (M7 Issue 6), Centre looks at the section again.
 class _UnitsPanel extends StatelessWidget {
-  const new({required this.onCentre});
+  const new({required this.onCentre, required this.onStorage});
 
   final VoidCallback onCentre;
+  final VoidCallback onStorage;
 
   @override
   Widget build(BuildContext context) {
@@ -480,6 +501,14 @@ class _UnitsPanel extends StatelessWidget {
             children: [
               Text(l10n.battleUnits),
               TextButton(onPressed: onCentre, child: Text(l10n.battleCentre)),
+              TextButton(
+                onPressed: onStorage,
+                child: BlocSelector<StorageCubit, StorageState, int>(
+                  selector: (state) => state.stored.length,
+                  builder: (context, stored) =>
+                      Text(l10n.storageOpen('$stored')),
+                ),
+              ),
             ],
           ),
           for (final unit in units) _UnitRow(unit: unit),
@@ -499,22 +528,12 @@ class _UnitRow extends StatelessWidget {
     final l10n = context.l10n;
     final cubit = context.read<BattleCubit>();
     final stored = unit.private?.place == UnitPlace.stored;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () => cubit.select(unit.unitId),
-          child: Text(
-            '${unit.unitType} · '
-            '${stored ? l10n.battleStored : l10n.battleInField}',
-          ),
-        ),
-        if (stored)
-          TextButton(
-            onPressed: () => cubit.deploy(unit.unitId),
-            child: Text(l10n.battleDeploy),
-          ),
-      ],
+    return TextButton(
+      onPressed: () => cubit.select(unit.unitId),
+      child: Text(
+        '${unit.unitType} · '
+        '${stored ? l10n.battleStored : l10n.battleInField}',
+      ),
     );
   }
 }
@@ -541,8 +560,7 @@ class _SelectedUnit extends StatelessWidget {
           unit.hp.toStringAsFixed(0),
           cubit.apNow(unit)?.toStringAsFixed(1) ?? '–',
         ),
-      // The answer to an order of the selected unit, or to one given with no
-      // unit selected (deploying): not the answer to another unit's.
+      // The answer to an order of the selected unit, not to another unit's.
       if (notice != null && (unit == null || notice.unitId == unit.unitId))
         switch (notice.refusal) {
           null => l10n.battleOrderAccepted(l10n.battleOrderName(notice.order)),
@@ -562,6 +580,8 @@ class _SelectedUnit extends StatelessWidget {
         children: [
           Text(lines.join('\n')),
           if (unit != null) WeaponPanel(unit: unit, aim: aim),
+          if (unit != null && unit.private?.place == UnitPlace.deployed)
+            StoreButton(unit: unit),
           if (seeable)
             TextButton(
               onPressed: cubit.enterFirstPerson,

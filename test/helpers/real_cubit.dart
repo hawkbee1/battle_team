@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:battle_team/battle/battle.dart';
+import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'fake_host.dart';
@@ -36,3 +37,9 @@ BattleCubit realCubit(FakeHost host) {
     preCheck: testPreCheck(),
   );
 }
+
+/// The storage cubit over the same repository as [battle]; started, so that it
+/// follows the view from the first message. Call it before `battle.start()`.
+StorageCubit realStorageCubit(BattleCubit battle) =>
+    StorageCubit(repository: battle.repository, preCheck: battle.preCheck)
+      ..start();
