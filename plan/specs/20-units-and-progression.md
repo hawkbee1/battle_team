@@ -25,7 +25,7 @@ commanders, engineers, scouts, artillery, transports, vehicles, soldiers, plus r
 | `capabilities` | Optional list of extra abilities: `flying`, `sail`. |
 | `actions` | What the unit can do besides moving and shooting: `capture`, `push`, `build`, `repair`, `heal`, `observe` (UNIT-38). |
 
-AP recovery is not a unit stat: every unit recovers at the battle's rate, **1 AP per hour** by default (decisions 168, 172; `ap.recovery_per_hour` in `data/battle.yaml`).
+AP recovery is not a unit stat: every unit recovers at the battle's rate, **1 AP per hour** by default (decisions 168, 172, 238; `ap.recovery_delay_s` in `data/battle.yaml`).
 
 Role-specific stats are added per category: medic heal value, scout observe, transport weight limits, radio range, commander aura radius (see section 8). Engineer building: AP + build time per structure (decision 113). Weapon range, splash and terrain deformation belong to the **weapon**, not the unit.
 

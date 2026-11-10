@@ -74,3 +74,7 @@ weather:
 # section cannot deploy again for this long, from the moment the last one left it. Not after a
 # commander's death (decision 125).
 section_redeploy_lock_s: 86400
+
+# The test unit (UNIT-44, decision 239) can be bought only where this is on: testing battles, never a
+# public war. A battle's settings override it, like ap.recovery_delay_s (decision 238).
+test_units: false

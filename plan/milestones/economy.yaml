@@ -8,6 +8,7 @@ war_defaults:
 prices:
   default: 100               # anything not listed below
   encampment: 500            # decision 111
+  test_unit: 0               # testing battles only (decision 239)
 
 earnings:                    # money for the acting unit's section
   hit: 1
