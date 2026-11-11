@@ -143,8 +143,60 @@ void main() {
           section: blueView.section,
           team: 'blue',
           sectionId: 's-blue',
+          weather: 'clear',
+          worldVersion: 1,
         ),
       );
+    });
+
+    test('MAP-31 MAP-08 MAP-49 gives the weather, the delta layer and the '
+        'countdown as they change', () async {
+      final first = await play();
+      expect(first.weather, 'clear');
+      expect(first.hold, isNull);
+
+      final next = repository.snapshots.first;
+      host.sockets.single.deliver(
+        TickUpdate(
+          at: blueView.at + const Duration(minutes: 1),
+          weather: 'fog',
+          events: const [
+            CraterDug(at: Position(1, 1, 1), radiusM: 2, depthM: 1),
+            VictoryHoldStarted(team: 'red', winsAt: Duration(hours: 30)),
+          ],
+        ),
+      );
+      final snapshot = await next;
+
+      expect(snapshot.weather, 'fog');
+      expect(snapshot.world, hasLength(1));
+      expect(snapshot.worldVersion, isNot(first.worldVersion));
+      expect(snapshot.hold?.team, 'red');
+    });
+
+    test('RELIC-10 decision 233 gives the relic alerts the host sends, also '
+        'those it sends on connecting', () async {
+      final alerts = <RelicAlert>[];
+      final subscription = repository.alerts.listen(alerts.add);
+      addTearDown(subscription.cancel);
+      await play();
+
+      host.sockets.single.deliver(
+        const RelicAlert(
+          at: Duration(hours: 2),
+          relicId: 'relic-1',
+          team: 'red',
+        ),
+      );
+      await pumpEventQueue();
+
+      expect(alerts, [
+        const RelicAlert(
+          at: Duration(hours: 2),
+          relicId: 'relic-1',
+          team: 'red',
+        ),
+      ]);
     });
 
     test('HQ-32 gives the recalls the host announced', () async {

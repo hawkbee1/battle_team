@@ -48,6 +48,7 @@ void main() {
         'through the codec, and the host answer shows', () async {
       final host = FakeHost(
         view: SectionView(
+          weather: 'clear',
           at: blueView.at,
           section: const SectionPrivate(money: 500, xp: 0),
           units: const [blueCommander],
@@ -70,6 +71,7 @@ void main() {
         'out and the host refusal shows as the host one', () async {
       final host = FakeHost(
         view: SectionView(
+          weather: 'clear',
           at: blueView.at,
           section: const SectionPrivate(money: 500, xp: 0),
           units: const [blueCommander],
@@ -92,6 +94,7 @@ void main() {
         'against', () async {
       final host = FakeHost(
         view: SectionView(
+          weather: 'clear',
           at: blueView.at,
           section: const SectionPrivate(money: 50, xp: 0),
           units: const [blueCommander],

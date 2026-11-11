@@ -47,6 +47,7 @@ void main() {
         'shows', () async {
       final host = FakeHost(
         view: SectionView(
+          weather: 'clear',
           at: blueView.at,
           section: blueView.section,
           units: const [blueCommander, storedSoldier, redSoldier],
@@ -67,6 +68,7 @@ void main() {
         'shows as the host one, nothing was known before', () async {
       final host = FakeHost(
         view: SectionView(
+          weather: 'clear',
           at: blueView.at,
           section: blueView.section,
           units: const [blueCommander, storedSoldier],
@@ -88,6 +90,7 @@ void main() {
         'stored', () async {
       final host = FakeHost(
         view: SectionView(
+          weather: 'clear',
           at: blueView.at,
           section: blueView.section,
           units: const [blueCommander],

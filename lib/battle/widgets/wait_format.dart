@@ -8,3 +8,8 @@ String formatWait(Duration wait) => switch (wait) {
 
 /// AP, whole when they are.
 String formatAp(double ap) => ap.toStringAsFixed(ap % 1 == 0 ? 0 : 1);
+
+/// The time left until the battle time [until] at [now]; none once it is past
+/// or before the host's first message.
+Duration remainingOf(Duration until, Duration? now) =>
+    now == null || until < now ? Duration.zero : until - now;

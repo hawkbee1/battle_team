@@ -34,6 +34,7 @@ UnitView _soldier({
   position: at,
   weapon: 'rifle',
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.deployed,
     ap: ApView(value: ap, at: const Duration(hours: 1), perHour: 1, max: 30),
     morale: 100,

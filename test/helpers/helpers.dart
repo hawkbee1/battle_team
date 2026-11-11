@@ -1,3 +1,4 @@
+export 'fog.dart';
 export 'log_capture.dart';
 export 'mocks.dart';
 export 'pre_check.dart';

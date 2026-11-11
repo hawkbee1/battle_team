@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
+import 'package:battle_team/alerts/cubit/alerts_cubit.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/battle/data/battle_repository.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
@@ -11,6 +12,9 @@ import 'package:battle_team/battle/view/battle_view.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/scene_battle_world.dart';
+import 'package:battle_team/fog/cubit/fog_cubit.dart';
+import 'package:battle_team/fog/data/ground_sight_loader.dart';
+import 'package:battle_team/fog/model/fog_tracker.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/shop/cubit/shop_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
@@ -33,6 +37,7 @@ class BattlePage extends StatefulWidget {
     this.loadBodies = loadUnitBodies,
     this.loadPreCheck = loadOrderPreCheck,
     this.loadMovePreviewer = loadMovePreview,
+    this.loadSight = loadGroundSight,
     this.initialize = Scene.initializeStaticResources,
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
@@ -55,6 +60,10 @@ class BattlePage extends StatefulWidget {
   final Future<MovePreviewer> Function(AssetBundle bundle, String mapId)
   loadMovePreviewer;
 
+  /// Loads the ground a unit sees, which the fog is made of.
+  final Future<GroundSight> Function(AssetBundle bundle, String mapId)
+  loadSight;
+
   /// Loads flutter_scene's shaders and shared resources.
   final Future<void> Function() initialize;
 
@@ -75,6 +84,7 @@ class _BattlePageState extends State<BattlePage> {
       UnitBodies bodies,
       OrderPreCheck preCheck,
       MovePreviewer previewer,
+      GroundSight sight,
     })
   >
   _ready = () async {
@@ -84,8 +94,15 @@ class _BattlePageState extends State<BattlePage> {
     final bodies = await widget.loadBodies(bundle);
     final preCheck = await widget.loadPreCheck(bundle);
     final previewer = await widget.loadMovePreviewer(bundle, mapId);
+    final sight = await widget.loadSight(bundle, mapId);
     await widget.initialize();
-    return (map: map, bodies: bodies, preCheck: preCheck, previewer: previewer);
+    return (
+      map: map,
+      bodies: bodies,
+      preCheck: preCheck,
+      previewer: previewer,
+      sight: sight,
+    );
   }();
 
   @override
@@ -106,6 +123,21 @@ class _BattlePageState extends State<BattlePage> {
                       create: (_) => StorageCubit(
                         repository: repository,
                         preCheck: data.preCheck,
+                      )..start(),
+                    ),
+                    BlocProvider(
+                      lazy: false,
+                      create: (_) =>
+                          AlertsCubit(repository: repository)..start(),
+                    ),
+                    BlocProvider(
+                      lazy: false,
+                      create: (_) => FogCubit(
+                        repository: repository,
+                        tracker: FogTracker(
+                          sight: data.sight,
+                          bodies: data.bodies,
+                        ),
                       )..start(),
                     ),
                     BlocProvider(

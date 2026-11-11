@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/alerts/cubit/alerts_cubit.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
+import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/shop/cubit/shop_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
@@ -23,6 +25,7 @@ import 'package:vector_math/vector_math.dart' show Vector3;
 
 import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
+import '../../helpers/fog.dart';
 import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
 import '../../helpers/pre_check.dart';
@@ -94,6 +97,8 @@ void main() {
     late StreamController<BattleSnapshot> snapshots;
     late StorageCubit storage;
     late ShopCubit shop;
+    late FogCubit fog;
+    late AlertsCubit alerts;
 
     setUp(() {
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
@@ -102,6 +107,10 @@ void main() {
       addTearDown(storage.close);
       shop = shopCubit(snapshots.stream);
       addTearDown(shop.close);
+      fog = fogCubit(snapshots.stream);
+      addTearDown(fog.close);
+      alerts = alertsCubit(snapshots.stream);
+      addTearDown(alerts.close);
       cubit = _MockBattleCubit();
       world = FakeWorld(map);
       states = StreamController<BattleState>.broadcast();
@@ -142,6 +151,8 @@ void main() {
             providers: [
               BlocProvider<StorageCubit>.value(value: storage),
               BlocProvider<ShopCubit>.value(value: shop),
+              BlocProvider<FogCubit>.value(value: fog),
+              BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: cubit),
             ],
             child: BattleView(
@@ -941,6 +952,10 @@ void main() {
       );
       final storage = realStorageCubit(cubit);
       addTearDown(storage.close);
+      final fogOfBattle = realFogCubit(cubit);
+      addTearDown(fogOfBattle.close);
+      final alerts = realAlertsCubit(cubit);
+      addTearDown(alerts.close);
       addTearDown(cubit.close);
       await tester.runAsync(() async {
         await cubit.start();
@@ -955,6 +970,8 @@ void main() {
           home: MultiBlocProvider(
             providers: [
               BlocProvider<StorageCubit>.value(value: storage),
+              BlocProvider<FogCubit>.value(value: fogOfBattle),
+              BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: cubit),
             ],
             child: BattleView(

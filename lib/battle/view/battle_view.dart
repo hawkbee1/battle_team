@@ -3,6 +3,8 @@ import 'dart:math' as math;
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/alerts/widgets/alert_banners.dart';
+import 'package:battle_team/alerts/widgets/status_strip.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/widgets/move_panel.dart';
@@ -12,6 +14,7 @@ import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
+import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/shop/widgets/shop_panel.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
@@ -97,6 +100,7 @@ class _BattleViewState extends State<BattleView> {
     _topDown = TopDownCamera(target: centre, distance: 700);
     widget.world.useCamera(_topDown);
     final cubit = context.read<BattleCubit>();
+    widget.world.showFog(context.read<FogCubit>().state.model);
     _shots = cubit.shots.listen(widget.world.showShots);
     _show(cubit.state, centreOnUnits: true);
   }
@@ -326,11 +330,20 @@ class _BattleViewState extends State<BattleView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<BattleCubit, BattleState>(
-      listener: (context, state) {
-        _show(state, centreOnUnits: true);
-        _syncCamera(state);
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<BattleCubit, BattleState>(
+          listener: (context, state) {
+            _show(state, centreOnUnits: true);
+            _syncCamera(state);
+          },
+        ),
+        // The ground is shaded when what the section sees changes, not every
+        // frame (M7 Issue 9).
+        BlocListener<FogCubit, FogState>(
+          listener: (context, state) => widget.world.showFog(state.model),
+        ),
+      ],
       child: Focus(
         focusNode: _focus,
         autofocus: true,
@@ -478,6 +491,32 @@ class _BattleViewState extends State<BattleView> {
                 ),
               ),
             if (_firstPerson != null) const AimReticle(),
+            Positioned(
+              top: 96,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: AlertBanners(builder: (child) => _Panel(child: child)),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 12,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: IgnorePointer(
+                    child: StatusStrip(
+                      builder: (child) => _Panel(child: child),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
               left: 12,
               bottom: 12,

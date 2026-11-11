@@ -250,6 +250,7 @@ void main() {
         maxHp: 200,
         position: onMap ? at : null,
         private: UnitPrivate(
+          sightRangeM: 60,
           place: place,
           ap: blueCommander.private!.ap,
           morale: 100,

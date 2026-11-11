@@ -4,6 +4,7 @@ import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:vector_math/vector_math.dart';
 
 /// A world without a GPU: it draws each unit where the battle puts it.
@@ -77,6 +78,18 @@ class FakeWorld implements BattleWorld {
   void showPath(List<Position>? points) {
     path = points;
     paths.add(points);
+  }
+
+  /// The fog last shown; null before any.
+  FogModel? fog;
+
+  /// Every call of `showFog`, in order.
+  final fogs = <FogModel>[];
+
+  @override
+  void showFog(FogModel fog) {
+    this.fog = fog;
+    fogs.add(fog);
   }
 
   @override

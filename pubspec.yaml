@@ -13,6 +13,7 @@ dependencies:
   backend_status_repository: ^0.1.0
   battle_client: ^0.1.0
   battle_map: ^0.1.0
+  battle_pathfinding: ^0.1.0
   battle_protocol: ^0.1.0
   battle_rules: ^0.1.0
   bloc: ^9.2.1
@@ -30,7 +31,6 @@ dependencies:
   vector_math: ^2.1.4
 
 dev_dependencies:
-  battle_pathfinding: ^0.1.0
   bloc_lint: ^0.4.2
   bloc_test: ^10.0.0
   bloc_tools: ^0.1.0-dev.24

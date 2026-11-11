@@ -30,6 +30,7 @@ const _impact = Impact(
 
 /// The section's whole view: its shooter, two enemies and its team's HQ.
 SectionView _whole({List<UnitView>? units}) => SectionView(
+  weather: 'clear',
   at: const Duration(hours: 1),
   section: const SectionPrivate(money: 0, xp: 0),
   units:

@@ -1,5 +1,6 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
+import 'package:battle_team/alerts/cubit/alerts_cubit.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
@@ -7,6 +8,7 @@ import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/widgets/weapon_panel.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter/gestures.dart';
@@ -33,6 +35,7 @@ const _near = UnitView(
 );
 
 final _view = SectionView(
+  weather: 'clear',
   at: armedView.at,
   section: armedView.section,
   units: const [blueCommander, blueRifleman, blueGun, _near],
@@ -63,6 +66,10 @@ void main() {
       cubit = realCubit(host);
       final storage = realStorageCubit(cubit);
       addTearDown(storage.close);
+      final fog = realFogCubit(cubit);
+      addTearDown(fog.close);
+      final alerts = realAlertsCubit(cubit);
+      addTearDown(alerts.close);
       addTearDown(cubit.close);
       await tester.runAsync(() async {
         await cubit.start();
@@ -76,6 +83,8 @@ void main() {
           home: MultiBlocProvider(
             providers: [
               BlocProvider<StorageCubit>.value(value: storage),
+              BlocProvider<FogCubit>.value(value: fog),
+              BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: cubit),
             ],
             child: BattleView(

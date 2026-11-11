@@ -27,6 +27,7 @@ UnitView _busy(Duration busyUntil) => UnitView(
   position: blueRifleman.position,
   weapon: 'rifle',
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.deployed,
     ap: blueRifleman.private!.ap,
     morale: 100,

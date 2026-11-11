@@ -514,5 +514,74 @@
         "type": "String"
       }
     }
+  },
+  "alertsRelics": "Relics",
+  "@alertsRelics": {
+    "description": "Title of the relics in the status strip"
+  },
+  "alertsRelicsOwned": "{team} {count}",
+  "@alertsRelicsOwned": {
+    "description": "How many relics a team owns, in the status strip",
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsRelicsFree": "free {count}",
+  "@alertsRelicsFree": {
+    "description": "How many relics belong to nobody, in the status strip",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsCountdown": "{team} wins in {time}",
+  "@alertsCountdown": {
+    "description": "The victory countdown of the team that holds the relics (RELIC-16)",
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsRelicTaken": "{team} took the relic {relic}",
+  "@alertsRelicTaken": {
+    "description": "Alert: the section's team lost a relic (RELIC-10)",
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "relic": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsCountdownStarted": "{team} holds the relics: it wins in {time} unless one is taken back",
+  "@alertsCountdownStarted": {
+    "description": "Alert: a victory countdown started (RELIC-16)",
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsCountdownReset": "The victory countdown was reset",
+  "@alertsCountdownReset": {
+    "description": "Alert: the victory countdown was reset (RELIC-16)"
+  },
+  "alertsDismiss": "Dismiss",
+  "@alertsDismiss": {
+    "description": "Button that closes an alert"
   }
 }

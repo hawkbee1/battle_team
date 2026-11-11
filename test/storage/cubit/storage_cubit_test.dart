@@ -163,6 +163,7 @@ void main() {
         hp: 100,
         maxHp: 100,
         private: UnitPrivate(
+          sightRangeM: 60,
           place: UnitPlace.stored,
           ap: ApView(value: 4, at: Duration(hours: 1), perHour: 1, max: 30),
           morale: 100,

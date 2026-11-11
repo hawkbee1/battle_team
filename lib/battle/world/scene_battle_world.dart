@@ -3,6 +3,7 @@
 // `flutter test` does not have.
 
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
@@ -11,6 +12,8 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/live_shots.dart';
+import 'package:battle_team/fog/model/fog_model.dart';
+import 'package:battle_team/fog/model/fog_shading.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -61,22 +64,24 @@ class SceneBattleWorld implements BattleWorld {
     for (final MapEntry(:key, :value) in _units.entries) key: value.at(_clock),
   };
 
+  late final TerrainArrays _ground = terrainArrays(map);
+  final _groundMaterial = UnlitMaterial()..doubleSided = true;
+  late final Node _groundNode = Node(
+    name: 'ground',
+    mesh: _groundMesh(_ground.colors),
+  );
+
+  Mesh _groundMesh(Float32List colors) => Mesh(
+    MeshGeometry.fromArrays(
+      positions: _ground.positions,
+      colors: colors,
+      indices: _ground.indices,
+    ),
+    _groundMaterial,
+  );
+
   Scene _build() {
-    final scene = Scene();
-    final ground = terrainArrays(map);
-    scene.add(
-      Node(
-        name: 'ground',
-        mesh: Mesh(
-          MeshGeometry.fromArrays(
-            positions: ground.positions,
-            colors: ground.colors,
-            indices: ground.indices,
-          ),
-          UnlitMaterial()..doubleSided = true,
-        ),
-      ),
-    );
+    final scene = Scene()..add(_groundNode);
     final trees = InstancedMesh(
       geometry: CylinderGeometry(
         bottomRadius: 3.5,
@@ -240,6 +245,13 @@ class SceneBattleWorld implements BattleWorld {
       scene.add(node);
       _pathNodes.add(node);
     }
+  }
+
+  /// The ground's vertex colours with the fog on them: the mesh is made again
+  /// when the fog changes, never per frame (stack decision 4).
+  @override
+  void showFog(FogModel fog) {
+    _groundNode.mesh = _groundMesh(fogShadedColors(_ground.colors, fog));
   }
 
   @override

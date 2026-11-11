@@ -18,6 +18,7 @@ const blueCommander = UnitView(
   maxHp: 200,
   position: Position(50500, 5500, 3000),
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.deployed,
     ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
     morale: 100,
@@ -50,6 +51,7 @@ const blueRifleman = UnitView(
   position: Position(50500, 6000, 3000),
   weapon: 'rifle',
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.deployed,
     ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
     morale: 100,
@@ -70,6 +72,7 @@ const blueGun = UnitView(
   position: Position(50500, 6000, 3000),
   weapon: 'artillery',
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.deployed,
     ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
     morale: 100,
@@ -88,6 +91,7 @@ const storedSoldier = UnitView(
   hp: 100,
   maxHp: 100,
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.stored,
     ap: ApView(value: 30, at: Duration(hours: 1), perHour: 1, max: 30),
     morale: 100,
@@ -99,6 +103,7 @@ const storedSoldier = UnitView(
 
 /// The blue section's whole view.
 const blueView = SectionView(
+  weather: 'clear',
   at: Duration(hours: 1),
   section: SectionPrivate(money: 0, xp: 0),
   units: [blueCommander, redSoldier],
@@ -119,6 +124,7 @@ const blueView = SectionView(
 /// The blue section's whole view with an armed rifleman and a gun, and a
 /// machine gun in the section's storage.
 const armedView = SectionView(
+  weather: 'clear',
   at: Duration(hours: 1),
   section: SectionPrivate(money: 0, xp: 0, storedWeapons: ['machine_gun']),
   units: [blueCommander, blueRifleman, blueGun, redSoldier],
