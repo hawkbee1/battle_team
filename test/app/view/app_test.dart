@@ -86,19 +86,31 @@ void main() {
 
       expect(find.byType(SignInPage), findsNothing);
       verify(() => battleLocator.locate('u-1')).called(1);
-      expect(
-        find.text('This account has no section in a running battle yet.'),
-        findsOneWidget,
-      );
+      expect(find.text('No battle is running right now.'), findsOneWidget);
     });
 
-    testWidgets('M7.12 an account in several wars is shown the list of its '
-        'battles, one per war', (tester) async {
+    testWidgets('SOC-30 an account that is in no battle is shown the '
+        'running battles to join, and the ones it is in marked', (
+      tester,
+    ) async {
       when(apiClient.currentAccount).thenAnswer((_) async => _account);
       when(() => battleLocator.locate('u-1')).thenAnswer(
         (_) async => const [
-          (warId: 'w-1', battle: (battleId: 'b-1', mapId: 'saint_lo_1km')),
-          (warId: 'w-2', battle: (battleId: 'b-2', mapId: 'valley')),
+          (
+            warId: 'w-1',
+            battle: (battleId: 'b-1', mapId: 'saint_lo_1km'),
+            joined: true,
+          ),
+          (
+            warId: 'w-2',
+            battle: (battleId: 'b-2', mapId: 'valley'),
+            joined: true,
+          ),
+          (
+            warId: 'w-3',
+            battle: (battleId: 'b-3', mapId: 'valley'),
+            joined: false,
+          ),
         ],
       );
 
@@ -107,7 +119,9 @@ void main() {
 
       expect(find.text('Choose a battle'), findsOneWidget);
       expect(find.text('War w-1'), findsOneWidget);
-      expect(find.text('War w-2'), findsOneWidget);
+      expect(find.text('War w-3'), findsOneWidget);
+      expect(find.text('You are in'), findsNWidgets(2));
+      expect(find.widgetWithText(FilledButton, 'Join'), findsOneWidget);
       expect(find.byType(BattlePage), findsNothing);
     });
 

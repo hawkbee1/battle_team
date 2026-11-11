@@ -6,11 +6,14 @@ import 'package:logging/logging.dart';
 part 'battle_entry_state.dart';
 
 /// {@template battle_entry_cubit}
-/// Finds the battles an account plays, once it is signed in, through the
-/// locator: the screen then opens the only one, lets the player choose among
-/// several, or says there is none or why the search failed. [choose] looks
-/// again and always lets the player choose (the battle screen's Switch
-/// battle). It enters nothing: the host logs the player in on the socket
+/// Finds the battles of an account, once it is signed in, through the
+/// locator: the screen then opens the only battle the account is in, lets the
+/// player choose among the running battles (the ones he is in and the ones he
+/// can join), or says there is none or why the search failed. [choose] looks
+/// again and always lists them (the battle screen's Switch battle). A battle
+/// the account is not in is joined first (SOC-30): its war gives the account a
+/// new section, then the battle is entered and the host admits the section.
+/// The cubit enters nothing itself: the host logs the player in on the socket
 /// (decision 220).
 /// {@endtemplate}
 class BattleEntryCubit extends Cubit<BattleEntryState> {
@@ -23,28 +26,48 @@ class BattleEntryCubit extends Cubit<BattleEntryState> {
 
   static final _log = Logger('battle_team.BattleEntryCubit');
 
-  /// Looks for the account's battles; again after a failure or a "none". The
-  /// only battle found is entered at once.
+  /// The battles of the last look, which a failed join goes back to.
+  List<AccountBattle> _listed = const [];
+
+  /// Looks for the battles; again after a failure or a "none". The only
+  /// battle the account is in is entered at once.
   Future<void> locate() => _look(enterTheOnlyOne: true);
 
-  /// Looks again and lists the account's battles, even when there is one: the
-  /// player wants another war, or another battle.
+  /// Looks again and lists the running battles, even when the account is in
+  /// one: the player wants another war, or another battle.
   Future<void> choose() => _look(enterTheOnlyOne: false);
 
-  /// Enters [battle], one of the [BattleEntryChoosing] list.
-  void enter(AccountBattle battle) => emit(BattleEntryFound(battle.battle));
+  /// Enters [battle], one of the [BattleEntryChoosing] list: at once when the
+  /// account is in it, after joining its war when it is not.
+  Future<void> enter(AccountBattle battle) async {
+    if (battle.joined) {
+      emit(BattleEntryFound(battle.battle));
+      return;
+    }
+    emit(BattleEntryJoining(battle));
+    try {
+      await _locator.join(battle.warId!);
+      emit(BattleEntryFound(battle.battle));
+    } on BattleJoinFailure catch (failure) {
+      _log.warning('war not joined: ${failure.reason.name}');
+      emit(BattleEntryChoosing(_listed, problem: failure.reason));
+    }
+  }
 
   Future<void> _look({required bool enterTheOnlyOne}) async {
     emit(const BattleEntryLocating());
     try {
-      final battles = await _locator.locate(_accountId);
+      final battles = _listed = await _locator.locate(_accountId);
+      final mine = battles.where((battle) => battle.joined).toList();
       emit(switch (battles) {
         [] => const BattleEntryNone(),
-        [final only] when enterTheOnlyOne => BattleEntryFound(only.battle),
+        _ when enterTheOnlyOne && mine.length == 1 => BattleEntryFound(
+          mine.single.battle,
+        ),
         _ => BattleEntryChoosing(battles),
       });
     } on BattleLookupFailure catch (failure) {
-      _log.warning('no battle: lookup failed');
+      _log.warning('no battles: lookup failed');
       emit(BattleEntryFailed(unreachable: failure.unreachable));
     }
   }

@@ -11,7 +11,7 @@ sealed class BattleEntryState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Looking for the account's battle.
+/// Looking for the running battles.
 final class BattleEntryLocating extends BattleEntryState {
   /// Looking.
   const new();
@@ -29,20 +29,37 @@ final class BattleEntryFound extends BattleEntryState {
   List<Object?> get props => [assignment];
 }
 
-/// The account has several battles to choose from, or asked to choose: it
-/// picks one of [battles].
+/// The player picks a battle among [battles], the running ones, each marked
+/// with whether the account is in it. [problem] says why the last join of one
+/// failed.
 final class BattleEntryChoosing extends BattleEntryState {
   /// Choosing among [battles].
-  const new(this.battles);
+  const new(this.battles, {this.problem});
 
-  /// The running battles of the account, one per war.
+  /// The running battles, one per war.
   final List<AccountBattle> battles;
 
+  /// Why the last war the player tried to join was not joined; null if none
+  /// was tried.
+  final BattleJoinFailureReason? problem;
+
   @override
-  List<Object?> get props => [battles];
+  List<Object?> get props => [battles, problem];
 }
 
-/// The account has no section in a running battle.
+/// The account joins the war of [battle]: its section is being created.
+final class BattleEntryJoining extends BattleEntryState {
+  /// Joining the war of [battle].
+  const new(this.battle);
+
+  /// The battle whose war is joined.
+  final AccountBattle battle;
+
+  @override
+  List<Object?> get props => [battle];
+}
+
+/// No battle runs.
 final class BattleEntryNone extends BattleEntryState {
   /// Nothing to play.
   const new();

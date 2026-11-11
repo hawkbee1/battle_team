@@ -12,14 +12,16 @@ import 'package:material_ui/material_ui.dart';
 Widget _battlePage(BuildContext context) => const BattlePage();
 
 /// {@template battle_entry_page}
-/// What a signed-in account sees first: it looks for the account's battles
-/// (`BattleLocator`) and opens the only one with a repository of its own (the
-/// `BattleRepositoryFactory`'s, closed when the battle goes); with several
-/// wars running, it lists them and the player picks one (so does the battle
-/// screen's Switch battle, which comes back here); or it says there is none
-/// or why the search failed, with a button to look again and one to log out.
-/// The battle's screen is built by [pageBuilder], so that tests run without
-/// a GPU.
+/// What a signed-in account sees first: it looks for the running battles
+/// (`BattleLocator`) and opens the only one the account is in with a
+/// repository of its own (the `BattleRepositoryFactory`'s, closed when the
+/// battle goes). Otherwise it lists the running battles, each marked "You are
+/// in" or "Join", and the player picks one (so does the battle screen's
+/// Switch battle, which comes back here): a battle he is in is entered, one he
+/// is not is joined after he confirms (SOC-30: a new section in its war) and
+/// then entered. Or it says there is none or why the search failed, with a
+/// button to look again and one to log out. The battle's screen is built by
+/// [pageBuilder], so that tests run without a GPU.
 ///
 /// Needs a `BattleLocator`, a `BattleRepositoryFactory` and an
 /// `AuthenticationCubit` above it.
@@ -96,42 +98,18 @@ class _Waiting extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   switch (state) {
-                    BattleEntryLocating() => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
-                        Text(l10n.battleEntryLooking),
-                      ],
+                    BattleEntryLocating() => _Progress(
+                      label: l10n.battleEntryLooking,
                     ),
-                    BattleEntryChoosing(:final battles) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          l10n.battleEntryChoose,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 12),
-                        for (final battle in battles)
-                          Card(
-                            child: ListTile(
-                              title: Text(
-                                l10n.battleEntryBattleOn(battle.battle.mapId),
-                              ),
-                              subtitle: switch (battle.warId) {
-                                final war? => Text(l10n.battleEntryWar(war)),
-                                null => null,
-                              },
-                              trailing: const Icon(Icons.chevron_right),
-                              onTap: () => cubit.enter(battle),
-                            ),
-                          ),
-                      ],
+                    BattleEntryJoining() => _Progress(
+                      label: l10n.battleEntryJoining,
                     ),
+                    BattleEntryChoosing(:final battles, :final problem) =>
+                      _Battles(battles: battles, problem: problem),
                     _ => Text(message, textAlign: TextAlign.center),
                   },
-                  if (state is! BattleEntryLocating) ...[
+                  if (state is! BattleEntryLocating &&
+                      state is! BattleEntryJoining) ...[
                     const SizedBox(height: 16),
                     Center(
                       child: FilledButton(
@@ -148,6 +126,110 @@ class _Waiting extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _Progress extends StatelessWidget {
+  const new({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const CircularProgressIndicator(),
+      const SizedBox(height: 16),
+      Text(label),
+    ],
+  );
+}
+
+/// The running battles: the ones the account is in enter, the others ask
+/// before they join their war.
+class _Battles extends StatelessWidget {
+  const new({required this.battles, required this.problem});
+
+  final List<AccountBattle> battles;
+  final BattleJoinFailureReason? problem;
+
+  Future<void> _pick(BuildContext context, AccountBattle battle) async {
+    final cubit = context.read<BattleEntryCubit>();
+    if (!battle.joined) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => _JoinDialog(war: battle.warId ?? ''),
+      );
+      if (confirmed != true) return;
+    }
+    await cubit.enter(battle);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          l10n.battleEntryChoose,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        if (problem case final reason?) ...[
+          const SizedBox(height: 8),
+          Text(
+            l10n.battleEntryJoinProblem(reason.name),
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ],
+        const SizedBox(height: 12),
+        for (final battle in battles)
+          Card(
+            child: ListTile(
+              title: Text(l10n.battleEntryBattleOn(battle.battle.mapId)),
+              subtitle: switch (battle.warId) {
+                final war? => Text(l10n.battleEntryWar(war)),
+                null => null,
+              },
+              trailing: battle.joined
+                  ? Text(l10n.battleEntryYouAreIn)
+                  : FilledButton.tonal(
+                      onPressed: () => unawaited(_pick(context, battle)),
+                      child: Text(l10n.battleEntryJoin),
+                    ),
+              onTap: () => unawaited(_pick(context, battle)),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Asks before the account joins a war: its section stays in the team for
+/// the whole battle (SOC-09).
+class _JoinDialog extends StatelessWidget {
+  const new({required this.war});
+
+  final String war;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(l10n.battleEntryJoinTitle),
+      content: Text(l10n.battleEntryJoinBody(war)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.battleEntryCancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.battleEntryJoin),
+        ),
+      ],
     );
   }
 }

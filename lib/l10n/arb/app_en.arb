@@ -640,9 +640,9 @@
   "@battleEntryLooking": {
     "description": "Shown while the battle of the account is looked for"
   },
-  "battleEntryNone": "This account has no section in a running battle yet.",
+  "battleEntryNone": "No battle is running right now.",
   "@battleEntryNone": {
-    "description": "Shown when the account has no battle to play"
+    "description": "Shown when no battle is running"
   },
   "battleEntryRetry": "Check again",
   "@battleEntryRetry": {
@@ -713,6 +713,42 @@
       "war": {
         "type": "String"
       }
+    }
+  },
+  "battleEntryYouAreIn": "You are in",
+  "@battleEntryYouAreIn": {
+    "description": "Marks a running battle of the list that the account has a section in"
+  },
+  "battleEntryJoin": "Join",
+  "@battleEntryJoin": {
+    "description": "Button of a running battle of the list that the account is not in, and the button that confirms joining"
+  },
+  "battleEntryCancel": "Cancel",
+  "@battleEntryCancel": {
+    "description": "Button that gives up joining a war"
+  },
+  "battleEntryJoining": "Joining the war…",
+  "@battleEntryJoining": {
+    "description": "Shown while the account joins a war: its new section is being created"
+  },
+  "battleEntryJoinTitle": "Join this war?",
+  "@battleEntryJoinTitle": {
+    "description": "Heading of the dialog that asks before the account joins a war"
+  },
+  "battleEntryJoinBody": "A new section is created for you in the war {war}, and you enter its battle. You stay in its team for the whole battle.",
+  "@battleEntryJoinBody": {
+    "description": "Text of the dialog that asks before the account joins a war",
+    "placeholders": {
+      "war": {
+        "type": "String"
+      }
+    }
+  },
+  "battleEntryJoinProblem": "{reason, select, warOver{This war is over.} unreachable{Cannot reach the server. Check your connection and try again.} other{Could not join this war. Try again later.}}",
+  "@battleEntryJoinProblem": {
+    "description": "Why the account could not join a war, in words",
+    "placeholders": {
+      "reason": {}
     }
   }
 }

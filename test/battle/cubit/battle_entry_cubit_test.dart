@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:battle_team/battle/battle.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,10 +8,18 @@ import 'package:mocktail/mocktail.dart';
 import '../../helpers/helpers.dart';
 
 const BattleAssignment _assignment = (battleId: 'b-1', mapId: 'saint_lo_1km');
-const AccountBattle _first = (warId: 'w-1', battle: _assignment);
-const AccountBattle _second = (
+
+/// A battle the account is in, and one it can join.
+const AccountBattle _mine = (warId: 'w-1', battle: _assignment, joined: true);
+const AccountBattle _other = (
   warId: 'w-2',
   battle: (battleId: 'b-2', mapId: 'valley'),
+  joined: false,
+);
+const AccountBattle _third = (
+  warId: 'w-3',
+  battle: (battleId: 'b-3', mapId: 'valley'),
+  joined: true,
 );
 
 void main() {
@@ -30,69 +40,134 @@ void main() {
       expect(build().state, const BattleEntryLocating());
     });
 
-    blocTest<BattleEntryCubit, BattleEntryState>(
-      'M7.12 enters at once the only battle of the account',
-      setUp: () => stubBattles(const [_first]),
-      build: build,
-      act: (cubit) => cubit.locate(),
-      expect: () => const [
-        BattleEntryLocating(),
-        BattleEntryFound(_assignment),
-      ],
-    );
+    group('on arrival', () {
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 enters at once the only battle the account is in, though '
+        'others run',
+        setUp: () => stubBattles(const [_other, _mine]),
+        build: build,
+        act: (cubit) => cubit.locate(),
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryFound(_assignment),
+        ],
+      );
 
-    blocTest<BattleEntryCubit, BattleEntryState>(
-      'M7.12 lets the player choose among several battles, one per war',
-      setUp: () => stubBattles(const [_first, _second]),
-      build: build,
-      act: (cubit) => cubit.locate(),
-      expect: () => const [
-        BattleEntryLocating(),
-        BattleEntryChoosing([_first, _second]),
-      ],
-    );
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 lets the player choose when the account is in several',
+        setUp: () => stubBattles(const [_mine, _third, _other]),
+        build: build,
+        act: (cubit) => cubit.locate(),
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine, _third, _other]),
+        ],
+      );
 
-    blocTest<BattleEntryCubit, BattleEntryState>(
-      'M7.12 an account with no running battle has none',
-      setUp: () => stubBattles(const []),
-      build: build,
-      act: (cubit) => cubit.locate(),
-      expect: () => const [BattleEntryLocating(), BattleEntryNone()],
-    );
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'SOC-30 lets the player choose when the account is in no battle but '
+        'some run: he can join one',
+        setUp: () => stubBattles(const [_other]),
+        build: build,
+        act: (cubit) => cubit.locate(),
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_other]),
+        ],
+      );
 
-    blocTest<BattleEntryCubit, BattleEntryState>(
-      'M7.12 switching lists the battles even when there is only one',
-      setUp: () => stubBattles(const [_first]),
-      build: build,
-      act: (cubit) => cubit.choose(),
-      expect: () => const [
-        BattleEntryLocating(),
-        BattleEntryChoosing([_first]),
-      ],
-    );
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 says there is none when no battle runs',
+        setUp: () => stubBattles(const []),
+        build: build,
+        act: (cubit) => cubit.locate(),
+        expect: () => const [BattleEntryLocating(), BattleEntryNone()],
+      );
+    });
 
-    blocTest<BattleEntryCubit, BattleEntryState>(
-      'M7.12 switching with no running battle says there is none',
-      setUp: () => stubBattles(const []),
-      build: build,
-      act: (cubit) => cubit.choose(),
-      expect: () => const [BattleEntryLocating(), BattleEntryNone()],
-    );
+    group('switching', () {
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 lists the running battles even when the account is in only '
+        'one',
+        setUp: () => stubBattles(const [_mine, _other]),
+        build: build,
+        act: (cubit) => cubit.choose(),
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine, _other]),
+        ],
+      );
 
-    blocTest<BattleEntryCubit, BattleEntryState>(
-      'M7.12 enters the battle the player picked',
-      setUp: () => stubBattles(const [_first, _second]),
-      build: build,
-      act: (cubit) async {
-        await cubit.locate();
-        cubit.enter(_second);
-      },
-      expect: () => const [
-        BattleEntryLocating(),
-        BattleEntryChoosing([_first, _second]),
-        BattleEntryFound((battleId: 'b-2', mapId: 'valley')),
-      ],
-    );
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 says there is none when no battle runs',
+        setUp: () => stubBattles(const []),
+        build: build,
+        act: (cubit) => cubit.choose(),
+        expect: () => const [BattleEntryLocating(), BattleEntryNone()],
+      );
+    });
+
+    group('entering', () {
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 enters at once a battle the account is in, and joins nothing',
+        setUp: () => stubBattles(const [_mine, _third]),
+        build: build,
+        act: (cubit) async {
+          await cubit.locate();
+          await cubit.enter(_third);
+        },
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine, _third]),
+          BattleEntryFound((battleId: 'b-3', mapId: 'valley')),
+        ],
+        verify: (_) => verifyNever(() => locator.join(any())),
+      );
+
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'SOC-30 joins the war of a battle the account is not in, then enters '
+        'it',
+        setUp: () {
+          stubBattles(const [_mine, _other]);
+          when(() => locator.join('w-2')).thenAnswer((_) async {});
+        },
+        build: build,
+        act: (cubit) async {
+          await cubit.choose();
+          await cubit.enter(_other);
+        },
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine, _other]),
+          BattleEntryJoining(_other),
+          BattleEntryFound((battleId: 'b-2', mapId: 'valley')),
+        ],
+        verify: (_) => verify(() => locator.join('w-2')).called(1),
+      );
+
+      for (final reason in BattleJoinFailureReason.values) {
+        blocTest<BattleEntryCubit, BattleEntryState>(
+          'SOC-30 a war that cannot be joined (${reason.name}) goes back to '
+          'the list with the reason, and enters nothing',
+          setUp: () {
+            stubBattles(const [_mine, _other]);
+            when(() => locator.join('w-2'))
+                .thenThrow(BattleJoinFailure(reason));
+          },
+          build: build,
+          act: (cubit) async {
+            await cubit.choose();
+            await cubit.enter(_other);
+          },
+          expect: () => [
+            const BattleEntryLocating(),
+            const BattleEntryChoosing([_mine, _other]),
+            const BattleEntryJoining(_other),
+            BattleEntryChoosing(const [_mine, _other], problem: reason),
+          ],
+        );
+      }
+    });
 
     blocTest<BattleEntryCubit, BattleEntryState>(
       'M7.12 says whether the server did not answer',
@@ -115,7 +190,7 @@ void main() {
           if (++calls == 1) {
             throw const BattleLookupFailure(unreachable: false);
           }
-          return const [_first];
+          return const [_mine];
         });
       },
       build: build,
@@ -137,12 +212,44 @@ void main() {
         const BattleEntryFound(_assignment),
       );
       expect(
-        const BattleEntryChoosing([_first]),
-        isNot(const BattleEntryChoosing([_second])),
+        const BattleEntryChoosing([_mine]),
+        isNot(const BattleEntryChoosing([_other])),
+      );
+      expect(
+        const BattleEntryChoosing([_mine]),
+        isNot(
+          const BattleEntryChoosing([
+            _mine,
+          ], problem: BattleJoinFailureReason.warOver),
+        ),
+      );
+      expect(
+        const BattleEntryJoining(_other),
+        const BattleEntryJoining(_other),
       );
       expect(
         const BattleEntryFailed(unreachable: true),
         isNot(const BattleEntryFailed(unreachable: false)),
+      );
+    });
+
+    test('M7.12 a battle joined while the player waits is entered only '
+        'after the join', () async {
+      stubBattles(const [_other]);
+      final joined = Completer<void>();
+      when(() => locator.join('w-2')).thenAnswer((_) => joined.future);
+      final cubit = build();
+      await cubit.choose();
+
+      final entering = cubit.enter(_other);
+      await pumpEventQueue();
+      expect(cubit.state, const BattleEntryJoining(_other));
+
+      joined.complete();
+      await entering;
+      expect(
+        cubit.state,
+        const BattleEntryFound((battleId: 'b-2', mapId: 'valley')),
       );
     });
   });

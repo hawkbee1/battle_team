@@ -100,7 +100,7 @@
   "authenticationConfirmationMismatch": "Les mots de passe diffèrent",
   "authenticationLogOut": "Se déconnecter",
   "battleEntryLooking": "Recherche de votre bataille…",
-  "battleEntryNone": "Ce compte n’a pas encore de section dans une bataille en cours.",
+  "battleEntryNone": "Aucune bataille n’est en cours pour le moment.",
   "battleEntryRetry": "Vérifier à nouveau",
   "authenticationPasswordTooShort": "Au moins {minimum} caractères",
   "authenticationNameTooLong": "Au plus {maximum} caractères",
@@ -110,5 +110,12 @@
   "battleEntrySwitch": "Changer de bataille",
   "battleEntryChoose": "Choisissez une bataille",
   "battleEntryBattleOn": "Bataille sur {map}",
-  "battleEntryWar": "Guerre {war}"
+  "battleEntryWar": "Guerre {war}",
+  "battleEntryYouAreIn": "Vous y êtes",
+  "battleEntryJoin": "Rejoindre",
+  "battleEntryCancel": "Annuler",
+  "battleEntryJoining": "Entrée dans la guerre…",
+  "battleEntryJoinTitle": "Rejoindre cette guerre ?",
+  "battleEntryJoinBody": "Une nouvelle section est créée pour vous dans la guerre {war}, et vous entrez dans sa bataille. Vous restez dans son équipe pendant toute la bataille.",
+  "battleEntryJoinProblem": "{reason, select, warOver{Cette guerre est terminée.} unreachable{Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.} other{Impossible de rejoindre cette guerre. Réessayez plus tard.}}"
 }
