@@ -30,7 +30,8 @@ void main() {
       battleLocator = MockBattleLocator();
       // No section in a running battle: the entry screen says so, and the
       // test needs no GPU.
-      when(() => battleLocator.locate(any())).thenAnswer((_) async => null);
+      when(() => battleLocator.locate(any()))
+          .thenAnswer((_) async => const <AccountBattle>[]);
     });
 
     // The repository is made inside the test, in its zone: `pump` flushes the
@@ -89,6 +90,25 @@ void main() {
         find.text('This account has no section in a running battle yet.'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('M7.12 an account in several wars is shown the list of its '
+        'battles, one per war', (tester) async {
+      when(apiClient.currentAccount).thenAnswer((_) async => _account);
+      when(() => battleLocator.locate('u-1')).thenAnswer(
+        (_) async => const [
+          (warId: 'w-1', battle: (battleId: 'b-1', mapId: 'saint_lo_1km')),
+          (warId: 'w-2', battle: (battleId: 'b-2', mapId: 'valley')),
+        ],
+      );
+
+      await tester.pumpWidget(app());
+      await settle(tester);
+
+      expect(find.text('Choose a battle'), findsOneWidget);
+      expect(find.text('War w-1'), findsOneWidget);
+      expect(find.text('War w-2'), findsOneWidget);
+      expect(find.byType(BattlePage), findsNothing);
     });
 
     testWidgets('M7.12 a log-out returns to the sign-in page, and a new '

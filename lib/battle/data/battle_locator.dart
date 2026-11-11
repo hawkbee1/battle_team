@@ -5,6 +5,10 @@ import 'package:logging/logging.dart';
 /// The battle an account plays and its map.
 typedef BattleAssignment = ({String battleId, String mapId});
 
+/// A running battle the account has a section in, and the war it belongs to
+/// (null when the locator does not know it, as the playtest's).
+typedef AccountBattle = ({String? warId, BattleAssignment battle});
+
 /// {@template battle_lookup_failure}
 /// Thrown by a [BattleLocator] when it cannot say which battle an account
 /// plays. The screen says it in words; [unreachable] tells whether the server
@@ -22,15 +26,15 @@ class BattleLookupFailure implements Exception {
 }
 
 /// {@template battle_locator}
-/// Finds the battle an account plays (Strategy: from the account's section on
-/// Appwrite, or the one battle of the playtest).
+/// Finds the battles an account plays (Strategy: from the account's sections
+/// on Appwrite, or the one battle of the playtest).
 /// {@endtemplate}
 abstract interface class BattleLocator {
-  /// The battle [accountId] plays, or null when its section is in none that
-  /// runs.
+  /// The running battles [accountId] has a section in, one per war; empty when
+  /// its sections are in none that runs.
   ///
   /// Throws a [BattleLookupFailure] when it cannot find out.
-  Future<BattleAssignment?> locate(String accountId);
+  Future<List<AccountBattle>> locate(String accountId);
 }
 
 /// {@template fixed_battle_locator}
@@ -45,18 +49,20 @@ class FixedBattleLocator implements BattleLocator {
   final BattleAssignment assignment;
 
   @override
-  Future<BattleAssignment?> locate(String accountId) async => assignment;
+  Future<List<AccountBattle>> locate(String accountId) async => [
+    (warId: null, battle: assignment),
+  ];
 }
 
 /// {@template appwrite_battle_locator}
-/// Finds the battle of an account on Appwrite: its sections (`bt_sections`,
-/// one per war), then the battle of one of their wars that runs
-/// (`bt_battles`) and has the section in one of its teams. Both tables are
-/// readable by any signed-in account (M5.18); nothing is written, and the
-/// host decides whether the account may enter (decision 220).
+/// Finds the battles of an account on Appwrite: its sections (`bt_sections`,
+/// one per war), then the battles of their wars that run (`bt_battles`) and
+/// have the section in one of their teams. Both tables are readable by any
+/// signed-in account (M5.18); nothing is written, and the host decides whether
+/// the account may enter (decision 220).
 ///
-/// The account's sections may be in several wars: the first battle found
-/// wins. Choosing among them waits for the newcomer flow (SOC-03).
+/// An account in several wars gets a battle for each that runs one: the player
+/// chooses (`BattleEntryPage`).
 /// {@endtemplate}
 class AppwriteBattleLocator implements BattleLocator {
   /// {@macro appwrite_battle_locator}
@@ -68,7 +74,7 @@ class AppwriteBattleLocator implements BattleLocator {
   static final _log = Logger('battle_team.AppwriteBattleLocator');
 
   @override
-  Future<BattleAssignment?> locate(String accountId) async {
+  Future<List<AccountBattle>> locate(String accountId) async {
     try {
       final sections = [
         for (final row in await apiClient.findRows(
@@ -82,7 +88,7 @@ class AppwriteBattleLocator implements BattleLocator {
       ];
       if (sections.isEmpty) {
         _log.info('no section');
-        return null;
+        return const [];
       }
       final battles = [
         for (final row in await apiClient.findRows(
@@ -95,17 +101,20 @@ class AppwriteBattleLocator implements BattleLocator {
         ))
           BattleRow.fromData(row.id, row.data),
       ];
-      for (final battle in battles) {
-        for (final section in sections) {
-          if (section.warId == battle.warId &&
-              battle.teams.values.any((ids) => ids.contains(section.id))) {
-            _log.info('battle found');
-            return (battleId: battle.id, mapId: battle.mapId);
-          }
-        }
-      }
-      _log.info('no running battle');
-      return null;
+      final found = <AccountBattle>[
+        for (final battle in battles)
+          if (sections.any(
+            (section) =>
+                section.warId == battle.warId &&
+                battle.teams.values.any((ids) => ids.contains(section.id)),
+          ))
+            (
+              warId: battle.warId,
+              battle: (battleId: battle.id, mapId: battle.mapId),
+            ),
+      ];
+      _log.info('running battles found: ${found.length}');
+      return found;
     } on AppwriteRowsFailure catch (failure) {
       _log.warning('lookup failed: ${failure.kind.name}', failure);
       throw BattleLookupFailure(

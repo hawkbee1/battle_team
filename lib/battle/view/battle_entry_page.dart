@@ -12,12 +12,14 @@ import 'package:material_ui/material_ui.dart';
 Widget _battlePage(BuildContext context) => const BattlePage();
 
 /// {@template battle_entry_page}
-/// What a signed-in account sees first: it looks for the account's battle
-/// (`BattleLocator`), opens it with a repository of its own (the
-/// `BattleRepositoryFactory`'s, closed when the battle goes), or says there is
-/// none or why the search failed, with a button to look again and one to log
-/// out. The battle's screen is built by [pageBuilder], so that tests run
-/// without a GPU.
+/// What a signed-in account sees first: it looks for the account's battles
+/// (`BattleLocator`) and opens the only one with a repository of its own (the
+/// `BattleRepositoryFactory`'s, closed when the battle goes); with several
+/// wars running, it lists them and the player picks one (so does the battle
+/// screen's Switch battle, which comes back here); or it says there is none
+/// or why the search failed, with a button to look again and one to log out.
+/// The battle's screen is built by [pageBuilder], so that tests run without
+/// a GPU.
 ///
 /// Needs a `BattleLocator`, a `BattleRepositoryFactory` and an
 /// `AuthenticationCubit` above it.
@@ -71,6 +73,7 @@ class _Waiting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final cubit = context.read<BattleEntryCubit>();
     final message = switch (state) {
       BattleEntryFailed(:final unreachable) => l10n.battleEntryProblem(
         unreachable ? 'unreachable' : 'other',
@@ -84,24 +87,63 @@ class _Waiting extends StatelessWidget {
       ),
       body: SafeArea(
         child: Center(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (state is BattleEntryLocating) ...[
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text(l10n.battleEntryLooking),
-                ] else ...[
-                  Text(message, textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: context.read<BattleEntryCubit>().locate,
-                    child: Text(l10n.battleEntryRetry),
-                  ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  switch (state) {
+                    BattleEntryLocating() => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(l10n.battleEntryLooking),
+                      ],
+                    ),
+                    BattleEntryChoosing(:final battles) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          l10n.battleEntryChoose,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        for (final battle in battles)
+                          Card(
+                            child: ListTile(
+                              title: Text(
+                                l10n.battleEntryBattleOn(battle.battle.mapId),
+                              ),
+                              subtitle: switch (battle.warId) {
+                                final war? => Text(l10n.battleEntryWar(war)),
+                                null => null,
+                              },
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () => cubit.enter(battle),
+                            ),
+                          ),
+                      ],
+                    ),
+                    _ => Text(message, textAlign: TextAlign.center),
+                  },
+                  if (state is! BattleEntryLocating) ...[
+                    const SizedBox(height: 16),
+                    Center(
+                      child: FilledButton(
+                        onPressed: state is BattleEntryChoosing
+                            ? cubit.choose
+                            : cubit.locate,
+                        child: Text(l10n.battleEntryRetry),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

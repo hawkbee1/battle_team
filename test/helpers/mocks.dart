@@ -25,6 +25,9 @@ class MockAuthenticationCubit extends MockCubit<AuthenticationState>
 
 class MockBattleLocator extends Mock implements BattleLocator;
 
+class MockBattleEntryCubit extends MockCubit<BattleEntryState>
+    implements BattleEntryCubit;
+
 class MockBattleRepositoryFactory extends Mock
     implements BattleRepositoryFactory;
 

@@ -143,6 +143,7 @@ void main() {
       Locale? locale,
       UnitBodies? unitBodies,
       AuthenticationCubit? authentication,
+      BattleEntryCubit? entry,
     }) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -158,6 +159,8 @@ void main() {
               BlocProvider<BattleCubit>.value(value: cubit),
               if (authentication != null)
                 BlocProvider<AuthenticationCubit>.value(value: authentication),
+              if (entry != null)
+                BlocProvider<BattleEntryCubit>.value(value: entry),
             ],
             child: BattleView(
               map: map,
@@ -243,9 +246,22 @@ void main() {
           .called(1);
     });
 
+    testWidgets('M7.12 Switch battle goes back to the list of battles', (
+      tester,
+    ) async {
+      final entry = MockBattleEntryCubit();
+      when(entry.choose).thenAnswer((_) async {});
+      await pump(tester, entry: entry);
+
+      await tester.tap(find.text('Switch battle'));
+
+      verify(entry.choose).called(1);
+    });
+
     testWidgets('M7.12 the log-out is in French too', (tester) async {
       await pump(tester, locale: const Locale('fr'));
 
+      expect(find.text('Changer de bataille'), findsOneWidget);
       expect(find.text('Se déconnecter'), findsOneWidget);
       expect(find.text('Crédits'), findsOneWidget);
     });

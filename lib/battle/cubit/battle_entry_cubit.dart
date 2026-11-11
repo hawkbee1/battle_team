@@ -6,9 +6,11 @@ import 'package:logging/logging.dart';
 part 'battle_entry_state.dart';
 
 /// {@template battle_entry_cubit}
-/// Finds the battle an account plays, once it is signed in, through the
-/// locator: the screen then opens it, or says there is none or why the search
-/// failed. It enters nothing: the host logs the player in on the socket
+/// Finds the battles an account plays, once it is signed in, through the
+/// locator: the screen then opens the only one, lets the player choose among
+/// several, or says there is none or why the search failed. [choose] looks
+/// again and always lets the player choose (the battle screen's Switch
+/// battle). It enters nothing: the host logs the player in on the socket
 /// (decision 220).
 /// {@endtemplate}
 class BattleEntryCubit extends Cubit<BattleEntryState> {
@@ -21,16 +23,26 @@ class BattleEntryCubit extends Cubit<BattleEntryState> {
 
   static final _log = Logger('battle_team.BattleEntryCubit');
 
-  /// Looks for the account's battle; again after a failure or a "none".
-  Future<void> locate() async {
+  /// Looks for the account's battles; again after a failure or a "none". The
+  /// only battle found is entered at once.
+  Future<void> locate() => _look(enterTheOnlyOne: true);
+
+  /// Looks again and lists the account's battles, even when there is one: the
+  /// player wants another war, or another battle.
+  Future<void> choose() => _look(enterTheOnlyOne: false);
+
+  /// Enters [battle], one of the [BattleEntryChoosing] list.
+  void enter(AccountBattle battle) => emit(BattleEntryFound(battle.battle));
+
+  Future<void> _look({required bool enterTheOnlyOne}) async {
     emit(const BattleEntryLocating());
     try {
-      final assignment = await _locator.locate(_accountId);
-      emit(
-        assignment == null
-            ? const BattleEntryNone()
-            : BattleEntryFound(assignment),
-      );
+      final battles = await _locator.locate(_accountId);
+      emit(switch (battles) {
+        [] => const BattleEntryNone(),
+        [final only] when enterTheOnlyOne => BattleEntryFound(only.battle),
+        _ => BattleEntryChoosing(battles),
+      });
     } on BattleLookupFailure catch (failure) {
       _log.warning('no battle: lookup failed');
       emit(BattleEntryFailed(unreachable: failure.unreachable));

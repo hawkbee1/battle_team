@@ -688,5 +688,31 @@
     "placeholders": {
       "reason": {}
     }
+  },
+  "battleEntrySwitch": "Switch battle",
+  "@battleEntrySwitch": {
+    "description": "Button of the battle screen that goes back to the list of the account's battles"
+  },
+  "battleEntryChoose": "Choose a battle",
+  "@battleEntryChoose": {
+    "description": "Heading of the list of the account's running battles"
+  },
+  "battleEntryBattleOn": "Battle on {map}",
+  "@battleEntryBattleOn": {
+    "description": "A running battle of the list, by its map",
+    "placeholders": {
+      "map": {
+        "type": "String"
+      }
+    }
+  },
+  "battleEntryWar": "War {war}",
+  "@battleEntryWar": {
+    "description": "The war a battle of the list belongs to",
+    "placeholders": {
+      "war": {
+        "type": "String"
+      }
+    }
   }
 }

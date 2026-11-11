@@ -106,5 +106,9 @@
   "authenticationNameTooLong": "Au plus {maximum} caractères",
   "authenticationFailure": "{reason, select, wrongCredentials{E-mail ou mot de passe incorrect.} accountExists{Un compte existe déjà avec cet e-mail. Connectez-vous plutôt.} invalidInput{Cet e-mail ou ce mot de passe n’est pas accepté. Vérifiez l’e-mail et choisissez un mot de passe plus long.} tooManyRequests{Trop de tentatives. Patientez un instant puis réessayez.} unreachable{Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.} other{Un problème est survenu. Réessayez plus tard.}}",
   "authenticationLogOutFailed": "Déconnexion impossible. {problem}",
-  "battleEntryProblem": "{reason, select, unreachable{Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.} other{Impossible de trouver votre bataille. Réessayez plus tard.}}"
+  "battleEntryProblem": "{reason, select, unreachable{Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.} other{Impossible de trouver votre bataille. Réessayez plus tard.}}",
+  "battleEntrySwitch": "Changer de bataille",
+  "battleEntryChoose": "Choisissez une bataille",
+  "battleEntryBattleOn": "Bataille sur {map}",
+  "battleEntryWar": "Guerre {war}"
 }

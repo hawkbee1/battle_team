@@ -40,7 +40,9 @@ void main() {
     test('M7.12 gives the one battle of the playtest to any account', () async {
       const locator = FixedBattleLocator((battleId: 'pt-1', mapId: 'm'));
 
-      expect(await locator.locate('anyone'), (battleId: 'pt-1', mapId: 'm'));
+      expect(await locator.locate('anyone'), [
+        (warId: null, battle: (battleId: 'pt-1', mapId: 'm')),
+      ]);
     });
   });
 
@@ -94,7 +96,9 @@ void main() {
         ],
       );
 
-      expect(await locator.locate('a-1'), (battleId: 'b-1', mapId: 'saint_lo'));
+      expect(await locator.locate('a-1'), [
+        (warId: 'w-1', battle: (battleId: 'b-1', mapId: 'saint_lo')),
+      ]);
     });
 
     test('M7.12 asks Appwrite for the sections of the account, then for the '
@@ -133,7 +137,7 @@ void main() {
         'are not asked', () async {
       stubRows();
 
-      expect(await locator.locate('a-1'), isNull);
+      expect(await locator.locate('a-1'), isEmpty);
       verifyNever(
         () => apiClient.findRows(
           databaseId: any(named: 'databaseId'),
@@ -166,11 +170,11 @@ void main() {
         ],
       );
 
-      expect(await locator.locate('a-1'), isNull);
+      expect(await locator.locate('a-1'), isEmpty);
     });
 
-    test('M7.12 with sections in several wars, the first running battle '
-        'wins', () async {
+    test('M7.12 with sections in several wars, every running battle is '
+        'listed with its war, in the order of the table', () async {
       stubRows(
         sections: [
           _section('s-1', 'w-1', 'a-1'),
@@ -194,7 +198,10 @@ void main() {
         ],
       );
 
-      expect((await locator.locate('a-1'))?.battleId, 'b-2');
+      expect(await locator.locate('a-1'), [
+        (warId: 'w-2', battle: (battleId: 'b-2', mapId: 'saint_lo_1km')),
+        (warId: 'w-1', battle: (battleId: 'b-1', mapId: 'saint_lo_1km')),
+      ]);
     });
 
     for (final (kind, unreachable) in [
@@ -262,7 +269,7 @@ void main() {
 
       await locator.locate('a-secret');
 
-      expect(log.lines, ['INFO battle found']);
+      expect(log.lines, ['INFO running battles found: 1']);
       for (final text in log.texts) {
         expect(text, isNot(contains('secret')));
       }
@@ -275,7 +282,7 @@ void main() {
       stubRows(sections: [_section('s-1', 'w-1', 'a-1')]);
       await locator.locate('a-1');
 
-      expect(log.lines, ['INFO no section', 'INFO no running battle']);
+      expect(log.lines, ['INFO no section', 'INFO running battles found: 0']);
     });
 
     test(
