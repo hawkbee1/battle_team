@@ -96,8 +96,20 @@ class BattleRepository {
       roster: view.roster,
       team: seat?.team,
       sectionId: seat?.sectionId,
+      weather: view.weather,
+      world: view.world,
+      worldVersion: view.worldVersion,
+      hold: view.hold,
     );
   });
+
+  /// The relic alerts the host sends (RELIC-10, decision 233): at once when
+  /// the section's team loses a relic, and on connecting for those it missed.
+  /// The host sends each only to the team that lost the relic. A stream of its
+  /// own on each call, to listen to once; nothing is replayed.
+  Stream<RelicAlert> get alerts => _client.messages
+      .where((message) => message is RelicAlert)
+      .cast<RelicAlert>();
 
   /// The shots the section sees, after each update of the host: the effects
   /// to draw for a moment (Observer; `ShotEffects` cuts them down to what the

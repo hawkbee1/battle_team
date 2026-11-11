@@ -30,6 +30,7 @@ UnitView _stored(String id, {double ap = 30, double apMax = 30}) => UnitView(
   hp: 80,
   maxHp: 100,
   private: UnitPrivate(
+    sightRangeM: 60,
     place: UnitPlace.stored,
     ap: ApView(value: ap, at: const Duration(hours: 1), perHour: 1, max: apMax),
     morale: 100,

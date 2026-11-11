@@ -58,6 +58,8 @@ Update policy (messages in `battle_protocol`, M6 Issue 2):
 
 Fog filter: the host computes each section's visible set once per tick (see stack decision 1) and sends each section only what it sees.
 
+The ground the section sees, for the fog shading (M7.9): the host sends units, never an area. The private view of each own unit carries its sight range (8 bytes), and the whole view and the update carry the weather (a word in the whole view, 4 bytes when it changes); the client runs `battle_rules`' vision over the heights it holds and the delta layer it received, for display only. Nothing of other units feeds it.
+
 What orders carry: a shot carries its aim direction and fire time (decision 183); a move order may carry the client's path, which the host checks (stack decision 8). First-person movement is a stream of short move orders, **5 a second** while the player holds a direction, the cadence of the position updates; the client moves its unit between them. It is small and bounded by AP (an infantry pool is a 30 m dash).
 
 First-person movement, measured (M7.4; real codec over a simulated minute at 5 moves a second, a 1 m step each; not a live host): a move order is **56 bytes up** (2.2 kbit/s), the mover is sent **12 bytes** to accept it and **140 bytes** for its own unit whole, with its AP (**6.1 kbit/s down**), and a section that watches it **37 bytes** an update (1.5 kbit/s; the table below has 38). The host puts a unit in a 10 m cell and sends its position when the cell changes, so today the app sends one move per tap: the 5 a second applies once units follow their paths (M8).
@@ -101,12 +103,13 @@ Measured (M6 Issue 2, `battle_protocol`'s committed samples, binary, without the
 
 | Message | Measured | Estimate |
 |---|---|---|
-| A tick update with nothing but its time | 20 bytes | |
+| A tick update with nothing but its time | 21 bytes | |
 | One moving unit in a tick | 18 bytes more | 16 bytes |
-| A tick with ten moving vehicles | 200 bytes | 160 bytes |
-| A rifle shot (one hit) as an event | 55 bytes; 74 as a whole tick | 40 bytes |
-| A hit by a shooter not seen, as a whole tick | 39 bytes | |
-| The whole view of a 16-unit section, its private state and 8 relics | 2,383 bytes (6,121 in JSON) | |
+| A tick with ten moving vehicles | 201 bytes | 160 bytes |
+| A rifle shot (one hit) as an event | 55 bytes; 75 as a whole tick | 40 bytes |
+| A hit by a shooter not seen, as a whole tick | 40 bytes | |
+| A tick that changes the weather (M7.9) | 25 bytes | |
+| The whole view of a 16-unit section, its private state and 8 relics | 2,516 bytes (6,474 in JSON) | |
 | The roster after each whole view (M7.7): 11 unit types with their prices and allowed weapons, 6 weapons | 417 bytes (1,178 in JSON) | |
 
 Ten moving vehicles at 5 Hz, once units follow their paths, are about 1 kB a second, **8 kbit/s** instead of 6; events are about a third larger than assumed. The fight totals stay under **12 kbit/s down**. The string IDs dominate, as in the log: a battle-wide ID table remains the version 2 saving.

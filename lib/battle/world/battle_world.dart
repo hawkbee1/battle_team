@@ -2,6 +2,7 @@ import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:vector_math/vector_math.dart';
 
 /// What the view needs of the 3D world: it shows the section's view, moves
@@ -45,6 +46,13 @@ abstract interface class BattleWorld {
   /// it. Only the path of the section's own unit: nothing the section does
   /// not see (decision 237).
   void showPath(List<Position>? points);
+
+  /// Shades the ground by what the section sees (M7 Issue 9, MAP-27, MAP-33):
+  /// in sight now as it is, seen once dimmed, never seen dark, until it is
+  /// called again. Called when the fog changes, not every frame (stack
+  /// decision 4); the model holds nothing of any unit the section does not see
+  /// (decision 237).
+  void showFog(FogModel fog);
 
   /// Moves on by [seconds].
   void tick(double seconds);

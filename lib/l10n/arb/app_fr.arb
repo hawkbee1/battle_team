@@ -77,5 +77,13 @@
   "moveCancel": "Annuler",
   "moveRefused": "Déplacement impossible : {reason}",
   "moveLater": "L’hôte fait arriver l’unité {time} plus tard que prévu",
-  "moveSooner": "L’hôte fait arriver l’unité {time} plus tôt que prévu"
+  "moveSooner": "L’hôte fait arriver l’unité {time} plus tôt que prévu",
+  "alertsRelics": "Reliques",
+  "alertsRelicsOwned": "{team} {count}",
+  "alertsRelicsFree": "libres {count}",
+  "alertsCountdown": "{team} gagne dans {time}",
+  "alertsRelicTaken": "{team} a pris la relique {relic}",
+  "alertsCountdownStarted": "{team} tient les reliques : victoire dans {time} sauf si l’une est reprise",
+  "alertsCountdownReset": "Le compte à rebours de la victoire est réinitialisé",
+  "alertsDismiss": "Fermer"
 }
