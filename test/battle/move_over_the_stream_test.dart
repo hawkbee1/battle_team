@@ -14,7 +14,7 @@ void main() {
         final host = FakeHost.recorded(name);
         final cubit = realCubit(host, previewer: testMovePreviewer());
         addTearDown(cubit.close);
-        await cubit.start();
+        cubit.start();
         await pumpEventQueue(times: 500);
         final own = cubit.state.sectionUnits.firstWhere(
           (unit) =>
@@ -48,7 +48,7 @@ void main() {
       final host = FakeHost.recorded('clear_s-1')..refusal = 'impassable';
       final cubit = realCubit(host, previewer: testMovePreviewer());
       addTearDown(cubit.close);
-      await cubit.start();
+      cubit.start();
       await pumpEventQueue(times: 500);
       final own = cubit.state.sectionUnits.firstWhere(
         (unit) =>

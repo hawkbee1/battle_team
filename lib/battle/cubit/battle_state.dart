@@ -2,9 +2,6 @@ part of 'battle_cubit.dart';
 
 /// Where the battle screen stands.
 enum BattleStatus {
-  /// Signing in to Appwrite.
-  signingIn,
-
   /// Finding the battle's host and signing in to it.
   connecting,
 
@@ -16,9 +13,6 @@ enum BattleStatus {
 
   /// Stopped for good: the host or Appwrite refused, or the battle ended.
   stopped,
-
-  /// The sign-in to Appwrite failed.
-  failed,
 }
 
 /// {@template view_mode}
@@ -138,7 +132,7 @@ class ArrivalNote extends Equatable {
 class BattleState extends Equatable {
   /// {@macro battle_state}
   const new({
-    this.status = BattleStatus.signingIn,
+    this.status = BattleStatus.connecting,
     this.units = const {},
     this.hqs = const [],
     this.relics = const [],

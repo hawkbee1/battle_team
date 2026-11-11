@@ -97,7 +97,7 @@ void main() {
         ),
       );
       await tester.runAsync(() async {
-        await battle.start();
+        battle.start();
         await pumpEventQueue(times: 500);
       });
       await tester.pump();

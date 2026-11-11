@@ -17,7 +17,7 @@ Future<({BattleCubit battle, ShopCubit shop})> play(FakeHost host) async {
   )..start();
   addTearDown(shop.close);
   addTearDown(battle.close);
-  await battle.start();
+  battle.start();
   await pumpEventQueue(times: 500);
   return (battle: battle, shop: shop);
 }

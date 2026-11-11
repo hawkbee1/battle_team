@@ -10,17 +10,22 @@ import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/shots/shot_effects.dart';
 
 /// {@template battle_repository}
-/// The data the battle screen lives on, for one battle: it signs the player
-/// in to Appwrite, builds the `BattleClient` that finds the battle's host
-/// with a fresh JWT each time and keeps the section's view, and shows the
+/// The data the battle screen lives on, for one battle: it builds the
+/// `BattleClient` that finds the battle's host with a fresh JWT of the
+/// signed-in account each time and keeps the section's view, and shows the
 /// screen what it needs of both: [connection], [snapshots], the host's
 /// answers to [send], the battle time and the AP between updates. The cubit
 /// above it never sees the client (Adapter over `battle_client` and
 /// `appwrite_api_client`).
 ///
+/// The account is already signed in (`AuthenticationRepository`), and the app
+/// sends no `EnterBattle`: the host logs the player in on the socket when it
+/// signs in (decision 220), so the repository has no call for it.
+///
 /// The host checks every order (decision 3, stack decision 8): the
 /// repository checks nothing. A repository serves one session: [start] it
-/// once, [close] it when the screen goes.
+/// once, [close] it when the screen goes (`BattleRepositoryFactory` makes a
+/// new one for the next battle or sign-in).
 /// {@endtemplate}
 class BattleRepository {
   /// {@macro battle_repository}
@@ -36,7 +41,6 @@ class BattleRepository {
     Clock clock = const SystemClock(),
     math.Random? random,
   }) : _settings = settings,
-       _apiClient = apiClient,
        _client = BattleClient(
          battleId: settings.battleId,
          transport: transport,
@@ -47,7 +51,6 @@ class BattleRepository {
        );
 
   final BattleSettings _settings;
-  final AppwriteApiClient _apiClient;
   final BattleClient _client;
 
   static Future<Uri> Function(Credential credential) _hostAddress(
@@ -60,17 +63,8 @@ class BattleRepository {
     return (credential) => finder.socketOf(settings.battleId, credential);
   }
 
-  /// Whether every setting of the battle was given.
-  bool get isConfigured => _settings.complete;
-
   /// The battle's map, in the app's assets.
   String get mapId => _settings.mapId;
-
-  /// Signs the player in to Appwrite, so that the client gets JWTs.
-  ///
-  /// Throws an [AppwriteSignInFailure] when it cannot.
-  Future<void> signIn() =>
-      _apiClient.signIn(email: _settings.email, password: _settings.password);
 
   /// Each change of [connection]'s status, from the next one on.
   Stream<ConnectionStatus> get connection => _client.statuses.map(

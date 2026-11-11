@@ -1,13 +1,5 @@
 {
   "@@locale": "en",
-  "titleAppBarTitle": "Battle Team",
-  "@titleAppBarTitle": {
-    "description": "Text shown in the AppBar of the Title Page"
-  },
-  "titleButtonStart": "Start",
-  "@titleButtonStart": {
-    "description": "Text shown in the start Button of the Title Page"
-  },
   "backendStatusChecking": "Contacting Appwrite…",
   "@backendStatusChecking": {
     "description": "Shown while the game checks that the Appwrite backend answers"
@@ -28,7 +20,7 @@
   "@battleTitle": {
     "description": "Title of the app"
   },
-  "battleStatus": "{status, select, signingIn{Signing in…} connecting{Finding the host…} playing{In battle} lost{Host lost, coming back…} stopped{Stopped} failed{Sign-in failed} other{ }}",
+  "battleStatus": "{status, select, connecting{Finding the host…} playing{In battle} lost{Host lost, coming back…} stopped{Stopped} other{ }}",
   "@battleStatus": {
     "description": "Where the battle screen stands",
     "placeholders": {
@@ -90,10 +82,6 @@
         "type": "String"
       }
     }
-  },
-  "battleMissingSettings": "Run battle_host's tool/playtest.dart, then start the app with --dart-define-from-file=env/playtest.json.",
-  "@battleMissingSettings": {
-    "description": "Shown when the battle settings are missing"
   },
   "battleUnits": "Your units",
   "@battleUnits": {
@@ -583,5 +571,122 @@
   "alertsDismiss": "Dismiss",
   "@alertsDismiss": {
     "description": "Button that closes an alert"
+  },
+  "authenticationSignInTitle": "Sign in",
+  "@authenticationSignInTitle": {
+    "description": "Heading of the sign-in page"
+  },
+  "authenticationSignUpTitle": "Create an account",
+  "@authenticationSignUpTitle": {
+    "description": "Heading of the sign-up page"
+  },
+  "authenticationEmail": "Email",
+  "@authenticationEmail": {
+    "description": "Label of the email field"
+  },
+  "authenticationPassword": "Password",
+  "@authenticationPassword": {
+    "description": "Label of the password field"
+  },
+  "authenticationConfirmPassword": "Repeat the password",
+  "@authenticationConfirmPassword": {
+    "description": "Label of the field that repeats the new password"
+  },
+  "authenticationName": "Name",
+  "@authenticationName": {
+    "description": "Label of the name field of the sign-up page"
+  },
+  "authenticationSignInButton": "Sign in",
+  "@authenticationSignInButton": {
+    "description": "Button that signs in"
+  },
+  "authenticationSignUpButton": "Create the account",
+  "@authenticationSignUpButton": {
+    "description": "Button that creates the account"
+  },
+  "authenticationGoToSignUp": "No account yet? Create one",
+  "@authenticationGoToSignUp": {
+    "description": "Button of the sign-in page that opens the sign-up page"
+  },
+  "authenticationGoToSignIn": "Already have an account? Sign in",
+  "@authenticationGoToSignIn": {
+    "description": "Button of the sign-up page that goes back to the sign-in page"
+  },
+  "authenticationEmailEmpty": "Enter your email",
+  "@authenticationEmailEmpty": {
+    "description": "Error of the email field when it is empty"
+  },
+  "authenticationEmailInvalid": "This is not an email address",
+  "@authenticationEmailInvalid": {
+    "description": "Error of the email field when it is not an email"
+  },
+  "authenticationPasswordEmpty": "Enter your password",
+  "@authenticationPasswordEmpty": {
+    "description": "Error of the password field when it is empty"
+  },
+  "authenticationNameEmpty": "Enter a name",
+  "@authenticationNameEmpty": {
+    "description": "Error of the name field when it is empty"
+  },
+  "authenticationConfirmationMismatch": "The passwords differ",
+  "@authenticationConfirmationMismatch": {
+    "description": "Error of the repeated password when it differs"
+  },
+  "authenticationLogOut": "Log out",
+  "@authenticationLogOut": {
+    "description": "Button that logs out of the account"
+  },
+  "battleEntryLooking": "Looking for your battle…",
+  "@battleEntryLooking": {
+    "description": "Shown while the battle of the account is looked for"
+  },
+  "battleEntryNone": "This account has no section in a running battle yet.",
+  "@battleEntryNone": {
+    "description": "Shown when the account has no battle to play"
+  },
+  "battleEntryRetry": "Check again",
+  "@battleEntryRetry": {
+    "description": "Button that looks for the account's battle again"
+  },
+  "authenticationPasswordTooShort": "At least {minimum} characters",
+  "@authenticationPasswordTooShort": {
+    "description": "Error of the new password when it is too short",
+    "placeholders": {
+      "minimum": {
+        "type": "int"
+      }
+    }
+  },
+  "authenticationNameTooLong": "At most {maximum} characters",
+  "@authenticationNameTooLong": {
+    "description": "Error of the name when it is too long",
+    "placeholders": {
+      "maximum": {
+        "type": "int"
+      }
+    }
+  },
+  "authenticationFailure": "{reason, select, wrongCredentials{Wrong email or password.} accountExists{An account with this email already exists. Sign in instead.} invalidInput{This email or password is not accepted. Check the email and choose a longer password.} tooManyRequests{Too many attempts. Wait a moment and try again.} unreachable{Cannot reach the server. Check your connection and try again.} other{Something went wrong. Try again later.}}",
+  "@authenticationFailure": {
+    "description": "Why a sign-in, a sign-up or a log-out failed, in words",
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "authenticationLogOutFailed": "Could not log out. {problem}",
+  "@authenticationLogOutFailed": {
+    "description": "Shown when logging out failed; the problem is one of the authenticationFailure messages",
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "battleEntryProblem": "{reason, select, unreachable{Cannot reach the server. Check your connection and try again.} other{Could not find your battle. Try again later.}}",
+  "@battleEntryProblem": {
+    "description": "Shown when the account's battle could not be looked up",
+    "placeholders": {
+      "reason": {}
+    }
   }
 }

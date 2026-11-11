@@ -14,8 +14,9 @@ import 'package:logging/logging.dart';
 part 'battle_state.dart';
 
 /// {@template battle_cubit}
-/// Plays one battle as one player through [repository]: signs in, then keeps
-/// the section's view and sends the player's orders. The host checks every
+/// Plays one battle as one player through [repository], whose account is
+/// signed in already: it keeps the section's view and sends the player's
+/// orders. The host checks every
 /// order (stack decision 8); [preCheck] tells the buttons what it will refuse,
 /// for display only, and an order it expects refused is not sent. The 3D view
 /// listens to it (Observer), and to [shots], the shots the section sees.
@@ -28,7 +29,7 @@ part 'battle_state.dart';
 /// preview's is said, never argued. Without a previewer a move goes straight
 /// to the host, which searches the path.
 ///
-/// It logs on `battle_team.BattleCubit`: the sign-in, each change of the
+/// It logs on `battle_team.BattleCubit`: each change of the
 /// connection, each order and the answer, with its refusal code. Never a
 /// unit, a position or any part of the state (decision 237).
 /// {@endtemplate}
@@ -54,17 +55,8 @@ class BattleCubit extends Cubit<BattleState> {
 
   final _subscriptions = <StreamSubscription<Object?>>[];
 
-  /// Signs in, then connects to the battle.
-  Future<void> start() async {
-    _log.info('signing in');
-    try {
-      await repository.signIn();
-      _log.info('signed in');
-    } on Object catch (error, stackTrace) {
-      _log.severe('sign-in failed', error, stackTrace);
-      emit(state.copyWith(status: BattleStatus.failed, problem: '$error'));
-      return;
-    }
+  /// Connects to the battle.
+  void start() {
     _subscriptions
       ..add(repository.connection.listen(_onConnection))
       ..add(repository.snapshots.listen(_onSnapshot));

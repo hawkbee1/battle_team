@@ -12,8 +12,6 @@ import '../../helpers/mocks.dart';
 const _settings = BattleSettings(
   endpoint: 'http://127.0.0.1:9/v1',
   projectId: 'hawkbee',
-  email: 'blue@battleteam.local',
-  password: 'secret',
   battleId: 'b-1',
 );
 
@@ -52,12 +50,6 @@ void main() {
 
     setUp(() {
       apiClient = MockAppwriteApiClient();
-      when(
-        () => apiClient.signIn(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenAnswer((_) async {});
       when(apiClient.createJwt).thenAnswer((_) async => 'jwt');
       host = FakeHost();
       credentials = [];
@@ -66,27 +58,8 @@ void main() {
 
     tearDown(() => repository.close());
 
-    test('M7.1 knows its map and whether it can play', () {
+    test('M7.1 knows its map', () {
       expect(repository.mapId, 'saint_lo_1km');
-      expect(repository.isConfigured, isTrue);
-      expect(
-        BattleRepository(
-          settings: const BattleSettings.fromEnvironment(),
-          apiClient: apiClient,
-        ).isConfigured,
-        isFalse,
-      );
-    });
-
-    test('M7.1 signs the player in to Appwrite with the settings', () async {
-      await repository.signIn();
-
-      verify(
-        () => apiClient.signIn(
-          email: 'blue@battleteam.local',
-          password: 'secret',
-        ),
-      ).called(1);
     });
 
     test('M7.1 signs in to the host with a fresh JWT from Appwrite', () async {
@@ -96,6 +69,23 @@ void main() {
       expect(credentials.single.secret, 'jwt');
       verify(apiClient.createJwt).called(1);
       expect(host.sockets, hasLength(1));
+    });
+
+    test('decision 220 the app sends no EnterBattle: the host logs the player '
+        'in on the socket', () async {
+      await play();
+      await pumpEventQueue();
+
+      // The sign-in is all the app said; the host entered the player.
+      expect(host.orders, isEmpty);
+
+      expect(
+        await repository.send(const Move(unitId: 'u-1', to: Position(1, 2, 3))),
+        isNull,
+      );
+
+      expect(host.orders, [isA<Move>()]);
+      expect(host.orders.whereType<EnterBattle>(), isEmpty);
     });
 
     test('M7.1 shows the connection as it goes', () async {

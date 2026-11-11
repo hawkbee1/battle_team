@@ -50,20 +50,12 @@ void main() {
         team: recorded.team,
       );
       final apiClient = MockAppwriteApiClient();
-      when(
-        () => apiClient.signIn(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenAnswer((_) async {});
       when(apiClient.createJwt).thenAnswer((_) async => 'jwt-secret-value');
       final cubit = BattleCubit(
         repository: BattleRepository(
           settings: const BattleSettings(
             endpoint: 'http://127.0.0.1:9/v1',
             projectId: 'hawkbee',
-            email: 'a@battleteam.local',
-            password: 'password-value',
             battleId: 'b-1',
           ),
           apiClient: apiClient,
@@ -74,7 +66,7 @@ void main() {
       );
       addTearDown(cubit.close);
 
-      await cubit.start();
+      cubit.start();
       await pumpEventQueue(times: 500);
       cubit.select(cubit.state.sectionUnits.first.unitId);
       await cubit.moveSelectedTo(const Position(52000, 9000, 3100));
@@ -101,7 +93,6 @@ void main() {
         }
         expect(text, isNot(contains('52000')));
         expect(text, isNot(contains('jwt-secret-value')));
-        expect(text, isNot(contains('password-value')));
       }
       expect(
         log.records.where((record) => record.level >= Level.SEVERE),

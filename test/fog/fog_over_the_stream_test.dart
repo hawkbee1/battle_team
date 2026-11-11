@@ -88,7 +88,7 @@ Future<({BattleCubit battle, FogCubit fog, Map<String, int> held})> _play(
   addTearDown(spy.cancel);
   addTearDown(fog.close);
   addTearDown(battle.close);
-  await battle.start();
+  battle.start();
   await pumpEventQueue(times: 500);
   return (battle: battle, fog: fog, held: held);
 }
@@ -194,7 +194,7 @@ void main() {
       addTearDown(fog.close);
       addTearDown(battle.close);
 
-      await battle.start();
+      battle.start();
       await pumpEventQueue(times: 500);
 
       // One state: the view lit the ground around the commander. The hit,

@@ -12,8 +12,6 @@ import '../../helpers/mocks.dart';
 const _settings = BattleSettings(
   endpoint: 'http://127.0.0.1:9/v1',
   projectId: 'hawkbee',
-  email: 'blue@battleteam.local',
-  password: 'secret',
   battleId: 'pt-1',
 );
 
@@ -22,12 +20,6 @@ void main() {
 
   setUp(() {
     apiClient = MockAppwriteApiClient();
-    when(
-      () => apiClient.signIn(
-        email: any(named: 'email'),
-        password: any(named: 'password'),
-      ),
-    ).thenAnswer((_) async {});
     when(apiClient.createJwt).thenAnswer((_) async => 'jwt');
   });
 
@@ -72,12 +64,7 @@ void main() {
       await tester.pump();
 
       expect(find.textContaining('In battle'), findsOneWidget);
-      verify(
-        () => apiClient.signIn(
-          email: 'blue@battleteam.local',
-          password: 'secret',
-        ),
-      ).called(1);
+      verify(apiClient.createJwt).called(1);
       expect(host.sockets, hasLength(1));
       await tester.pumpWidget(const SizedBox());
       await tester.runAsync(
@@ -99,42 +86,6 @@ void main() {
       await tester.pump();
 
       expect(find.textContaining('no map'), findsOneWidget);
-    });
-
-    testWidgets('M7.1 says how to set the battle up without settings', (
-      tester,
-    ) async {
-      final repository = BattleRepository(
-        settings: const BattleSettings.fromEnvironment(),
-        apiClient: apiClient,
-      );
-      await tester.pumpWidget(appOf(repository, const BattlePage()));
-      await tester.pump();
-
-      expect(find.textContaining('tool/playtest.dart'), findsOneWidget);
-    });
-
-    testWidgets('M7.1 has a route to the battle', (tester) async {
-      final repository = BattleRepository(
-        settings: const BattleSettings.fromEnvironment(),
-        apiClient: apiClient,
-      );
-      await tester.pumpWidget(
-        appOf(
-          repository,
-          Builder(
-            builder: (context) => TextButton(
-              onPressed: () => Navigator.of(context).push(BattlePage.route()),
-              child: const Text('go'),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('go'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(BattlePage), findsOneWidget);
     });
   });
 }

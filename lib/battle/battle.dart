@@ -1,7 +1,12 @@
 export 'cubit/battle_cubit.dart';
+export 'cubit/battle_entry_cubit.dart';
+export 'data/battle_locator.dart';
 export 'data/battle_repository.dart';
+export 'data/battle_repository_factory.dart';
 export 'data/battle_settings.dart';
 export 'data/battle_snapshot.dart';
 export 'data/connection_status.dart';
+export 'data/playtest_settings.dart';
+export 'view/battle_entry_page.dart';
 export 'view/battle_page.dart';
 export 'view/battle_view.dart';
