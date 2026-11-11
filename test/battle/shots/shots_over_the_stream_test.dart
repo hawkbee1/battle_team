@@ -13,7 +13,7 @@ Future<List<List<ShotEffect>>> play(FakeHost host) async {
   final announced = <List<ShotEffect>>[];
   final subscription = cubit.shots.listen(announced.add);
   addTearDown(subscription.cancel);
-  await cubit.start();
+  cubit.start();
   await pumpEventQueue(times: 500);
   return announced;
 }

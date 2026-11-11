@@ -36,17 +36,14 @@ void main() {
       );
 
       blocTest<BackendStatusCubit, BackendStatusState>(
-        'emits [checking, unreachable] with the reason when it does not',
+        'emits [checking, unreachable] when it does not',
         setUp: () => when(() => backendStatusRepository.checkConnection())
             .thenThrow(const BackendUnreachableException('Project not found')),
         build: buildCubit,
         act: (cubit) => cubit.checkConnection(),
         expect: () => const [
           BackendStatusState(status: BackendStatus.checking),
-          BackendStatusState(
-            status: BackendStatus.unreachable,
-            errorMessage: 'Project not found',
-          ),
+          BackendStatusState(status: BackendStatus.unreachable),
         ],
         errors: () => [isA<BackendUnreachableException>()],
       );

@@ -45,20 +45,16 @@ void main() {
       expect(find.text('Connected to Appwrite'), findsOneWidget);
     });
 
-    testWidgets('shows the reason when the backend is unreachable', (
-      tester,
-    ) async {
+    testWidgets('M7.12 says in words that the backend is unreachable, '
+        'with no technical text', (tester) async {
       await pumpIndicator(
         tester,
-        const BackendStatusState(
-          status: BackendStatus.unreachable,
-          errorMessage: 'Project not found',
-        ),
+        const BackendStatusState(status: BackendStatus.unreachable),
       );
 
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
       expect(find.text('Cannot reach Appwrite'), findsOneWidget);
-      expect(find.text('Project not found'), findsOneWidget);
+      expect(find.byType(SelectableText), findsNothing);
     });
 
     testWidgets('checks again when the retry button is tapped', (tester) async {

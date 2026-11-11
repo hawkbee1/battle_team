@@ -72,7 +72,7 @@ void main() {
       addTearDown(alerts.close);
       addTearDown(cubit.close);
       await tester.runAsync(() async {
-        await cubit.start();
+        cubit.start();
         await pumpEventQueue(times: 500);
       });
       world = FakeWorld(map);

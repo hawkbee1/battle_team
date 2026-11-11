@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_team/alerts/cubit/alerts_cubit.dart';
@@ -15,7 +13,6 @@ import 'package:battle_team/battle/world/scene_battle_world.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/fog/data/ground_sight_loader.dart';
 import 'package:battle_team/fog/model/fog_tracker.dart';
-import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/shop/cubit/shop_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,9 +22,8 @@ import 'package:material_ui/material_ui.dart';
 /// {@template battle_page}
 /// Opens the battle of the [BattleRepository] in the tree as its player:
 /// loads the map, the unit types' bodies and what the order pre-check reads,
-/// signs in, finds the battle's
-/// host and plays. Its map, its 3D world and its scene are built by the
-/// functions it is given, so that tests run without a GPU.
+/// finds the battle's host and plays. Its map, its 3D world and its scene are
+/// built by the functions it is given, so that tests run without a GPU.
 /// {@endtemplate}
 class BattlePage extends StatefulWidget {
   /// {@macro battle_page}
@@ -42,10 +38,6 @@ class BattlePage extends StatefulWidget {
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
   });
-
-  /// The route to the battle, for the title's Start button.
-  static Route<void> route() =>
-      MaterialPageRoute<void>(builder: (_) => const BattlePage());
 
   /// Loads a map from the assets.
   final Future<MapData> Function(AssetBundle bundle, String mapId) loadMap;
@@ -109,75 +101,57 @@ class _BattlePageState extends State<BattlePage> {
   Widget build(BuildContext context) {
     final repository = context.read<BattleRepository>();
     return Scaffold(
-      body: repository.isConfigured
-          ? FutureBuilder(
-              future: _ready,
-              builder: (context, snapshot) => switch (snapshot) {
-                AsyncSnapshot(:final data?) => MultiBlocProvider(
-                  providers: [
-                    // First, and not lazy: it follows the view from the
-                    // first message the battle cubit makes the repository
-                    // fetch.
-                    BlocProvider(
-                      lazy: false,
-                      create: (_) => StorageCubit(
-                        repository: repository,
-                        preCheck: data.preCheck,
-                      )..start(),
-                    ),
-                    BlocProvider(
-                      lazy: false,
-                      create: (_) =>
-                          AlertsCubit(repository: repository)..start(),
-                    ),
-                    BlocProvider(
-                      lazy: false,
-                      create: (_) => FogCubit(
-                        repository: repository,
-                        tracker: FogTracker(
-                          sight: data.sight,
-                          bodies: data.bodies,
-                        ),
-                      )..start(),
-                    ),
-                    BlocProvider(
-                      lazy: false,
-                      create: (_) => ShopCubit(
-                        repository: repository,
-                        preCheck: data.preCheck,
-                      )..start(),
-                    ),
-                    BlocProvider(
-                      create: (_) {
-                        final cubit = BattleCubit(
-                          repository: repository,
-                          preCheck: data.preCheck,
-                          movePreviewer: data.previewer,
-                        );
-                        unawaited(cubit.start());
-                        return cubit;
-                      },
-                    ),
-                  ],
-                  child: BattleView(
-                    map: data.map,
-                    world: widget.worldBuilder(data.map),
-                    sceneBuilder: widget.sceneBuilder,
-                    bodies: data.bodies,
-                  ),
-                ),
-                AsyncSnapshot(:final Object error) => Center(
-                  child: Text('$error'),
-                ),
-                _ => const Center(child: CircularProgressIndicator()),
-              },
-            )
-          : Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(context.l10n.battleMissingSettings),
+      body: FutureBuilder(
+        future: _ready,
+        builder: (context, snapshot) => switch (snapshot) {
+          AsyncSnapshot(:final data?) => MultiBlocProvider(
+            providers: [
+              // First, and not lazy: it follows the view from the
+              // first message the battle cubit makes the repository
+              // fetch.
+              BlocProvider(
+                lazy: false,
+                create: (_) => StorageCubit(
+                  repository: repository,
+                  preCheck: data.preCheck,
+                )..start(),
               ),
+              BlocProvider(
+                lazy: false,
+                create: (_) => AlertsCubit(repository: repository)..start(),
+              ),
+              BlocProvider(
+                lazy: false,
+                create: (_) => FogCubit(
+                  repository: repository,
+                  tracker: FogTracker(sight: data.sight, bodies: data.bodies),
+                )..start(),
+              ),
+              BlocProvider(
+                lazy: false,
+                create: (_) =>
+                    ShopCubit(repository: repository, preCheck: data.preCheck)
+                      ..start(),
+              ),
+              BlocProvider(
+                create: (_) => BattleCubit(
+                  repository: repository,
+                  preCheck: data.preCheck,
+                  movePreviewer: data.previewer,
+                )..start(),
+              ),
+            ],
+            child: BattleView(
+              map: data.map,
+              world: widget.worldBuilder(data.map),
+              sceneBuilder: widget.sceneBuilder,
+              bodies: data.bodies,
             ),
+          ),
+          AsyncSnapshot(:final Object error) => Center(child: Text('$error')),
+          _ => const Center(child: CircularProgressIndicator()),
+        },
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:battle_client/battle_client.dart';
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/alerts/cubit/alerts_cubit.dart';
+import 'package:battle_team/authentication/authentication.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
@@ -141,6 +142,8 @@ void main() {
       WidgetTester tester, {
       Locale? locale,
       UnitBodies? unitBodies,
+      AuthenticationCubit? authentication,
+      BattleEntryCubit? entry,
     }) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -154,6 +157,10 @@ void main() {
               BlocProvider<FogCubit>.value(value: fog),
               BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: cubit),
+              if (authentication != null)
+                BlocProvider<AuthenticationCubit>.value(value: authentication),
+              if (entry != null)
+                BlocProvider<BattleEntryCubit>.value(value: entry),
             ],
             child: BattleView(
               map: map,
@@ -223,6 +230,40 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('OpenStreetMap'), findsNothing);
+    });
+
+    testWidgets('M7.12 logs out from the battle screen, beside the credits', (
+      tester,
+    ) async {
+      final authentication = MockAuthenticationCubit();
+      when(() => authentication.logOut(onFailure: any(named: 'onFailure')))
+          .thenAnswer((_) async {});
+      await pump(tester, authentication: authentication);
+
+      await tester.tap(find.text('Log out'));
+
+      verify(() => authentication.logOut(onFailure: any(named: 'onFailure')))
+          .called(1);
+    });
+
+    testWidgets('M7.12 Switch battle goes back to the list of battles', (
+      tester,
+    ) async {
+      final entry = MockBattleEntryCubit();
+      when(entry.choose).thenAnswer((_) async {});
+      await pump(tester, entry: entry);
+
+      await tester.tap(find.text('Switch battle'));
+
+      verify(entry.choose).called(1);
+    });
+
+    testWidgets('M7.12 the log-out is in French too', (tester) async {
+      await pump(tester, locale: const Locale('fr'));
+
+      expect(find.text('Changer de bataille'), findsOneWidget);
+      expect(find.text('Se déconnecter'), findsOneWidget);
+      expect(find.text('Crédits'), findsOneWidget);
     });
 
     testWidgets(
@@ -927,12 +968,6 @@ void main() {
       expect(hidden, isNotEmpty, reason: 'the recordings must differ');
 
       final apiClient = MockAppwriteApiClient();
-      when(
-        () => apiClient.signIn(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenAnswer((_) async {});
       when(apiClient.createJwt).thenAnswer((_) async => 'jwt');
       final host = FakeHost.recorded('fog_s-2');
       final cubit = BattleCubit(
@@ -940,8 +975,6 @@ void main() {
           settings: const BattleSettings(
             endpoint: 'http://127.0.0.1:9/v1',
             projectId: 'hawkbee',
-            email: 'a@battleteam.local',
-            password: 'secret',
             battleId: 'b-1',
           ),
           apiClient: apiClient,
@@ -958,7 +991,7 @@ void main() {
       addTearDown(alerts.close);
       addTearDown(cubit.close);
       await tester.runAsync(() async {
-        await cubit.start();
+        cubit.start();
         await pumpEventQueue(times: 500);
       });
       final world = FakeWorld(map);

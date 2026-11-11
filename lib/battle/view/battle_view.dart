@@ -5,7 +5,9 @@ import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/alerts/widgets/alert_banners.dart';
 import 'package:battle_team/alerts/widgets/status_strip.dart';
+import 'package:battle_team/authentication/widgets/log_out_button.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
+import 'package:battle_team/battle/cubit/battle_entry_cubit.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/widgets/move_panel.dart';
 import 'package:battle_team/battle/widgets/weapon_panel.dart';
@@ -533,7 +535,16 @@ class _BattleViewState extends State<BattleView> {
             Positioned(
               right: 12,
               bottom: 12,
-              child: _Credits(lines: widget.map.spec.attribution),
+              child: _Panel(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Credits(lines: widget.map.spec.attribution),
+                    const _SwitchBattle(),
+                    const LogOutButton(),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -772,7 +783,8 @@ class _UnitLabels extends StatelessWidget {
 }
 
 /// The map's credits: its data is under licences that ask for an
-/// attribution (Q-MAP-22), which a tap on the entry shows.
+/// attribution (Q-MAP-22), which a tap on the entry shows. Beside it, the
+/// switch to another battle and the log-out button (M7 Issue 12).
 class _Credits extends StatelessWidget {
   const new({required this.lines});
 
@@ -781,25 +793,35 @@ class _Credits extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return _Panel(
-      child: TextButton(
-        onPressed: () => showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(l10n.battleCredits),
-            content: SingleChildScrollView(child: Text(lines.join('\n\n'))),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.battleCreditsClose),
-              ),
-            ],
-          ),
+    return TextButton(
+      onPressed: () => showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.battleCredits),
+          content: SingleChildScrollView(child: Text(lines.join('\n\n'))),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.battleCreditsClose),
+            ),
+          ],
         ),
-        child: Text(l10n.battleCredits),
       ),
+      child: Text(l10n.battleCredits),
     );
   }
+}
+
+/// Leaves the battle for the list of the account's battles, to enter another
+/// war's (its `BattleEntryCubit` is above the battle page).
+class _SwitchBattle extends StatelessWidget {
+  const new();
+
+  @override
+  Widget build(BuildContext context) => TextButton(
+    onPressed: () => unawaited(context.read<BattleEntryCubit>().choose()),
+    child: Text(context.l10n.battleEntrySwitch),
+  );
 }
 
 class _Panel extends StatelessWidget {

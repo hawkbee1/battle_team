@@ -69,8 +69,7 @@ void main() {
     /// Plays a battle on [view] until the section's view came.
     Future<void> play([SectionView? view]) async {
       host = FakeHost(view: view ?? armedView);
-      cubit = realCubit(host);
-      await cubit.start();
+      cubit = realCubit(host)..start();
       await pumpEventQueue(times: 500);
       expect(cubit.state.status, BattleStatus.playing);
     }
@@ -262,7 +261,7 @@ void main() {
         await cubit.reload();
         await cubit.fireSelected();
 
-        expect(cubit.state.status, BattleStatus.signingIn);
+        expect(cubit.state.status, BattleStatus.connecting);
         expect(host.orders, isEmpty);
         expect(cubit.state.notice, isNull);
       });

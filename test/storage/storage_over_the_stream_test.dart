@@ -14,7 +14,7 @@ Future<({BattleCubit battle, StorageCubit storage})> play(FakeHost host) async {
   final storage = realStorageCubit(battle);
   addTearDown(storage.close);
   addTearDown(battle.close);
-  await battle.start();
+  battle.start();
   await pumpEventQueue(times: 500);
   return (battle: battle, storage: storage);
 }

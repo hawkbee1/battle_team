@@ -18,20 +18,12 @@ import 'pre_check.dart';
 /// and closes it.
 BattleCubit realCubit(FakeHost host, {MovePreviewer? previewer}) {
   final apiClient = MockAppwriteApiClient();
-  when(
-    () => apiClient.signIn(
-      email: any(named: 'email'),
-      password: any(named: 'password'),
-    ),
-  ).thenAnswer((_) async {});
   when(apiClient.createJwt).thenAnswer((_) async => 'jwt');
   return BattleCubit(
     repository: BattleRepository(
       settings: const BattleSettings(
         endpoint: 'http://127.0.0.1:9/v1',
         projectId: 'hawkbee',
-        email: 'a@battleteam.local',
-        password: 'secret',
         battleId: 'b-1',
       ),
       apiClient: apiClient,

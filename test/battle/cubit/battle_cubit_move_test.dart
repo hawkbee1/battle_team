@@ -76,7 +76,6 @@ void main() {
       repository = MockBattleRepository();
       connection = StreamController<ConnectionStatus>.broadcast(sync: true);
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
-      when(repository.signIn).thenAnswer((_) async {});
       when(() => repository.connection).thenAnswer((_) => connection.stream);
       when(() => repository.snapshots).thenAnswer((_) => snapshots.stream);
       when(() => repository.stopReason).thenReturn(null);
@@ -97,7 +96,7 @@ void main() {
 
     /// Plays with [units] and the soldier selected.
     Future<void> play([List<UnitView>? units]) async {
-      await cubit.start();
+      cubit.start();
       connection.add(ConnectionStatus.connected);
       snapshots.add(_snapshot(units ?? [_soldier(), blueCommander]));
       cubit.select('u-1');
@@ -215,7 +214,7 @@ void main() {
       test('nothing is previewed without a selected unit, a battle time or '
           'while the battle is not playing', () async {
         await cubit.previewMoveTo(to);
-        await cubit.start();
+        cubit.start();
         snapshots.add(_snapshot([_soldier()]));
         cubit.select('u-1');
         await cubit.previewMoveTo(to);
@@ -376,7 +375,7 @@ void main() {
       });
 
       test('nothing is sent without a selected unit', () async {
-        await cubit.start();
+        cubit.start();
         connection.add(ConnectionStatus.connected);
 
         await cubit.moveSelectedTo(to);

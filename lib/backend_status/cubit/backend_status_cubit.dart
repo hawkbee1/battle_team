@@ -16,13 +16,10 @@ class BackendStatusCubit extends Cubit<BackendStatusState> {
       await _backendStatusRepository.checkConnection();
       emit(const BackendStatusState(status: BackendStatus.reachable));
     } on BackendUnreachableException catch (exception, stackTrace) {
+      // Logged by the bloc observer; the player is told in words, never with
+      // the reason.
       addError(exception, stackTrace);
-      emit(
-        BackendStatusState(
-          status: BackendStatus.unreachable,
-          errorMessage: exception.reason,
-        ),
-      );
+      emit(const BackendStatusState(status: BackendStatus.unreachable));
     }
   }
 }

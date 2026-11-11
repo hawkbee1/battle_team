@@ -42,7 +42,6 @@ void main() {
       repository = MockBattleRepository();
       connection = StreamController<ConnectionStatus>.broadcast(sync: true);
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
-      when(repository.signIn).thenAnswer((_) async {});
       when(() => repository.connection).thenAnswer((_) => connection.stream);
       when(() => repository.snapshots).thenAnswer((_) => snapshots.stream);
       when(() => repository.stopReason).thenReturn(null);
@@ -58,30 +57,30 @@ void main() {
       await snapshots.close();
     });
 
-    /// Plays: signed in to the host, with the section's view.
+    /// Plays: connected to the host, with the section's view.
     Future<void> play() async {
-      await cubit.start();
+      cubit.start();
       connection.add(ConnectionStatus.connected);
       snapshots.add(_snapshot);
     }
 
-    test('M7.1 starts signed out, nothing shown', () {
+    test('M7.1 starts connecting, nothing shown', () {
       expect(cubit.state, const BattleState());
-      expect(cubit.state.status, BattleStatus.signingIn);
+      expect(cubit.state.status, BattleStatus.connecting);
     });
 
     blocTest<BattleCubit, BattleState>(
-      'M7.1 signs in, then connects and keeps the section view',
+      'M7.1 connects and keeps the section view',
       build: () => cubit,
       act: (cubit) async {
-        await cubit.start();
+        cubit.start();
         connection
           ..add(ConnectionStatus.connecting)
           ..add(ConnectionStatus.connected);
         snapshots.add(_snapshot);
       },
       expect: () => [
-        const BattleState(status: BattleStatus.connecting),
+        const BattleState(),
         const BattleState(status: BattleStatus.playing),
         const BattleState(
           status: BattleStatus.playing,
@@ -106,19 +105,9 @@ void main() {
         ),
       ],
       verify: (_) {
-        verifyInOrder([repository.signIn, repository.start]);
+        verify(repository.start).called(1);
       },
     );
-
-    test('M7.1 fails, and never connects, when the sign-in fails', () async {
-      when(repository.signIn).thenThrow(StateError('no account'));
-
-      await cubit.start();
-
-      expect(cubit.state.status, BattleStatus.failed);
-      expect(cubit.state.problem, contains('no account'));
-      verifyNever(repository.start);
-    });
 
     test('M7.1 shows a lost host, then the host back', () async {
       await play();
@@ -155,7 +144,7 @@ void main() {
 
       tearDown(() => log.cancel());
 
-      test('M7.3 the sign-in, the connection and an accepted order', () async {
+      test('M7.3 the connection and an accepted order', () async {
         await play();
         cubit.select('c-1');
         await cubit.moveSelectedTo(const Position(52000, 9000, 3100));
@@ -163,8 +152,6 @@ void main() {
         expect(
           log.lines,
           equals([
-            'INFO signing in',
-            'INFO signed in',
             'INFO connection connected',
             'INFO order move sent',
             'INFO order move accepted',
@@ -208,17 +195,6 @@ void main() {
         expect(failed.message, 'order move failed');
         expect(failed.error, isA<StateError>());
         expect(failed.stackTrace, isNotNull);
-      });
-
-      test('M7.3 a sign-in that failed as SEVERE', () async {
-        when(repository.signIn).thenThrow(StateError('no account'));
-
-        await cubit.start();
-
-        final failed = log.records.last;
-        expect(failed.level, Level.SEVERE);
-        expect(failed.message, 'sign-in failed');
-        expect(failed.error, isA<StateError>());
       });
 
       test('decision 237 names no unit and no position of the state', () async {
@@ -544,7 +520,7 @@ void main() {
     });
 
     test('M7.1 sends no order while it is not playing', () async {
-      await cubit.start();
+      cubit.start();
       connection.add(ConnectionStatus.connecting);
       snapshots.add(_snapshot);
       cubit.select('c-1');
@@ -588,11 +564,9 @@ void main() {
             settings: const BattleSettings(
               endpoint: 'http://127.0.0.1:9/v1',
               projectId: 'hawkbee',
-              email: 'a@battleteam.local',
-              password: 'secret',
               battleId: 'b-1',
             ),
-            apiClient: MockAppwriteApiClient()..stubSignIn(),
+            apiClient: MockAppwriteApiClient()..stubJwt(),
             transport: host,
             address: (_) async => Uri.parse('ws://host/v1/socket'),
           );
@@ -602,7 +576,7 @@ void main() {
           );
           addTearDown(cubit.close);
 
-          await cubit.start();
+          cubit.start();
           await pumpEventQueue(times: 500);
 
           // What the host holds for that section at the end of its stream.
@@ -621,13 +595,7 @@ void main() {
 }
 
 extension on MockAppwriteApiClient {
-  void stubSignIn() {
-    when(
-      () => signIn(
-        email: any(named: 'email'),
-        password: any(named: 'password'),
-      ),
-    ).thenAnswer((_) async {});
+  void stubJwt() {
     when(createJwt).thenAnswer((_) async => 'jwt');
   }
 }
