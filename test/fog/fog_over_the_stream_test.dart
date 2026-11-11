@@ -4,6 +4,7 @@ import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
+import 'package:battle_team/fog/model/fog_tracker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/fake_host.dart';
@@ -27,18 +28,23 @@ bool _within(UnitView unit, int x, int y, double metres) {
 /// the snapshot and the fog cubit that followed it. Gives what the stream
 /// held, so that a test can show it was not an empty proof.
 Future<({BattleCubit battle, FogCubit fog, Map<String, int> held})> _play(
-  FakeHost host,
-) async {
+  FakeHost host, {
+  FogTracker? tracker,
+}) async {
   final terrain = testTerrain();
-  // A flying unit stands above the ground and sees farther (MAP-33): on the
-  // flat map, the flying limit above it.
-  final flierBonus = math.min(
-    terrain.vision.heightBonusMaxM,
-    terrain.flyingMaxAboveHighestTerrainM * terrain.vision.heightBonusMPerM,
-  );
+  // A unit standing higher than the ground sees farther (MAP-33), up to a
+  // cap: on the flat map only a flying unit does, by the flying limit above
+  // it; on a map with relief, by up to the cap.
+  final bonus = tracker == null
+      ? math.min(
+          terrain.vision.heightBonusMaxM,
+          terrain.flyingMaxAboveHighestTerrainM *
+              terrain.vision.heightBonusMPerM,
+        )
+      : terrain.vision.heightBonusMaxM;
   final battle = realCubit(host);
-  final fog = realFogCubit(battle);
-  final held = {'snapshots': 0, 'others': 0, 'lit': 0, 'unseen': 0};
+  final fog = realFogCubit(battle, tracker: tracker);
+  final held = {'snapshots': 0, 'others': 0, 'lit': 0, 'outside': 0};
   final spy = battle.repository.snapshots.listen((snapshot) {
     final model = fog.state.model;
     final weather = snapshot.weather;
@@ -51,6 +57,14 @@ Future<({BattleCubit battle, FogCubit fog, Map<String, int> held})> _play(
     held['others'] =
         held['others']! +
         snapshot.units.values.where((unit) => unit.private == null).length;
+    // MAP-29: a unit drawn, its own or another's, stands on ground in sight.
+    for (final unit in snapshot.units.values) {
+      final at = unit.position;
+      if (at == null) continue;
+      if (model.levelAt(at.x, at.y) != FogLevel.lit) {
+        held['outside'] = held['outside']! + 1;
+      }
+    }
     for (var y = 0; y < model.depth; y++) {
       for (var x = 0; x < model.width; x++) {
         if (!model.isLit(x, y)) continue;
@@ -62,7 +76,7 @@ Future<({BattleCubit battle, FogCubit fog, Map<String, int> held})> _play(
               x,
               y,
               unit.private!.sightRangeM * terrain.weather[weather]! +
-                  (unit.flying ? flierBonus : 0),
+                  (tracker != null || unit.flying ? bonus : 0),
             ),
           ),
           isTrue,
@@ -81,12 +95,18 @@ Future<({BattleCubit battle, FogCubit fog, Map<String, int> held})> _play(
 
 void main() {
   group('the fog over the host streams', () {
-    test('decision 237 MAP-27 MAP-29 a recorded stream: the fog lights only '
-        'around the own units of the section, at every message', () async {
+    test('MAP-29 nothing outside the lit area is drawn, and decision 237 '
+        'the fog lights only around the own units of the section, on the '
+        'valley, at every message of recorded streams', () async {
       var others = 0;
       var lit = 0;
+      var outside = 0;
       for (final name in ['clear_s-1', 'clear_s-2', 'fog_s-1', 'fog_s-2']) {
-        final played = await _play(FakeHost.recorded(name));
+        final played = await _play(
+          FakeHost.recorded(name),
+          tracker: testTracker(sight: valleySight()),
+        );
+        outside += played.held['outside']!;
 
         expect(played.held['snapshots'], greaterThan(5), reason: name);
         others += played.held['others']!;
@@ -97,6 +117,8 @@ void main() {
       // and ground was lit.
       expect(others, greaterThan(0));
       expect(lit, greaterThan(0));
+      // MAP-29: no unit is drawn on ground out of the section's sight.
+      expect(outside, 0);
     });
 
     test('M7.9 the fog follows a late join like one from the start: the '

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:battle_client/battle_client.dart';
+import 'package:battle_map/battle_map.dart';
 import 'package:battle_pathfinding/battle_pathfinding.dart' as nav;
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_rules/battle_rules.dart' as rules;
@@ -45,6 +46,36 @@ GroundSight testSight({String? map}) => GroundSight(
   map: nav.NavigationFixture.parse(map ?? flatMap()),
   terrain: testTerrain(),
 );
+
+/// The ground a unit sees on the valley, the map of `battle_host`'s scripted
+/// battle (12 × 8 cells, a floating island, hills, a wood), built by
+/// `battle_map` from its own fixture and the plan's own data: the map the
+/// recorded streams were played on.
+GroundSight valleySight() {
+  String plan(String file) => File('plan/data/$file').readAsStringSync();
+  const source = '../../packages/battle_map/test/fixtures/valley';
+  final data = rules.GameData.parse(
+    units: plan('units.yaml'),
+    combat: plan('combat.yaml'),
+    terrain: plan('terrain.yaml'),
+    battle: plan('battle.yaml'),
+    economy: File('plan/milestones/economy.yaml').readAsStringSync(),
+    medals: plan('medals.yaml'),
+  );
+  final built = buildMap(
+    MapData.fromSource(
+      mapYaml: File('$source/$mapFile').readAsStringSync(),
+      heightsPng: File('$source/heights.png').readAsBytesSync(),
+      terrainPng: File('$source/terrain.png').readAsBytesSync(),
+      objectsYaml: File('$source/$objectsFile').readAsStringSync(),
+    ),
+    data,
+  );
+  return GroundSight(
+    map: HostMapLoader(data.terrain).load((built as MapBuilt).files).navigation,
+    terrain: data.terrain,
+  );
+}
 
 /// The fog tracker on [sight], with the plan's own unit bodies.
 FogTracker testTracker({GroundSight? sight}) =>
