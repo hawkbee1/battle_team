@@ -4,12 +4,16 @@ import 'package:battle_team/authentication/widgets/log_out_button.dart';
 import 'package:battle_team/battle/cubit/battle_entry_cubit.dart';
 import 'package:battle_team/battle/data/battle_locator.dart';
 import 'package:battle_team/battle/data/battle_repository_factory.dart';
+import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/view/battle_page.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 Widget _battlePage(BuildContext context) => const BattlePage();
+
+/// Every map is available: the list of the app's maps is not known.
+bool _anyMap(String mapId) => true;
 
 /// {@template battle_entry_page}
 /// What a signed-in account sees first: it looks for the running battles
@@ -26,11 +30,12 @@ Widget _battlePage(BuildContext context) => const BattlePage();
 /// Needs a `BattleLocator`, a `BattleRepositoryFactory` and an
 /// `AuthenticationCubit` above it.
 /// {@endtemplate}
-class BattleEntryPage extends StatelessWidget {
+class BattleEntryPage extends StatefulWidget {
   /// {@macro battle_entry_page}
   const new({
     required this.accountId,
     this.pageBuilder = _battlePage,
+    this.loadMapIds = loadBundledMapIds,
     super.key,
   });
 
@@ -40,6 +45,53 @@ class BattleEntryPage extends StatelessWidget {
   /// Builds the battle's screen, with its repository in the tree.
   final WidgetBuilder pageBuilder;
 
+  /// Loads the IDs of the maps the app has.
+  final Future<Set<String>> Function(AssetBundle bundle) loadMapIds;
+
+  @override
+  State<BattleEntryPage> createState() => _BattleEntryPageState();
+}
+
+class _BattleEntryPageState extends State<BattleEntryPage> {
+  late final Future<Set<String>> _maps = widget.loadMapIds(
+    DefaultAssetBundle.of(context),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _maps,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const _Waiting(
+            state: BattleEntryLocating(),
+            mapAvailable: _anyMap,
+          );
+        }
+        // Without the list of maps, none is refused: the battle's page says
+        // if a map is missing.
+        final maps = snapshot.data;
+        return _Entry(
+          accountId: widget.accountId,
+          pageBuilder: widget.pageBuilder,
+          mapAvailable: maps == null ? _anyMap : maps.contains,
+        );
+      },
+    );
+  }
+}
+
+class _Entry extends StatelessWidget {
+  const new({
+    required this.accountId,
+    required this.pageBuilder,
+    required this.mapAvailable,
+  });
+
+  final String accountId;
+  final WidgetBuilder pageBuilder;
+  final bool Function(String mapId) mapAvailable;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -47,6 +99,7 @@ class BattleEntryPage extends StatelessWidget {
         final cubit = BattleEntryCubit(
           locator: context.read<BattleLocator>(),
           accountId: accountId,
+          mapAvailable: mapAvailable,
         );
         unawaited(cubit.locate());
         return cubit;
@@ -60,7 +113,7 @@ class BattleEntryPage extends StatelessWidget {
             dispose: (repository) => unawaited(repository.close()),
             child: Builder(builder: pageBuilder),
           ),
-          _ => _Waiting(state: state),
+          _ => _Waiting(state: state, mapAvailable: mapAvailable),
         },
       ),
     );
@@ -68,14 +121,14 @@ class BattleEntryPage extends StatelessWidget {
 }
 
 class _Waiting extends StatelessWidget {
-  const new({required this.state});
+  const new({required this.state, required this.mapAvailable});
 
   final BattleEntryState state;
+  final bool Function(String mapId) mapAvailable;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final cubit = context.read<BattleEntryCubit>();
     final message = switch (state) {
       BattleEntryFailed(:final unreachable) => l10n.battleEntryProblem(
         unreachable ? 'unreachable' : 'other',
@@ -105,7 +158,11 @@ class _Waiting extends StatelessWidget {
                       label: l10n.battleEntryJoining,
                     ),
                     BattleEntryChoosing(:final battles, :final problem) =>
-                      _Battles(battles: battles, problem: problem),
+                      _Battles(
+                        battles: battles,
+                        problem: problem,
+                        mapAvailable: mapAvailable,
+                      ),
                     _ => Text(message, textAlign: TextAlign.center),
                   },
                   if (state is! BattleEntryLocating &&
@@ -114,8 +171,8 @@ class _Waiting extends StatelessWidget {
                     Center(
                       child: FilledButton(
                         onPressed: state is BattleEntryChoosing
-                            ? cubit.choose
-                            : cubit.locate,
+                            ? context.read<BattleEntryCubit>().choose
+                            : context.read<BattleEntryCubit>().locate,
                         child: Text(l10n.battleEntryRetry),
                       ),
                     ),
@@ -149,10 +206,15 @@ class _Progress extends StatelessWidget {
 /// The running battles: the ones the account is in enter, the others ask
 /// before they join their war.
 class _Battles extends StatelessWidget {
-  const new({required this.battles, required this.problem});
+  const new({
+    required this.battles,
+    required this.problem,
+    required this.mapAvailable,
+  });
 
   final List<AccountBattle> battles;
   final BattleJoinFailureReason? problem;
+  final bool Function(String mapId) mapAvailable;
 
   Future<void> _pick(BuildContext context, AccountBattle battle) async {
     final cubit = context.read<BattleEntryCubit>();
@@ -186,23 +248,59 @@ class _Battles extends StatelessWidget {
         ],
         const SizedBox(height: 12),
         for (final battle in battles)
-          Card(
-            child: ListTile(
-              title: Text(l10n.battleEntryBattleOn(battle.battle.mapId)),
-              subtitle: switch (battle.warId) {
-                final war? => Text(l10n.battleEntryWar(war)),
-                null => null,
-              },
-              trailing: battle.joined
-                  ? Text(l10n.battleEntryYouAreIn)
-                  : FilledButton.tonal(
-                      onPressed: () => unawaited(_pick(context, battle)),
-                      child: Text(l10n.battleEntryJoin),
-                    ),
-              onTap: () => unawaited(_pick(context, battle)),
-            ),
+          _BattleTile(
+            battle: battle,
+            available: mapAvailable(battle.battle.mapId),
+            onPick: () => unawaited(_pick(context, battle)),
           ),
       ],
+    );
+  }
+}
+
+/// A running battle of the list: its map and war, and either that the account
+/// is in it, a button to join it, or that the app has no map for it.
+class _BattleTile extends StatelessWidget {
+  const new({
+    required this.battle,
+    required this.available,
+    required this.onPick,
+  });
+
+  final AccountBattle battle;
+  final bool available;
+  final VoidCallback onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Card(
+      child: ListTile(
+        enabled: available,
+        title: Text(l10n.battleEntryBattleOn(battle.battle.mapId)),
+        // The war and, when the app cannot show the battle, why: below the
+        // title, where a long text has the width of the tile.
+        subtitle: switch ((battle.warId, available)) {
+          (null, true) => null,
+          (final war, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (war != null) Text(l10n.battleEntryWar(war)),
+              if (!available) Text(l10n.battleEntryNoMap),
+            ],
+          ),
+        },
+        trailing: switch ((available, battle.joined)) {
+          (false, _) => null,
+          (true, true) => Text(l10n.battleEntryYouAreIn),
+          (true, false) => FilledButton.tonal(
+            onPressed: onPick,
+            child: Text(l10n.battleEntryJoin),
+          ),
+        },
+        onTap: onPick,
+      ),
     );
   }
 }

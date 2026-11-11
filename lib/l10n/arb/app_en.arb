@@ -750,5 +750,9 @@
     "placeholders": {
       "reason": {}
     }
+  },
+  "battleEntryNoMap": "Map not available in this app",
+  "@battleEntryNoMap": {
+    "description": "Shown on a running battle of the list whose map the app does not have: it cannot be entered or joined"
   }
 }

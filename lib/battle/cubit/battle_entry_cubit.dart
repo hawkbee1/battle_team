@@ -13,16 +13,24 @@ part 'battle_entry_state.dart';
 /// again and always lists them (the battle screen's Switch battle). A battle
 /// the account is not in is joined first (SOC-30): its war gives the account a
 /// new section, then the battle is entered and the host admits the section.
-/// The cubit enters nothing itself: the host logs the player in on the socket
-/// (decision 220).
+/// A battle on a map the app does not have (`mapAvailable`) cannot be shown:
+/// it is not entered at once and not entered when picked, so that the player
+/// never joins a war he cannot play. The cubit enters nothing itself: the host
+/// logs the player in on the socket (decision 220).
 /// {@endtemplate}
 class BattleEntryCubit extends Cubit<BattleEntryState> {
   /// {@macro battle_entry_cubit}
-  new({required this._locator, required this._accountId})
-    : super(const BattleEntryLocating());
+  new({
+    required this._locator,
+    required this._accountId,
+    this._mapAvailable = _anyMap,
+  }) : super(const BattleEntryLocating());
 
   final BattleLocator _locator;
   final String _accountId;
+  final bool Function(String mapId) _mapAvailable;
+
+  static bool _anyMap(String mapId) => true;
 
   static final _log = Logger('battle_team.BattleEntryCubit');
 
@@ -40,6 +48,7 @@ class BattleEntryCubit extends Cubit<BattleEntryState> {
   /// Enters [battle], one of the [BattleEntryChoosing] list: at once when the
   /// account is in it, after joining its war when it is not.
   Future<void> enter(AccountBattle battle) async {
+    if (!_mapAvailable(battle.battle.mapId)) return;
     if (battle.joined) {
       emit(BattleEntryFound(battle.battle));
       return;
@@ -61,9 +70,11 @@ class BattleEntryCubit extends Cubit<BattleEntryState> {
       final mine = battles.where((battle) => battle.joined).toList();
       emit(switch (battles) {
         [] => const BattleEntryNone(),
-        _ when enterTheOnlyOne && mine.length == 1 => BattleEntryFound(
-          mine.single.battle,
-        ),
+        _
+            when enterTheOnlyOne &&
+                mine.length == 1 &&
+                _mapAvailable(mine.single.battle.mapId) =>
+          BattleEntryFound(mine.single.battle),
         _ => BattleEntryChoosing(battles),
       });
     } on BattleLookupFailure catch (failure) {

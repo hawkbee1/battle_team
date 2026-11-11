@@ -117,5 +117,6 @@
   "battleEntryJoining": "Entrée dans la guerre…",
   "battleEntryJoinTitle": "Rejoindre cette guerre ?",
   "battleEntryJoinBody": "Une nouvelle section est créée pour vous dans la guerre {war}, et vous entrez dans sa bataille. Vous restez dans son équipe pendant toute la bataille.",
-  "battleEntryJoinProblem": "{reason, select, warOver{Cette guerre est terminée.} unreachable{Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.} other{Impossible de rejoindre cette guerre. Réessayez plus tard.}}"
+  "battleEntryJoinProblem": "{reason, select, warOver{Cette guerre est terminée.} unreachable{Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.} other{Impossible de rejoindre cette guerre. Réessayez plus tard.}}",
+  "battleEntryNoMap": "Carte absente de cette application"
 }

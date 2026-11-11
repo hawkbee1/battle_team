@@ -107,6 +107,58 @@ void main() {
       );
     });
 
+    group('on a map the app does not have', () {
+      BattleEntryCubit buildWithout(String mapId) => BattleEntryCubit(
+        locator: locator,
+        accountId: 'a-1',
+        mapAvailable: (id) => id != mapId,
+      );
+
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 the only battle the account is in is not entered at once: the '
+        'list shows it',
+        setUp: () => stubBattles(const [_mine]),
+        build: () => buildWithout('saint_lo_1km'),
+        act: (cubit) => cubit.locate(),
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine]),
+        ],
+      );
+
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 a battle picked there is not entered, and its war is not '
+        'joined',
+        setUp: () => stubBattles(const [_mine, _third, _other]),
+        build: () => buildWithout('valley'),
+        act: (cubit) async {
+          await cubit.locate();
+          await cubit.enter(_other);
+          await cubit.enter(_third);
+        },
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine, _third, _other]),
+        ],
+        verify: (_) => verifyNever(() => locator.join(any())),
+      );
+
+      blocTest<BattleEntryCubit, BattleEntryState>(
+        'M7.12 a battle on a map it has is entered as before',
+        setUp: () => stubBattles(const [_mine, _third, _other]),
+        build: () => buildWithout('valley'),
+        act: (cubit) async {
+          await cubit.locate();
+          await cubit.enter(_mine);
+        },
+        expect: () => const [
+          BattleEntryLocating(),
+          BattleEntryChoosing([_mine, _third, _other]),
+          BattleEntryFound(_assignment),
+        ],
+      );
+    });
+
     group('entering', () {
       blocTest<BattleEntryCubit, BattleEntryState>(
         'M7.12 enters at once a battle the account is in, and joins nothing',

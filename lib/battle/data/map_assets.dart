@@ -1,6 +1,18 @@
 import 'package:battle_map/battle_map.dart';
 import 'package:flutter/services.dart';
 
+final _mapFile = RegExp(r'^assets/maps/([^/]+)/map\.yaml$');
+
+/// The IDs of the maps the app has, those with an `assets/maps/<id>/map.yaml`
+/// in its assets: a battle on another map cannot be shown.
+Future<Set<String>> loadBundledMapIds(AssetBundle bundle) async {
+  final manifest = await AssetManifest.loadFromAssetBundle(bundle);
+  return {
+    for (final asset in manifest.listAssets())
+      if (_mapFile.firstMatch(asset) case final match?) match[1]!,
+  };
+}
+
 /// The built map [mapId] from the app's assets (`assets/maps/<mapId>/`,
 /// as `battle_map`'s builder writes it).
 ///

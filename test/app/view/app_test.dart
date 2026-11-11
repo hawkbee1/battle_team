@@ -108,7 +108,12 @@ void main() {
           ),
           (
             warId: 'w-3',
-            battle: (battleId: 'b-3', mapId: 'valley'),
+            battle: (battleId: 'b-3', mapId: 'saint_lo_1km'),
+            joined: false,
+          ),
+          (
+            warId: 'w-4',
+            battle: (battleId: 'b-4', mapId: 'no_such_map'),
             joined: false,
           ),
         ],
@@ -120,8 +125,10 @@ void main() {
       expect(find.text('Choose a battle'), findsOneWidget);
       expect(find.text('War w-1'), findsOneWidget);
       expect(find.text('War w-3'), findsOneWidget);
-      expect(find.text('You are in'), findsNWidgets(2));
+      // The app has the map `saint_lo_1km` only: the others cannot be shown.
+      expect(find.text('You are in'), findsOneWidget);
       expect(find.widgetWithText(FilledButton, 'Join'), findsOneWidget);
+      expect(find.text('Map not available in this app'), findsNWidgets(2));
       expect(find.byType(BattlePage), findsNothing);
     });
 

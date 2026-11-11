@@ -34,8 +34,11 @@ void main() {
     late MockBattleRepositoryFactory factory;
     late MockBattleRepository repository;
     late MockAuthenticationCubit authentication;
+    // The maps the app has, as its assets list them.
+    late Future<Set<String>> Function(AssetBundle bundle) loadMapIds;
 
     setUp(() {
+      loadMapIds = (_) async => {'saint_lo', 'valley', 'ridge'};
       locator = MockBattleLocator();
       factory = MockBattleRepositoryFactory();
       repository = MockBattleRepository();
@@ -66,6 +69,7 @@ void main() {
       ],
       child: BattleEntryPage(
         accountId: 'a-1',
+        loadMapIds: loadMapIds,
         pageBuilder: (context) => Column(
           children: [
             Text('battle on ${context.read<BattleRepository>().mapId}'),
@@ -79,8 +83,15 @@ void main() {
       ),
     );
 
-    Future<void> pumpPage(WidgetTester tester, {Locale? locale}) => tester
-        .pumpApp(page(), authenticationCubit: authentication, locale: locale);
+    // One frame for the list of maps, then the page looks for the battles.
+    Future<void> pumpPage(WidgetTester tester, {Locale? locale}) async {
+      await tester.pumpApp(
+        page(),
+        authenticationCubit: authentication,
+        locale: locale,
+      );
+      await tester.pump();
+    }
 
     Finder inDialog(String text) => find.descendant(
       of: find.byType(AlertDialog),
@@ -97,6 +108,84 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       verify(() => locator.locate('a-1')).called(1);
       verifyNever(() => factory.create(any()));
+    });
+
+    testWidgets('M7.12 waits for the list of the maps of the app before it '
+        'looks for the battles', (tester) async {
+      final maps = Completer<Set<String>>();
+      loadMapIds = (_) => maps.future;
+      stubBattles(const [_mine]);
+
+      await tester.pumpApp(page(), authenticationCubit: authentication);
+      await tester.pump();
+
+      expect(find.text('Looking for your battle…'), findsOneWidget);
+      verifyNever(() => locator.locate(any()));
+
+      maps.complete({'saint_lo'});
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('battle on saint_lo'), findsOneWidget);
+    });
+
+    testWidgets('M7.12 a battle on a map the app does not have is listed, '
+        'but cannot be entered or joined', (tester) async {
+      loadMapIds = (_) async => {'saint_lo'};
+      stubBattles(const [_mine, _third, _other]);
+      await pumpPage(tester);
+      await tester.pump();
+
+      // The battle of a map it has stays as before; the two others say why
+      // they cannot be entered, and offer no Join.
+      expect(find.text('You are in'), findsOneWidget);
+      expect(find.text('Map not available in this app'), findsNWidgets(2));
+      expect(find.widgetWithText(FilledButton, 'Join'), findsNothing);
+
+      await tester.tap(find.text('Battle on valley'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Battle on ridge'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      verifyNever(() => locator.join(any()));
+      verifyNever(() => factory.create(any()));
+    });
+
+    testWidgets('M7.12 the only battle the account is in is not entered at '
+        'once when the app lacks its map: the list shows it', (tester) async {
+      loadMapIds = (_) async => {'valley'};
+      stubBattles(const [_mine]);
+
+      await pumpPage(tester);
+      await tester.pump();
+
+      expect(find.text('Choose a battle'), findsOneWidget);
+      expect(find.text('Map not available in this app'), findsOneWidget);
+      verifyNever(() => factory.create(any()));
+    });
+
+    testWidgets('M7.12 without the list of maps no battle is refused: the page '
+        'of the battle says if a map is missing', (tester) async {
+      loadMapIds = (_) async => throw StateError('no manifest');
+      stubBattles(const [_other]);
+
+      await pumpPage(tester);
+      await tester.pump();
+
+      expect(find.widgetWithText(FilledButton, 'Join'), findsOneWidget);
+      expect(find.text('Map not available in this app'), findsNothing);
+    });
+
+    testWidgets('M7.12 a battle on a map the app does not have says so in '
+        'French', (tester) async {
+      loadMapIds = (_) async => {'saint_lo'};
+      stubBattles(const [_mine, _third, _other]);
+
+      await pumpPage(tester, locale: const Locale('fr'));
+      await tester.pump();
+
+      expect(find.text('Carte absente de cette application'), findsNWidgets(2));
     });
 
     testWidgets('M7.12 opens the only battle the account is in with a '
