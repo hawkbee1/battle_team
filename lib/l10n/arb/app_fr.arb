@@ -34,7 +34,7 @@
   "battleSwapTo": "Prendre : {weapon}",
   "battleTarget": "Cible : {type}",
   "battleApWait": "Attend {time} de PA",
-  "battleRefusal": "{code, select, out_of_range{Hors de portée} target_not_seen{Aucune cible en vue} no_weapon{Pas d’arme} empty_magazine{Chargeur vide, rechargez} not_loaded{Arme non chargée, rechargez} cost_above_ap_max{Un tir coûte plus de PA que l’unité n’en peut avoir} not_indirect{Cette arme ne tire pas sur une position} position_not_seen{Cette position n’est pas en vue} not_aimed{Cette arme ne se vise pas à la première personne} cannot_hit_flying{Cette arme ne touche pas les cibles aériennes} not_allowed{Cette unité ne peut pas utiliser cette arme} not_in_storage{Cette arme n’est pas en stock} not_at_storage{Pas à côté du lieu de stockage} not_on_field{L’unité n’est pas sur le terrain} unknown_target{Cible inconnue} not_stored{L’unité n’est pas en réserve} is_prisoner{Un prisonnier ne se déploie pas} section_locked{La section est verrouillée} blocked_by_enemy{Un ennemi est près du portail} never_stored{Cette unité n’est jamais mise en réserve} carries_units{Déchargez d’abord les passagers} already_recalled{Déjà rappelée} no_room{Pas de place pour une unité de plus} arrival_blocked{Un ennemi est près du portail} not_enough_money{Pas assez d’argent} test_units_off{Les unités de test ne sont pas permises dans cette bataille} unknown_type{Type d’unité inconnu} not_for_sale{Pas à vendre} other{{code}}}",
+  "battleRefusal": "{code, select, out_of_range{Hors de portée} target_not_seen{Aucune cible en vue} no_weapon{Pas d’arme} empty_magazine{Chargeur vide, rechargez} not_loaded{Arme non chargée, rechargez} cost_above_ap_max{Un tir coûte plus de PA que l’unité n’en peut avoir} not_indirect{Cette arme ne tire pas sur une position} position_not_seen{Cette position n’est pas en vue} not_aimed{Cette arme ne se vise pas à la première personne} cannot_hit_flying{Cette arme ne touche pas les cibles aériennes} not_allowed{Cette unité ne peut pas utiliser cette arme} not_in_storage{Cette arme n’est pas en stock} not_at_storage{Pas à côté du lieu de stockage} not_on_field{L’unité n’est pas sur le terrain} unknown_target{Cible inconnue} not_stored{L’unité n’est pas en réserve} is_prisoner{Un prisonnier ne se déploie pas} section_locked{La section est verrouillée} blocked_by_enemy{Un ennemi est près du portail} never_stored{Cette unité n’est jamais mise en réserve} carries_units{Déchargez d’abord les passagers} already_recalled{Déjà rappelée} no_room{Pas de place pour une unité de plus} arrival_blocked{Un ennemi est près du portail} not_enough_money{Pas assez d’argent} test_units_off{Les unités de test ne sont pas permises dans cette bataille} unknown_type{Type d’unité inconnu} not_for_sale{Pas à vendre} no_path{Aucun chemin n’y mène} off_map{C’est hors de la carte} occupied{La place est prise} other{{code}}}",
   "battleHelpFireAtPosition": "Touchez le sol pour y tirer · appuyez à nouveau sur le bouton ou Échap pour annuler",
   "storageOpen": "Réserve ({count})",
   "storageTitle": "Réserve",
@@ -70,5 +70,12 @@
   "shopNoWeapons": "Cette unité n’utilise aucune arme.",
   "shopBuy": "Acheter",
   "shopBuyItem": "Acheter {item} pour {price}",
-  "shopWeapons": "Armes"
+  "shopWeapons": "Armes",
+  "moveCost": "Déplacement : {cost} PA sur {ap} · arrivée dans {time}",
+  "moveWait": "Manque de PA : attend {time} qu’ils reviennent",
+  "moveConfirm": "Confirmer le déplacement",
+  "moveCancel": "Annuler",
+  "moveRefused": "Déplacement impossible : {reason}",
+  "moveLater": "L’hôte fait arriver l’unité {time} plus tard que prévu",
+  "moveSooner": "L’hôte fait arriver l’unité {time} plus tôt que prévu"
 }

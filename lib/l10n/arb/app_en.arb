@@ -205,7 +205,7 @@
       }
     }
   },
-  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} not_stored{The unit is not in storage} is_prisoner{A prisoner cannot be deployed} section_locked{The section is locked} blocked_by_enemy{An enemy is near the portal} never_stored{This unit is never stored} carries_units{Unload the passengers first} already_recalled{Already recalled} no_room{No room for one more unit} arrival_blocked{An enemy is near the portal} not_enough_money{Not enough money} test_units_off{Test units are not allowed in this battle} unknown_type{Unknown unit type} not_for_sale{Not for sale} other{{code}}}",
+  "battleRefusal": "{code, select, out_of_range{Out of range} target_not_seen{No target in sight} no_weapon{No weapon} empty_magazine{Magazine empty, reload} not_loaded{Not loaded, reload} cost_above_ap_max{A shot costs more AP than the unit can hold} not_indirect{This weapon cannot fire at a position} position_not_seen{That position is not in sight} not_aimed{This weapon is not aimed from first person} cannot_hit_flying{This weapon cannot hit flying targets} not_allowed{This unit cannot use that weapon} not_in_storage{No such weapon in storage} not_at_storage{Not next to the storage place} not_on_field{The unit is not on the field} unknown_target{Unknown target} not_stored{The unit is not in storage} is_prisoner{A prisoner cannot be deployed} section_locked{The section is locked} blocked_by_enemy{An enemy is near the portal} never_stored{This unit is never stored} carries_units{Unload the passengers first} already_recalled{Already recalled} no_room{No room for one more unit} arrival_blocked{An enemy is near the portal} not_enough_money{Not enough money} test_units_off{Test units are not allowed in this battle} unknown_type{Unknown unit type} not_for_sale{Not for sale} no_path{No way leads there} off_map{That is off the map} occupied{The place is taken} other{{code}}}",
   "@battleRefusal": {
     "description": "Why an order is refused, as the host or the pre-check says it",
     "placeholders": {
@@ -455,5 +455,64 @@
   "shopWeapons": "Weapons",
   "@shopWeapons": {
     "description": "Heading of the weapons on sale"
+  },
+  "moveCost": "Move: {cost} AP of {ap} · arrives in {time}",
+  "@moveCost": {
+    "description": "The previewed move: its AP cost against the unit's AP and when it arrives",
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "ap": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "moveWait": "Short of AP: waits {time} for them",
+  "@moveWait": {
+    "description": "The previewed move needs more AP than the unit has: how long it waits for them",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "moveConfirm": "Confirm move",
+  "@moveConfirm": {
+    "description": "Sends the previewed move"
+  },
+  "moveCancel": "Cancel",
+  "@moveCancel": {
+    "description": "Drops the previewed move"
+  },
+  "moveRefused": "Cannot move there: {reason}",
+  "@moveRefused": {
+    "description": "The client expects the host to refuse the previewed move",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "moveLater": "The host has the unit arrive {time} later than previewed",
+  "@moveLater": {
+    "description": "The host's arrival is later than the preview's",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "moveSooner": "The host has the unit arrive {time} sooner than previewed",
+  "@moveSooner": {
+    "description": "The host's arrival is earlier than the preview's",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

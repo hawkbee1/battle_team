@@ -5,7 +5,15 @@ import 'package:flutter/services.dart';
 /// as `battle_map`'s builder writes it).
 ///
 /// Throws a [MapFormatException] for a map out of the format.
-Future<MapData> loadMapAsset(AssetBundle bundle, String mapId) async {
+Future<MapData> loadMapAsset(AssetBundle bundle, String mapId) async =>
+    MapData.fromBuilt(await loadBuiltMapAsset(bundle, mapId));
+
+/// The files of the built map [mapId], as `battle_map`'s loaders take them:
+/// the 3D view makes its mesh of them, the move preview its navigation model.
+Future<BuiltMapFiles> loadBuiltMapAsset(
+  AssetBundle bundle,
+  String mapId,
+) async {
   final base = 'assets/maps/$mapId';
   final mapYaml = await bundle.loadString('$base/map.yaml');
   final spec = MapSpec.parse(mapYaml);
@@ -22,5 +30,5 @@ Future<MapData> loadMapAsset(AssetBundle bundle, String mapId) async {
       objectsYaml: await bundle.loadString('$tile/objects.yaml'),
     );
   }
-  return MapData.fromBuilt(BuiltMapFiles(mapYaml: mapYaml, tiles: tiles));
+  return BuiltMapFiles(mapYaml: mapYaml, tiles: tiles);
 }

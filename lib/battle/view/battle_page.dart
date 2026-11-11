@@ -32,6 +32,7 @@ class BattlePage extends StatefulWidget {
     this.loadMap = loadMapAsset,
     this.loadBodies = loadUnitBodies,
     this.loadPreCheck = loadOrderPreCheck,
+    this.loadMovePreviewer = loadMovePreview,
     this.initialize = Scene.initializeStaticResources,
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
@@ -50,6 +51,10 @@ class BattlePage extends StatefulWidget {
   /// Loads what the order pre-check reads from the assets.
   final Future<OrderPreCheck> Function(AssetBundle bundle) loadPreCheck;
 
+  /// Loads the move preview, which plans a path on the map.
+  final Future<MovePreviewer> Function(AssetBundle bundle, String mapId)
+  loadMovePreviewer;
+
   /// Loads flutter_scene's shaders and shared resources.
   final Future<void> Function() initialize;
 
@@ -64,17 +69,23 @@ class BattlePage extends StatefulWidget {
 }
 
 class _BattlePageState extends State<BattlePage> {
-  late final Future<({MapData map, UnitBodies bodies, OrderPreCheck preCheck})>
+  late final Future<
+    ({
+      MapData map,
+      UnitBodies bodies,
+      OrderPreCheck preCheck,
+      MovePreviewer previewer,
+    })
+  >
   _ready = () async {
     final bundle = DefaultAssetBundle.of(context);
-    final map = await widget.loadMap(
-      bundle,
-      context.read<BattleRepository>().mapId,
-    );
+    final mapId = context.read<BattleRepository>().mapId;
+    final map = await widget.loadMap(bundle, mapId);
     final bodies = await widget.loadBodies(bundle);
     final preCheck = await widget.loadPreCheck(bundle);
+    final previewer = await widget.loadMovePreviewer(bundle, mapId);
     await widget.initialize();
-    return (map: map, bodies: bodies, preCheck: preCheck);
+    return (map: map, bodies: bodies, preCheck: preCheck, previewer: previewer);
   }();
 
   @override
@@ -109,6 +120,7 @@ class _BattlePageState extends State<BattlePage> {
                         final cubit = BattleCubit(
                           repository: repository,
                           preCheck: data.preCheck,
+                          movePreviewer: data.previewer,
                         );
                         unawaited(cubit.start());
                         return cubit;

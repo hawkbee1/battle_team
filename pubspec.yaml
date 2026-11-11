@@ -30,6 +30,7 @@ dependencies:
   vector_math: ^2.1.4
 
 dev_dependencies:
+  battle_pathfinding: ^0.1.0
   bloc_lint: ^0.4.2
   bloc_test: ^10.0.0
   bloc_tools: ^0.1.0-dev.24
@@ -57,3 +58,6 @@ flutter:
     # host decides).
     - plan/data/combat.yaml
     - plan/data/battle.yaml
+    # The terrain tables price a move: the path preview's AP cost (the host's
+    # own file; display only).
+    - plan/data/terrain.yaml

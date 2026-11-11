@@ -51,6 +51,8 @@ class SceneBattleWorld implements BattleWorld {
   final _relics = <String, Node>{};
   final _shots = LiveShots();
   final _shotNodes = <LiveShot, _ShotNode>{};
+  final _pathNodes = <Node>[];
+  List<Position>? _pathPoints;
   double _clock = 0;
   String? _insideUnit;
 
@@ -189,6 +191,55 @@ class SceneBattleWorld implements BattleWorld {
       _shotNodes[shot] = drawn;
     }
     _fadeShots();
+  }
+
+  @override
+  void showPath(List<Position>? points) {
+    if (_pathPoints == points) return;
+    _pathPoints = points;
+    _pathNodes
+      ..forEach(scene.remove)
+      ..clear();
+    if (points == null) return;
+    final material = UnlitMaterial()
+      ..alphaMode = AlphaMode.blend
+      ..doubleSided = true
+      ..baseColorFactor = Vector4(0.35, 0.9, 1, 0.85);
+    for (var i = 0; i + 1 < points.length; i++) {
+      final start = _onGround(points[i])..y += 1.5;
+      final end = _onGround(points[i + 1])..y += 1.5;
+      final along = end - start;
+      if (along.length == 0) continue;
+      final z = along.normalized();
+      final x = (z.y.abs() > 0.99 ? Vector3(1, 0, 0) : Vector3(0, 1, 0)).cross(
+        z,
+      )..normalize();
+      final y = z.cross(x);
+      final mid = (start + end) / 2;
+      final node = Node(
+        mesh: Mesh(CuboidGeometry(Vector3(1.6, 0.6, along.length)), material),
+        localTransform: Matrix4(
+          x.x,
+          x.y,
+          x.z,
+          0, //
+          y.x,
+          y.y,
+          y.z,
+          0,
+          z.x,
+          z.y,
+          z.z,
+          0,
+          mid.x,
+          mid.y,
+          mid.z,
+          1,
+        ),
+      );
+      scene.add(node);
+      _pathNodes.add(node);
+    }
   }
 
   @override

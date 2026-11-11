@@ -111,6 +111,8 @@ void main() {
       when(() => cubit.battleTime).thenReturn(const Duration(hours: 1));
       when(() => cubit.apNow(any())).thenReturn(30);
       when(() => cubit.moveSelectedTo(any())).thenAnswer((_) async {});
+      when(() => cubit.previewMoveTo(any())).thenAnswer((_) async {});
+      when(() => cubit.confirmMove()).thenAnswer((_) async {});
       // The weapon panel of M7.5 asks the cubit what the buttons may do; these
       // tests are about the view, so nothing may fire.
       when(() => cubit.shots).thenAnswer((_) => const Stream.empty());
@@ -247,19 +249,97 @@ void main() {
       verify(() => cubit.select(null)).called(1);
     });
 
-    testWidgets('M7.1 moves the selected unit where the ground is tapped', (
-      tester,
-    ) async {
+    testWidgets('M7.8 a tap on the ground previews the selected unit move; '
+        'nothing is sent by it', (tester) async {
       when(() => cubit.state)
           .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
       await pump(tester);
 
       await tester.tapAt(const Offset(600, 500));
       final to =
-          verify(() => cubit.moveSelectedTo(captureAny())).captured.single
+          verify(() => cubit.previewMoveTo(captureAny())).captured.single
               as Position;
       expect(to.y, greaterThan(blueCommander.position!.y));
 
+      verifyNever(() => cubit.moveSelectedTo(any()));
+      verifyNever(() => cubit.select(any()));
+    });
+
+    testWidgets('M7.8 a previewed move is drawn as a line, shows its cost, '
+        'and confirms or cancels', (tester) async {
+      const points = [Position(50500, 5500, 3000), Position(52500, 5500, 3000)];
+      final pending = PendingMove(
+        unitId: 'c-1',
+        from: blueCommander.position!,
+        plan: const MovePreview(
+          destination: Position(52500, 5500, 3000),
+          cells: [Cell(5, 0), Cell(7, 0)],
+          points: points,
+          costAp: 20,
+          lengthM: 20,
+          arrivesAt: Duration(hours: 1, seconds: 4),
+          apWait: Duration.zero,
+        ),
+      );
+      when(() => cubit.state).thenReturn(
+        _playing.copyWith(selectedId: () => 'c-1', pendingMove: () => pending),
+      );
+      await pump(tester);
+
+      expect(world.path, points);
+      expect(find.text('Move: 20 AP of 30 · arrives in 4 s'), findsOneWidget);
+
+      await tester.tap(find.text('Confirm move'));
+      verify(() => cubit.confirmMove()).called(1);
+      await tester.tap(find.text('Cancel'));
+      verify(() => cubit.cancelMove()).called(1);
+
+      // The preview over, the line goes.
+      await show(tester, _playing.copyWith(selectedId: () => 'c-1'));
+      expect(world.path, isNull);
+      expect(find.text('Confirm move'), findsNothing);
+    });
+
+    testWidgets('M7.8 the preview of another unit is not shown with the '
+        'selected one, nor the arrival note of another', (tester) async {
+      when(() => cubit.state).thenReturn(
+        _playing.copyWith(
+          selectedId: () => 'c-1',
+          pendingMove: () => const PendingMove(
+            unitId: 's-2',
+            from: Position(0, 0, 0),
+            plan: MoveRefused(PreCheckRefusal.noPath),
+          ),
+          arrivalNote: () => const ArrivalNote(
+            unitId: 's-2',
+            expected: Duration.zero,
+            host: Duration(minutes: 1),
+          ),
+        ),
+      );
+      await pump(tester);
+
+      expect(find.textContaining('Cannot move there'), findsNothing);
+      expect(find.textContaining('The host has the unit arrive'), findsNothing);
+    });
+
+    testWidgets('M7.8 Escape gives up a previewed move before it clears the '
+        'selection', (tester) async {
+      when(() => cubit.state).thenReturn(
+        _playing.copyWith(
+          selectedId: () => 'c-1',
+          pendingMove: () => const PendingMove(
+            unitId: 'c-1',
+            from: Position(0, 0, 0),
+            plan: MoveRefused(PreCheckRefusal.noPath),
+          ),
+        ),
+      );
+      await pump(tester);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+
+      verify(() => cubit.cancelMove()).called(1);
       verifyNever(() => cubit.select(any()));
     });
 
@@ -273,6 +353,7 @@ void main() {
       await tester.tapAt(const Offset(400, 2));
 
       verifyNever(() => cubit.moveSelectedTo(any()));
+      verifyNever(() => cubit.previewMoveTo(any()));
     });
 
     testWidgets('M7.1 shows the selected unit and the answer to its order', (

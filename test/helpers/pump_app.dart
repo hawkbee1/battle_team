@@ -12,11 +12,13 @@ extension PumpApp on WidgetTester {
     Widget widget, {
     MockNavigator? navigator,
     BackendStatusRepository? backendStatusRepository,
+    Locale? locale,
   }) {
     return pumpWidget(
       RepositoryProvider.value(
         value: backendStatusRepository ?? _reachableBackendStatusRepository(),
         child: MaterialApp(
+          locale: locale,
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: navigator != null
