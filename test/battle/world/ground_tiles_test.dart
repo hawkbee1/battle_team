@@ -323,6 +323,148 @@ void main() {
     });
   });
 
+  group('chunks of another size', () {
+    test('objectChunks groups by the cells asked', () {
+      final map = mapOf(
+        200,
+        100,
+        features: const [
+          MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [CellRef(1, 2), CellRef(15, 15), CellRef(16, 2)],
+          ),
+        ],
+      );
+
+      final chunks = objectChunks(map, cells: 16);
+
+      expect(chunks.keys, [(x: 0, y: 0), (x: 1, y: 0)]);
+      expect(chunks[(x: 0, y: 0)]!.trees, [2 * 200 + 1, 15 * 200 + 15]);
+    });
+
+    test('chunkCells covers the cells asked', () {
+      final grid = GroundGrid(width: 200, depth: 100, cellSizeM: 10);
+
+      expect(chunkCells(grid, (x: 1, y: 0), cells: 16), (
+        x0: 16,
+        y0: 0,
+        x1: 31,
+        y1: 15,
+      ));
+      expect(chunkCells(grid, (x: 12, y: 6), cells: 16), (
+        x0: 192,
+        y0: 96,
+        x1: 199,
+        y1: 99,
+      ));
+    });
+  });
+
+  group('chunksAround', () {
+    final grid = GroundGrid(width: 200, depth: 100, cellSizeM: 10);
+
+    test('gives the chunks of the square around the eye', () {
+      // 500 m east, 500 m south: chunks are 160 m wide.
+      final chunks = chunksAround(grid, Vector3(500, 50, -500), 100, cells: 16);
+
+      expect(chunks, [
+        for (var y = 2; y <= 3; y++)
+          for (var x = 2; x <= 3; x++) (x: x, y: y),
+      ]);
+    });
+
+    test("stops at the map's edge", () {
+      final chunks = chunksAround(grid, Vector3(1990, 0, -990), 5000);
+
+      expect(chunks, [
+        for (var y = 0; y <= 1; y++)
+          for (var x = 0; x <= 3; x++) (x: x, y: y),
+      ]);
+      expect(chunksAround(grid, Vector3(-9000, 0, 0), 100), isEmpty);
+    });
+
+    test('holds every chunk within the range', () {
+      final eye = Vector3(733, 20, -411);
+      final around = chunksAround(grid, eye, 300, cells: 16).toSet();
+
+      for (var y = 0; y < 7; y++) {
+        for (var x = 0; x < 13; x++) {
+          final id = (x: x, y: y);
+          final distance = grid.distanceTo(
+            chunkCells(grid, id, cells: 16),
+            eye,
+            flat,
+          );
+          if (distance <= 300) expect(around, contains(id));
+        }
+      }
+    });
+  });
+
+  group('treeLevelAt', () {
+    TreeLevel at(double distance, TreeLevel now) =>
+        treeLevelAt(distance, now: now, nearM: 100, rangeM: 1500);
+
+    test('is near within the near range, far within the range', () {
+      expect(at(0, TreeLevel.none), TreeLevel.near);
+      expect(at(100, TreeLevel.none), TreeLevel.near);
+      expect(at(101, TreeLevel.none), TreeLevel.far);
+      expect(at(1500, TreeLevel.none), TreeLevel.far);
+      expect(at(1501, TreeLevel.none), TreeLevel.none);
+    });
+
+    test('a chunk keeps its level until past the limit by the margin', () {
+      expect(at(120, TreeLevel.near), TreeLevel.near);
+      expect(at(120, TreeLevel.far), TreeLevel.far);
+      expect(at(126, TreeLevel.near), TreeLevel.far);
+      expect(at(1800, TreeLevel.far), TreeLevel.far);
+      expect(at(1800, TreeLevel.near), TreeLevel.far);
+      expect(at(1800, TreeLevel.none), TreeLevel.none);
+      expect(at(1876, TreeLevel.far), TreeLevel.none);
+    });
+  });
+
+  group('treeConeArrays', () {
+    test('is a cone of one triangle a side, on the origin', () {
+      final cone = treeConeArrays();
+
+      expect(cone.indices, hasLength(6 * 3));
+      expect(cone.positions, hasLength(12 * 3));
+      expect(cone.normals, hasLength(12 * 3));
+      for (var v = 0; v < 12; v++) {
+        final position = Vector3.array(cone.positions, v * 3);
+        final normal = Vector3.array(cone.normals, v * 3);
+        if (v < 6) {
+          expect(position.y, 0);
+          expect(position.length, closeTo(1, 1e-6));
+        } else {
+          expect(position, Vector3(0, 1, 0));
+        }
+        expect(normal.length, closeTo(1, 1e-6));
+        expect(normal.y, greaterThan(0));
+      }
+    });
+
+    test('each side joins two neighbours of the base to the apex', () {
+      final cone = treeConeArrays(sides: 5);
+
+      for (var side = 0; side < 5; side++) {
+        expect(cone.indices.sublist(side * 3, side * 3 + 3), [
+          side,
+          5 + side,
+          (side + 1) % 5,
+        ]);
+      }
+      // The normal of a side points out of it.
+      final out = Vector3.array(cone.normals, 5 * 3);
+      final middle =
+          (Vector3.array(cone.positions) + Vector3.array(cone.positions, 3)) /
+          2;
+      expect(out.dot(middle), greaterThan(0));
+    });
+  });
+
   group('treeLook', () {
     test('is the same for a cell every time, and stays in its cell', () {
       for (final cell in [0, 1, 4999999, 123456]) {
@@ -333,8 +475,25 @@ void main() {
         expect(look.south.abs(), lessThanOrEqualTo(0.25));
         expect(look.yaw, inInclusiveRange(0, 2 * math.pi));
         expect(look.scale, inInclusiveRange(0.8, 1.25));
+        expect(look.kind, inInclusiveRange(0, 0.9999));
       }
       expect(treeLook(10), isNot(treeLook(11)));
+    });
+
+    test('shares a forest between the kinds of tree', () {
+      final first = [
+        for (var cell = 0; cell < 5000; cell++)
+          if (treeLook(cell).kind < 0.5) cell,
+      ];
+
+      expect(first.length, inInclusiveRange(2000, 3000));
+      // Not in stripes: neighbours differ often.
+      final changes = [
+        for (var cell = 1; cell < 5000; cell++)
+          if ((treeLook(cell).kind < 0.5) != (treeLook(cell - 1).kind < 0.5))
+            cell,
+      ];
+      expect(changes.length, greaterThan(1000));
     });
   });
 }

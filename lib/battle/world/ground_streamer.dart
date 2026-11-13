@@ -22,9 +22,11 @@ import 'package:vector_math/vector_math.dart';
 /// Keeps in the [scene] the ground and the objects worth drawing from where
 /// the battle is seen: the ground as the tiles a `GroundSelector` chooses,
 /// fine near the eye and coarse far away, and the trees and buildings of the
-/// chunks within [objectRangeM] of the eye. Meshes are made a few a frame
-/// ([tileBuildsPerFrame], [chunkBuildsPerFrame]), so moving never stalls a
-/// frame, and are dropped once out of the cut or out of range.
+/// chunks within [objectRangeM] of the eye. A chunk of trees draws the model
+/// of each tree within [treeNearM] and a cone for each beyond. Meshes are
+/// made a few a frame ([tileBuildsPerFrame], [chunkBuildsPerFrame],
+/// [treeBuildsPerFrame]), so moving never stalls a frame, and are dropped
+/// once out of the cut or out of range.
 ///
 /// The whole map stays in memory as `MapData`; only what is on the GPU
 /// follows the eye.
@@ -35,11 +37,14 @@ class GroundStreamer {
     required this.scene,
     required this.map,
     required this.surface,
-    required this.tree,
+    required this.trees,
     this.tileBuildsPerFrame = 6,
     this.chunkBuildsPerFrame = 2,
+    this.treeBuildsPerFrame = 8,
     this.fogUpdatesPerFrame = 12,
     this.objectRangeM = 1500,
+    this.treeNearM = 100,
+    this.treeChunkCells = 16,
   });
 
   /// The scene the meshes are added to.
@@ -51,15 +56,20 @@ class GroundStreamer {
   /// The ground of the map.
   final TerrainSurface surface;
 
-  /// The model every tree is drawn with.
-  final TreeModel tree;
+  /// The models the trees are drawn with; `treeLook` picks one for each
+  /// cell. Without any, no tree is drawn.
+  final List<TreeModel> trees;
 
   /// The ground tiles made in a frame at most; the roots are all made at
   /// once, so there is ground from the first frame.
   final int tileBuildsPerFrame;
 
-  /// The chunks of objects made in a frame at most.
+  /// The chunks of buildings made in a frame at most.
   final int chunkBuildsPerFrame;
+
+  /// The meshes of trees made in a frame at most: a chunk's models or its
+  /// cones.
+  final int treeBuildsPerFrame;
 
   /// The ground tiles whose fog is redrawn in a frame at most.
   final int fogUpdatesPerFrame;
@@ -68,30 +78,71 @@ class GroundStreamer {
   /// it a forest shows by the colour of its ground.
   final double objectRangeM;
 
+  /// How far from the eye a chunk of trees draws their models, in metres,
+  /// measured to the chunk's nearest ground. Beyond it a tree is a cone.
+  final double treeNearM;
+
+  /// The cells along the side of a chunk of trees. A chunk has one level
+  /// for all its trees, so the smaller it is, the fewer models are drawn
+  /// past [treeNearM] and the more draws a forest costs: in the densest
+  /// forest of `saint_lo`, 2,304 models at once with 16 cells, 4,041 with
+  /// 32 and 8,824 with 64.
+  final int treeChunkCells;
+
   late final GroundGrid _grid = GroundGrid.of(map);
   late final GroundSelector _selector = GroundSelector(grid: _grid);
   late final Map<ChunkId, ObjectChunk> _chunks = objectChunks(map);
+  late final Map<ChunkId, ObjectChunk> _treeChunks = trees.isEmpty
+      ? const {}
+      : objectChunks(map, cells: treeChunkCells);
 
   final _groundMaterial = UnlitMaterial()..doubleSided = true;
   late final Geometry _buildingGeometry = CuboidGeometry(Vector3(8, 6, 8));
   late final Material _buildingMaterial = PhysicallyBasedMaterial()
     ..baseColorFactor = Vector4(0.72, 0.62, 0.52, 1)
     ..roughnessFactor = 0.8;
+  late final Geometry _coneGeometry = () {
+    final cone = treeConeArrays();
+    return MeshGeometry.fromArrays(
+      positions: cone.positions,
+      normals: cone.normals,
+      indices: cone.indices,
+    );
+  }();
+  // Each cone takes the colour of its tree's leaves as its instance colour.
+  // Double-sided, so the cone does not depend on the winding flutter_scene
+  // culls.
+  late final Material _coneMaterial = PhysicallyBasedMaterial()
+    ..roughnessFactor = 0.9
+    ..doubleSided = true;
 
   final _tiles = <GroundTile, _LiveTile>{};
   final _objects = <ChunkId, Node>{};
+  final _trees = <ChunkId, _LiveTrees>{};
   FogModel? _fog;
   int _fogVersion = 0;
   Vector3? _settledEye;
   double? _settledFov;
 
-  /// The ground tiles on the GPU, and those of them drawn now: for a
-  /// debug overlay.
-  ({int live, int drawn, int chunks}) get counts => (
-    live: _tiles.length,
-    drawn: _tiles.values.where((tile) => tile.node.visible).length,
-    chunks: _objects.length,
-  );
+  /// The ground tiles on the GPU, those of them drawn now, the chunks of
+  /// buildings, and the trees drawn as models and as cones: for a debug
+  /// overlay.
+  ({int live, int drawn, int chunks, int nearTrees, int farTrees}) get counts {
+    var nearTrees = 0;
+    var farTrees = 0;
+    for (final MapEntry(key: id, value: live) in _trees.entries) {
+      final count = _treeChunks[id]!.trees.length;
+      if (live.near?.visible ?? false) nearTrees += count;
+      if (live.far?.visible ?? false) farTrees += count;
+    }
+    return (
+      live: _tiles.length,
+      drawn: _tiles.values.where((tile) => tile.node.visible).length,
+      chunks: _objects.length,
+      nearTrees: nearTrees,
+      farTrees: farTrees,
+    );
+  }
 
   /// Shades the ground by [fog] from now on. The tiles are redrawn over the
   /// next frames, the ones on screen first.
@@ -113,7 +164,8 @@ class GroundStreamer {
     final groundDone = _updateGround(eye, camera.fovY);
     final fogDone = _updateFog();
     final objectsDone = _updateObjects(eye);
-    if (groundDone && fogDone && objectsDone) {
+    final treesDone = _updateTrees(eye);
+    if (groundDone && fogDone && objectsDone && treesDone) {
       _settledEye = eye.clone();
       _settledFov = camera.fovY;
     } else {
@@ -186,7 +238,7 @@ class GroundStreamer {
     return stale.length <= fogUpdatesPerFrame;
   }
 
-  /// Whether the objects in range of [eye] are all made.
+  /// Whether the buildings in range of [eye] are all made.
   bool _updateObjects(Vector3 eye) {
     final missing = <(double, ChunkId)>[];
     for (final id in _chunks.keys) {
@@ -211,39 +263,10 @@ class GroundStreamer {
     return missing.length <= chunkBuildsPerFrame;
   }
 
-  /// The trees and buildings of a chunk: one instanced mesh per part of the
-  /// tree model and one for the buildings, so a chunk is a few draws.
+  /// The buildings of a chunk, as one instanced mesh.
   Node _makeObjects(ChunkId id, ObjectChunk chunk) {
     final cell = surface.cell;
     final node = Node(name: 'objects_${id.x}_${id.y}');
-    if (chunk.trees.isNotEmpty) {
-      final parts = [
-        for (final part in tree.parts)
-          InstancedMesh(geometry: part.geometry, material: part.material),
-      ];
-      final up = Vector3(0, 1, 0);
-      for (final index in chunk.trees) {
-        final look = treeLook(index);
-        final east = (index % map.width + 0.5 + look.east) * cell;
-        final south = (index ~/ map.width + 0.5 + look.south) * cell;
-        // The model's foot stands on the ground.
-        final foot = Matrix4.compose(
-          Vector3(
-            east,
-            surface.heightAt(east, south) - tree.baseY * look.scale,
-            -south,
-          ),
-          Quaternion.axisAngle(up, look.yaw),
-          Vector3.all(look.scale),
-        );
-        for (final (at, part) in tree.parts.indexed) {
-          parts[at].addInstance(foot.multiplied(part.transform));
-        }
-      }
-      for (final mesh in parts) {
-        node.add(Node()..addComponent(InstancedMeshComponent(mesh)));
-      }
-    }
     if (chunk.buildings.isNotEmpty) {
       final buildings = InstancedMesh(
         geometry: _buildingGeometry,
@@ -262,6 +285,146 @@ class GroundStreamer {
     }
     return node;
   }
+
+  /// Whether the trees in range of [eye] are all drawn at their level.
+  bool _updateTrees(Vector3 eye) {
+    final missing = <(double, ChunkId, TreeLevel)>[];
+    final around = chunksAround(
+      _grid,
+      eye,
+      objectRangeM,
+      cells: treeChunkCells,
+    ).where(_treeChunks.containsKey);
+    // The chunks on the GPU too: one left behind by a jump of the eye is
+    // dropped here.
+    for (final id in {...around, ..._trees.keys}) {
+      final distance = _grid.distanceTo(
+        chunkCells(_grid, id, cells: treeChunkCells),
+        eye,
+        surface.heightAt,
+      );
+      final live = _trees[id];
+      final level = treeLevelAt(
+        distance,
+        now: live?.level ?? .none,
+        nearM: treeNearM,
+        rangeM: objectRangeM,
+      );
+      if (level == .none) {
+        if (live != null) {
+          if (live.near case final near?) scene.remove(near);
+          if (live.far case final far?) scene.remove(far);
+          _trees.remove(id);
+        }
+        continue;
+      }
+      if (live != null) {
+        live.level = level;
+        // The models of a chunk gone far are dropped; its cones stay while
+        // it is near, so going far again makes nothing.
+        if (level == .far && live.near != null) {
+          scene.remove(live.near!);
+          live.near = null;
+        }
+        // Until the mesh of its level is made, a chunk shows the other.
+        live.near?.visible = level == .near;
+        live.far?.visible = level == .far || live.near == null;
+      }
+      if ((level == .near ? live?.near : live?.far) == null) {
+        missing.add((distance, id, level));
+      }
+    }
+    missing.sort((a, b) => a.$1.compareTo(b.$1));
+    for (final (_, id, level) in missing.take(treeBuildsPerFrame)) {
+      final live = _trees[id] ??= _LiveTrees(level);
+      final cells = _treeChunks[id]!.trees;
+      if (level == .near) {
+        live.near = _makeNearTrees(id, cells)..also(scene.add);
+        live.far?.visible = false;
+      } else {
+        live.far = _makeFarTrees(id, cells)..also(scene.add);
+      }
+    }
+    return missing.length <= treeBuildsPerFrame;
+  }
+
+  /// The model of the tree of [cell], and where it stands: the transform
+  /// from the model's frame to the world.
+  (TreeModel, Matrix4) _treeAt(int cell) {
+    final look = treeLook(cell);
+    final model = trees[(look.kind * trees.length).floor()];
+    final east = (cell % map.width + 0.5 + look.east) * surface.cell;
+    final south = (cell ~/ map.width + 0.5 + look.south) * surface.cell;
+    final scale = model.metresPerUnit * look.scale;
+    return (
+      model,
+      // The model's foot stands on the ground.
+      Matrix4.compose(
+        Vector3(
+          east,
+          surface.heightAt(east, south) - model.baseY * scale,
+          -south,
+        ),
+        Quaternion.axisAngle(Vector3(0, 1, 0), look.yaw),
+        Vector3.all(scale),
+      ),
+    );
+  }
+
+  /// The trees of a chunk as their models: one instanced mesh per part of
+  /// each model.
+  Node _makeNearTrees(ChunkId id, List<int> cells) {
+    final meshes = <TreePart, InstancedMesh>{};
+    for (final cell in cells) {
+      final (model, foot) = _treeAt(cell);
+      for (final part in model.parts) {
+        (meshes[part] ??= InstancedMesh(
+          geometry: part.geometry,
+          material: part.material,
+        )).addInstance(foot.multiplied(part.transform));
+      }
+    }
+    final node = Node(name: 'trees_near_${id.x}_${id.y}');
+    for (final mesh in meshes.values) {
+      node.add(Node()..addComponent(InstancedMeshComponent(mesh)));
+    }
+    return node;
+  }
+
+  /// The trees of a chunk as cones, in one instanced mesh: each cone as
+  /// tall and as wide as its tree, in the colour of its leaves.
+  Node _makeFarTrees(ChunkId id, List<int> cells) {
+    final cones = InstancedMesh(
+      geometry: _coneGeometry,
+      material: _coneMaterial,
+    );
+    for (final cell in cells) {
+      final (model, foot) = _treeAt(cell);
+      final (red, green, blue) = model.leaves;
+      cones.addInstance(
+        foot.multiplied(
+          Matrix4.compose(
+            Vector3(model.centreX, model.baseY, model.centreZ),
+            Quaternion.identity(),
+            Vector3(model.radius, model.height, model.radius),
+          ),
+        ),
+        color: Vector4(red, green, blue, 1),
+      );
+    }
+    return Node(name: 'trees_far_${id.x}_${id.y}')
+      ..addComponent(InstancedMeshComponent(cones));
+  }
+}
+
+/// The trees of a chunk on the GPU: the level they are drawn at, and the
+/// node of their models and of their cones, each once made.
+class _LiveTrees {
+  new(this.level);
+
+  TreeLevel level;
+  Node? near;
+  Node? far;
 }
 
 /// A ground tile on the GPU: its node, its geometry, whose colours change

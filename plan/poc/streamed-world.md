@@ -79,13 +79,18 @@ Sources are in `assets_src/3d_models/`, credits in `assets/3d_models/SOURCES.md`
 
 Check: the owner opens each lightened model next to its source in a glTF viewer and says which are acceptable. To look at: that `concept_tank`, whose parts hung on a skeleton, is assembled; the far models from a distance (the far tank has lost its antenna and its wheels are spikes); the soldier's helmet net, now a cut-out.
 
-### 3. Trees
-- Near model: the two trees of step 2, one `InstancedMesh` each per chunk, within 100 m. Which tree a cell gets comes from `treeLook`. The glTF loader of `tree_model.dart` stays; its `treeModelAsset` points to the new files.
-- Far model: a cone made in code, one `InstancedMesh` per chunk, from 100 m to `objectRangeM`. Beyond, the ground colour stands for the forest.
-- The level of a chunk follows its distance to the eye; a chunk that straddles 100 m draws near (chunks are 640 m wide, so try 16-cell chunks for trees if the switch shows or costs too much).
-- To verify first: that flutter_scene's standard material shows the vertex colours of `flow_tree` (glTF `COLOR_0`). Both trees are opaque, so no cut-out material is needed.
+### 3. Trees: written, waiting for the Check
+`tree_model.dart` loads the two trees of step 2 (`treeKinds`: asset, height in metres, leaf colour); `ground_tiles.dart` holds the logic (tested); `ground_streamer.dart` draws.
 
-Check: a forest in first person and from above, the switch between the two levels, the frame rate inside the densest forest of `saint_lo`.
+- Near model: one `InstancedMesh` per tree model and per chunk, within `treeNearM` (100 m). Which tree a cell gets comes from `treeLook`: half pines, half flow trees, mixed cell by cell. The pine is drawn 13 m tall and the flow tree 9 m, before the 0.8 to 1.25 of `treeLook`.
+- Far model: a cone of 6 triangles made in code, as tall and as wide as its tree, in the colour of its leaves; one `InstancedMesh` per chunk, from 100 m to `objectRangeM`. Beyond, the ground colour stands for the forest.
+- The level of a chunk follows the distance from the eye to its nearest ground, and a chunk keeps its level until 25 % past the limit. Its cones stay on the GPU while it is near, so only the models are made and dropped at the switch.
+- Trees have chunks of their own, of `treeChunkCells` cells: **16, not 64**. Counted on `saint_lo`: in its densest forest (around cell 24, 3368) 64-cell chunks draw 8,824 models at once (about 9 million triangles), 32-cell ones 4,041 and 16-cell ones 2,304, which is still eight times the 300 of "Starting budgets". The price is draws: up to about 280 chunks of cones within 1,500 m instead of 30.
+- flutter_scene's standard material multiplies the vertex colours (glTF `COLOR_0`) into the base colour, and its importer reads them: read in its code, not seen on a screen. The flow tree's material is grey (0.5) and half metallic: the loader sets the metal to 0, the grey stays.
+
+Knobs: `GroundStreamer.treeNearM`, `treeChunkCells`, `treeBuildsPerFrame`; `treeKinds`. `GroundStreamer.counts` gives the trees drawn as models and as cones.
+
+Check: a forest in first person and from above; that the flow tree shows its colours (green leaves, brown trunk) and is not too dark; the sizes of the two trees next to a unit; the switch between the two levels, in shape and in colour (the cones' colour is the mean green of each model); the frame rate inside the densest forest of `saint_lo` (cell 24, 3368), with `treeChunkCells` at 16 and at 32.
 
 ### 4. Units: commander and tank
 - One `InstancedMesh` per unit type, per level and per part of its model, one instance per unit, moved with `setInstanceTransform`. About 1,000 units then cost a few draws per unit type. Static models only: a skinned model cannot be instanced (stack decision 4), so animation is out of this POC.

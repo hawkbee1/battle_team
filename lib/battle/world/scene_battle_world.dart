@@ -37,13 +37,13 @@ const _vehicles = {'jeep', 'tank', 'truck', 'artillery'};
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
   /// {@macro scene_battle_world}
-  new(this.map, this.tree) : surface = TerrainSurface(map);
+  new(this.map, this.trees) : surface = TerrainSurface(map);
 
   /// The map.
   final MapData map;
 
-  /// The tree model every tree of the map is drawn with.
-  final TreeModel tree;
+  /// The tree models the trees of the map are drawn with.
+  final List<TreeModel> trees;
 
   @override
   final TerrainSurface surface;
@@ -74,7 +74,7 @@ class SceneBattleWorld implements BattleWorld {
     scene: scene,
     map: map,
     surface: surface,
-    tree: tree,
+    trees: trees,
   );
 
   @override

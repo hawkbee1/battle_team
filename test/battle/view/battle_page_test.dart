@@ -48,7 +48,7 @@ void main() {
           repository,
           BattlePage(
             initialize: () async {},
-            loadTree: (_) async => const TreeModel(parts: [], baseY: 0),
+            loadTrees: (_) async => const [TreeModel(parts: [], baseY: 0)],
             worldBuilder: (map, _) => FakeWorld(map),
             sceneBuilder: (_, _, _, _) => const SizedBox.expand(),
           ),

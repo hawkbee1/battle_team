@@ -348,54 +348,149 @@ Float32List fogShadedTileColors(
   return shaded;
 }
 
-/// A square of [groundTileQuads] cells whose objects are drawn together.
+/// A square of cells whose objects are drawn together: [groundTileQuads]
+/// cells wide unless said otherwise.
 typedef ChunkId = ({int x, int y});
 
 /// The objects of a chunk that are drawn: the cells (`y × width + x`) of its
 /// `trees` and of its `buildings`.
 typedef ObjectChunk = ({List<int> trees, List<int> buildings});
 
-/// The trees and buildings of [map] by chunk, so that only those near the
-/// eye are drawn.
-Map<ChunkId, ObjectChunk> objectChunks(MapData map) {
+/// The trees and buildings of [map] by chunk of [cells] cells, so that only
+/// those near the eye are drawn.
+Map<ChunkId, ObjectChunk> objectChunks(
+  MapData map, {
+  int cells = groundTileQuads,
+}) {
   final chunks = <ChunkId, ObjectChunk>{};
   for (final feature in map.features.features) {
     final tree = feature.type == 'tree';
     if (!tree && feature.type != 'building') continue;
     for (final cell in feature.cells) {
-      final chunk =
-          chunks[(
-            x: cell.x ~/ groundTileQuads,
-            y: cell.y ~/ groundTileQuads,
-          )] ??= (
-            trees: [],
-            buildings: [],
-          );
+      final chunk = chunks[(x: cell.x ~/ cells, y: cell.y ~/ cells)] ??= (
+        trees: [],
+        buildings: [],
+      );
       (tree ? chunk.trees : chunk.buildings).add(cell.y * map.width + cell.x);
     }
   }
   return chunks;
 }
 
-/// The cells of the chunk [id] in [grid].
-CellRect chunkCells(GroundGrid grid, ChunkId id) => (
-  x0: id.x * groundTileQuads,
-  y0: id.y * groundTileQuads,
-  x1: math.min((id.x + 1) * groundTileQuads, grid.width) - 1,
-  y1: math.min((id.y + 1) * groundTileQuads, grid.depth) - 1,
+/// The cells of the chunk [id] in [grid], for chunks of [cells] cells.
+CellRect chunkCells(
+  GroundGrid grid,
+  ChunkId id, {
+  int cells = groundTileQuads,
+}) => (
+  x0: id.x * cells,
+  y0: id.y * cells,
+  x1: math.min((id.x + 1) * cells, grid.width) - 1,
+  y1: math.min((id.y + 1) * cells, grid.depth) - 1,
 );
+
+/// The chunks of [cells] cells that may hold ground within [rangeM] metres
+/// of [eye]: those of the square around it, cut at the map's edge. The
+/// range is taken on the ground, so none within it in 3D is missed.
+List<ChunkId> chunksAround(
+  GroundGrid grid,
+  Vector3 eye,
+  double rangeM, {
+  int cells = groundTileQuads,
+}) {
+  final side = cells * grid.cellSizeM;
+  int first(double at) => math.max(0, ((at - rangeM) / side).floor());
+  int last(double at, int count) =>
+      math.min((count - 1) ~/ cells, ((at + rangeM) / side).floor());
+  return [
+    for (var y = first(-eye.z); y <= last(-eye.z, grid.depth); y++)
+      for (var x = first(eye.x); x <= last(eye.x, grid.width); x++)
+        (x: x, y: y),
+  ];
+}
+
+/// How the trees of a chunk are drawn: with their model, with the cone that
+/// stands for it far away, or not at all.
+enum TreeLevel {
+  /// The model of each tree.
+  near,
+
+  /// A cone in the colour of the leaves.
+  far,
+
+  /// Nothing: the colour of the ground stands for the forest.
+  none,
+}
+
+/// The level of a chunk of trees whose nearest ground is [distance] metres
+/// from the eye: [TreeLevel.near] within [nearM], [TreeLevel.far] within
+/// [rangeM]. A chunk keeps the level it has ([now]) until it is past the
+/// limit by [margin], so it does not flicker while the eye hovers there.
+TreeLevel treeLevelAt(
+  double distance, {
+  required TreeLevel now,
+  required double nearM,
+  required double rangeM,
+  double margin = 1.25,
+}) {
+  if (distance <= nearM || (now == .near && distance <= nearM * margin)) {
+    return .near;
+  }
+  if (distance <= rangeM || (now != .none && distance <= rangeM * margin)) {
+    return .far;
+  }
+  return .none;
+}
+
+/// The far model of a tree: a cone of [sides] triangles without a base,
+/// one unit tall and one in radius, standing on the origin; each tree
+/// scales it to its own crown. The normals are those of a cone three times
+/// taller than wide, about what a tree is.
+({Float32List positions, Float32List normals, Uint16List indices})
+treeConeArrays({int sides = 6}) {
+  final positions = Float32List(sides * 2 * 3);
+  final normals = Float32List(sides * 2 * 3);
+  final indices = Uint16List(sides * 3);
+  final slope = Vector3(3, 1, 0)..normalize();
+  for (var i = 0; i < sides; i++) {
+    final angle = 2 * math.pi * i / sides;
+    // The apex has a vertex a side, so each takes the normal of its side.
+    final middle = 2 * math.pi * (i + 0.5) / sides;
+    final apex = sides + i;
+    positions
+      ..[i * 3] = math.cos(angle)
+      ..[i * 3 + 2] = math.sin(angle)
+      ..[apex * 3 + 1] = 1;
+    normals
+      ..[i * 3] = math.cos(angle) * slope.x
+      ..[i * 3 + 1] = slope.y
+      ..[i * 3 + 2] = math.sin(angle) * slope.x
+      ..[apex * 3] = math.cos(middle) * slope.x
+      ..[apex * 3 + 1] = slope.y
+      ..[apex * 3 + 2] = math.sin(middle) * slope.x;
+    indices
+      ..[i * 3] = i
+      ..[i * 3 + 1] = apex
+      ..[i * 3 + 2] = (i + 1) % sides;
+  }
+  return (positions: positions, normals: normals, indices: indices);
+}
 
 /// How the tree of the map cell [cell] is drawn, so that a forest is not a
 /// grid of copies: moved `east` and `south` within its cell (a fraction of
-/// the cell), turned by `yaw` radians and scaled by `scale`. The same for a
+/// the cell), turned by `yaw` radians, scaled by `scale`, and of the model
+/// `kind` picks (a fraction of the list of models, under 1). The same for a
 /// cell every time. Only the drawing varies; the battle keeps the tree at
 /// its cell.
-({double east, double south, double yaw, double scale}) treeLook(int cell) {
+({double east, double south, double yaw, double scale, double kind}) treeLook(
+  int cell,
+) {
   double part(int a, int b) => (cell % 100003 * a + b) % 9973 / 9973;
   return (
     east: (part(7919, 17) - 0.5) * 0.5,
     south: (part(6271, 4099) - 0.5) * 0.5,
     yaw: part(3571, 911) * 2 * math.pi,
     scale: 0.8 + part(5119, 2749) * 0.45,
+    kind: part(4421, 6007),
   );
 }
