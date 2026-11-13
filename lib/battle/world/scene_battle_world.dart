@@ -3,7 +3,6 @@
 // `flutter test` does not have.
 
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_protocol/battle_protocol.dart';
@@ -11,9 +10,10 @@ import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/ground_streamer.dart';
 import 'package:battle_team/battle/world/live_shots.dart';
+import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
-import 'package:battle_team/fog/model/fog_shading.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -37,17 +37,20 @@ const _vehicles = {'jeep', 'tank', 'truck', 'artillery'};
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
   /// {@macro scene_battle_world}
-  new(this.map) : surface = TerrainSurface(map);
+  new(this.map, this.tree) : surface = TerrainSurface(map);
 
   /// The map.
   final MapData map;
+
+  /// The tree model every tree of the map is drawn with.
+  final TreeModel tree;
 
   @override
   final TerrainSurface surface;
 
   /// The scene, built on first use: read it only once
   /// `Scene.initializeStaticResources()` completed.
-  late final Scene scene = _build();
+  late final Scene scene = Scene();
 
   final _units = <String, _Glide>{};
   final _hqs = <String, Node>{};
@@ -58,73 +61,21 @@ class SceneBattleWorld implements BattleWorld {
   List<Position>? _pathPoints;
   double _clock = 0;
   String? _insideUnit;
+  BattleCamera? _camera;
 
   @override
   Map<String, Vector3> get drawn => {
     for (final MapEntry(:key, :value) in _units.entries) key: value.at(_clock),
   };
 
-  late final TerrainArrays _ground = terrainArrays(map);
-  final _groundMaterial = UnlitMaterial()..doubleSided = true;
-  late final Node _groundNode = Node(
-    name: 'ground',
-    mesh: _groundMesh(_ground.colors),
+  /// The ground, the trees and the buildings, as much of them as the eye
+  /// needs (POC: see `GroundStreamer`).
+  late final GroundStreamer _streamer = GroundStreamer(
+    scene: scene,
+    map: map,
+    surface: surface,
+    tree: tree,
   );
-
-  Mesh _groundMesh(Float32List colors) => Mesh(
-    MeshGeometry.fromArrays(
-      positions: _ground.positions,
-      colors: colors,
-      indices: _ground.indices,
-    ),
-    _groundMaterial,
-  );
-
-  Scene _build() {
-    final scene = Scene()..add(_groundNode);
-    final trees = InstancedMesh(
-      geometry: CylinderGeometry(
-        bottomRadius: 3.5,
-        height: 9,
-        radialSegments: 8,
-      ),
-      material: PhysicallyBasedMaterial()
-        ..baseColorFactor = Vector4(0.16, 0.33, 0.14, 1)
-        ..roughnessFactor = 0.9,
-    );
-    final buildings = InstancedMesh(
-      geometry: CuboidGeometry(Vector3(8, 6, 8)),
-      material: PhysicallyBasedMaterial()
-        ..baseColorFactor = Vector4(0.72, 0.62, 0.52, 1)
-        ..roughnessFactor = 0.8,
-    );
-    final cell = surface.cell;
-    for (final feature in map.features.features) {
-      final mesh = switch (feature.type) {
-        'tree' => trees,
-        'building' => buildings,
-        _ => null,
-      };
-      if (mesh == null) continue;
-      final lift = mesh == trees ? 4.5 : 3.0;
-      for (final at in feature.cells) {
-        final east = (at.x + 0.5) * cell;
-        final south = (at.y + 0.5) * cell;
-        mesh.addInstance(
-          Matrix4.translation(
-            Vector3(east, surface.heightAt(east, south) + lift, -south),
-          ),
-        );
-      }
-    }
-    scene
-      ..add(Node(name: 'trees')..addComponent(InstancedMeshComponent(trees)))
-      ..add(
-        Node(name: 'buildings')
-          ..addComponent(InstancedMeshComponent(buildings)),
-      );
-    return scene;
-  }
 
   @override
   void show({
@@ -177,6 +128,7 @@ class SceneBattleWorld implements BattleWorld {
 
   @override
   void useCamera(BattleCamera camera) {
+    _camera = camera;
     _insideUnit = camera.insideUnit;
     _hideInsideUnit();
   }
@@ -247,16 +199,15 @@ class SceneBattleWorld implements BattleWorld {
     }
   }
 
-  /// The ground's vertex colours with the fog on them: the mesh is made again
+  /// The ground's colours with the fog on them: the tiles are recoloured
   /// when the fog changes, never per frame (stack decision 4).
   @override
-  void showFog(FogModel fog) {
-    _groundNode.mesh = _groundMesh(fogShadedColors(_ground.colors, fog));
-  }
+  void showFog(FogModel fog) => _streamer.showFog(fog);
 
   @override
   void tick(double seconds) {
     _clock += seconds;
+    if (_camera case final camera?) _streamer.update(camera);
     for (final glide in _units.values) {
       final at = glide.at(_clock);
       glide.node.localTransform = Matrix4.translation(at);

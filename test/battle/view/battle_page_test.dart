@@ -1,4 +1,5 @@
 import 'package:battle_team/battle/battle.dart';
+import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/l10n/l10n.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,7 +48,8 @@ void main() {
           repository,
           BattlePage(
             initialize: () async {},
-            worldBuilder: FakeWorld.new,
+            loadTree: (_) async => const TreeModel(parts: [], baseY: 0),
+            worldBuilder: (map, _) => FakeWorld(map),
             sceneBuilder: (_, _, _, _) => const SizedBox.expand(),
           ),
         ),

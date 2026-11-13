@@ -10,6 +10,7 @@ import 'package:battle_team/battle/view/battle_view.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/scene_battle_world.dart';
+import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/fog/data/ground_sight_loader.dart';
 import 'package:battle_team/fog/model/fog_tracker.dart';
@@ -35,6 +36,8 @@ class BattlePage extends StatefulWidget {
     this.loadMovePreviewer = loadMovePreview,
     this.loadSight = loadGroundSight,
     this.initialize = Scene.initializeStaticResources,
+    // POC: a tree made in code until a low-poly model is chosen.
+    this.loadTree = loadPlaceholderTree,
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
   });
@@ -59,8 +62,11 @@ class BattlePage extends StatefulWidget {
   /// Loads flutter_scene's shaders and shared resources.
   final Future<void> Function() initialize;
 
-  /// The 3D world of a map.
-  final BattleWorld Function(MapData map) worldBuilder;
+  /// Loads the tree model the 3D world draws the trees with.
+  final Future<TreeModel> Function(AssetBundle bundle) loadTree;
+
+  /// The 3D world of a map, drawn with the tree model.
+  final BattleWorld Function(MapData map, TreeModel tree) worldBuilder;
 
   /// Builds the 3D area.
   final BattleSceneBuilder sceneBuilder;
@@ -77,6 +83,7 @@ class _BattlePageState extends State<BattlePage> {
       OrderPreCheck preCheck,
       MovePreviewer previewer,
       GroundSight sight,
+      TreeModel tree,
     })
   >
   _ready = () async {
@@ -88,12 +95,15 @@ class _BattlePageState extends State<BattlePage> {
     final previewer = await widget.loadMovePreviewer(bundle, mapId);
     final sight = await widget.loadSight(bundle, mapId);
     await widget.initialize();
+    // After initialize: the model is imported on the GPU.
+    final tree = await widget.loadTree(bundle);
     return (
       map: map,
       bodies: bodies,
       preCheck: preCheck,
       previewer: previewer,
       sight: sight,
+      tree: tree,
     );
   }();
 
@@ -143,7 +153,7 @@ class _BattlePageState extends State<BattlePage> {
             ],
             child: BattleView(
               map: data.map,
-              world: widget.worldBuilder(data.map),
+              world: widget.worldBuilder(data.map, data.tree),
               sceneBuilder: widget.sceneBuilder,
               bodies: data.bodies,
             ),

@@ -46,6 +46,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/licenses/poppins/
+    - assets/3d_models/
     # A built map of battle_map (maps/built), for the battle. Its data is
     # under the ODbL 1.0 and the Licence Ouverte 2.0: its attribution shows
     # on screen (the battle's credits).
