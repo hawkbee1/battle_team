@@ -113,3 +113,6 @@ lib/l10n/gen/
 
 # The playtest player sign-in, written by battle_host tool/playtest.dart.
 env/playtest.json
+
+# POC streamed-world: model tools
+tool/models/node_modules/

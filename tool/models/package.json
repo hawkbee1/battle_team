@@ -1,0 +1,20 @@
+{
+  "name": "battle-team-model-tools",
+  "private": true,
+  "type": "module",
+  "description": "POC streamed-world: lighten downloaded glTF models to a triangle and texture budget",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@gltf-transform/cli": "^4.5.1",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "meshoptimizer": "^1.3.0",
+    "sharp": "^0.35.5"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  }
+}

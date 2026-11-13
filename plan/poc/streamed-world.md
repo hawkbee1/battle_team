@@ -34,26 +34,26 @@ Guesses to test, replaced by measured values in step 8.
 A dense forest holds one tree per 10 m cell: about 300 trees within 100 m (300,000 triangles with the near model), and up to 4,096 per chunk with about 30 chunks in range. The far model decides the cost of a forest.
 
 ## Models at hand
-Downloaded by the owner on 2026-11-13 from Sketchfab, all CC-BY 4.0, measured the same day. "Lightened" is what the step 2 recipes gave; nobody has looked at the results yet.
+Downloaded by the owner on 2026-11-13 from Sketchfab, all CC-BY 4.0, measured the same day. "Lightened" is what `tool/models/build.sh` writes to `assets/3d_models/` (step 2); nobody has looked at the results in a viewer yet.
 
 | Source (`assets_src/3d_models/`) | Content | Lightened |
 |---|---|---|
-| `stylized_pine_tree` | Pine, 939 triangles, one part, three 2048² textures, opaque | 939 with 256² textures (175 KB); 300 (148 KB) |
-| `flow_tree` | Leafy tree, 1,113 triangles, one part, vertex colours, no texture, opaque | as is (58 KB); stops at 505 |
-| `soldier` | German soldier, 31,263 triangles, 16 parts, 12 textures, a skeleton but no animation | 3,086 with textures (1.2 MB); 154 without (26 KB) |
-| `concept_tank` | Tank, 5,454 triangles, 10 parts, one material, one 4096² texture, a skeleton and one animation | 3,565 with a 256² texture (360 KB); 290 without (54 KB) |
-| `hcr2_tank` | Cartoon tank, 70,714 triangles (62,784 in its 12 wheels), parts named chassis, tower, gun, wheels; two materials, 4096² textures | 10,514 with textures; 2,956 without (215 KB); 294 without (23 KB) |
-| `low_poly_building` | Building, 4,353 triangles, 7 parts, 6 material colours, no texture | stops at 3,584 (207 KB) |
+| `stylized_pine_tree` | Pine, 939 triangles, one part, three 2048² textures, opaque | `tree_pine_near`: 939, 256² textures (175 KB) |
+| `flow_tree` | Leafy tree, 1,113 triangles, one part, vertex colours, no texture, opaque | `tree_flow_near`: 1,113, as is (58 KB) |
+| `soldier` | German soldier, 31,263 triangles, 16 parts, 12 textures, a skeleton but no animation | `infantry_near`: 2,998, 12 textures of 256² at most (1.1 MB); `infantry_far`: 147, one part (12 KB) |
+| `concept_tank` | Tank, 5,454 triangles, 10 parts, one material, one 4096² texture, a skeleton and one animation | `vehicle_near`: 2,991, one 256² texture (166 KB); `vehicle_far`: 299, one part (23 KB) |
+| `hcr2_tank` | Cartoon tank, 70,714 triangles (62,784 in its 12 wheels), parts named chassis, tower, gun, wheels; two materials, 4096² textures | `vehicle_hcr2_near`: 2,996, no textures, the tower and the gun parts of their own (218 KB); with textures it stops at 10,514 |
+| `low_poly_building` | Building, 4,353 triangles, 7 parts, 6 material colours, no texture | `hq_near`: 3,535 (204 KB) |
 
 `hcr2_tank` is the tank of the game Hill Climb Racing 2 redrawn by a fan: the owner confirms it may be used before it reaches `main`.
 
 ### Which model each element uses
 | Element | Near | Far |
 |---|---|---|
-| Tree | `stylized_pine_tree` (939) and `flow_tree` (1,113), as they are | a cone made in code, in the colour of the leaves |
-| Commander, and every infantry unit for now | `soldier` with textures (3,086) | `soldier` without textures (154) |
-| Tank, and every vehicle for now | `concept_tank` with its texture (3,565); `hcr2_tank` without textures (2,956) as the second candidate, for its separate tower and gun | `concept_tank` without texture (290) |
-| HQ | `low_poly_building` (3,584) | none |
+| Tree | `tree_pine_near` and `tree_flow_near`, as they are | a cone made in code, in the colour of the leaves |
+| Commander, and every infantry unit for now | `infantry_near` | `infantry_far` |
+| Tank, and every vehicle for now | `vehicle_near`; `vehicle_hcr2_near` as the second candidate, for its separate tower and gun | `vehicle_far` |
+| HQ | `hq_near` | none |
 | Building (82,000 cells) | boxes made in code, batched per chunk (step 6) | ground colour |
 | Relic | today's pillar: no model yet | none |
 
@@ -67,17 +67,17 @@ When downloading more: read the triangle count on the model's page first. Under 
 Run on the web by the owner (2026-11-13): the full `saint_lo` map draws and the result is good. Left open: the map is slow to load (not timed on the web; the map, the move preview and the sight each read it), and no frame rate was measured; both belong to step 8.
 Knobs: `GroundSelector.detail`, `GroundStreamer.objectRangeM`, the per-frame build budgets.
 
-### 2. Model pipeline: next
-The downloads are tidied (sources in `assets_src/3d_models/`, credits in `assets/3d_models/SOURCES.md`).
+### 2. Model pipeline: written, waiting for the Check
+Sources are in `assets_src/3d_models/`, credits in `assets/3d_models/SOURCES.md`.
 
 1. **`tool/models/`**, a small Node project (`@gltf-transform/core`, `extensions`, `functions`, `cli`, `meshoptimizer`; needs only Node, which the container has):
-   - `lighten.mjs <in> <out> --triangles N [--no-textures] [--texture-size 256]`. With textures: `metalrough` (converts spec-gloss materials, which flutter_scene does not read), `weld`, `simplify`, `resize`, `prune`, `dedup`. Without: drop every vertex attribute but the position and every texture, then `flatten`, `join`, `weld`, `simplify`, `normals`, `prune`, `dedup`. The seams of UVs and normals are what stops the simplifier: `hcr2_tank` stops at 10,514 with them and reaches 294 without.
-   - `inspect.mjs <file>... [--budget tree|infantry|vehicle|hq]` prints triangles, parts, materials, alpha modes, textures and extensions, and fails when over the budget.
-   - `build.sh` runs `lighten.mjs` for every row of "Which model each element uses" and writes `assets/3d_models/<element>_<near|far>.glb`, so the folder is rebuilt from the sources by one command.
-2. **Produce** those models and list each with its triangle count and size in the step's commit message.
-3. **Blender on the host**, only if the check asks for it: a script in `tool/models/blender/` (`blender -b -P <script> -- <in> <out>`) that puts the soldier in a standing pose and bakes it to a static mesh.
+   - `lighten.mjs <in> <out> --triangles N [--no-textures] [--texture-size 256] [--error 1] [--keep-parts name,name]`. Both recipes first bake a skinned source in the pose of the file (the game draws models as instances, which a skeleton forbids) and drop its animations. With textures: `metalrough` (converts spec-gloss materials, which flutter_scene does not read), `weld`, `simplify`, a textured BLEND material turned into MASK (the soldier's helmet net), `resize`, `prune`, `dedup`. Without: drop every vertex attribute but the position and every texture, one neutral material for all, then `flatten`, `join`, `weld`, `simplify`, `normals`, `prune`, `dedup`; the result is one part (but the `--keep-parts` ones), flat-shaded. The seams of UVs and normals are what stops the simplifier: `hcr2_tank` stops at 10,514 with them and reaches 294 without.
+   - `inspect.mjs <file>... [--budget tree|infantry|vehicle|hq]` prints triangles, parts, materials, alpha modes, textures and extensions, and fails when over the budget (a file named `*_far.glb` is held to the far budget).
+   - `build.sh` runs `lighten.mjs` for every row of "Which model each element uses" and writes `assets/3d_models/<element>_<near|far>.glb`, so the folder is rebuilt from the sources by one command, and checks each file against its budget. `npm test` in `tool/models/` runs the tests.
+2. **Produced**: the models of the table above. The models keep the scale of their download (soldier 194 units tall, tank 2.9 long, pine 463, flow tree 5): steps 3 and 4 scale them in code.
+3. The soldier keeps the pose of its download (arms slightly down and out): the owner does not change it for now.
 
-Check: the owner opens each lightened model next to its source in a glTF viewer and says which are acceptable. To look at: the soldier's rest pose (arms out or not); whether `concept_tank`, whose parts hang on a skeleton, is assembled when drawn without it; the far models from a distance.
+Check: the owner opens each lightened model next to its source in a glTF viewer and says which are acceptable. To look at: that `concept_tank`, whose parts hung on a skeleton, is assembled; the far models from a distance (the far tank has lost its antenna and its wheels are spikes); the soldier's helmet net, now a cut-out.
 
 ### 3. Trees
 - Near model: the two trees of step 2, one `InstancedMesh` each per chunk, within 100 m. Which tree a cell gets comes from `treeLook`. The glTF loader of `tree_model.dart` stays; its `treeModelAsset` points to the new files.

@@ -11,4 +11,13 @@ The models of this folder are lightened copies of the sources in `assets_src/3d_
 | `flow_tree` | Flow Tree | Xillute \| Dev | https://sketchfab.com/3d-models/flow-tree-b86cb2d3819546bda2d82c4936d2b927 |
 | `low_poly_building` | Low Poly Building | tedpermana | https://sketchfab.com/3d-models/low-poly-building-f943ba2828a64b7d858ee6e4bdacedc6 |
 
-Every model here was changed from its source: fewer triangles, smaller or no textures.
+Every model here was changed from its source: fewer triangles, smaller or no textures, no skeleton. `tool/models/build.sh` rebuilds them all.
+
+| File | Source folder |
+|---|---|
+| `tree_pine_near.glb` | `stylized_pine_tree` |
+| `tree_flow_near.glb` | `flow_tree` |
+| `infantry_near.glb`, `infantry_far.glb` | `soldier` |
+| `vehicle_near.glb`, `vehicle_far.glb` | `concept_tank` |
+| `vehicle_hcr2_near.glb` | `hcr2_tank` |
+| `hq_near.glb` | `low_poly_building` |
