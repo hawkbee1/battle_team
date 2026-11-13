@@ -33,12 +33,12 @@ const UnitKind infantryKind = (
   frontYaw: math.pi,
 );
 
-/// Every vehicle, for now: the tank, 6.5 m long. Its model is longer on X
+/// Every vehicle, for now: the tank, 5.85 m long. Its model is longer on X
 /// than on Z, so it is turned a quarter.
 const UnitKind vehicleKind = (
   near: 'assets/3d_models/vehicle_near.glb',
   far: 'assets/3d_models/vehicle_far.glb',
-  sizeM: 6.5,
+  sizeM: 5.85,
   byLength: true,
   frontYaw: math.pi / 2,
 );
