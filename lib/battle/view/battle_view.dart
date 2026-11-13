@@ -15,6 +15,7 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
+import 'package:battle_team/battle/world/scene_battle_world.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
@@ -578,6 +579,20 @@ class _BattleViewState extends State<BattleView> {
                       : _hidden.add(overlay),
                 ),
                 credits: widget.map.spec.attribution,
+                crowd: switch (widget.world) {
+                  final SceneBattleWorld world => world.crowd,
+                  _ => null,
+                },
+                onCrowd: () => setState(() {
+                  final world = widget.world as SceneBattleWorld;
+                  world.crowd = !world.crowd;
+                  final counts = world.unitCounts;
+                  _log.info(
+                    'crowd ${world.crowd ? 'out' : 'gone'}: '
+                    '${counts.near} near, ${counts.far} far, '
+                    '${counts.meshes} instanced meshes',
+                  );
+                }),
               ),
             ),
           ],
@@ -845,9 +860,15 @@ class _Toolbar extends StatelessWidget {
     required this.hidden,
     required this.onToggleOverlay,
     required this.credits,
+    required this.crowd,
+    required this.onCrowd,
   });
 
   final bool compact;
+
+  /// POC: whether the debug crowd is out; null for a world that has none.
+  final bool? crowd;
+  final VoidCallback onCrowd;
 
   /// The overlays masked now.
   final Set<_Overlay> hidden;
@@ -896,6 +917,14 @@ class _Toolbar extends StatelessWidget {
         icon: const Icon(Icons.swap_horiz),
       ),
       const LogOutButton(icon: true),
+      if (crowd case final crowd?)
+        IconButton(
+          tooltip: 'POC: ${SceneBattleWorld.crowdCount} units',
+          onPressed: onCrowd,
+          isSelected: crowd,
+          icon: const Icon(Icons.groups_outlined),
+          selectedIcon: const Icon(Icons.groups),
+        ),
     ];
     return DecoratedBox(
       decoration: const BoxDecoration(color: Color(0xCC1E2228)),

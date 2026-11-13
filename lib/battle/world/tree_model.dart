@@ -32,7 +32,7 @@ const treeKinds = <TreeKind>[
 ];
 
 /// {@template tree_part}
-/// One primitive of the tree model: its geometry, its material, and the
+/// One primitive of a model: its geometry, its material, and the
 /// transform from the model's root to it.
 /// {@endtemplate}
 typedef TreePart = ({Geometry geometry, Material material, Matrix4 transform});
@@ -91,27 +91,12 @@ Future<List<TreeModel>> loadTreeModels(AssetBundle bundle) async => [
 ];
 
 Future<TreeModel> _loadTreeModel(TreeKind kind) async {
-  final root = await Node.fromGlbAsset(kind.asset);
-  final parts = <TreePart>[];
-  _collect(root, Matrix4.identity(), parts);
-  final min = Vector3.all(double.infinity);
-  final max = Vector3.all(double.negativeInfinity);
+  final (:parts, :min, :max) = await loadModelParts(kind.asset);
   for (final part in parts) {
     // A tree is not metal: the flow tree's material says 0.53, which draws
     // it dark where nothing is reflected.
     if (part.material case final PhysicallyBasedMaterial material) {
       material.metallicFactor = 0;
-    }
-    final bounds = part.geometry.localBounds;
-    if (bounds == null) continue;
-    for (final x in [bounds.min.x, bounds.max.x]) {
-      for (final y in [bounds.min.y, bounds.max.y]) {
-        for (final z in [bounds.min.z, bounds.max.z]) {
-          final corner = part.transform.transform3(Vector3(x, y, z));
-          Vector3.min(min, corner, min);
-          Vector3.max(max, corner, max);
-        }
-      }
     }
   }
   if (!min.x.isFinite || max.y <= min.y) {
@@ -132,6 +117,33 @@ Future<TreeModel> _loadTreeModel(TreeKind kind) async {
     heightM: kind.heightM,
     leaves: kind.leaves,
   );
+}
+
+/// Loads the model at [asset], flattened into its parts, with the corners
+/// of its box in the model's own frame (`min` is not finite when the model
+/// has no geometry).
+Future<({List<TreePart> parts, Vector3 min, Vector3 max})> loadModelParts(
+  String asset,
+) async {
+  final root = await Node.fromGlbAsset(asset);
+  final parts = <TreePart>[];
+  _collect(root, Matrix4.identity(), parts);
+  final min = Vector3.all(double.infinity);
+  final max = Vector3.all(double.negativeInfinity);
+  for (final part in parts) {
+    final bounds = part.geometry.localBounds;
+    if (bounds == null) continue;
+    for (final x in [bounds.min.x, bounds.max.x]) {
+      for (final y in [bounds.min.y, bounds.max.y]) {
+        for (final z in [bounds.min.z, bounds.max.z]) {
+          final corner = part.transform.transform3(Vector3(x, y, z));
+          Vector3.min(min, corner, min);
+          Vector3.max(max, corner, max);
+        }
+      }
+    }
+  }
+  return (parts: parts, min: min, max: max);
 }
 
 void _collect(Node node, Matrix4 parent, List<TreePart> out) {

@@ -13,6 +13,9 @@ import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/ground_streamer.dart';
 import 'package:battle_team/battle/world/live_shots.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
+import 'package:battle_team/battle/world/unit_instances.dart';
+import 'package:battle_team/battle/world/unit_levels.dart';
+import 'package:battle_team/battle/world/unit_model.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
@@ -25,25 +28,31 @@ Vector4 teamColor(String? team) => switch (team) {
   _ => Vector4(0.7, 0.7, 0.7, 1),
 };
 
-const _vehicles = {'jeep', 'tank', 'truck', 'artillery'};
-
 /// {@template scene_battle_world}
 /// The battle in 3D with flutter_scene, the renderer behind the `BattleWorld`
 /// Strategy: the map's ground, its trees and buildings, and what the section
 /// sees (units, HQs, relics), each unit gliding to where the host put it by
 /// its move's arrival time (decision 236), and the shots it sees for a moment
 /// each (`LiveShots` keeps their lives; this class only draws them). Units are
-/// drawn about three times their size so they show from above.
+/// drawn at their size, as instances of their models (POC: see
+/// `UnitInstances`), each on a disc in its team's colour that shows from
+/// above.
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
   /// {@macro scene_battle_world}
-  new(this.map, this.trees) : surface = TerrainSurface(map);
+  new(this.map, this.trees, this.unitModels) : surface = TerrainSurface(map);
 
   /// The map.
   final MapData map;
 
   /// The tree models the trees of the map are drawn with.
   final List<TreeModel> trees;
+
+  /// The models the units are drawn with.
+  final UnitModels unitModels;
+
+  /// The units of the debug crowd (POC).
+  static const crowdCount = 1000;
 
   @override
   final TerrainSurface surface;
@@ -62,6 +71,47 @@ class SceneBattleWorld implements BattleWorld {
   double _clock = 0;
   String? _insideUnit;
   BattleCamera? _camera;
+  String? _selected;
+  String? _target;
+  Vector3? _crowdCentre;
+  double _crowdClock = 0;
+  static final List<String> _crowdIds = [
+    for (var i = 0; i < crowdCount; i++) 'crowd_$i',
+  ];
+
+  late final UnitInstances _instances = UnitInstances(
+    scene: scene,
+    models: unitModels,
+  );
+  late final Node _selectedMark = _mark(Vector4(1, 1, 0.3, 1))..also(scene.add);
+  late final Node _targetMark = _mark(Vector4(1, 1, 1, 1))..also(scene.add);
+
+  /// The units drawn with their near and their far model, and the instanced
+  /// meshes that draw them: for a debug overlay.
+  ({int near, int far, int meshes}) get unitCounts => _instances.counts;
+
+  /// Whether the debug crowd is out: [crowdCount] units around the middle
+  /// of what the camera sees when it is switched on, four soldiers for one
+  /// tank, each walking a small circle so that every instance moves every
+  /// frame. They are only drawn: no label, no tap, nothing of the battle.
+  bool get crowd => _crowdCentre != null;
+  set crowd(bool out) {
+    if (out == crowd) return;
+    if (!out) {
+      _crowdCentre = null;
+      _crowdIds.forEach(_instances.remove);
+      return;
+    }
+    final camera = _camera;
+    final eye = camera?.position ?? Vector3.zero();
+    _crowdCentre = lookedAt(
+      eye,
+      camera?.forward ?? Vector3(0, -1, 0),
+      groundY: surface.heightAt(eye.x, -eye.z),
+    );
+    _crowdClock = 0;
+    tick(0);
+  }
 
   @override
   Map<String, Vector3> get drawn => {
@@ -97,7 +147,8 @@ class SceneBattleWorld implements BattleWorld {
       if (to == null) continue;
       to.y = surface.heightAt(to.x, -to.z);
       final glide = _units[unit.unitId] ??= _Glide(
-        _unitNode(unit)..also(scene.add),
+        unit.unitType,
+        teamColor(unit.team),
         to,
       );
       if (glide.to != to) {
@@ -107,15 +158,14 @@ class SceneBattleWorld implements BattleWorld {
             : 0.5;
         glide.retarget(to, now: _clock, seconds: seconds.toDouble());
       }
-      glide.node.highlightColor = switch (unit.unitId) {
-        final id when id == selected => Vector4(1, 1, 0.3, 1),
-        final id when id == target => Vector4(1, 1, 1, 1),
-        _ => null,
-      };
     }
-    _hideInsideUnit();
+    _selected = selected;
+    _target = target;
     for (final id in _units.keys.toList()) {
-      if (!spread.containsKey(id)) scene.remove(_units.remove(id)!.node);
+      if (!spread.containsKey(id)) {
+        _units.remove(id);
+        _instances.remove(id);
+      }
     }
     _place(_hqs, {
       for (final hq in hqs) hq.team: (hq.position, hq.team),
@@ -130,14 +180,6 @@ class SceneBattleWorld implements BattleWorld {
   void useCamera(BattleCamera camera) {
     _camera = camera;
     _insideUnit = camera.insideUnit;
-    _hideInsideUnit();
-  }
-
-  /// The body the eye is inside would fill the view: it is not drawn.
-  void _hideInsideUnit() {
-    for (final MapEntry(:key, :value) in _units.entries) {
-      value.node.visible = key != _insideUnit;
-    }
   }
 
   @override
@@ -208,14 +250,59 @@ class SceneBattleWorld implements BattleWorld {
   void tick(double seconds) {
     _clock += seconds;
     if (_camera case final camera?) _streamer.update(camera);
-    for (final glide in _units.values) {
+    final eye = _camera?.position;
+    for (final MapEntry(key: id, value: glide) in _units.entries) {
       final at = glide.at(_clock);
-      glide.node.localTransform = Matrix4.translation(at);
+      glide.yaw = headingYaw(glide.from, glide.to, otherwise: glide.yaw);
+      _instances.place(
+        id,
+        unitType: glide.unitType,
+        color: glide.color,
+        at: at,
+        yaw: glide.yaw,
+        eye: eye,
+        // The body the eye is inside would fill the view: it is not drawn.
+        hidden: id == _insideUnit,
+      );
     }
+    _placeMark(_selectedMark, _selected);
+    _placeMark(_targetMark, _target);
+    _walkCrowd(seconds, eye);
     for (final shot in _shots.advance(seconds)) {
       scene.remove(_shotNodes.remove(shot)!.node);
     }
     _fadeShots();
+  }
+
+  /// Puts [mark] under the unit [id], or hides it when that unit is not
+  /// drawn.
+  void _placeMark(Node mark, String? id) {
+    final glide = id == _insideUnit ? null : _units[id];
+    mark.visible = glide != null;
+    if (glide == null) return;
+    mark.localTransform = Matrix4.translation(glide.at(_clock)..y += 0.35);
+  }
+
+  void _walkCrowd(double seconds, Vector3? eye) {
+    final centre = _crowdCentre;
+    if (centre == null) return;
+    _crowdClock += seconds;
+    final at = Vector3.zero();
+    for (var i = 0; i < crowdCount; i++) {
+      final spot = crowdAt(i, crowdCount, _crowdClock);
+      at
+        ..x = centre.x + spot.east
+        ..z = centre.z + spot.north;
+      at.y = surface.heightAt(at.x, -at.z);
+      _instances.place(
+        _crowdIds[i],
+        unitType: i % 5 == 4 ? 'tank' : 'commander',
+        color: teamColor(i.isEven ? 'blue' : 'red'),
+        at: at,
+        yaw: spot.yaw,
+        eye: eye,
+      );
+    }
   }
 
   /// Fades each shot on screen with its age, and swells its hit mark.
@@ -234,8 +321,8 @@ class SceneBattleWorld implements BattleWorld {
     }
   }
 
-  /// The muzzle of a unit drawn at [position]: units are drawn big.
-  Vector3 _muzzle(Position position) => _onGround(position)..y += 6;
+  /// The muzzle of a unit drawn at [position].
+  Vector3 _muzzle(Position position) => _onGround(position)..y += 1.6;
 
   _ShotNode _shotNode(ShotEffect effect) {
     final material = UnlitMaterial()
@@ -285,7 +372,7 @@ class SceneBattleWorld implements BattleWorld {
         result == ImpactResult.damaged
             ? Vector4(1, 0.35, 0.1, 1)
             : Vector4(0.7, 0, 0, 1),
-        Matrix4.translation(_onGround(at)..y += 3),
+        Matrix4.translation(_onGround(at)..y += 1.2),
       ),
     };
     material.baseColorFactor = color.clone();
@@ -316,39 +403,15 @@ class SceneBattleWorld implements BattleWorld {
     }
   }
 
-  Node _unitNode(UnitView unit) {
-    final color = teamColor(unit.team);
-    final vehicle = _vehicles.contains(unit.unitType);
-    final body = vehicle
-        ? Node(
-            mesh: Mesh(CuboidGeometry(Vector3(7, 4, 10)), _paint(color)),
-            localTransform: Matrix4.translation(Vector3(0, 2, 0)),
-          )
-        : Node(
-            mesh: Mesh(
-              CapsuleGeometry(
-                radius: unit.unitType == 'commander' ? 2.2 : 1.6,
-                height: 6,
-                radialSegments: 12,
-                capRings: 4,
-              ),
-              _paint(color),
-            ),
-            localTransform: Matrix4.translation(Vector3(0, 3, 0)),
-          );
-    final base = Node(
-      mesh: Mesh(
-        DiscGeometry(radius: 3, segments: 24),
-        UnlitMaterial()
-          ..baseColorFactor = color
-          ..doubleSided = true,
-      ),
-      localTransform: Matrix4.translation(Vector3(0, 0.3, 0)),
-    );
-    return Node(name: unit.unitId)
-      ..add(base)
-      ..add(body);
-  }
+  /// A ring around a unit's disc, for the selected unit and for the target.
+  static Node _mark(Vector4 color) => Node(
+    mesh: Mesh(
+      RingGeometry(innerRadius: 3.3, outerRadius: 4.2),
+      UnlitMaterial()
+        ..baseColorFactor = color
+        ..doubleSided = true,
+    ),
+  )..visible = false;
 
   /// An HQ: a ring on the ground around its units and a flag on a pole.
   static Node _flag(Vector4 color) => Node()
@@ -407,11 +470,16 @@ class _ShotNode {
   final Matrix4 base;
 }
 
-/// A unit's node gliding from [from] to [to] between two clock times.
+/// A unit gliding from [from] to [to] between two clock times, facing
+/// [yaw].
 class _Glide {
-  new(this.node, Vector3 at) : from = at.clone(), to = at.clone();
+  new(this.unitType, this.color, Vector3 at)
+    : from = at.clone(),
+      to = at.clone();
 
-  final Node node;
+  final String unitType;
+  final Vector4 color;
+  double yaw = 0;
   Vector3 from;
   Vector3 to;
   double _start = 0;
