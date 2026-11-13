@@ -12,6 +12,7 @@ import 'dart:typed_data';
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
+import 'package:battle_team/battle/world/building_mesh.dart';
 import 'package:battle_team/battle/world/ground_tiles.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
@@ -23,7 +24,8 @@ import 'package:vector_math/vector_math.dart';
 /// the battle is seen: the ground as the tiles a `GroundSelector` chooses,
 /// fine near the eye and coarse far away, and the trees and buildings of the
 /// chunks within [objectRangeM] of the eye. A chunk of trees draws the model
-/// of each tree within [treeNearM] and a cone for each beyond. Meshes are
+/// of each tree within [treeNearM] and a cone for each beyond. The buildings
+/// of a chunk are a few meshes made in code (`buildingArrays`). Meshes are
 /// made a few a frame ([tileBuildsPerFrame], [chunkBuildsPerFrame],
 /// [treeBuildsPerFrame]), so moving never stalls a frame, and are dropped
 /// once out of the cut or out of range.
@@ -97,10 +99,15 @@ class GroundStreamer {
       : objectChunks(map, cells: treeChunkCells);
 
   final _groundMaterial = UnlitMaterial()..doubleSided = true;
-  late final Geometry _buildingGeometry = CuboidGeometry(Vector3(8, 6, 8));
+  late final Set<int> _buildingCells = {
+    for (final chunk in _chunks.values) ...chunk.buildings,
+  };
+  // The roofs and the walls take their colours from the vertices.
+  // Double-sided, so a building does not depend on the winding flutter_scene
+  // culls.
   late final Material _buildingMaterial = PhysicallyBasedMaterial()
-    ..baseColorFactor = Vector4(0.72, 0.62, 0.52, 1)
-    ..roughnessFactor = 0.8;
+    ..roughnessFactor = 0.8
+    ..doubleSided = true;
   late final Geometry _coneGeometry = () {
     final cone = treeConeArrays();
     return MeshGeometry.fromArrays(
@@ -118,6 +125,7 @@ class GroundStreamer {
 
   final _tiles = <GroundTile, _LiveTile>{};
   final _objects = <ChunkId, Node>{};
+  final _buildingTriangles = <ChunkId, int>{};
   final _trees = <ChunkId, _LiveTrees>{};
   FogModel? _fog;
   int _fogVersion = 0;
@@ -125,9 +133,18 @@ class GroundStreamer {
   double? _settledFov;
 
   /// The ground tiles on the GPU, those of them drawn now, the chunks of
-  /// buildings, and the trees drawn as models and as cones: for a debug
-  /// overlay.
-  ({int live, int drawn, int chunks, int nearTrees, int farTrees}) get counts {
+  /// buildings, their meshes and their triangles, and the trees drawn as
+  /// models and as cones: for a debug overlay.
+  ({
+    int live,
+    int drawn,
+    int chunks,
+    int buildingMeshes,
+    int buildingTriangles,
+    int nearTrees,
+    int farTrees,
+  })
+  get counts {
     var nearTrees = 0;
     var farTrees = 0;
     for (final MapEntry(key: id, value: live) in _trees.entries) {
@@ -139,6 +156,11 @@ class GroundStreamer {
       live: _tiles.length,
       drawn: _tiles.values.where((tile) => tile.node.visible).length,
       chunks: _objects.length,
+      buildingMeshes: _objects.values.fold(
+        0,
+        (sum, node) => sum + node.children.length,
+      ),
+      buildingTriangles: _buildingTriangles.values.fold(0, (a, b) => a + b),
       nearTrees: nearTrees,
       farTrees: farTrees,
     );
@@ -254,6 +276,7 @@ class GroundStreamer {
         // dropped again as the eye hovers there.
         final node = _objects.remove(id);
         if (node != null) scene.remove(node);
+        _buildingTriangles.remove(id);
       }
     }
     missing.sort((a, b) => a.$1.compareTo(b.$1));
@@ -263,26 +286,40 @@ class GroundStreamer {
     return missing.length <= chunkBuildsPerFrame;
   }
 
-  /// The buildings of a chunk, as one instanced mesh.
+  /// The buildings of a chunk, as the meshes of `buildingArrays`: a wall
+  /// only where no building stands next door, in this chunk or another.
   Node _makeObjects(ChunkId id, ObjectChunk chunk) {
-    final cell = surface.cell;
     final node = Node(name: 'objects_${id.x}_${id.y}');
-    if (chunk.buildings.isNotEmpty) {
-      final buildings = InstancedMesh(
-        geometry: _buildingGeometry,
-        material: _buildingMaterial,
-      );
-      for (final index in chunk.buildings) {
-        final east = (index % map.width + 0.5) * cell;
-        final south = (index ~/ map.width + 0.5) * cell;
-        buildings.addInstance(
-          Matrix4.translation(
-            Vector3(east, surface.heightAt(east, south) + 3, -south),
+    final meshes = buildingArrays(
+      cells: chunk.buildings,
+      width: map.width,
+      cellSizeM: surface.cell,
+      heightAt: surface.heightAt,
+      isBuilding: (x, y) =>
+          x >= 0 &&
+          x < map.width &&
+          y >= 0 &&
+          y < map.depth &&
+          _buildingCells.contains(y * map.width + x),
+    );
+    var triangles = 0;
+    for (final arrays in meshes) {
+      triangles += arrays.indices.length ~/ 3;
+      node.add(
+        Node(
+          mesh: Mesh(
+            MeshGeometry.fromArrays(
+              positions: arrays.positions,
+              normals: arrays.normals,
+              colors: arrays.colors,
+              indices: arrays.indices,
+            ),
+            _buildingMaterial,
           ),
-        );
-      }
-      node.add(Node()..addComponent(InstancedMeshComponent(buildings)));
+        ),
+      );
     }
+    _buildingTriangles[id] = triangles;
     return node;
   }
 

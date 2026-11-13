@@ -87,6 +87,17 @@ class SceneBattleWorld implements BattleWorld {
   /// meshes that draw them: for a debug overlay.
   ({int near, int far, int meshes}) get unitCounts => _instances.counts;
 
+  /// The chunks of buildings drawn, their meshes and their triangles: for a
+  /// debug overlay.
+  ({int chunks, int meshes, int triangles}) get buildingCounts {
+    final counts = _streamer.counts;
+    return (
+      chunks: counts.chunks,
+      meshes: counts.buildingMeshes,
+      triangles: counts.buildingTriangles,
+    );
+  }
+
   /// Whether the debug crowd is out: [crowdCount] units around the middle
   /// of what the camera sees when it is switched on, four soldiers for one
   /// tank, of the five teams in turn (`crowdUnitAt`), each walking a small
@@ -167,7 +178,7 @@ class SceneBattleWorld implements BattleWorld {
     }
     _place(_hqs, {
       for (final hq in hqs) hq.team: (hq.position, hq.team),
-    }, (team) => _flag(teamColor(team)));
+    }, (team) => _hq(teamColor(team)));
     _place(_relics, {
       for (final relic in relics) relic.relicId: (relic.position, relic.owner),
     }, (owner) => _pillar(teamColor(owner)));
@@ -419,7 +430,21 @@ class SceneBattleWorld implements BattleWorld {
     ),
   )..visible = false;
 
-  /// An HQ: a ring on the ground around its units and a flag on a pole.
+  /// An HQ: its building, in the model's own colours, and what shows its
+  /// team: a ring on the ground around it and a flag on a pole.
+  Node _hq(Vector4 color) {
+    final node = _flag(color);
+    for (final part in unitModels.hq ?? const <TreePart>[]) {
+      node.add(
+        Node(
+          mesh: Mesh(part.geometry, part.material),
+          localTransform: part.transform,
+        ),
+      );
+    }
+    return node;
+  }
+
   static Node _flag(Vector4 color) => Node()
     ..add(
       Node(

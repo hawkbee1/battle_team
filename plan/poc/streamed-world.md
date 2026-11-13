@@ -141,8 +141,19 @@ Knobs: `teamPalette`, `nearTintMix`, `tintParts` of `infantryKind`, `_rimShare` 
 
 Check: the owner, and if possible a colour-blind player, switch the crowd on and tell the five teams apart top-down at the usual zoom, on grass, forest, sand, road and fogged ground; say whether the rim helps. In first person and close to a unit: that the tint of the soldier's tunic, trousers and helmet shows through the textures, is neither too dark nor washed out, and that the black team is still a soldier (and which parts of the soldier should take the colour); the tank tinted whole. An HQ and a relic in each colour, a relic changing colour when it is captured, and an unowned relic white.
 
-### 6. Buildings batched per chunk
-One mesh per chunk built in code from the buildings' cells (walls and a roof per cell, neighbours merged; dashmap batches 24,000 vertices per mesh), instead of an instanced box per cell. The HQ takes `low_poly_building`.
+### 6. Buildings batched per chunk: written, waiting for the Check
+`building_mesh.dart` holds the logic (tested); `ground_streamer.dart` draws the buildings; `unit_model.dart` loads the HQ's model and `scene_battle_world.dart` draws it.
+
+- The buildings of a 64-cell chunk are meshes made in code, 24,000 vertices each at most (as dashmap batches), instead of an instanced box per cell: one draw for most chunks, three for a chunk full of buildings.
+- A building cell is a block that fills its cell (10 m, where the box was 8 m): a flat roof 6 m above the ground at its centre, and a wall on each side where no building stands, in this chunk or the next. Blocks side by side are merged: no wall between them, so a town of 9 cells in a square is 9 roofs and 12 walls. On a slope the roofs are terraces, with the wall of the step from one roof down to the next.
+- An outer wall goes half a metre under the lowest ground along its side. A block costs 2 to 10 triangles, against 12 for the box.
+- Roofs and walls take their colours from the vertices (`buildingRoofColor`, `buildingWallColor`), under one material. It is double-sided: the triangles are wound counter-clockwise seen from outside (tested), but which side flutter_scene culls was not seen on a screen.
+- Buildings are not shaded by the fog, as before.
+- The HQ is `hq_near` drawn 12 m tall in the model's own colours, at the centre of the ring and next to the flag, which still show its team. Five nodes of 6 parts at most: no instancing.
+
+Knobs: `wallM`, `sinkM` and `maxVertices` of `buildingArrays`; the two colours; `hqKind.heightM`. The crowd switch also logs the buildings drawn: triangles, meshes and chunks (`SceneBattleWorld.buildingCounts`).
+
+Check: a town from above and in first person: that walls and roofs are lit from outside (no black or missing face), that the two colours show, that no gap shows under a wall on a slope, and whether terraces of roofs look right on a hillside; the seam between two chunks inside a town (no wall, no gap); the size of a block next to a unit and a tree; the counts logged over the densest town. The HQ: its size next to a unit and inside its ring, that it stands on the ground and that its colours are not too dark.
 
 ### 7. Ground colour and fog in a material
 A `.fmat` material that reads the terrain and the fog from textures, so a coarse tile keeps its roads and a fog change costs one texture upload instead of recolouring tiles.

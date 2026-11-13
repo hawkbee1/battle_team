@@ -52,6 +52,12 @@ const UnitKind vehicleKind = (
   tintParts: null,
 );
 
+/// The HQ: the building, 12 m tall, which fits inside the ring of its team.
+const ({String asset, double heightM}) hqKind = (
+  asset: 'assets/3d_models/hq_near.glb',
+  heightM: 12,
+);
+
 /// The unit types drawn with the vehicle's model; the others take the
 /// infantry's.
 const vehicleUnitTypes = {'jeep', 'tank', 'truck', 'artillery'};
@@ -75,18 +81,23 @@ final class UnitShape {
 }
 
 /// {@template unit_models}
-/// The models units are drawn with, each at its two levels. A kind left out
-/// (in tests, which have no GPU) draws nothing but the disc under the unit.
+/// The models units are drawn with, each at its two levels, and the model
+/// of the HQ. A kind left out (in tests, which have no GPU) draws nothing
+/// but the disc under the unit; an HQ left out is its ring and its flag.
 /// {@endtemplate}
 final class UnitModels {
   /// {@macro unit_models}
-  const new({this.infantry, this.vehicle});
+  const new({this.infantry, this.vehicle, this.hq});
 
   /// The model of infantry units.
   final Map<UnitLevel, UnitShape>? infantry;
 
   /// The model of vehicles.
   final Map<UnitLevel, UnitShape>? vehicle;
+
+  /// The model of the HQ, its parts in the HQ's frame: metres, standing on
+  /// the origin, centred on it.
+  final List<TreePart>? hq;
 
   /// The model of a unit of [unitType].
   Map<UnitLevel, UnitShape>? of(String unitType) =>
@@ -97,7 +108,33 @@ final class UnitModels {
 Future<UnitModels> loadUnitModels(AssetBundle bundle) async => UnitModels(
   infantry: await _loadKind(infantryKind),
   vehicle: await _loadKind(vehicleKind),
+  hq: await _loadHq(),
 );
+
+/// The HQ's model, as it is in its file but `hqKind.heightM` tall, centred
+/// and standing on the origin.
+Future<List<TreePart>> _loadHq() async {
+  final (:parts, :min, :max) = await loadModelParts(hqKind.asset);
+  if (!min.x.isFinite || max.y <= min.y) return parts;
+  final fit = Matrix4.identity()
+    ..scaleByDouble(
+      hqKind.heightM / (max.y - min.y),
+      hqKind.heightM / (max.y - min.y),
+      hqKind.heightM / (max.y - min.y),
+      1,
+    )
+    ..translateByVector3(
+      Vector3(-(min.x + max.x) / 2, -min.y, -(min.z + max.z) / 2),
+    );
+  return [
+    for (final part in parts)
+      (
+        geometry: part.geometry,
+        material: part.material,
+        transform: fit.multiplied(part.transform),
+      ),
+  ];
+}
 
 Future<Map<UnitLevel, UnitShape>> _loadKind(UnitKind kind) async => {
   .near: await _loadShape(kind.near, kind, .near),

@@ -587,10 +587,14 @@ class _BattleViewState extends State<BattleView> {
                   final world = widget.world as SceneBattleWorld;
                   world.crowd = !world.crowd;
                   final counts = world.unitCounts;
+                  final buildings = world.buildingCounts;
                   _log.info(
                     'crowd ${world.crowd ? 'out' : 'gone'}: '
                     '${counts.near} near, ${counts.far} far, '
-                    '${counts.meshes} instanced meshes',
+                    '${counts.meshes} instanced meshes; buildings: '
+                    '${buildings.triangles} triangles in '
+                    '${buildings.meshes} meshes of '
+                    '${buildings.chunks} chunks',
                   );
                 }),
               ),
