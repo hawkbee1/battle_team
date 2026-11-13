@@ -30,18 +30,17 @@ const UnitKind infantryKind = (
   far: 'assets/3d_models/infantry_far.glb',
   sizeM: 1.8,
   byLength: false,
-  frontYaw: 0,
+  frontYaw: math.pi,
 );
 
 /// Every vehicle, for now: the tank, 6.5 m long. Its model is longer on X
-/// than on Z, so it is turned a quarter; whether its front then looks
-/// forwards or backwards was not seen.
+/// than on Z, so it is turned a quarter.
 const UnitKind vehicleKind = (
   near: 'assets/3d_models/vehicle_near.glb',
   far: 'assets/3d_models/vehicle_far.glb',
   sizeM: 6.5,
   byLength: true,
-  frontYaw: -math.pi / 2,
+  frontYaw: math.pi / 2,
 );
 
 /// The unit types drawn with the vehicle's model; the others take the

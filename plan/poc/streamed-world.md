@@ -92,20 +92,22 @@ Knobs: `GroundStreamer.treeNearM`, `treeChunkCells`, `treeBuildsPerFrame`; `tree
 
 Check: a forest in first person and from above; that the flow tree shows its colours (green leaves, brown trunk) and is not too dark; the sizes of the two trees next to a unit; the switch between the two levels, in shape and in colour (the cones' colour is the mean green of each model); the frame rate inside the densest forest of `saint_lo` (cell 24, 3368), with `treeChunkCells` at 16 and at 32.
 
-### 4. Units: commander and tank: written, waiting for the Check
+### 4. Units: commander and tank: done but one check
 `unit_model.dart` loads the models of step 2 (`infantryKind`, `vehicleKind`: assets, size in metres, which way the front is); `unit_levels.dart` holds the logic (tested); `unit_instances.dart` draws; `scene_battle_world.dart` moves the units.
 
 - One `InstancedMesh` per unit model, per level and per part of the model, one instance per unit, moved with `setInstanceTransform` only when the unit moved. All units then cost 29 draws at most: 16 for the near soldier, 10 for the near tank (its 10 parts share one material: joining them is a job for `lighten.mjs`), 1 each for the two far models and the discs. Static models only: a skinned model cannot be instanced (stack decision 4), so animation is out of this POC.
 - Every infantry unit is the soldier and every vehicle the tank, drawn whole: its tower does not turn.
 - A unit within `nearM` (100 m) of the eye uses the near model, the others the far model; it keeps its level until 25 % past the limit. The unit under first-person control is not drawn at all, as before: the eye is inside it.
 - **Units are drawn at their real size**, no longer three times bigger: the soldier 1.8 m tall, the tank 6.5 m long. From above a unit shows by its disc (3 m in radius, in its team's colour, all discs one instanced mesh). The models are not tinted: that is step 5.
-- A unit faces where it last moved. Which side of each model is its front was not seen: `frontYaw` of each kind turns it. The tank is longer on X, so it is turned a quarter, forwards or backwards unknown; the soldier is taken to face +Z.
+- A unit faces where it last moved. `frontYaw` of each kind turns its model's front onto the way it walks (set by the owner on a screen).
 - The selected unit and the target have a ring around their disc (yellow, white) instead of a highlight of the model.
 - The debug switch is the last button of the toolbar (the group icon): 1,000 units in a square of 32 by 32, 8 m apart, around the middle of the screen, four soldiers for one tank, half blue and half red. Each walks a circle of 3 m, so every instance moves every frame. They are only drawn: no label, no tap. The switch logs the counts (`SceneBattleWorld.unitCounts`).
 
 Knobs: `UnitInstances.nearM`; `sizeM` and `frontYaw` of `infantryKind` and `vehicleKind`; `SceneBattleWorld.crowdCount`; spacing, circle and speed in `crowdAt`.
 
-Check: 1,000 units on screen, top-down and first person, and the frame rate with them walking; the soldier's pose and size next to a tree and a tank; that soldiers and tanks walk forwards, not backwards (else add π to `frontYaw`); that both levels stand on the ground and the switch between them at 100 m; whether real-size units are readable top-down at the usual zoom with only their disc.
+Checked by the owner (2026-11-13): 1,000 walking units draw, top-down and in first person; they walk forwards; both levels stand on the ground and the switch at 100 m looks good; from above a unit shows as its disc and a white figure, partly hidden by the ground on a steep slope, which is accepted.
+
+Check left: the soldier's size and pose next to a tree and a tank, in first person.
 
 ### 5. Team colours
 Each team has one colour, which tints its units, HQ and relics. Five teams (MAP-04).
