@@ -12,6 +12,7 @@ import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
 import 'package:battle_team/battle/world/ground_streamer.dart';
 import 'package:battle_team/battle/world/live_shots.dart';
+import 'package:battle_team/battle/world/team_colours.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_instances.dart';
 import 'package:battle_team/battle/world/unit_levels.dart';
@@ -20,14 +21,6 @@ import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
 
-/// The colour of [team]'s units, HQ and relics.
-Vector4 teamColor(String? team) => switch (team) {
-  'blue' => Vector4(0.15, 0.40, 0.95, 1),
-  'red' => Vector4(0.90, 0.20, 0.15, 1),
-  null => Vector4(0.95, 0.80, 0.20, 1),
-  _ => Vector4(0.7, 0.7, 0.7, 1),
-};
-
 /// {@template scene_battle_world}
 /// The battle in 3D with flutter_scene, the renderer behind the `BattleWorld`
 /// Strategy: the map's ground, its trees and buildings, and what the section
@@ -35,8 +28,8 @@ Vector4 teamColor(String? team) => switch (team) {
 /// its move's arrival time (decision 236), and the shots it sees for a moment
 /// each (`LiveShots` keeps their lives; this class only draws them). Units are
 /// drawn at their size, as instances of their models (POC: see
-/// `UnitInstances`), each on a disc in its team's colour that shows from
-/// above.
+/// `UnitInstances`), each tinted in its team's colour (`teamColor`) and on a
+/// disc with a rim that show from above.
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
   /// {@macro scene_battle_world}
@@ -62,8 +55,8 @@ class SceneBattleWorld implements BattleWorld {
   late final Scene scene = Scene();
 
   final _units = <String, _Glide>{};
-  final _hqs = <String, Node>{};
-  final _relics = <String, Node>{};
+  final _hqs = <String, (Node, String?)>{};
+  final _relics = <String, (Node, String?)>{};
   final _shots = LiveShots();
   final _shotNodes = <LiveShot, _ShotNode>{};
   final _pathNodes = <Node>[];
@@ -77,6 +70,10 @@ class SceneBattleWorld implements BattleWorld {
   double _crowdClock = 0;
   static final List<String> _crowdIds = [
     for (var i = 0; i < crowdCount; i++) 'crowd_$i',
+  ];
+  static final List<Vector4> _crowdTeams = [
+    for (var team = 1; team <= teamPalette.length; team++)
+      teamColor('team-$team'),
   ];
 
   late final UnitInstances _instances = UnitInstances(
@@ -92,8 +89,9 @@ class SceneBattleWorld implements BattleWorld {
 
   /// Whether the debug crowd is out: [crowdCount] units around the middle
   /// of what the camera sees when it is switched on, four soldiers for one
-  /// tank, each walking a small circle so that every instance moves every
-  /// frame. They are only drawn: no label, no tap, nothing of the battle.
+  /// tank, of the five teams in turn (`crowdUnitAt`), each walking a small
+  /// circle so that every instance moves every frame. They are only drawn: no
+  /// label, no tap, nothing of the battle.
   bool get crowd => _crowdCentre != null;
   set crowd(bool out) {
     if (out == crowd) return;
@@ -290,14 +288,15 @@ class SceneBattleWorld implements BattleWorld {
     final at = Vector3.zero();
     for (var i = 0; i < crowdCount; i++) {
       final spot = crowdAt(i, crowdCount, _crowdClock);
+      final unit = crowdUnitAt(i, teams: _crowdTeams.length);
       at
         ..x = centre.x + spot.east
         ..z = centre.z + spot.north;
       at.y = surface.heightAt(at.x, -at.z);
       _instances.place(
         _crowdIds[i],
-        unitType: i % 5 == 4 ? 'tank' : 'commander',
-        color: teamColor(i.isEven ? 'blue' : 'red'),
+        unitType: unit.tank ? 'tank' : 'commander',
+        color: _crowdTeams[unit.team],
         at: at,
         yaw: spot.yaw,
         eye: eye,
@@ -389,17 +388,24 @@ class SceneBattleWorld implements BattleWorld {
     return world..y = surface.heightAt(world.x, -world.z);
   }
 
+  /// Puts the nodes of [wanted] on the ground, each made by [make] for its
+  /// team (`teamColor`) and made again when the team changes, a relic taken.
   void _place(
-    Map<String, Node> nodes,
+    Map<String, (Node, String?)> placed,
     Map<String, (Position, String?)> wanted,
     Node Function(String? team) make,
   ) {
-    for (final id in nodes.keys.toList()) {
-      if (!wanted.containsKey(id)) scene.remove(nodes.remove(id)!);
+    for (final id in placed.keys.toList()) {
+      if (!wanted.containsKey(id)) scene.remove(placed.remove(id)!.$1);
     }
     for (final MapEntry(key: id, value: (position, team)) in wanted.entries) {
-      (nodes[id] ??= make(team)..also(scene.add)).localTransform =
-          Matrix4.translation(_onGround(position));
+      var entry = placed[id];
+      if (entry == null || entry.$2 != team) {
+        if (entry != null) scene.remove(entry.$1);
+        entry = (make(team)..also(scene.add), team);
+        placed[id] = entry;
+      }
+      entry.$1.localTransform = Matrix4.translation(_onGround(position));
     }
   }
 

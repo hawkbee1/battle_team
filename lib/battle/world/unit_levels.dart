@@ -113,6 +113,20 @@ Vector3 lookedAt(
   );
 }
 
+/// What unit [index] of a crowd is: a tank one time in [tankEvery], a soldier
+/// otherwise, and its team (0 to [teams] less one). Teams come in turn, one
+/// step further after each [tankEvery] units, so a unit never has its
+/// neighbours' team on the grid of `crowdAt` (32 wide for a thousand) and
+/// tanks as well as soldiers are of every team.
+({bool tank, int team}) crowdUnitAt(
+  int index, {
+  int teams = 5,
+  int tankEvery = 5,
+}) => (
+  tank: index % tankEvery == tankEvery - 1,
+  team: (index + index ~/ tankEvery) % teams,
+);
+
 /// Where unit [index] of a crowd of [count] is after [seconds], from the
 /// middle of the crowd, and the way it faces. The crowd is a square grid
 /// with [spacingM] between units; each unit walks a circle of [circleM]

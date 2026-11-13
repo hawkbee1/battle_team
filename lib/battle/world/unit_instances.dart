@@ -4,6 +4,8 @@
 //
 // POC (branch poc/streamed-world).
 
+import 'package:battle_team/battle/world/team_colours.dart';
+import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_levels.dart';
 import 'package:battle_team/battle/world/unit_model.dart';
 import 'package:flutter_scene/scene.dart';
@@ -12,11 +14,17 @@ import 'package:vector_math/vector_math.dart';
 /// {@template unit_instances}
 /// Draws the units as instances: one `InstancedMesh` per unit model, per
 /// level and per part of the model, with one instance per unit, and one more
-/// for the discs under them, in the colour of each unit's team. A thousand
-/// units then cost the draws of the models, whatever their number.
+/// for the discs under them. A thousand units then cost the draws of the
+/// models, whatever their number.
 ///
 /// A unit within [nearM] of the eye is drawn with its near model, the others
 /// with the far one (`unitLevelAt`).
+///
+/// Each unit shows its team three ways: its model, tinted in the team's
+/// colour (the far one whole, the near one on some parts and mixed with
+/// white: see `UnitShape.tint`), the disc under it in that colour, and a rim
+/// around the disc, white or black, that stands out from the disc by
+/// lightness, a cue that does not depend on a hue (`rimColor`).
 /// {@endtemplate}
 class UnitInstances {
   /// {@macro unit_instances}
@@ -31,15 +39,30 @@ class UnitInstances {
   /// How far from the eye a unit is drawn with its near model, in metres.
   final double nearM;
 
+  /// The share of a disc's radius that its rim takes, on the outside.
+  static const _rimShare = 0.2;
+
   final _units = <String, _Unit>{};
   final _batches = <UnitShape, _Batch>{};
+
+  /// The disc in the team's colour and the rim around it, side by side: a
+  /// unit's disc is `discM` metres in radius with both.
   late final _Batch _discs = _Batch(scene, 'unit_discs', [
     (
-      geometry: DiscGeometry(radius: 1, segments: 24),
+      geometry: DiscGeometry(radius: 1 - _rimShare, segments: 24),
       material: UnlitMaterial()..doubleSided = true,
       transform: Matrix4.identity(),
     ),
-  ]);
+    (
+      geometry: RingGeometry(
+        innerRadius: 1 - _rimShare,
+        outerRadius: 1,
+        segments: 24,
+      ),
+      material: UnlitMaterial()..doubleSided = true,
+      transform: Matrix4.identity(),
+    ),
+  ], (team, part) => part == 0 ? team : rimColor(team));
   final _base = Matrix4.identity();
   final _turn = Quaternion.identity();
   final _scale = Vector3.all(1);
@@ -65,9 +88,10 @@ class UnitInstances {
   }
 
   /// Draws the unit [id] of [unitType] standing at [at] and facing [yaw]
-  /// (radians around +Y from +Z), seen from [eye], on a disc of [discM]
-  /// metres in [color]. Call it again when any of these changes: it does
-  /// nothing for a unit that did not move. A [hidden] unit is not drawn.
+  /// (radians around +Y from +Z), seen from [eye], in its team's [color]
+  /// (linear RGB, `teamColor`), on a disc of [discM] metres. Call it again
+  /// when any of these changes: it does nothing for a unit that did not move
+  /// nor change colour. A [hidden] unit is not drawn.
   void place(
     String id, {
     required String unitType,
@@ -86,6 +110,7 @@ class UnitInstances {
     final shape = hidden ? null : model?[level];
     final disc = hidden ? null : discM;
     final moved = unit.at != at || unit.yaw != yaw;
+    final recoloured = unit.color != color;
     unit
       ..at.setFrom(at)
       ..yaw = yaw
@@ -97,18 +122,21 @@ class UnitInstances {
         (_batches[shape] ??= _Batch(
           scene,
           'units_${unitType}_${level.name}',
-          shape,
-        )).add(id, _baseOf(unit));
+          shape.parts,
+          (team, part) => shape.tint[part] == 0
+              ? null
+              : mixedWithWhite(team, shape.tint[part]),
+        )).add(id, _baseOf(unit), color);
       }
-    } else if (moved && shape != null) {
-      _batches[shape]!.move(id, _baseOf(unit));
+    } else if (shape != null) {
+      if (moved) _batches[shape]!.move(id, _baseOf(unit));
+      if (recoloured) _batches[shape]!.colour(id, color);
     }
-    final recoloured = unit.color != color;
     unit.color.setFrom(color);
     if (disc != unit.discM) {
       if (unit.discM != null) _leaveDiscs(id);
       unit.discM = disc;
-      if (disc != null) _discs.add(id, _discOf(unit), color: color);
+      if (disc != null) _discs.add(id, _discOf(unit), color);
     } else if (disc != null) {
       if (moved) _discs.move(id, _discOf(unit));
       if (recoloured) _discs.colour(id, color);
@@ -127,7 +155,11 @@ class UnitInstances {
     if (shape == null) return;
     // The instance that took the place of the one removed is written again.
     final moved = _batches[shape]!.remove(id);
-    if (moved != null) _batches[shape]!.move(moved, _baseOf(_units[moved]!));
+    if (moved == null) return;
+    final unit = _units[moved]!;
+    _batches[shape]!
+      ..move(moved, _baseOf(unit))
+      ..colour(moved, unit.color);
   }
 
   void _leaveDiscs(String id) {
@@ -170,12 +202,16 @@ class _Unit {
   double? discM;
 }
 
-/// The instances of one shape: an instanced mesh per part, and which
+/// The colour of one part of an instance, from its team's colour, or null to
+/// leave the part as it is.
+typedef _Paint = Vector4? Function(Vector4 team, int part);
+
+/// The instances of one set of parts: an instanced mesh per part, and which
 /// instance is which unit's.
 class _Batch {
-  new(Scene scene, String name, this.shape)
+  new(Scene scene, String name, this.parts, this.paint)
     : _meshes = [
-        for (final part in shape)
+        for (final part in parts)
           InstancedMesh(geometry: part.geometry, material: part.material),
       ] {
     final node = Node(name: name);
@@ -185,7 +221,8 @@ class _Batch {
     scene.add(node);
   }
 
-  final UnitShape shape;
+  final List<TreePart> parts;
+  final _Paint paint;
   final List<InstancedMesh> _meshes;
   final _slots = InstanceSlots<String>();
   final _scratch = Matrix4.identity();
@@ -194,10 +231,10 @@ class _Batch {
 
   bool get isEmpty => _slots.length == 0;
 
-  void add(String id, Matrix4 base, {Vector4? color}) {
+  void add(String id, Matrix4 base, Vector4 team) {
     _slots.add(id);
     for (final (index, mesh) in _meshes.indexed) {
-      mesh.addInstance(_at(base, index), color: color);
+      mesh.addInstance(_at(base, index), color: paint(team, index));
     }
   }
 
@@ -208,10 +245,13 @@ class _Batch {
     }
   }
 
-  void colour(String id, Vector4 color) {
+  void colour(String id, Vector4 team) {
     final slot = _slots.indexOf(id)!;
-    for (final mesh in _meshes) {
-      mesh.setInstanceColor(slot, color);
+    for (final (index, mesh) in _meshes.indexed) {
+      // A part left as it is never had a colour of its own.
+      if (paint(team, index) case final color?) {
+        mesh.setInstanceColor(slot, color);
+      }
     }
   }
 
@@ -228,5 +268,5 @@ class _Batch {
 
   Matrix4 _at(Matrix4 base, int part) => _scratch
     ..setFrom(base)
-    ..multiply(shape[part].transform);
+    ..multiply(parts[part].transform);
 }

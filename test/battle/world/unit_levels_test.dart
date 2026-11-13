@@ -128,6 +128,42 @@ void main() {
     });
   });
 
+  group('crowdUnitAt', () {
+    final crowd = [for (var i = 0; i < 1000; i++) crowdUnitAt(i)];
+
+    test('is a tank one time in five', () {
+      expect(crowd.where((unit) => unit.tank), hasLength(200));
+      expect(crowd.first.tank, isFalse);
+      expect(crowd[4].tank, isTrue);
+    });
+
+    test('has soldiers and tanks of each of the five teams', () {
+      for (final tank in [false, true]) {
+        final teams = {
+          for (final unit in crowd.where((unit) => unit.tank == tank))
+            unit.team,
+        };
+        expect(teams, {0, 1, 2, 3, 4});
+      }
+    });
+
+    test('never gives a unit the team of its neighbours on the grid', () {
+      // crowdAt lays a thousand units out 32 wide.
+      for (var i = 0; i < 999; i++) {
+        expect(crowd[i].team, isNot(crowd[i + 1].team), reason: 'next to $i');
+        if (i + 32 < 1000) {
+          expect(crowd[i].team, isNot(crowd[i + 32].team), reason: 'below $i');
+        }
+      }
+    });
+
+    test('keeps within the teams asked for', () {
+      for (var i = 0; i < 100; i++) {
+        expect(crowdUnitAt(i, teams: 2).team, lessThan(2));
+      }
+    });
+  });
+
   group('crowdAt', () {
     test('standing, the crowd is a grid around its middle', () {
       final spots = [

@@ -95,13 +95,13 @@ Check: a forest in first person and from above; that the flow tree shows its col
 ### 4. Units: commander and tank: done but one check
 `unit_model.dart` loads the models of step 2 (`infantryKind`, `vehicleKind`: assets, size in metres, which way the front is); `unit_levels.dart` holds the logic (tested); `unit_instances.dart` draws; `scene_battle_world.dart` moves the units.
 
-- One `InstancedMesh` per unit model, per level and per part of the model, one instance per unit, moved with `setInstanceTransform` only when the unit moved. All units then cost 29 draws at most: 16 for the near soldier, 10 for the near tank (its 10 parts share one material: joining them is a job for `lighten.mjs`), 1 each for the two far models and the discs. Static models only: a skinned model cannot be instanced (stack decision 4), so animation is out of this POC.
+- One `InstancedMesh` per unit model, per level and per part of the model, one instance per unit, moved with `setInstanceTransform` only when the unit moved. All units then cost 30 draws at most: 16 for the near soldier, 10 for the near tank (its 10 parts share one material: joining them is a job for `lighten.mjs`), 1 each for the two far models and 2 for the discs (disc and rim, step 5). Static models only: a skinned model cannot be instanced (stack decision 4), so animation is out of this POC.
 - Every infantry unit is the soldier and every vehicle the tank, drawn whole: its tower does not turn.
 - A unit within `nearM` (100 m) of the eye uses the near model, the others the far model; it keeps its level until 25 % past the limit. The unit under first-person control is not drawn at all, as before: the eye is inside it.
-- **Units are drawn at their real size**, no longer three times bigger: the soldier 1.8 m tall, the tank 5.85 m long. From above a unit shows by its disc (3 m in radius, in its team's colour, all discs one instanced mesh). The models are not tinted: that is step 5.
+- **Units are drawn at their real size**, no longer three times bigger: the soldier 1.8 m tall, the tank 5.85 m long. From above a unit shows by its disc (3 m in radius, in its team's colour: step 5).
 - A unit faces where it last moved. `frontYaw` of each kind turns its model's front onto the way it walks (set by the owner on a screen).
 - The selected unit and the target have a ring around their disc (yellow, white) instead of a highlight of the model.
-- The debug switch is the last button of the toolbar (the group icon): 1,000 units in a square of 32 by 32, 8 m apart, around the middle of the screen, four soldiers for one tank, half blue and half red. Each walks a circle of 3 m, so every instance moves every frame. They are only drawn: no label, no tap. The switch logs the counts (`SceneBattleWorld.unitCounts`).
+- The debug switch is the last button of the toolbar (the group icon): 1,000 units in a square of 32 by 32, 8 m apart, around the middle of the screen, four soldiers for one tank, of the five teams in turn. Each walks a circle of 3 m, so every instance moves every frame. They are only drawn: no label, no tap. The switch logs the counts (`SceneBattleWorld.unitCounts`).
 
 Knobs: `UnitInstances.nearM`; `sizeM` and `frontYaw` of `infantryKind` and `vehicleKind`; `SceneBattleWorld.crowdCount`; spacing, circle and speed in `crowdAt`.
 
@@ -109,10 +109,10 @@ Checked by the owner (2026-11-13): 1,000 walking units draw, top-down and in fir
 
 Check left: the soldier's size and pose next to a tree and a tank, in first person.
 
-### 5. Team colours
-Each team has one colour, which tints its units, HQ and relics. Five teams (MAP-04).
+### 5. Team colours: written, waiting for the Check
+Each team has one colour, which tints its units, HQ and relics. Five teams (MAP-04). `team_colours.dart` holds the logic (tested); `unit_instances.dart` and `scene_battle_world.dart` draw. A team's place is the number its id ends with (`team-3` is the third, as the backend names them); an id with no place gets a grey.
 
-Proposed palette (Okabe–Ito), in team order:
+Palette (Okabe–Ito), in team order:
 
 | Team | Colour | sRGB |
 |---|---|---|
@@ -125,15 +125,21 @@ Proposed palette (Okabe–Ito), in team order:
 
 A battle of two teams is then blue against yellow. Measured with a simulation of protanopia, deuteranopia and tritanopia (distance in OKLab × 100; under 10 is hard to tell apart):
 - The five colours: the closest pair is at 18.9 in the worst case. With purple instead of sky blue it falls to 9.6 (blue and purple for a protanope).
-- Today's red: 1.9 from the forest ground for a protanope, 5.2 from grass for a deuteranope. The red team disappears on the ground.
-- Weak points left: vermillion is 5.3 from grass (deuteranope), yellow 5.8 from sand (tritanope), blue 0.4 from a lake. No colour is safe against every ground, so a unit also needs a cue that is not a hue.
+- The red the game had before: 1.9 from the forest ground for a protanope, 5.2 from grass for a deuteranope. The red team disappeared on the ground.
+- Weak points left: vermillion is 5.3 from grass (deuteranope), yellow 5.8 from sand (tritanope), blue 0.4 from a lake. No colour is safe against every ground, so a unit also has a cue that is not a hue.
 
-To test:
-- **Where the tint goes.** `InstancedMesh.addInstance(color:)` multiplies the colour of a whole part. Far models have no texture, so they take the team colour whole: from above a unit is a figure in its team's colour. Near models keep their textures; try the tint on chosen parts only (some of the soldier's 16 parts; the tank has one material, so the whole of it), mixed with white so the texture still shows. A model tinted whole in black loses its shape.
-- **The second cue.** A light or dark rim around the team-coloured disc under each unit, so a unit stands out by lightness on any ground.
-- The palette on a device, on grass, forest, sand, road and fogged ground.
+A unit shows its team three ways:
+- **Its model.** A far model has no texture and takes the colour whole. A near model multiplies its textures by the colour mixed with white (`nearTintMix`, 0.75 of the way from white to the colour, so the texture shows and a black team keeps its shape), on chosen parts only: the soldier's tunic, trousers and helmet (parts 0, 1 and 3 of `infantry_near`, picked from their textures, not seen on the model), the whole tank (one material).
+- **Its disc**, in the colour.
+- **A rim** around the disc (its outer fifth, 0.6 m), white or black, whichever contrasts more with the colour: white for the blue and the black team, black for the others and for the white relic. A lightness cue that does not depend on a hue. Disc and rim are one instanced mesh of two parts.
 
-Check: the owner, and if possible a colour-blind player, tell five teams apart top-down at the usual zoom.
+HQs and relics take the same colours through `teamColor` (flag, ring, pillar); neither has a rim. They are now made again when their team changes: a relic kept the colour of its first owner.
+
+Colours reach the materials as linear RGB (`srgbToLinear`); what the scene's lighting and tone mapping make of them is for the Check. The debug crowd shows the five teams in turn, soldiers and tanks of each, no unit next to one of its own team (`crowdUnitAt`).
+
+Knobs: `teamPalette`, `nearTintMix`, `tintParts` of `infantryKind`, `_rimShare` of `UnitInstances`.
+
+Check: the owner, and if possible a colour-blind player, switch the crowd on and tell the five teams apart top-down at the usual zoom, on grass, forest, sand, road and fogged ground; say whether the rim helps. In first person and close to a unit: that the tint of the soldier's tunic, trousers and helmet shows through the textures, is neither too dark nor washed out, and that the black team is still a soldier (and which parts of the soldier should take the colour); the tank tinted whole. An HQ and a relic in each colour, a relic changing colour when it is captured, and an unowned relic white.
 
 ### 6. Buildings batched per chunk
 One mesh per chunk built in code from the buildings' cells (walls and a roof per cell, neighbours merged; dashmap batches 24,000 vertices per mesh), instead of an instanced box per cell. The HQ takes `low_poly_building`.

@@ -6,6 +6,7 @@
 
 import 'dart:math' as math;
 
+import 'package:battle_team/battle/world/team_colours.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_levels.dart';
 import 'package:flutter/services.dart' show AssetBundle;
@@ -15,22 +16,29 @@ import 'package:vector_math/vector_math.dart';
 /// assets, and how they stand in the game. The models keep the scale and
 /// the frame of their download, so each is brought to `sizeM` metres, its
 /// height or (when `byLength`) the longer side of its footprint, and turned
-/// by `frontYaw` radians around +Y so that its front is on +Z.
+/// by `frontYaw` radians around +Y so that its front is on +Z. The parts of
+/// its near model that take the team's colour are `tintParts`, by their place
+/// in the model (the order of `loadModelParts`), all of them when null; its
+/// far model is tinted whole.
 typedef UnitKind = ({
   String near,
   String far,
   double sizeM,
   bool byLength,
   double frontYaw,
+  Set<int>? tintParts,
 });
 
-/// Every infantry unit, for now: the soldier, 1.8 m tall.
+/// Every infantry unit, for now: the soldier, 1.8 m tall. Its tunic (part 0),
+/// its trousers (1) and its helmet (3) take the team's colour: read on the
+/// textures, not seen on the model.
 const UnitKind infantryKind = (
   near: 'assets/3d_models/infantry_near.glb',
   far: 'assets/3d_models/infantry_far.glb',
   sizeM: 1.8,
   byLength: false,
   frontYaw: math.pi,
+  tintParts: {0, 1, 3},
 );
 
 /// Every vehicle, for now: the tank, 5.85 m long. Its model is longer on X
@@ -41,6 +49,7 @@ const UnitKind vehicleKind = (
   sizeM: 5.85,
   byLength: true,
   frontYaw: math.pi / 2,
+  tintParts: null,
 );
 
 /// The unit types drawn with the vehicle's model; the others take the
@@ -48,11 +57,22 @@ const UnitKind vehicleKind = (
 const vehicleUnitTypes = {'jeep', 'tank', 'truck', 'artillery'};
 
 /// {@template unit_shape}
-/// A unit model at one level, flattened into its parts. The transform of
+/// A unit model at one level, flattened into its [parts]. The transform of
 /// each part goes from the part to the unit's frame: metres, the feet on
 /// the origin, the front on +Z.
 /// {@endtemplate}
-typedef UnitShape = List<TreePart>;
+final class UnitShape {
+  /// {@macro unit_shape}
+  const new({required this.parts, required this.tint});
+
+  /// The model's primitives.
+  final List<TreePart> parts;
+
+  /// For each of [parts], how much of the team's colour it takes: 0 leaves it
+  /// as it is, 1 paints it whole, in between it is mixed with white so that
+  /// its texture shows (`mixedWithWhite`).
+  final List<double> tint;
+}
 
 /// {@template unit_models}
 /// The models units are drawn with, each at its two levels. A kind left out
@@ -80,15 +100,26 @@ Future<UnitModels> loadUnitModels(AssetBundle bundle) async => UnitModels(
 );
 
 Future<Map<UnitLevel, UnitShape>> _loadKind(UnitKind kind) async => {
-  .near: await _loadShape(kind.near, kind),
-  .far: await _loadShape(kind.far, kind),
+  .near: await _loadShape(kind.near, kind, .near),
+  .far: await _loadShape(kind.far, kind, .far),
 };
 
 /// Each level is fitted by its own box: lightening a model moves its box a
 /// little, and both must stand on the ground.
-Future<UnitShape> _loadShape(String asset, UnitKind kind) async {
+Future<UnitShape> _loadShape(
+  String asset,
+  UnitKind kind,
+  UnitLevel level,
+) async {
   final (:parts, :min, :max) = await loadModelParts(asset);
-  if (!min.x.isFinite) return parts;
+  final tint = [
+    for (final (index, _) in parts.indexed)
+      switch (level) {
+        .far => 1.0,
+        .near => (kind.tintParts?.contains(index) ?? true) ? nearTintMix : 0.0,
+      },
+  ];
+  if (!min.x.isFinite) return UnitShape(parts: parts, tint: tint);
   final size = kind.byLength
       ? math.max(max.x - min.x, max.z - min.z)
       : max.y - min.y;
@@ -100,12 +131,15 @@ Future<UnitShape> _loadShape(String asset, UnitKind kind) async {
       )..translateByVector3(
         Vector3(-(min.x + max.x) / 2, -min.y, -(min.z + max.z) / 2),
       );
-  return [
-    for (final part in parts)
-      (
-        geometry: part.geometry,
-        material: part.material,
-        transform: fit.multiplied(part.transform),
-      ),
-  ];
+  return UnitShape(
+    parts: [
+      for (final part in parts)
+        (
+          geometry: part.geometry,
+          material: part.material,
+          transform: fit.multiplied(part.transform),
+        ),
+    ],
+    tint: tint,
+  );
 }
