@@ -10,29 +10,37 @@ import 'package:material_ui/material_ui.dart';
 /// and a message says why. Needs an [AuthenticationCubit] above it when it is
 /// pressed.
 class LogOutButton extends StatelessWidget {
-  const new({super.key});
+  const new({super.key, this.icon = false});
+
+  /// Whether it is an icon with a tooltip, for a toolbar, rather than text.
+  final bool icon;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return TextButton(
-      onPressed: () {
-        final messenger = ScaffoldMessenger.of(context);
-        unawaited(
-          context.read<AuthenticationCubit>().logOut(
-            onFailure: (reason) => messenger.showSnackBar(
-              SnackBar(
-                content: Text(
-                  l10n.authenticationLogOutFailed(
-                    l10n.authenticationFailure(reason.name),
-                  ),
+    void logOut() {
+      final messenger = ScaffoldMessenger.of(context);
+      unawaited(
+        context.read<AuthenticationCubit>().logOut(
+          onFailure: (reason) => messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.authenticationLogOutFailed(
+                  l10n.authenticationFailure(reason.name),
                 ),
               ),
             ),
           ),
-        );
-      },
-      child: Text(l10n.authenticationLogOut),
-    );
+        ),
+      );
+    }
+
+    return icon
+        ? IconButton(
+            tooltip: l10n.authenticationLogOut,
+            onPressed: logOut,
+            icon: const Icon(Icons.logout),
+          )
+        : TextButton(onPressed: logOut, child: Text(l10n.authenticationLogOut));
   }
 }

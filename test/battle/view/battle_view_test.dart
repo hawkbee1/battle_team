@@ -218,7 +218,7 @@ void main() {
       // The attribution is behind the entry, not on the map.
       expect(find.textContaining('OpenStreetMap'), findsNothing);
 
-      await tester.tap(find.text('Credits'));
+      await tester.tap(find.byTooltip('Credits'));
       await tester.pumpAndSettle();
 
       expect(map.spec.attribution, isNotEmpty);
@@ -240,7 +240,7 @@ void main() {
           .thenAnswer((_) async {});
       await pump(tester, authentication: authentication);
 
-      await tester.tap(find.text('Log out'));
+      await tester.tap(find.byTooltip('Log out'));
 
       verify(() => authentication.logOut(onFailure: any(named: 'onFailure')))
           .called(1);
@@ -253,7 +253,7 @@ void main() {
       when(entry.choose).thenAnswer((_) async {});
       await pump(tester, entry: entry);
 
-      await tester.tap(find.text('Switch battle'));
+      await tester.tap(find.byTooltip('Switch battle'));
 
       verify(entry.choose).called(1);
     });
@@ -261,9 +261,51 @@ void main() {
     testWidgets('M7.12 the log-out is in French too', (tester) async {
       await pump(tester, locale: const Locale('fr'));
 
-      expect(find.text('Changer de bataille'), findsOneWidget);
-      expect(find.text('Se déconnecter'), findsOneWidget);
-      expect(find.text('Crédits'), findsOneWidget);
+      expect(find.byTooltip('Changer de bataille'), findsOneWidget);
+      expect(find.byTooltip('Se déconnecter'), findsOneWidget);
+      expect(find.byTooltip('Crédits'), findsOneWidget);
+    });
+
+    testWidgets('the toolbar masks and shows each overlay on its own', (
+      tester,
+    ) async {
+      await pump(tester);
+      expect(find.textContaining('Drag to pan'), findsOneWidget);
+      expect(find.textContaining('In battle'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Hide the status'));
+      await tester.pump();
+      expect(find.textContaining('In battle'), findsNothing);
+      expect(find.textContaining('Drag to pan'), findsNothing);
+      expect(find.text('Your units'), findsOneWidget);
+      expect(find.byTooltip('Credits'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Hide the units'));
+      await tester.pump();
+      expect(find.text('Your units'), findsNothing);
+
+      await tester.tap(find.byTooltip('Show the status'));
+      await tester.pump();
+      expect(find.textContaining('Drag to pan'), findsOneWidget);
+      expect(find.text('Your units'), findsNothing);
+    });
+
+    testWidgets('the toolbar is at the bottom on a phone, on the right on '
+        'a desktop, and the overlays stay clear of it', (tester) async {
+      await pump(tester);
+      final size = tester.getSize(find.byType(BattleView));
+      final credits = tester.getRect(find.byTooltip('Credits'));
+      final header = tester.getRect(find.textContaining('Drag to pan'));
+      // The test surface is wide: the toolbar is on the right.
+      expect(credits.left, greaterThan(size.width - 80));
+      expect(header.right, lessThanOrEqualTo(size.width - 56));
+
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pump();
+      final phoneCredits = tester.getRect(find.byTooltip('Credits'));
+      expect(phoneCredits.top, greaterThan(800 - 80));
     });
 
     testWidgets(

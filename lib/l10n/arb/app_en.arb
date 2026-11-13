@@ -114,6 +114,32 @@
   "@battleTopDown": {
     "description": "Goes back from a unit's eyes to the view from above"
   },
+  "battleOverlayHide": "Hide {overlay}",
+  "@battleOverlayHide": {
+    "description": "Tooltip of a battle toolbar button that masks or shows one overlay",
+    "placeholders": {"overlay": {"type": "String"}}
+  },
+  "battleOverlayShow": "Show {overlay}",
+  "@battleOverlayShow": {
+    "description": "Tooltip of a battle toolbar button that masks or shows one overlay",
+    "placeholders": {"overlay": {"type": "String"}}
+  },
+  "battleOverlayStatus": "the status",
+  "@battleOverlayStatus": {
+    "description": "Name of an overlay of the battle screen, in the toolbar tooltips"
+  },
+  "battleOverlayUnits": "the units",
+  "@battleOverlayUnits": {
+    "description": "Name of an overlay of the battle screen, in the toolbar tooltips"
+  },
+  "battleOverlayUnit": "the selected unit",
+  "@battleOverlayUnit": {
+    "description": "Name of an overlay of the battle screen, in the toolbar tooltips"
+  },
+  "battleOverlayAlerts": "the alerts",
+  "@battleOverlayAlerts": {
+    "description": "Name of an overlay of the battle screen, in the toolbar tooltips"
+  },
   "battleCredits": "Credits",
   "@battleCredits": {
     "description": "Entry of the battle screen that shows the map's attribution"

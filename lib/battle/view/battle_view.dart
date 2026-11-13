@@ -80,6 +80,8 @@ class BattleView extends StatefulWidget {
 }
 
 class _BattleViewState extends State<BattleView> {
+  static const _compactWidth = 600.0;
+  static const _toolbarExtent = 56.0;
   static final _log = Logger('battle_team.BattleView');
 
   late final TopDownCamera _topDown;
@@ -89,6 +91,7 @@ class _BattleViewState extends State<BattleView> {
   final _focus = FocusNode();
   bool _storageOpen = false;
   bool _shopOpen = false;
+  final _hidden = <_Overlay>{};
   double _lastScale = 1;
   double _lastRotation = 0;
   Size _size = Size.zero;
@@ -332,6 +335,9 @@ class _BattleViewState extends State<BattleView> {
 
   @override
   Widget build(BuildContext context) {
+    // A phone's toolbar runs along the bottom, a desktop's or a browser's
+    // along the right.
+    final compact = MediaQuery.sizeOf(context).width < _compactWidth;
     return MultiBlocListener(
       listeners: [
         BlocListener<BattleCubit, BattleState>(
@@ -412,138 +418,166 @@ class _BattleViewState extends State<BattleView> {
                 ),
               ),
             ),
-            Positioned(
-              left: 12,
-              top: 12,
-              right: 12,
-              child: _Header(
-                help: _firstPerson == null
-                    ? context.l10n.battleHelp
-                    : context.l10n.battleHelpFirstPerson,
-              ),
-            ),
-            Positioned(
-              right: 12,
-              top: 96,
-              child: _UnitsPanel(
-                onCentre: _centreNow,
-                onStorage: () => setState(() {
-                  _storageOpen = !_storageOpen;
-                  _shopOpen = false;
-                }),
-                onShop: () => setState(() {
-                  _shopOpen = !_shopOpen;
-                  _storageOpen = false;
-                }),
-              ),
-            ),
-            if (_storageOpen)
-              Positioned(
-                left: 12,
-                top: 96,
-                width: 300,
-                // Short enough to leave the selected unit's panel below.
-                child: BlocSelector<BattleCubit, BattleState, bool>(
-                  selector: (state) => state.selectedId != null,
-                  builder: (context, selected) => ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: math.max(
-                        80,
-                        MediaQuery.sizeOf(context).height -
-                            96 -
-                            (selected ? 200 : 12),
-                      ),
-                    ),
-                    child: _Panel(
-                      child: SingleChildScrollView(
-                        child: StoragePanel(
-                          onClose: () => setState(() => _storageOpen = false),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            if (_shopOpen)
-              Positioned(
-                left: 12,
-                top: 96,
-                width: 300,
-                // Short enough to leave the selected unit's panel below.
-                child: BlocSelector<BattleCubit, BattleState, UnitView?>(
-                  selector: (state) => state.selected,
-                  builder: (context, selected) => ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: math.max(
-                        80,
-                        MediaQuery.sizeOf(context).height -
-                            96 -
-                            (selected != null ? 200 : 12),
-                      ),
-                    ),
-                    child: _Panel(
-                      child: SingleChildScrollView(
-                        child: ShopPanel(
-                          selected: selected,
-                          onClose: () => setState(() => _shopOpen = false),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
             if (_firstPerson != null) const AimReticle(),
-            Positioned(
-              top: 96,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: AlertBanners(builder: (child) => _Panel(child: child)),
+            // The overlays live in what the toolbar leaves free, so that none
+            // can cover one of its buttons.
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: compact ? _toolbarExtent : 0,
+                  right: compact ? 0 : _toolbarExtent,
                 ),
-              ),
-            ),
-            Positioned(
-              bottom: 12,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: IgnorePointer(
-                    child: StatusStrip(
-                      builder: (child) => _Panel(child: child),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 12,
-              bottom: 12,
-              child: ValueListenableBuilder(
-                valueListenable: _frame,
-                builder: (context, _, _) => _SelectedUnit(
-                  aim: switch (_firstPerson) {
-                    final inside? => () => directionOf(inside.forward),
-                    null => null,
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              right: 12,
-              bottom: 12,
-              child: _Panel(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
                   children: [
-                    _Credits(lines: widget.map.spec.attribution),
-                    const _SwitchBattle(),
-                    const LogOutButton(),
+                    if (!_hidden.contains(_Overlay.status))
+                      Positioned(
+                        left: 12,
+                        top: 12,
+                        right: 12,
+                        child: _Header(
+                          help: _firstPerson == null
+                              ? context.l10n.battleHelp
+                              : context.l10n.battleHelpFirstPerson,
+                        ),
+                      ),
+                    if (!_hidden.contains(_Overlay.units))
+                      Positioned(
+                        right: 12,
+                        top: 96,
+                        child: _UnitsPanel(
+                          onCentre: _centreNow,
+                          onStorage: () => setState(() {
+                            _storageOpen = !_storageOpen;
+                            _shopOpen = false;
+                          }),
+                          onShop: () => setState(() {
+                            _shopOpen = !_shopOpen;
+                            _storageOpen = false;
+                          }),
+                        ),
+                      ),
+                    if (_storageOpen && !_hidden.contains(_Overlay.units))
+                      Positioned(
+                        left: 12,
+                        top: 96,
+                        width: 300,
+                        // Short enough to leave the selected unit panel.
+                        child: BlocSelector<BattleCubit, BattleState, bool>(
+                          selector: (state) => state.selectedId != null,
+                          builder: (context, selected) => ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: math.max(
+                                80,
+                                MediaQuery.sizeOf(context).height -
+                                    96 -
+                                    (selected ? 200 : 12),
+                              ),
+                            ),
+                            child: _Panel(
+                              child: SingleChildScrollView(
+                                child: StoragePanel(
+                                  onClose: () =>
+                                      setState(() => _storageOpen = false),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (_shopOpen && !_hidden.contains(_Overlay.units))
+                      Positioned(
+                        left: 12,
+                        top: 96,
+                        width: 300,
+                        // Short enough to leave the selected unit panel.
+                        child:
+                            BlocSelector<BattleCubit, BattleState, UnitView?>(
+                              selector: (state) => state.selected,
+                              builder: (context, selected) => ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: math.max(
+                                    80,
+                                    MediaQuery.sizeOf(context).height -
+                                        96 -
+                                        (selected != null ? 200 : 12),
+                                  ),
+                                ),
+                                child: _Panel(
+                                  child: SingleChildScrollView(
+                                    child: ShopPanel(
+                                      selected: selected,
+                                      onClose: () =>
+                                          setState(() => _shopOpen = false),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                      ),
+                    if (!_hidden.contains(_Overlay.alerts))
+                      Positioned(
+                        top: 96,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 420),
+                            child: AlertBanners(
+                              builder: (child) => _Panel(child: child),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!_hidden.contains(_Overlay.alerts))
+                      Positioned(
+                        bottom: 12,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 420),
+                            child: IgnorePointer(
+                              child: StatusStrip(
+                                builder: (child) => _Panel(child: child),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!_hidden.contains(_Overlay.unit))
+                      Positioned(
+                        left: 12,
+                        bottom: 12,
+                        child: ValueListenableBuilder(
+                          valueListenable: _frame,
+                          builder: (context, _, _) => _SelectedUnit(
+                            aim: switch (_firstPerson) {
+                              final inside? => () => directionOf(
+                                inside.forward,
+                              ),
+                              null => null,
+                            },
+                          ),
+                        ),
+                      ),
                   ],
                 ),
+              ),
+            ),
+            Positioned(
+              right: 0,
+              bottom: 0,
+              left: compact ? 0 : null,
+              top: compact ? null : 0,
+              child: _Toolbar(
+                compact: compact,
+                hidden: _hidden,
+                onToggleOverlay: (overlay) => setState(
+                  () => _hidden.contains(overlay)
+                      ? _hidden.remove(overlay)
+                      : _hidden.add(overlay),
+                ),
+                credits: widget.map.spec.attribution,
               ),
             ),
           ],
@@ -782,46 +816,105 @@ class _UnitLabels extends StatelessWidget {
   }
 }
 
-/// The map's credits: its data is under licences that ask for an
-/// attribution (Q-MAP-22), which a tap on the entry shows. Beside it, the
-/// switch to another battle and the log-out button (M7 Issue 12).
-class _Credits extends StatelessWidget {
-  const new({required this.lines});
+/// The overlays the toolbar masks, one button each.
+enum _Overlay {
+  status(Icons.info),
+  units(Icons.groups),
+  unit(Icons.person),
+  alerts(Icons.notifications);
 
-  final List<String> lines;
+  new(this.icon);
+
+  final IconData icon;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    status => l10n.battleOverlayStatus,
+    units => l10n.battleOverlayUnits,
+    unit => l10n.battleOverlayUnit,
+    alerts => l10n.battleOverlayAlerts,
+  };
+}
+
+/// The toolbar: masks or shows each overlay, the map's credits (its data is
+/// under licences that ask for an attribution, Q-MAP-22), the switch to
+/// another battle and the log-out (M7 Issue 12). Along the bottom of a phone,
+/// along the right of a desktop or a browser.
+class _Toolbar extends StatelessWidget {
+  const new({
+    required this.compact,
+    required this.hidden,
+    required this.onToggleOverlay,
+    required this.credits,
+  });
+
+  final bool compact;
+
+  /// The overlays masked now.
+  final Set<_Overlay> hidden;
+  final void Function(_Overlay overlay) onToggleOverlay;
+  final List<String> credits;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return TextButton(
-      onPressed: () => showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.battleCredits),
-          content: SingleChildScrollView(child: Text(lines.join('\n\n'))),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.battleCreditsClose),
-            ),
-          ],
+    final buttons = [
+      for (final overlay in _Overlay.values)
+        IconButton(
+          tooltip: hidden.contains(overlay)
+              ? l10n.battleOverlayShow(overlay.label(l10n))
+              : l10n.battleOverlayHide(overlay.label(l10n)),
+          onPressed: () => onToggleOverlay(overlay),
+          isSelected: !hidden.contains(overlay),
+          icon: Icon(overlay.icon),
+          selectedIcon: Icon(overlay.icon),
+          style: IconButton.styleFrom(
+            foregroundColor: hidden.contains(overlay)
+                ? Colors.white38
+                : Colors.white,
+          ),
+        ),
+      IconButton(
+        tooltip: l10n.battleCredits,
+        onPressed: () => showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.battleCredits),
+            content: SingleChildScrollView(child: Text(credits.join('\n\n'))),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.battleCreditsClose),
+              ),
+            ],
+          ),
+        ),
+        icon: const Icon(Icons.info_outline),
+      ),
+      IconButton(
+        tooltip: l10n.battleEntrySwitch,
+        onPressed: () => unawaited(context.read<BattleEntryCubit>().choose()),
+        icon: const Icon(Icons.swap_horiz),
+      ),
+      const LogOutButton(icon: true),
+    ];
+    return DecoratedBox(
+      decoration: const BoxDecoration(color: Color(0xCC1E2228)),
+      child: SafeArea(
+        child: IconTheme.merge(
+          data: const IconThemeData(color: Colors.white),
+          child: SingleChildScrollView(
+            scrollDirection: compact ? Axis.horizontal : Axis.vertical,
+            child: compact
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: buttons,
+                  )
+                : Column(mainAxisSize: MainAxisSize.min, children: buttons),
+          ),
         ),
       ),
-      child: Text(l10n.battleCredits),
     );
   }
-}
-
-/// Leaves the battle for the list of the account's battles, to enter another
-/// war's (its `BattleEntryCubit` is above the battle page).
-class _SwitchBattle extends StatelessWidget {
-  const new();
-
-  @override
-  Widget build(BuildContext context) => TextButton(
-    onPressed: () => unawaited(context.read<BattleEntryCubit>().choose()),
-    child: Text(context.l10n.battleEntrySwitch),
-  );
 }
 
 class _Panel extends StatelessWidget {
