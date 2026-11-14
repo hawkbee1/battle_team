@@ -13,18 +13,15 @@ import 'package:vector_math/vector_math.dart';
 
 /// {@template unit_instances}
 /// Draws the units as instances: one `InstancedMesh` per unit model, per
-/// level and per part of the model, with one instance per unit, and one more
-/// for the discs under them. A thousand units then cost the draws of the
-/// models, whatever their number.
+/// level and per part of the model, with one instance per unit. A thousand
+/// units then cost the draws of the models, whatever their number.
 ///
 /// A unit within [nearM] of the eye is drawn with its near model, the others
 /// with the far one (`unitLevelAt`).
 ///
-/// Each unit shows its team three ways: its model, tinted in the team's
-/// colour (the far one whole, the near one on some parts and mixed with
-/// white: see `UnitShape.tint`), the disc under it in that colour, and a rim
-/// around the disc, white or black, that stands out from the disc by
-/// lightness, a cue that does not depend on a hue (`rimColor`).
+/// Each unit shows its team by its model, tinted in the team's colour (the
+/// far one whole, the near one on some parts and mixed with white: see
+/// `UnitShape.tint`).
 /// {@endtemplate}
 class UnitInstances {
   /// {@macro unit_instances}
@@ -39,30 +36,9 @@ class UnitInstances {
   /// How far from the eye a unit is drawn with its near model, in metres.
   final double nearM;
 
-  /// The share of a disc's radius that its rim takes, on the outside.
-  static const _rimShare = 0.2;
-
   final _units = <String, _Unit>{};
   final _batches = <UnitShape, _Batch>{};
 
-  /// The disc in the team's colour and the rim around it, side by side: a
-  /// unit's disc is `discM` metres in radius with both.
-  late final _Batch _discs = _Batch(scene, 'unit_discs', [
-    (
-      geometry: DiscGeometry(radius: 1 - _rimShare, segments: 24),
-      material: UnlitMaterial()..doubleSided = true,
-      transform: Matrix4.identity(),
-    ),
-    (
-      geometry: RingGeometry(
-        innerRadius: 1 - _rimShare,
-        outerRadius: 1,
-        segments: 24,
-      ),
-      material: UnlitMaterial()..doubleSided = true,
-      transform: Matrix4.identity(),
-    ),
-  ], (team, part) => part == 0 ? team : rimColor(team));
   final _base = Matrix4.identity();
   final _turn = Quaternion.identity();
   final _scale = Vector3.all(1);
@@ -80,18 +56,16 @@ class UnitInstances {
     return (
       near: near,
       far: far,
-      meshes: [
-        _discs,
-        ..._batches.values,
-      ].fold(0, (sum, batch) => sum + (batch.isEmpty ? 0 : batch.meshes)),
+      meshes: [..._batches.values]
+          .fold(0, (sum, batch) => sum + (batch.isEmpty ? 0 : batch.meshes)),
     );
   }
 
   /// Draws the unit [id] of [unitType] standing at [at] and facing [yaw]
   /// (radians around +Y from +Z), seen from [eye], in its team's [color]
-  /// (linear RGB, `teamColor`), on a disc of [discM] metres. Call it again
-  /// when any of these changes: it does nothing for a unit that did not move
-  /// nor change colour. A [hidden] unit is not drawn.
+  /// (linear RGB, `teamColor`). Call it again when any of these changes: it
+  /// does nothing for a unit that did not move nor change colour. A [hidden]
+  /// unit is not drawn.
   void place(
     String id, {
     required String unitType,
@@ -99,7 +73,6 @@ class UnitInstances {
     required Vector3 at,
     required double yaw,
     required Vector3? eye,
-    double discM = 3,
     bool hidden = false,
   }) {
     final unit = _units[id] ??= _Unit();
@@ -108,7 +81,6 @@ class UnitInstances {
         ? UnitLevel.far
         : unitLevelAt(at.distanceTo(eye), now: unit.level, nearM: nearM);
     final shape = hidden ? null : model?[level];
-    final disc = hidden ? null : discM;
     final moved = unit.at != at || unit.yaw != yaw;
     final recoloured = unit.color != color;
     unit
@@ -133,14 +105,6 @@ class UnitInstances {
       if (recoloured) _batches[shape]!.colour(id, color);
     }
     unit.color.setFrom(color);
-    if (disc != unit.discM) {
-      if (unit.discM != null) _leaveDiscs(id);
-      unit.discM = disc;
-      if (disc != null) _discs.add(id, _discOf(unit), color);
-    } else if (disc != null) {
-      if (moved) _discs.move(id, _discOf(unit));
-      if (recoloured) _discs.colour(id, color);
-    }
   }
 
   /// Stops drawing the unit [id].
@@ -148,7 +112,6 @@ class UnitInstances {
     final unit = _units.remove(id);
     if (unit == null) return;
     _leave(id, unit.shape);
-    if (unit.discM != null) _leaveDiscs(id);
   }
 
   void _leave(String id, UnitShape? shape) {
@@ -162,29 +125,11 @@ class UnitInstances {
       ..colour(moved, unit.color);
   }
 
-  void _leaveDiscs(String id) {
-    final moved = _discs.remove(id);
-    if (moved == null) return;
-    final unit = _units[moved]!;
-    _discs
-      ..move(moved, _discOf(unit))
-      ..colour(moved, unit.color);
-  }
-
   /// From the unit's frame to the world. The matrix is reused: read it
   /// before the next call.
   Matrix4 _baseOf(_Unit unit) {
     _turn.setAxisAngle(_up, unit.yaw);
     return _base..setFromTranslationRotationScale(unit.at, _turn, _scale);
-  }
-
-  /// The disc under the unit, just above the ground.
-  Matrix4 _discOf(_Unit unit) {
-    final size = unit.discM!;
-    return _base
-      ..setIdentity()
-      ..setTranslationRaw(unit.at.x, unit.at.y + 0.3, unit.at.z)
-      ..scaleByDouble(size, 1, size, 1);
   }
 }
 
@@ -197,9 +142,6 @@ class _Unit {
 
   /// The shape it has an instance of, null when it has none.
   UnitShape? shape;
-
-  /// The size of its disc, null when it has none.
-  double? discM;
 }
 
 /// The colour of one part of an instance, from its team's colour, or null to
