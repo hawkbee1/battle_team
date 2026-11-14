@@ -5,8 +5,6 @@ import 'package:battle_map/battle_map.dart';
 import 'package:battle_pathfinding/battle_pathfinding.dart' show CellRef;
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/ground_tiles.dart';
-import 'package:battle_team/fog/model/fog_model.dart';
-import 'package:battle_team/fog/model/fog_shading.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -89,6 +87,14 @@ void main() {
         x1: 99,
         y1: 99,
       ));
+    });
+
+    test('a tile is under one root, whose cells are its page', () {
+      final grid = GroundGrid(width: 1000, depth: 5000, cellSizeM: 10);
+
+      expect(grid.rootOf((level: 4, x: 0, y: 3)), (level: 4, x: 0, y: 3));
+      expect(grid.rootOf((level: 0, x: 15, y: 16)), (level: 4, x: 0, y: 1));
+      expect(grid.rootOf((level: 2, x: 3, y: 19)), (level: 4, x: 0, y: 4));
     });
 
     test('measures from the eye to the nearest ground of a tile', () {
@@ -194,8 +200,8 @@ void main() {
       const inner = 65 * 65;
       const rim = 4 * 64;
       expect(arrays.positions.length, (inner + rim) * 3);
+      expect(arrays.texCoords.length, (inner + rim) * 2);
       expect(arrays.colors.length, (inner + rim) * 4);
-      expect(arrays.cells.length, inner + rim);
       expect(arrays.indices.length, 64 * 64 * 6 + rim * 6);
       expect(arrays.indices.reduce(math.max), inner + rim - 1);
       // The first vertex is the first cell's centre, at its height.
@@ -203,12 +209,16 @@ void main() {
       // Cell (3, 2): 3 east, 2 south.
       const v = 2 * 65 + 3;
       expect(arrays.positions.sublist(v * 3, v * 3 + 3), [35, 7, -25]);
-      expect(arrays.cells[v], 2 * 100 + 3);
-      // The skirt's first vertex hangs a quad below the first vertex.
+      // The skirt's first vertex hangs a quad below the first vertex, with
+      // its shade and its place in the textures.
       expect(arrays.positions.sublist(inner * 3, inner * 3 + 3), [5, -10, -5]);
       expect(
         arrays.colors.sublist(inner * 4, inner * 4 + 4),
         arrays.colors.sublist(0, 4),
+      );
+      expect(
+        arrays.texCoords.sublist(inner * 2, inner * 2 + 2),
+        arrays.texCoords.sublist(0, 2),
       );
     });
 
@@ -217,63 +227,67 @@ void main() {
 
       // Cells 0, 2, … 98, then 99.
       const cols = 51;
-      expect(arrays.cells.sublist(0, 3), [0, 2, 4]);
-      expect(arrays.cells[cols - 1], 99);
-      expect(arrays.cells.length, cols * cols + 4 * (cols - 1));
+      expect(arrays.positions.length, (cols * cols + 4 * (cols - 1)) * 3);
+      expect(
+        [for (var v = 0; v < 3; v++) arrays.positions[v * 3]],
+        [5, 25, 45],
+      );
       expect(arrays.positions.sublist((cols - 1) * 3, cols * 3), [995, 99, -5]);
     });
 
-    test('colours a tile as the whole map is coloured', () {
+    test("a vertex reads the textures at the centre of its cell's texel", () {
+      final arrays = groundTileArrays(map, grid, (level: 0, x: 0, y: 0));
+
+      // The map is one page of 100 × 100 texels. Cell (3, 2).
+      const v = 2 * 65 + 3;
+      expect(arrays.texCoords[v * 2], closeTo(3.5 / 100, 1e-6));
+      expect(arrays.texCoords[v * 2 + 1], closeTo(2.5 / 100, 1e-6));
+      // A coarse tile reads the same texel for the same cell.
+      final coarse = groundTileArrays(map, grid, (level: 1, x: 0, y: 0));
+      const w = 1 * 51 + 2;
+      expect(coarse.positions.sublist(w * 3, w * 3 + 3), [45, 8, -25]);
+      expect(coarse.texCoords[w * 2], closeTo(4.5 / 100, 1e-6));
+      expect(coarse.texCoords[w * 2 + 1], closeTo(2.5 / 100, 1e-6));
+    });
+
+    test('a tile under another root reads the page of that root', () {
+      // Three roots of 128 cells from north to south.
+      final long = mapOf(100, 300);
+      final grid = GroundGrid.of(long);
+      expect(grid.roots, hasLength(3));
+
+      // Cells 128 to 192 of the map, in the page of cells 128 to 256.
+      final arrays = groundTileArrays(long, grid, (level: 0, x: 0, y: 2));
+
+      expect(arrays.positions.sublist(0, 3), [5, 0, -1285]);
+      expect(arrays.texCoords[0], closeTo(0.5 / 100, 1e-6));
+      expect(arrays.texCoords[1], closeTo(0.5 / 129, 1e-6));
+      // The last row of the root above is the first of this one: the same
+      // cells, at the same place in the world.
+      final above = groundTileArrays(long, grid, (level: 0, x: 0, y: 1));
+      const last = 64 * 65;
+      expect(above.positions.sublist(last * 3, last * 3 + 3), [5, 0, -1285]);
+      expect(above.texCoords[last * 2 + 1], closeTo(128.5 / 129, 1e-6));
+    });
+
+    test('shades a tile as the whole map is shaded', () {
+      // The whole map's colours are the terrain's (grass everywhere) times
+      // the shade; a tile's are the shade alone.
       final whole = terrainArrays(map).colors;
+      final (red, green, blue) = terrainColors['grass']!;
       final arrays = groundTileArrays(map, grid, (level: 0, x: 1, y: 1));
 
+      // The tile's cells are 64 to 99 on both axes.
       for (final v in [0, 7, 36 * 36 - 1]) {
-        final cell = arrays.cells[v];
-        for (var channel = 0; channel < 4; channel++) {
+        final cell = (64 + v ~/ 36) * 100 + 64 + v % 36;
+        for (final (channel, colour) in [red, green, blue].indexed) {
           expect(
-            arrays.colors[v * 4 + channel],
+            arrays.colors[v * 4 + channel] * colour,
             closeTo(whole[cell * 4 + channel], 1e-6),
           );
         }
+        expect(arrays.colors[v * 4 + 3], 1);
       }
-    });
-  });
-
-  group('fogShadedTileColors', () {
-    test('MAP-33 keeps a lit cell, dims one seen once, darkens the rest', () {
-      final map = mapOf(100, 100);
-      final arrays = groundTileArrays(map, GroundGrid.of(map), (
-        level: 0,
-        x: 0,
-        y: 0,
-      ));
-      final fog = FogModel.dark(
-        width: 100,
-        depth: 100,
-        cellSizeM: 10,
-      ).lighting([0, 1]).lighting([0]);
-
-      final shaded = fogShadedTileColors(arrays.colors, arrays.cells, fog);
-
-      final (red, _, _) = FogShade.tint;
-      expect(shaded[0], arrays.colors[0]);
-      expect(
-        shaded[4],
-        closeTo(
-          arrays.colors[4] * FogShade.seenKeeps +
-              red * (1 - FogShade.seenKeeps),
-          1e-6,
-        ),
-      );
-      expect(
-        shaded[8],
-        closeTo(
-          arrays.colors[8] * FogShade.neverKeeps +
-              red * (1 - FogShade.neverKeeps),
-          1e-6,
-        ),
-      );
-      expect(shaded[11], 1);
     });
   });
 

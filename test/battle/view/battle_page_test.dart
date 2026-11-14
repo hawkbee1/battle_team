@@ -1,4 +1,5 @@
 import 'package:battle_team/battle/battle.dart';
+import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_model.dart';
 import 'package:battle_team/l10n/l10n.dart';
@@ -51,7 +52,8 @@ void main() {
             initialize: () async {},
             loadTrees: (_) async => const [TreeModel(parts: [], baseY: 0)],
             loadUnits: (_) async => const UnitModels(),
-            worldBuilder: (map, _, _) => FakeWorld(map),
+            loadGround: (_) async => const GroundMaterials({}),
+            worldBuilder: (map, _, _, _) => FakeWorld(map),
             sceneBuilder: (_, _, _, _) => const SizedBox.expand(),
           ),
         ),

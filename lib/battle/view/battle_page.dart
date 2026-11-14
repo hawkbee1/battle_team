@@ -9,6 +9,7 @@ import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/view/battle_view.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/scene_battle_world.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_model.dart';
@@ -39,6 +40,7 @@ class BattlePage extends StatefulWidget {
     this.initialize = Scene.initializeStaticResources,
     this.loadTrees = loadTreeModels,
     this.loadUnits = loadUnitModels,
+    this.loadGround = loadGroundMaterials,
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
   });
@@ -69,11 +71,16 @@ class BattlePage extends StatefulWidget {
   /// Loads the models the 3D world draws the units with.
   final Future<UnitModels> Function(AssetBundle bundle) loadUnits;
 
-  /// The 3D world of a map, drawn with the tree models and the unit models.
+  /// Makes the materials the 3D world draws the ground of a map with.
+  final Future<GroundMaterials> Function(MapData map) loadGround;
+
+  /// The 3D world of a map, drawn with the tree models, the unit models and
+  /// the ground's materials.
   final BattleWorld Function(
     MapData map,
     List<TreeModel> trees,
     UnitModels units,
+    GroundMaterials ground,
   )
   worldBuilder;
 
@@ -94,6 +101,7 @@ class _BattlePageState extends State<BattlePage> {
       GroundSight sight,
       List<TreeModel> trees,
       UnitModels units,
+      GroundMaterials ground,
     })
   >
   _ready = () async {
@@ -108,6 +116,7 @@ class _BattlePageState extends State<BattlePage> {
     // After initialize: the models are imported on the GPU.
     final trees = await widget.loadTrees(bundle);
     final units = await widget.loadUnits(bundle);
+    final ground = await widget.loadGround(map);
     return (
       map: map,
       bodies: bodies,
@@ -116,6 +125,7 @@ class _BattlePageState extends State<BattlePage> {
       sight: sight,
       trees: trees,
       units: units,
+      ground: ground,
     );
   }();
 
@@ -165,7 +175,12 @@ class _BattlePageState extends State<BattlePage> {
             ],
             child: BattleView(
               map: data.map,
-              world: widget.worldBuilder(data.map, data.trees, data.units),
+              world: widget.worldBuilder(
+                data.map,
+                data.trees,
+                data.units,
+                data.ground,
+              ),
               sceneBuilder: widget.sceneBuilder,
               bodies: data.bodies,
             ),

@@ -62,7 +62,7 @@ When downloading more: read the triangle count on the model's page first. Under 
 ## Steps
 
 ### 1. Streamed ground and objects: done
-`ground_tiles.dart` (pure, tested), `ground_streamer.dart` (GPU). Ground as a quadtree of 64-quad tiles chosen by screen-space error; trees and buildings per 64-cell chunk within 1,500 m; fog recoloured in place.
+`ground_tiles.dart` (pure, tested), `ground_streamer.dart` (GPU). Ground as a quadtree of 64-quad tiles chosen by screen-space error; trees and buildings per 64-cell chunk within 1,500 m.
 
 Run on the web by the owner (2026-11-13): the full `saint_lo` map draws and the result is good. Left open: the map is slow to load (not timed on the web; the map, the move preview and the sight each read it), and no frame rate was measured; both belong to step 8.
 Knobs: `GroundSelector.detail`, `GroundStreamer.objectRangeM`, the per-frame build budgets.
@@ -155,8 +155,20 @@ Knobs: `wallM`, `sinkM` and `maxVertices` of `buildingArrays`; the two colours; 
 
 Check: a town from above and in first person: that walls and roofs are lit from outside (no black or missing face), that the two colours show, that no gap shows under a wall on a slope, and whether terraces of roofs look right on a hillside; the seam between two chunks inside a town (no wall, no gap); the size of a block next to a unit and a tree; the counts logged over the densest town. The HQ: its size next to a unit and inside its ring, that it stands on the ground and that its colours are not too dark.
 
-### 7. Ground colour and fog in a material
-A `.fmat` material that reads the terrain and the fog from textures, so a coarse tile keeps its roads and a fog change costs one texture upload instead of recolouring tiles.
+### 7. Ground colour and fog in a material: written, waiting for the Check
+`assets/materials/ground.fmat` is the material; `ground_pages.dart` holds the logic (tested); `ground_material.dart` makes the textures and the materials; `ground_tiles.dart` and `ground_streamer.dart` draw with them.
+
+- A **page** is the cells of one root tile of the quadtree: 1,024 cells a side, so `saint_lo` has five, of 1,000 × 1,025 texels (the last row is the next page's first, as for tiles). A page has a terrain texture, a fog texture and its own instance of the material; every tile under the root draws with it. One texture for the whole map would be 5,000 texels long, past the 4,096 a phone or a browser takes for sure, and a fog change would upload all of it.
+- A tile's vertices hold a place in the textures of their page and the grey of their slope, no longer a terrain colour or a fog. The material is unlit and computes per pixel what was computed per vertex: terrain × slope, faded to `FogShade.tint` by what the fog lets the cell keep. So a coarse tile shows every cell it spans: its roads, its rivers and the fog's edge.
+- The terrain texture is made once, with a mip chain (`TextureContent.data`: the colours are linear and are averaged as they are), sampled trilinear and anisotropic.
+- The fog texture holds, in red, what each cell keeps of its colour: 255 in sight, 140 seen once, 46 never seen. It is sampled linear, without mips. When the fog changes, the pages where a cell changed upload theirs again, `fogUploadsPerFrame` (1) a frame, the nearest first; no tile is touched. An upload is the whole page, 4 MB on `saint_lo`: flutter_scene's `Texture2D` only makes RGBA textures, and one byte in four is used.
+- On the GPU for `saint_lo`: 27 MB of terrain with its mips, and up to 20 MB of fog.
+- `hook/build.dart` compiles the material (flutter_scene's `buildMaterials`) into `flutter_scene_generated/`, which is in `pubspec.yaml` and in git only by its `.gitignore` files. The models stay `.glb` files read at run time. `BattlePage` makes the pages after the models (`loadGroundMaterials`).
+- Compiled in the container for Linux (the same GLES and Vulkan shaders as Android's) by `flutter test`, which runs the hook. Not compiled for the web, and not drawn. That the first row of a texture is its north is taken from how flutter_scene draws a glTF texture (rows as they come, coordinates not flipped), not seen on a screen.
+
+Knobs: `GroundStreamer.fogUploadsPerFrame`; `terrainMipmaps` of `loadGroundMaterials`; `FogShade`; `terrainColors`.
+
+Check: near the eye the ground is as before (colours, slopes, the three levels of fog), with north and south the right way round inside a page (a road under a unit, the fog around it). From above: a far tile keeps its roads and rivers, and nothing changes colour when a tile changes level; far roads do not shimmer when the camera moves (with `terrainMipmaps` off to compare). Where two pages meet (every 10,240 m to the south): no line in the colours or in the fog. The fog follows a moving unit without a hitch, also when its sight crosses two pages. The time the map takes to load, against step 6.
 
 ### 8. Measure and decide
 Profile mode on the Pixel 6 and on the web (dashmap's `tool/profile.dart` reads UI and raster times through the VM service), and the time to load `saint_lo`. Fill the budget table with measured values, answer the four questions, and write the stack record proposal.

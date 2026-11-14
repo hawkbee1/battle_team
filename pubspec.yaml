@@ -26,6 +26,7 @@ dependencies:
   flutter_scene: ^0.24.0
   google_fonts: ^8.2.1
   hawkbee_schema: ^0.1.0
+  hooks: ^2.0.0
   intl: ^0.20.2
   logging: ^1.3.0
   material_ui: ^1.1.1
@@ -144,3 +145,14 @@ flutter:
     # The terrain tables price a move: the path preview's AP cost (the host's
     # own file; display only).
     - plan/data/terrain.yaml
+    # What hook/build.dart compiles from the .fmat materials under assets/
+    # (the ground's material), for the engine of each target.
+    - flutter_scene_generated/
+    - path: flutter_scene_generated/metal_ios/
+      platforms: [ios]
+    - path: flutter_scene_generated/metal_desktop/
+      platforms: [macos]
+    - path: flutter_scene_generated/opengl_es_vulkan/
+      platforms: [android, linux, windows]
+    - path: flutter_scene_generated/opengl_es/
+      platforms: [web]

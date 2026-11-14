@@ -8,9 +8,6 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:battle_map/battle_map.dart';
-import 'package:battle_team/battle/world/battle_space.dart';
-import 'package:battle_team/fog/model/fog_model.dart';
-import 'package:battle_team/fog/model/fog_shading.dart';
 import 'package:vector_math/vector_math.dart';
 
 /// The quads along the side of a ground tile, at every level: a tile's mesh
@@ -82,6 +79,14 @@ class GroundGrid {
       for (var x = 0; x * spanOf(rootLevel) < width - 1; x++)
         (level: rootLevel, x: x, y: y),
   ];
+
+  /// The root [tile] is under: itself for a root. Its cells are the page
+  /// whose textures the tile is drawn with (`ground_pages.dart`).
+  GroundTile rootOf(GroundTile tile) => (
+    level: rootLevel,
+    x: tile.x >> (rootLevel - tile.level),
+    y: tile.y >> (rootLevel - tile.level),
+  );
 
   /// The tiles one level finer that cover [tile]: up to four, fewer at the
   /// map's edge, none at level 0.
@@ -205,13 +210,13 @@ class GroundSelector {
 }
 
 /// The vertex arrays of a ground tile: its `positions` in the 3D world, its
-/// `colors` without fog, its `indices`, and the map cell each vertex stands
-/// on (`cells`, `y × width + x`), which is where its fog is read.
+/// `texCoords`, where each vertex's cell is in the textures of the tile's
+/// page, its `colors`, the grey of each vertex's slope, and its `indices`.
 typedef GroundTileArrays = ({
   Float32List positions,
+  Float32List texCoords,
   Float32List colors,
   Uint16List indices,
-  Int32List cells,
 });
 
 List<int> _stops(int from, int to, int step) => [
@@ -228,10 +233,13 @@ List<int> _rim(int cols, int rows) => [
 ];
 
 /// The mesh of [tile]: a vertex at the centre of every `stepOf(level)`-th
-/// cell, at its height, coloured by its terrain and shaded by its slope
-/// towards a light from the north-west, as `terrainArrays` does for a whole
-/// map. A skirt hangs from its edge, one quad deep, and hides the crack
-/// where it meets a tile of another level.
+/// cell, at its height, shaded by its slope towards a light from the
+/// north-west as `terrainArrays` shades a whole map. The terrain and the fog
+/// are not in the mesh: the ground's material reads them from the textures
+/// of the tile's page (the cells of its root), at the centre of the texel
+/// of each vertex's cell, so a coarse tile shows every cell it spans. A
+/// skirt hangs from its edge, one quad deep, and hides the crack where it
+/// meets a tile of another level.
 GroundTileArrays groundTileArrays(
   MapData map,
   GroundGrid grid,
@@ -240,6 +248,9 @@ GroundTileArrays groundTileArrays(
   final cell = grid.cellSizeM;
   final step = grid.stepOf(tile.level);
   final rect = grid.cellsOf(tile);
+  final page = grid.cellsOf(grid.rootOf(tile));
+  final pageWidth = page.x1 - page.x0 + 1;
+  final pageHeight = page.y1 - page.y0 + 1;
   final xs = _stops(rect.x0, rect.x1, step);
   final ys = _stops(rect.y0, rect.y1, step);
   final cols = xs.length;
@@ -248,8 +259,8 @@ GroundTileArrays groundTileArrays(
   final inner = cols * rows;
   final count = inner + rim.length;
   final positions = Float32List(count * 3);
+  final texCoords = Float32List(count * 2);
   final colors = Float32List(count * 4);
-  final cells = Int32List(count);
   final light = Vector3(-1, 2, 1)..normalize();
 
   double height(int x, int y) => map
@@ -270,15 +281,14 @@ GroundTileArrays groundTileArrays(
       final dNorth = height(x, y - step) - height(x, y + step);
       final normal = Vector3(-dEast, 2 * step * cell, -dNorth)..normalize();
       final shade = 0.55 + 0.45 * math.max(0, normal.dot(light));
-      final index = y * map.width + x;
-      final name = map.spec.terrainIndex[map.terrain[index]];
-      final (r, g, b) = terrainColors[name] ?? (0.5, 0.5, 0.5);
       colors
-        ..[v * 4] = r * shade
-        ..[v * 4 + 1] = g * shade
-        ..[v * 4 + 2] = b * shade
+        ..[v * 4] = shade
+        ..[v * 4 + 1] = shade
+        ..[v * 4 + 2] = shade
         ..[v * 4 + 3] = 1;
-      cells[v] = index;
+      texCoords
+        ..[v * 2] = (x - page.x0 + 0.5) / pageWidth
+        ..[v * 2 + 1] = (y - page.y0 + 0.5) / pageHeight;
     }
   }
   final skirt = step * cell;
@@ -289,7 +299,7 @@ GroundTileArrays groundTileArrays(
       ..[v * 3 + 1] = positions[from * 3 + 1] - skirt
       ..[v * 3 + 2] = positions[from * 3 + 2];
     colors.setRange(v * 4, v * 4 + 4, colors, from * 4);
-    cells[v] = cells[from];
+    texCoords.setRange(v * 2, v * 2 + 2, texCoords, from * 2);
   }
 
   final indices = Uint16List((cols - 1) * (rows - 1) * 6 + rim.length * 6);
@@ -319,33 +329,12 @@ GroundTileArrays groundTileArrays(
       ..[at++] = inner + next
       ..[at++] = inner + k;
   }
-  return (positions: positions, colors: colors, indices: indices, cells: cells);
-}
-
-/// The colours of a tile with the fog on them (MAP-33): [base] is its
-/// colours without fog and [cells] the map cell of each vertex, both from
-/// [groundTileArrays]. Shaded as `fogShadedColors` shades a whole map.
-Float32List fogShadedTileColors(
-  Float32List base,
-  Int32List cells,
-  FogModel fog,
-) {
-  final shaded = Float32List.fromList(base);
-  final levels = fog.levels;
-  final (red, green, blue) = FogShade.tint;
-  for (var v = 0; v < cells.length; v++) {
-    final keeps = switch (FogLevel.values[levels[cells[v]]]) {
-      FogLevel.lit => 1.0,
-      FogLevel.seen => FogShade.seenKeeps,
-      FogLevel.never => FogShade.neverKeeps,
-    };
-    if (keeps == 1) continue;
-    shaded
-      ..[v * 4] = base[v * 4] * keeps + red * (1 - keeps)
-      ..[v * 4 + 1] = base[v * 4 + 1] * keeps + green * (1 - keeps)
-      ..[v * 4 + 2] = base[v * 4 + 2] * keeps + blue * (1 - keeps);
-  }
-  return shaded;
+  return (
+    positions: positions,
+    texCoords: texCoords,
+    colors: colors,
+    indices: indices,
+  );
 }
 
 /// A square of cells whose objects are drawn together: [groundTileQuads]

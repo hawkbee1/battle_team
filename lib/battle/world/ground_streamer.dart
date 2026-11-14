@@ -7,12 +7,11 @@
 // (https://github.com/bdero/dashmap, MIT, Copyright (c) 2026 Brandon
 // DeRosier): `terrain_streamer.dart`.
 
-import 'dart:typed_data';
-
 import 'package:battle_map/battle_map.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/building_mesh.dart';
+import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/ground_tiles.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
@@ -23,12 +22,15 @@ import 'package:vector_math/vector_math.dart';
 /// Keeps in the [scene] the ground and the objects worth drawing from where
 /// the battle is seen: the ground as the tiles a `GroundSelector` chooses,
 /// fine near the eye and coarse far away, and the trees and buildings of the
-/// chunks within [objectRangeM] of the eye. A chunk of trees draws the model
-/// of each tree within [treeNearM] and a cone for each beyond. The buildings
-/// of a chunk are a few meshes made in code (`buildingArrays`). Meshes are
-/// made a few a frame ([tileBuildsPerFrame], [chunkBuildsPerFrame],
-/// [treeBuildsPerFrame]), so moving never stalls a frame, and are dropped
-/// once out of the cut or out of range.
+/// chunks within [objectRangeM] of the eye. A tile is drawn with the material
+/// of its page ([ground]), which reads the terrain and the fog from textures:
+/// a fog change uploads the texture of each page it touches, and no tile is
+/// made again. A chunk of trees draws the model of each tree within
+/// [treeNearM] and a cone for each beyond. The buildings of a chunk are a
+/// few meshes made in code (`buildingArrays`). Meshes are made a few a frame
+/// ([tileBuildsPerFrame], [chunkBuildsPerFrame], [treeBuildsPerFrame]), so
+/// moving never stalls a frame, and are dropped once out of the cut or out
+/// of range.
 ///
 /// The whole map stays in memory as `MapData`; only what is on the GPU
 /// follows the eye.
@@ -40,10 +42,11 @@ class GroundStreamer {
     required this.map,
     required this.surface,
     required this.trees,
+    required this.ground,
     this.tileBuildsPerFrame = 6,
     this.chunkBuildsPerFrame = 2,
     this.treeBuildsPerFrame = 8,
-    this.fogUpdatesPerFrame = 12,
+    this.fogUploadsPerFrame = 1,
     this.objectRangeM = 1500,
     this.treeNearM = 100,
     this.treeChunkCells = 16,
@@ -62,6 +65,10 @@ class GroundStreamer {
   /// cell. Without any, no tree is drawn.
   final List<TreeModel> trees;
 
+  /// The pages of the ground: the material of each root tile, with its
+  /// terrain and its fog as textures.
+  final GroundMaterials ground;
+
   /// The ground tiles made in a frame at most; the roots are all made at
   /// once, so there is ground from the first frame.
   final int tileBuildsPerFrame;
@@ -73,8 +80,9 @@ class GroundStreamer {
   /// cones.
   final int treeBuildsPerFrame;
 
-  /// The ground tiles whose fog is redrawn in a frame at most.
-  final int fogUpdatesPerFrame;
+  /// The pages whose fog texture is uploaded in a frame at most: one byte
+  /// in four of a page, 4 MB for a page of `saint_lo`.
+  final int fogUploadsPerFrame;
 
   /// How far from the eye trees and buildings are drawn, in metres. Beyond
   /// it a forest shows by the colour of its ground.
@@ -98,7 +106,6 @@ class GroundStreamer {
       ? const {}
       : objectChunks(map, cells: treeChunkCells);
 
-  final _groundMaterial = UnlitMaterial()..doubleSided = true;
   late final Set<int> _buildingCells = {
     for (final chunk in _chunks.values) ...chunk.buildings,
   };
@@ -123,12 +130,11 @@ class GroundStreamer {
     ..roughnessFactor = 0.9
     ..doubleSided = true;
 
-  final _tiles = <GroundTile, _LiveTile>{};
+  final _tiles = <GroundTile, Node>{};
   final _objects = <ChunkId, Node>{};
   final _buildingTriangles = <ChunkId, int>{};
   final _trees = <ChunkId, _LiveTrees>{};
   FogModel? _fog;
-  int _fogVersion = 0;
   Vector3? _settledEye;
   double? _settledFov;
 
@@ -154,7 +160,7 @@ class GroundStreamer {
     }
     return (
       live: _tiles.length,
-      drawn: _tiles.values.where((tile) => tile.node.visible).length,
+      drawn: _tiles.values.where((node) => node.visible).length,
       chunks: _objects.length,
       buildingMeshes: _objects.values.fold(
         0,
@@ -166,11 +172,10 @@ class GroundStreamer {
     );
   }
 
-  /// Shades the ground by [fog] from now on. The tiles are redrawn over the
-  /// next frames, the ones on screen first.
+  /// Shades the ground by [fog] from now on. The pages it changes take it
+  /// over the next frames, the nearest first.
   void showFog(FogModel fog) {
     _fog = fog;
-    _fogVersion++;
     _settledEye = null;
   }
 
@@ -184,7 +189,7 @@ class GroundStreamer {
       return;
     }
     final groundDone = _updateGround(eye, camera.fovY);
-    final fogDone = _updateFog();
+    final fogDone = _updateFog(eye);
     final objectsDone = _updateObjects(eye);
     final treesDone = _updateTrees(eye);
     if (groundDone && fogDone && objectsDone && treesDone) {
@@ -205,11 +210,11 @@ class GroundStreamer {
     );
     final keep = cut.load.toSet();
     for (final tile in _tiles.keys.toList()) {
-      if (!keep.contains(tile)) scene.remove(_tiles.remove(tile)!.node);
+      if (!keep.contains(tile)) scene.remove(_tiles.remove(tile)!);
     }
     final render = cut.render.toSet();
-    for (final MapEntry(key: tile, value: live) in _tiles.entries) {
-      live.node.visible = render.contains(tile);
+    for (final MapEntry(key: tile, value: node) in _tiles.entries) {
+      node.visible = render.contains(tile);
     }
     var budget = tileBuildsPerFrame;
     var done = true;
@@ -224,40 +229,40 @@ class GroundStreamer {
     return done;
   }
 
-  _LiveTile _makeTile(GroundTile tile, {required bool visible}) {
+  Node _makeTile(GroundTile tile, {required bool visible}) {
     final arrays = groundTileArrays(map, _grid, tile);
-    final fog = _fog;
-    final geometry = MeshGeometry.fromArrays(
-      positions: arrays.positions,
-      colors: fog == null
-          ? arrays.colors
-          : fogShadedTileColors(arrays.colors, arrays.cells, fog),
-      indices: arrays.indices,
-      storage: GeometryStorage.updatable,
-    );
     final node = Node(
       name: 'ground_${tile.level}_${tile.x}_${tile.y}',
-      mesh: Mesh(geometry, _groundMaterial),
+      mesh: Mesh(
+        MeshGeometry.fromArrays(
+          positions: arrays.positions,
+          texCoords: arrays.texCoords,
+          colors: arrays.colors,
+          indices: arrays.indices,
+        ),
+        ground.pages[_grid.rootOf(tile)]!.material,
+      ),
     )..visible = visible;
     scene.add(node);
-    return _LiveTile(node, geometry, arrays.colors, arrays.cells, _fogVersion);
+    return node;
   }
 
-  /// Whether every tile shows the current fog.
-  bool _updateFog() {
+  /// Whether every page shows the current fog. The pages nearest to [eye]
+  /// take it first.
+  bool _updateFog(Vector3 eye) {
     final fog = _fog;
     if (fog == null) return true;
     final stale = [
-      for (final tile in _tiles.values)
-        if (tile.fogVersion != _fogVersion) tile,
-    ]..sort((a, b) => (a.node.visible ? 0 : 1) - (b.node.visible ? 0 : 1));
-    for (final tile in stale.take(fogUpdatesPerFrame)) {
-      tile.geometry.updateColors(
-        fogShadedTileColors(tile.base, tile.cells, fog),
-      );
-      tile.fogVersion = _fogVersion;
+      for (final page in ground.pages.values)
+        if (!page.shows(fog))
+          (_grid.distanceTo(page.cells, eye, surface.heightAt), page),
+    ]..sort((a, b) => a.$1.compareTo(b.$1));
+    var uploads = 0;
+    for (final (_, page) in stale) {
+      if (uploads >= fogUploadsPerFrame) return false;
+      if (page.showFog(fog)) uploads++;
     }
-    return stale.length <= fogUpdatesPerFrame;
+    return true;
   }
 
   /// Whether the buildings in range of [eye] are all made.
@@ -462,18 +467,6 @@ class _LiveTrees {
   TreeLevel level;
   Node? near;
   Node? far;
-}
-
-/// A ground tile on the GPU: its node, its geometry, whose colours change
-/// with the fog, and what they are made from.
-class _LiveTile {
-  new(this.node, this.geometry, this.base, this.cells, this.fogVersion);
-
-  final Node node;
-  final MeshGeometry geometry;
-  final Float32List base;
-  final Int32List cells;
-  int fogVersion;
 }
 
 extension<T> on T {

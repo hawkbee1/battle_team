@@ -1,0 +1,38 @@
+// POC (branch poc/streamed-world): the ground of the battle.
+//
+// The terrain and the fog are read from the two textures of the tile's page
+// (lib/battle/world/ground_pages.dart), one texel a cell, at the tile's
+// texture coordinates. So a coarse tile shows every cell it spans, and a fog
+// change is one texture upload instead of new vertex colours for every tile.
+//
+// Unlit: the vertex colour is the grey of the slope, the only shading.
+// Double-sided, as the ground was.
+
+material {
+  name: "Ground",
+  shading_model: unlit,
+  blending: opaque,
+  culling: none,
+
+  parameters: [
+    // What the fog fades the ground to, linear RGB (FogShade.tint).
+    { type: vec3, name: fog_tint, default: [0.10, 0.12, 0.18] },
+    // The colour of each cell's terrain, linear RGB as it is (no sRGB
+    // decoding), with a mip chain.
+    { type: sampler2d, name: terrain_texture, hint: default_white },
+    // In red, what each cell keeps of its colour under the fog: 1 in sight.
+    // White until a fog is shown: no fog.
+    { type: sampler2d, name: fog_texture, hint: default_white },
+  ],
+}
+
+fragment {
+  void Surface(inout MaterialInputs material) {
+    highp vec2 uv = GetUV0();
+    vec3 ground = texture(terrain_texture, uv).rgb * GetVertexColor().rgb;
+    float keeps = texture(fog_texture, uv).r;
+    material.base_color =
+        vec4(mix(material_params.fog_tint, ground, keeps), 1.0);
+    PrepareMaterial(material);
+  }
+}

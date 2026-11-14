@@ -10,6 +10,7 @@ import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/ground_streamer.dart';
 import 'package:battle_team/battle/world/live_shots.dart';
 import 'package:battle_team/battle/world/team_colours.dart';
@@ -33,7 +34,8 @@ import 'package:vector_math/vector_math.dart';
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
   /// {@macro scene_battle_world}
-  new(this.map, this.trees, this.unitModels) : surface = TerrainSurface(map);
+  new(this.map, this.trees, this.unitModels, this.ground)
+    : surface = TerrainSurface(map);
 
   /// The map.
   final MapData map;
@@ -43,6 +45,9 @@ class SceneBattleWorld implements BattleWorld {
 
   /// The models the units are drawn with.
   final UnitModels unitModels;
+
+  /// The materials the ground is drawn with, and their textures.
+  final GroundMaterials ground;
 
   /// The units of the debug crowd (POC).
   static const crowdCount = 1000;
@@ -134,6 +139,7 @@ class SceneBattleWorld implements BattleWorld {
     map: map,
     surface: surface,
     trees: trees,
+    ground: ground,
   );
 
   @override
@@ -250,8 +256,8 @@ class SceneBattleWorld implements BattleWorld {
     }
   }
 
-  /// The ground's colours with the fog on them: the tiles are recoloured
-  /// when the fog changes, never per frame (stack decision 4).
+  /// The fog on the ground: a texture of each page the fog changes is
+  /// uploaded when it changes, never per frame (stack decision 4).
   @override
   void showFog(FogModel fog) => _streamer.showFog(fog);
 
