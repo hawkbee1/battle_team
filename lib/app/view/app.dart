@@ -5,9 +5,12 @@ import 'package:backend_status_repository/backend_status_repository.dart';
 import 'package:battle_team/authentication/authentication.dart';
 import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/settings/cubit/settings_cubit.dart';
+import 'package:battle_team/settings/data/player_settings_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const _appwriteEndpoint = String.fromEnvironment('APPWRITE_ENDPOINT');
 const _appwriteProjectId = String.fromEnvironment('APPWRITE_PROJECT_ID');
@@ -24,6 +27,7 @@ class App extends StatelessWidget {
     required this.backendStatusRepository,
     required this.battleLocator,
     required this.battleRepositoryFactory,
+    required this.settingsRepository,
     super.key,
   });
 
@@ -39,6 +43,7 @@ class App extends StatelessWidget {
       endpoint: _appwriteEndpoint,
       projectId: _appwriteProjectId,
     ),
+    settingsRepository: PlayerSettingsRepository(SharedPreferencesAsync()),
   );
 
   /// The playtest flavor over [apiClient]: it signs in the account of
@@ -60,6 +65,7 @@ class App extends StatelessWidget {
           endpoint: _appwriteEndpoint,
           projectId: _appwriteProjectId,
         ),
+        settingsRepository: PlayerSettingsRepository(SharedPreferencesAsync()),
       );
 
   /// The account: sign up, sign in, log out.
@@ -74,6 +80,9 @@ class App extends StatelessWidget {
   /// Makes the repository of a battle: one per battle entered.
   final BattleRepositoryFactory battleRepositoryFactory;
 
+  /// Keeps the player's settings on the device: sound and keys.
+  final PlayerSettingsRepository settingsRepository;
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -83,14 +92,27 @@ class App extends StatelessWidget {
         RepositoryProvider<BattleLocator>.value(value: battleLocator),
         RepositoryProvider.value(value: battleRepositoryFactory),
       ],
-      child: BlocProvider(
-        create: (context) {
-          final cubit = AuthenticationCubit(
-            repository: authenticationRepository,
-          );
-          unawaited(cubit.start());
-          return cubit;
-        },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) {
+              final cubit = AuthenticationCubit(
+                repository: authenticationRepository,
+              );
+              unawaited(cubit.start());
+              return cubit;
+            },
+          ),
+          // Above the navigator, so that the settings screen and the battle
+          // both reach it.
+          BlocProvider(
+            create: (context) {
+              final cubit = SettingsCubit(repository: settingsRepository);
+              unawaited(cubit.load());
+              return cubit;
+            },
+          ),
+        ],
         child: const AppView(),
       ),
     );

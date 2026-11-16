@@ -39,13 +39,22 @@
       }
     }
   },
-  "battleHelp": "Drag to pan · scroll or pinch to zoom · Q/E or two fingers to turn · tap one of your units, then tap the ground to move it · tap an enemy to target it, then Fire",
+  "battleHelp": "Drag to pan · scroll or pinch to zoom · {left}/{right} or two fingers to turn · tap one of your units, then tap the ground to move it · tap an enemy to target it, then Fire",
   "@battleHelp": {
-    "description": "How to use the battle view"
+    "description": "How to use the battle view; the keys that turn it are the player's",
+    "placeholders": {
+      "left": {"type": "String"},
+      "right": {"type": "String"}
+    }
   },
-  "battleHelpFirstPerson": "Drag to look · Q/E or arrow keys to turn · tap the ground to move there · Fire shoots where the reticle points · Esc or the button to go back to the top-down view",
+  "battleHelpFirstPerson": "Drag to look · {left}/{right} or arrow keys to turn · tap the ground to move there · Fire shoots where the reticle points · {back} or the button to go back to the top-down view",
   "@battleHelpFirstPerson": {
-    "description": "How to use the battle view seen through a unit's eyes"
+    "description": "How to use the battle view seen through a unit's eyes; the keys that turn it and go back are the player's",
+    "placeholders": {
+      "left": {"type": "String"},
+      "right": {"type": "String"},
+      "back": {"type": "String"}
+    }
   },
   "battleUnit": "{type} · HP {hp} · AP {ap}",
   "@battleUnit": {
@@ -147,6 +156,14 @@
   "battleCreditsClose": "Close",
   "@battleCreditsClose": {
     "description": "Closes the map's credits"
+  },
+  "battleHelpShow": "Help",
+  "@battleHelpShow": {
+    "description": "The button and the dialog that show the help on a phone"
+  },
+  "battleHelpClose": "Close",
+  "@battleHelpClose": {
+    "description": "Closes the help dialog"
   },
   "battleWeapon": "{weapon, select, rifle{Rifle} machine_gun{Machine gun} anti_tank{Anti-tank} artillery{Artillery} anti_air{Anti-air} explosive{Explosive charge} other{{weapon}}}",
   "@battleWeapon": {
@@ -780,5 +797,63 @@
   "battleEntryNoMap": "Map not available in this app",
   "@battleEntryNoMap": {
     "description": "Shown on a running battle of the list whose map the app does not have: it cannot be entered or joined"
+  },
+  "settingsOpen": "Settings",
+  "@settingsOpen": {
+    "description": "Tooltip of the toolbar button that opens the settings screen"
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Title of the settings screen"
+  },
+  "settingsSound": "Sound",
+  "@settingsSound": {
+    "description": "Heading of the sound switches on the settings screen"
+  },
+  "settingsSoundEffects": "Sound effects",
+  "@settingsSoundEffects": {
+    "description": "Switch: the battle's sound effects"
+  },
+  "settingsSoundEffectsHint": "Moves, shots, hits, deaths, victory and defeat",
+  "@settingsSoundEffectsHint": {
+    "description": "What the sound effects switch controls"
+  },
+  "settingsAmbience": "Ambience music",
+  "@settingsAmbience": {
+    "description": "Switch: the music that plays during the battle"
+  },
+  "settingsAmbienceHint": "A light, motivating loop in the background",
+  "@settingsAmbienceHint": {
+    "description": "What the ambience music switch controls"
+  },
+  "settingsCommands": "Commands",
+  "@settingsCommands": {
+    "description": "Heading of the keyboard commands on the settings screen"
+  },
+  "settingsCommandsHint": "Choose a command, then press the key you want for it. A key another command uses is swapped with it.",
+  "@settingsCommandsHint": {
+    "description": "How to change a command's key"
+  },
+  "settingsCommand": "{command, select, panLeft{Pan left · look left} panRight{Pan right · look right} panUp{Pan up · look up} panDown{Pan down · look down} turnLeft{Turn left} turnRight{Turn right} zoomIn{Zoom in} zoomOut{Zoom out} back{Back · cancel} other{{command}}}",
+  "@settingsCommand": {
+    "description": "A keyboard command of the battle view, by name",
+    "placeholders": {
+      "command": {}
+    }
+  },
+  "settingsPressKey": "Press the key for “{command}”",
+  "@settingsPressKey": {
+    "description": "Asks the player to press the new key of a command; the command is named",
+    "placeholders": {
+      "command": {}
+    }
+  },
+  "settingsCancel": "Cancel",
+  "@settingsCancel": {
+    "description": "Closes the dialog that waits for a key, changing nothing"
+  },
+  "settingsResetKeys": "Restore the default commands",
+  "@settingsResetKeys": {
+    "description": "Gives every command its default key back"
   }
 }

@@ -8,6 +8,8 @@ import 'package:battle_team/battle/data/battle_snapshot.dart';
 import 'package:battle_team/battle/data/connection_status.dart';
 import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/shots/shot_effects.dart';
+import 'package:battle_team/battle/sounds/sound_cue.dart';
+import 'package:battle_team/battle/sounds/sound_cues.dart';
 
 /// {@template battle_repository}
 /// The data the battle screen lives on, for one battle: it builds the
@@ -114,6 +116,24 @@ class BattleRepository {
     return _client.messages
         .map((message) => effects.of(message, _client.view))
         .where((effects) => effects.isNotEmpty);
+  }
+
+  /// The sounds the section hears, after each update of the host: the shots,
+  /// the injuries and the deaths of the effects of [shots], the units that set
+  /// off, and the end of the battle for the player's team (`SoundCues`). A
+  /// stream of its own on each call, to listen to once; nothing is replayed.
+  Stream<List<SoundCue>> get sounds {
+    final effects = ShotEffects();
+    return _client.messages
+        .map(
+          (message) => const SoundCues().of(
+            message,
+            _client.view,
+            effects.of(message, _client.view),
+            team: _client.seat?.team,
+          ),
+        )
+        .where((cues) => cues.isNotEmpty);
   }
 
   /// Why the connection stopped for good: the host's last word or the

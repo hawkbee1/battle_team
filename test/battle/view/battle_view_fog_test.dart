@@ -7,6 +7,7 @@ import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/settings/cubit/settings_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +18,7 @@ import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
 import '../../helpers/fog.dart';
 import '../../helpers/real_cubit.dart';
+import '../../helpers/settings.dart';
 
 /// The blue section's view with two relics, one of them red, and a victory
 /// countdown of red's.
@@ -86,6 +88,7 @@ void main() {
               BlocProvider<FogCubit>.value(value: fog),
               BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: battle),
+              BlocProvider<SettingsCubit>.value(value: realSettings()),
             ],
             child: BattleView(
               map: map,

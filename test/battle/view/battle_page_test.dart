@@ -3,6 +3,7 @@ import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_model.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/settings/cubit/settings_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -11,6 +12,7 @@ import 'package:mocktail/mocktail.dart';
 import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
 import '../../helpers/mocks.dart';
+import '../../helpers/settings.dart';
 
 const _settings = BattleSettings(
   endpoint: 'http://127.0.0.1:9/v1',
@@ -29,10 +31,13 @@ void main() {
   Widget appOf(BattleRepository repository, Widget home) =>
       RepositoryProvider.value(
         value: repository,
-        child: MaterialApp(
-          localizationsDelegates: appLocalizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: home,
+        child: BlocProvider<SettingsCubit>.value(
+          value: realSettings(),
+          child: MaterialApp(
+            localizationsDelegates: appLocalizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: home,
+          ),
         ),
       );
 

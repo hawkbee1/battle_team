@@ -49,9 +49,6 @@ class SceneBattleWorld implements BattleWorld {
   /// The materials the ground is drawn with, and their textures.
   final GroundMaterials ground;
 
-  /// The units of the debug crowd (POC).
-  static const crowdCount = 1000;
-
   @override
   final TerrainSurface surface;
 
@@ -71,61 +68,12 @@ class SceneBattleWorld implements BattleWorld {
   BattleCamera? _camera;
   String? _selected;
   String? _target;
-  Vector3? _crowdCentre;
-  double _crowdClock = 0;
-  static final List<String> _crowdIds = [
-    for (var i = 0; i < crowdCount; i++) 'crowd_$i',
-  ];
-  static final List<Vector4> _crowdTeams = [
-    for (var team = 1; team <= teamPalette.length; team++)
-      teamColor('team-$team'),
-  ];
-
   late final UnitInstances _instances = UnitInstances(
     scene: scene,
     models: unitModels,
   );
   late final Node _selectedMark = _mark(Vector4(1, 1, 0.3, 1))..also(scene.add);
   late final Node _targetMark = _mark(Vector4(1, 1, 1, 1))..also(scene.add);
-
-  /// The units drawn with their near and their far model, and the instanced
-  /// meshes that draw them: for a debug overlay.
-  ({int near, int far, int meshes}) get unitCounts => _instances.counts;
-
-  /// The chunks of buildings drawn, their meshes and their triangles: for a
-  /// debug overlay.
-  ({int chunks, int meshes, int triangles}) get buildingCounts {
-    final counts = _streamer.counts;
-    return (
-      chunks: counts.chunks,
-      meshes: counts.buildingMeshes,
-      triangles: counts.buildingTriangles,
-    );
-  }
-
-  /// Whether the debug crowd is out: [crowdCount] units around the middle
-  /// of what the camera sees when it is switched on, four soldiers for one
-  /// tank, of the five teams in turn (`crowdUnitAt`), each walking a small
-  /// circle so that every instance moves every frame. They are only drawn: no
-  /// label, no tap, nothing of the battle.
-  bool get crowd => _crowdCentre != null;
-  set crowd(bool out) {
-    if (out == crowd) return;
-    if (!out) {
-      _crowdCentre = null;
-      _crowdIds.forEach(_instances.remove);
-      return;
-    }
-    final camera = _camera;
-    final eye = camera?.position ?? Vector3.zero();
-    _crowdCentre = lookedAt(
-      eye,
-      camera?.forward ?? Vector3(0, -1, 0),
-      groundY: surface.heightAt(eye.x, -eye.z),
-    );
-    _crowdClock = 0;
-    tick(0);
-  }
 
   @override
   Map<String, Vector3> get drawn => {
@@ -282,7 +230,6 @@ class SceneBattleWorld implements BattleWorld {
     }
     _placeMark(_selectedMark, _selected);
     _placeMark(_targetMark, _target);
-    _walkCrowd(seconds, eye);
     for (final shot in _shots.advance(seconds)) {
       scene.remove(_shotNodes.remove(shot)!.node);
     }
@@ -296,29 +243,6 @@ class SceneBattleWorld implements BattleWorld {
     mark.visible = glide != null;
     if (glide == null) return;
     mark.localTransform = Matrix4.translation(glide.at(_clock)..y += 0.35);
-  }
-
-  void _walkCrowd(double seconds, Vector3? eye) {
-    final centre = _crowdCentre;
-    if (centre == null) return;
-    _crowdClock += seconds;
-    final at = Vector3.zero();
-    for (var i = 0; i < crowdCount; i++) {
-      final spot = crowdAt(i, crowdCount, _crowdClock);
-      final unit = crowdUnitAt(i, teams: _crowdTeams.length);
-      at
-        ..x = centre.x + spot.east
-        ..z = centre.z + spot.north;
-      at.y = surface.heightAt(at.x, -at.z);
-      _instances.place(
-        _crowdIds[i],
-        unitType: unit.tank ? 'tank' : 'commander',
-        color: _crowdTeams[unit.team],
-        at: at,
-        yaw: spot.yaw,
-        eye: eye,
-      );
-    }
   }
 
   /// Fades each shot on screen with its age, and swells its hit mark.

@@ -5,6 +5,10 @@ import 'package:backend_status_repository/backend_status_repository.dart';
 import 'package:battle_team/app/app.dart';
 import 'package:battle_team/authentication/authentication.dart';
 import 'package:battle_team/battle/battle.dart';
+import 'package:battle_team/settings/cubit/settings_cubit.dart';
+import 'package:battle_team/settings/data/player_settings.dart';
+import 'package:battle_team/settings/data/player_settings_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
@@ -27,6 +31,8 @@ void main() {
       when(apiClient.signOut).thenAnswer((_) async {});
       backendStatusRepository = MockBackendStatusRepository();
       when(backendStatusRepository.checkConnection).thenAnswer((_) async {});
+      // The settings the app keeps on the device: an empty store each test.
+      emptyPreferences();
       battleLocator = MockBattleLocator();
       // No section in a running battle: the entry screen says so, and the
       // test needs no GPU.
@@ -50,6 +56,7 @@ void main() {
           endpoint: 'http://127.0.0.1:9/v1',
           projectId: 'hawkbee',
         ),
+        settingsRepository: PlayerSettingsRepository(emptyPreferences()),
       );
     }
 
@@ -183,6 +190,22 @@ void main() {
         tester.element(find.byType(Scaffold).first),
       );
       expect(material.backButtonTooltip, 'Retour');
+    });
+
+    testWidgets("M7.14 gives the whole app the player's settings, loaded from "
+        'the device', (tester) async {
+      await PlayerSettingsRepository(emptyPreferences())
+          .save(const PlayerSettings(ambience: false));
+      when(apiClient.ping).thenAnswer((_) async {});
+
+      await tester.pumpWidget(App.fromApiClient(apiClient));
+      await settle(tester);
+
+      final settings = tester
+          .element(find.byType(AppView))
+          .read<SettingsCubit>();
+      await settle(tester);
+      expect(settings.state.ambience, isFalse);
     });
 
     testWidgets('M7.12 builds its repositories over the Appwrite client', (

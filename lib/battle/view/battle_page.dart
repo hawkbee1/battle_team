@@ -6,6 +6,9 @@ import 'package:battle_team/battle/data/battle_repository.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/data/order_checks.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
+import 'package:battle_team/battle/sounds/battle_audio.dart';
+import 'package:battle_team/battle/sounds/scene_battle_audio.dart';
+import 'package:battle_team/battle/sounds/sound_listener.dart';
 import 'package:battle_team/battle/view/battle_view.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
@@ -43,6 +46,7 @@ class BattlePage extends StatefulWidget {
     this.loadGround = loadGroundMaterials,
     this.worldBuilder = SceneBattleWorld.new,
     this.sceneBuilder = buildBattleScene,
+    this.audioBuilder = buildBattleAudio,
   });
 
   /// Loads a map from the assets.
@@ -87,6 +91,9 @@ class BattlePage extends StatefulWidget {
   /// Builds the 3D area.
   final BattleSceneBuilder sceneBuilder;
 
+  /// Builds what plays the battle's sounds in a world.
+  final BattleAudio Function(BattleWorld world) audioBuilder;
+
   @override
   State<BattlePage> createState() => _BattlePageState();
 }
@@ -99,9 +106,7 @@ class _BattlePageState extends State<BattlePage> {
       OrderPreCheck preCheck,
       MovePreviewer previewer,
       GroundSight sight,
-      List<TreeModel> trees,
-      UnitModels units,
-      GroundMaterials ground,
+      BattleWorld world,
     })
   >
   _ready = () async {
@@ -123,9 +128,7 @@ class _BattlePageState extends State<BattlePage> {
       preCheck: preCheck,
       previewer: previewer,
       sight: sight,
-      trees: trees,
-      units: units,
-      ground: ground,
+      world: widget.worldBuilder(map, trees, units, ground),
     );
   }();
 
@@ -173,16 +176,15 @@ class _BattlePageState extends State<BattlePage> {
                 )..start(),
               ),
             ],
-            child: BattleView(
-              map: data.map,
-              world: widget.worldBuilder(
-                data.map,
-                data.trees,
-                data.units,
-                data.ground,
+            child: SoundListener(
+              world: data.world,
+              audioBuilder: widget.audioBuilder,
+              child: BattleView(
+                map: data.map,
+                world: data.world,
+                sceneBuilder: widget.sceneBuilder,
+                bodies: data.bodies,
               ),
-              sceneBuilder: widget.sceneBuilder,
-              bodies: data.bodies,
             ),
           ),
           AsyncSnapshot(:final Object error) => Center(child: Text('$error')),
@@ -213,4 +215,11 @@ Widget buildBattleScene(
   ),
   onTick: (_, seconds) => onTick(seconds),
 );
+
+/// The audio of [world]: SoLoud through its scene, or none for a world that
+/// is not a scene.
+BattleAudio buildBattleAudio(BattleWorld world) => switch (world) {
+  SceneBattleWorld(:final scene) => SceneBattleAudio(scene),
+  _ => const SilentBattleAudio(),
+};
 // coverage:ignore-end

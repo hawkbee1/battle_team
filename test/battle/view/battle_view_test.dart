@@ -13,6 +13,9 @@ import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/settings/cubit/settings_cubit.dart';
+import 'package:battle_team/settings/data/key_bindings.dart';
+import 'package:battle_team/settings/view/settings_page.dart';
 import 'package:battle_team/shop/cubit/shop_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:bloc_test/bloc_test.dart';
@@ -31,6 +34,7 @@ import '../../helpers/log_capture.dart';
 import '../../helpers/mocks.dart';
 import '../../helpers/pre_check.dart';
 import '../../helpers/real_cubit.dart';
+import '../../helpers/settings.dart';
 import '../../helpers/shop_cubit.dart';
 import '../../helpers/storage_cubit.dart';
 
@@ -100,8 +104,10 @@ void main() {
     late ShopCubit shop;
     late FogCubit fog;
     late AlertsCubit alerts;
+    late SettingsCubit settings;
 
     setUp(() {
+      settings = realSettings();
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
       addTearDown(snapshots.close);
       storage = storageCubit(snapshots.stream);
@@ -146,31 +152,36 @@ void main() {
       BattleEntryCubit? entry,
     }) async {
       await tester.pumpWidget(
-        MaterialApp(
-          locale: locale,
-          localizationsDelegates: appLocalizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: MultiBlocProvider(
-            providers: [
-              BlocProvider<StorageCubit>.value(value: storage),
-              BlocProvider<ShopCubit>.value(value: shop),
-              BlocProvider<FogCubit>.value(value: fog),
-              BlocProvider<AlertsCubit>.value(value: alerts),
-              BlocProvider<BattleCubit>.value(value: cubit),
-              if (authentication != null)
-                BlocProvider<AuthenticationCubit>.value(value: authentication),
-              if (entry != null)
-                BlocProvider<BattleEntryCubit>.value(value: entry),
-            ],
-            child: BattleView(
-              map: map,
-              bodies: unitBodies ?? bodies,
-              world: world,
-              sceneBuilder: (context, world, camera, onTick) {
-                tick = onTick;
-                sceneCamera = camera;
-                return const SizedBox.expand();
-              },
+        BlocProvider<SettingsCubit>.value(
+          value: settings,
+          child: MaterialApp(
+            locale: locale,
+            localizationsDelegates: appLocalizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider<StorageCubit>.value(value: storage),
+                BlocProvider<ShopCubit>.value(value: shop),
+                BlocProvider<FogCubit>.value(value: fog),
+                BlocProvider<AlertsCubit>.value(value: alerts),
+                BlocProvider<BattleCubit>.value(value: cubit),
+                if (authentication != null)
+                  BlocProvider<AuthenticationCubit>.value(
+                    value: authentication,
+                  ),
+                if (entry != null)
+                  BlocProvider<BattleEntryCubit>.value(value: entry),
+              ],
+              child: BattleView(
+                map: map,
+                bodies: unitBodies ?? bodies,
+                world: world,
+                sceneBuilder: (context, world, camera, onTick) {
+                  tick = onTick;
+                  sceneCamera = camera;
+                  return const SizedBox.expand();
+                },
+              ),
             ),
           ),
         ),
@@ -306,6 +317,167 @@ void main() {
       await tester.pump();
       final phoneCredits = tester.getRect(find.byTooltip('Credits'));
       expect(phoneCredits.top, greaterThan(800 - 80));
+    });
+
+    group('with the keys the player chose', () {
+      TopDownCamera above() => world.cameras.first as TopDownCamera;
+
+      testWidgets('turns the overview with them, and no longer with the '
+          'default ones', (tester) async {
+        await settings.rebind(BattleCommand.turnLeft, LogicalKeyboardKey.keyA);
+        await settings.rebind(BattleCommand.zoomIn, LogicalKeyboardKey.keyZ);
+        await pump(tester);
+        final heading = above().heading;
+        final distance = above().distance;
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyQ);
+        expect(above().heading, heading);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+        expect(above().heading, isNot(heading));
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+        expect(above().distance, lessThan(distance));
+      });
+
+      testWidgets('shows them in the help', (tester) async {
+        await settings.rebind(BattleCommand.turnLeft, LogicalKeyboardKey.keyA);
+        await pump(tester);
+
+        expect(
+          find.textContaining('A/E or two fingers to turn'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('opens the settings, and the keys work again after', (
+        tester,
+      ) async {
+        await pump(tester);
+        final heading = above().heading;
+
+        await tester.tap(find.byTooltip('Settings'));
+        await tester.pumpAndSettle();
+        expect(find.byType(SettingsPage), findsOneWidget);
+
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+        expect(find.byType(SettingsPage), findsNothing);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+        expect(above().heading, isNot(heading));
+      });
+    });
+
+    group('on a phone', () {
+      // A tall screen with a status bar and a gesture bar.
+      Future<void> pumpPhone(WidgetTester tester, {Locale? locale}) async {
+        tester.view.physicalSize = const Size(400, 800);
+        tester.view.devicePixelRatio = 1;
+        tester.view.padding = const FakeViewPadding(top: 24, bottom: 40);
+        addTearDown(tester.view.reset);
+        await pump(tester, locale: locale);
+      }
+
+      testWidgets('the help is behind a button, in a dialog', (tester) async {
+        await pumpPhone(tester);
+        expect(find.textContaining('In battle'), findsOneWidget);
+        expect(find.textContaining('Drag to pan'), findsNothing);
+        // Nothing sits under the status bar.
+        final header = tester.getRect(find.textContaining('In battle'));
+        expect(header.top, greaterThanOrEqualTo(24));
+
+        await tester.tap(find.byTooltip('Help'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Drag to pan'), findsOneWidget);
+
+        await tester.tap(find.text('Close'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Drag to pan'), findsNothing);
+      });
+
+      testWidgets('the help button is in French too', (tester) async {
+        await pumpPhone(tester, locale: const Locale('fr'));
+        await tester.tap(find.byTooltip('Aide'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Glisser pour déplacer'), findsOneWidget);
+        await tester.tap(find.text('Fermer'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Glisser pour déplacer'), findsNothing);
+      });
+
+      testWidgets(
+        'the selected unit spans the width over the toolbar, its view button '
+        'on its first line, clear of the gesture bar',
+        (tester) async {
+          when(() => cubit.state).thenReturn(_fromAbove);
+          await pumpPhone(tester);
+
+          final view = tester.getRect(find.text('View from unit'));
+          final unit = tester.getRect(find.textContaining('AP 30.0'));
+          final units = tester.getRect(find.text('Your units'));
+          // Above the toolbar (56) and the gesture bar (40).
+          expect(view.bottom, lessThanOrEqualTo(800 - 56 - 40));
+          expect(view.top, lessThan(unit.bottom + 1));
+          // Under the units, which stack at the top.
+          expect(units.bottom, lessThan(unit.top));
+        },
+      );
+
+      testWidgets('the storage opens as the bottom sheet, the full width', (
+        tester,
+      ) async {
+        when(() => cubit.state).thenReturn(_fromAbove);
+        await pumpPhone(tester);
+        snapshots.add(
+          const BattleSnapshot(
+            units: {'c-1': blueCommander, 's-1': storedSoldier},
+            hqs: [
+              HqView(
+                team: 'blue',
+                position: Position(50500, 5500, 3000),
+                hp: 1000,
+                maxHp: 1000,
+              ),
+            ],
+            relics: [
+              RelicView(relicId: 'relic-1', position: Position(0, 0, 0)),
+            ],
+            section: SectionPrivate(money: 0, xp: 0),
+            team: 'blue',
+            sectionId: 's-blue',
+          ),
+        );
+        await tester.runAsync(pumpEventQueue);
+        await tester.pump();
+        // The relics strip is at the top, not over the sheet.
+        final strip = tester.getRect(find.textContaining('free'));
+        expect(strip.bottom, lessThan(400));
+        expect(find.text('View from unit'), findsOneWidget);
+
+        await tester.tap(find.text('Storage (1)'));
+        await tester.pump();
+        final deploy = tester.getRect(find.text('Deploy'));
+        expect(deploy.top, greaterThan(400));
+        expect(deploy.bottom, lessThanOrEqualTo(800 - 56 - 40));
+        // The sheet holds one thing at a time.
+        expect(find.text('View from unit'), findsNothing);
+
+        await tester.tap(find.text('Close'));
+        await tester.pump();
+        expect(find.text('Deploy'), findsNothing);
+        expect(find.text('View from unit'), findsOneWidget);
+
+        // The shop takes the same sheet.
+        await tester.tap(find.text('Shop'));
+        await tester.pump();
+        final shop = tester.getRect(find.text('Waiting for the host’s list…'));
+        expect(shop.top, greaterThan(400));
+        expect(find.text('View from unit'), findsNothing);
+        await tester.tap(find.text('Close'));
+        await tester.pump();
+        expect(find.text('View from unit'), findsOneWidget);
+      });
     });
 
     testWidgets(
@@ -721,6 +893,44 @@ void main() {
         await show(tester, _fromCommander);
       }
 
+      testWidgets('does not ask the view for the keys back when the view went '
+          'while the settings were open', (tester) async {
+        await pump(tester);
+
+        await tester.tap(find.byTooltip('Settings'));
+        await tester.pumpAndSettle();
+        // Under the settings page, the view goes: the battle is left.
+        tester
+            .state<NavigatorState>(find.byType(Navigator))
+            .pushAndRemoveUntil(
+              MaterialPageRoute<void>(builder: (_) => const SizedBox()),
+              (_) => false,
+            );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(find.byType(BattleView), findsNothing);
+      });
+
+      testWidgets('a unit looks around with them', (tester) async {
+        await settings.rebind(BattleCommand.turnLeft, LogicalKeyboardKey.keyA);
+        await settings.rebind(BattleCommand.back, LogicalKeyboardKey.keyB);
+        when(() => cubit.leaveFirstPerson()).thenReturn(null);
+        await enter(tester);
+        final yaw = eyes().yaw;
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyQ);
+        expect(eyes().yaw, yaw);
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+        expect(eyes().yaw, isNot(yaw));
+        expect(find.textContaining('B or the button'), findsOneWidget);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        verifyNever(() => cubit.leaveFirstPerson());
+        await tester.sendKeyEvent(LogicalKeyboardKey.keyB);
+        verify(() => cubit.leaveFirstPerson()).called(1);
+      });
+
       testWidgets(
         'decision 5 sees through the eyes of the unit the state names, and '
         'goes back to the camera it left',
@@ -1048,6 +1258,7 @@ void main() {
               BlocProvider<FogCubit>.value(value: fogOfBattle),
               BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: cubit),
+              BlocProvider<SettingsCubit>.value(value: realSettings()),
             ],
             child: BattleView(
               map: map,

@@ -10,6 +10,7 @@ import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
+import 'package:battle_team/settings/cubit/settings_cubit.dart';
 import 'package:battle_team/storage/cubit/storage_cubit.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,7 @@ import 'package:vector_math/vector_math.dart' show Vector3;
 import '../../helpers/fake_host.dart';
 import '../../helpers/fake_world.dart';
 import '../../helpers/real_cubit.dart';
+import '../../helpers/settings.dart';
 
 /// An enemy 20 m west of the rifleman: in range, and on screen from above,
 /// clear of the panels.
@@ -86,6 +88,7 @@ void main() {
               BlocProvider<FogCubit>.value(value: fog),
               BlocProvider<AlertsCubit>.value(value: alerts),
               BlocProvider<BattleCubit>.value(value: cubit),
+              BlocProvider<SettingsCubit>.value(value: realSettings()),
             ],
             child: BattleView(
               map: map,

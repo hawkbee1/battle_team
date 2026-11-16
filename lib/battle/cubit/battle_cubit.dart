@@ -7,6 +7,7 @@ import 'package:battle_team/battle/data/battle_snapshot.dart';
 import 'package:battle_team/battle/data/connection_status.dart';
 import 'package:battle_team/battle/data/order_sender.dart';
 import 'package:battle_team/battle/shots/shot_effect.dart';
+import 'package:battle_team/battle/sounds/sound_cue.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:logging/logging.dart';
@@ -143,6 +144,9 @@ class BattleCubit extends Cubit<BattleState> {
   /// The shots the section sees, to draw for a moment: transient, so not part
   /// of the state (decisions 234 and 237).
   Stream<List<ShotEffect>> get shots => repository.shots;
+
+  /// The sounds the section hears, to play once: transient like [shots].
+  Stream<List<SoundCue>> get sounds => repository.sounds;
 
   /// The battle time now, as the client shows it.
   Duration? get battleTime => repository.battleTime;

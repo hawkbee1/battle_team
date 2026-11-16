@@ -41,7 +41,7 @@ The formats and components below were read from the package's source and documen
 - `CameraComponent`, `NodeCamera` and camera controllers for the top-down and first-person cameras.
 - `Light`: directional, point, spot and area lights. Shadows, ambient occlusion, reflections, fog, bloom and other post-processing exist, and can be switched off to save frame time.
 - `TextureAtlas`, `MaterialsVariantsComponent`, `DecalNode`, particle emitters.
-- Physics and audio are separate packages with their own backends (`scene` contract). They are not needed for the rules, which decide everything on the host.
+- Physics and audio are separate packages with their own backends (`scene` contract). Physics is not needed for the rules, which decide everything on the host. Audio is: the client plays the battle's sound effects and its ambience music through `flutter_scene_soloud` (SoLoud), positioned in the scene from what the section sees only (decision 237). The player's sound switches and keyboard commands are kept on the device with `shared_preferences`.
 - **There is no terrain component.** Terrain is a mesh built from a heightmap in code (`MeshGeometry`, as in the procedural skill), one tile at a time.
 
 **Networking.** `flutter_scene_net` binds replicated state to the scene graph: replicas become nodes, and an interpolation buffer renders remote poses a fixed delay in the past. It builds on the `dashwire` multiplayer library. Its host (`SceneHost`) runs a WebSocket listener inside the app, is **native only**, and is a stub on the web. M6 Issue 1 compared dashwire with option 3 of `03-networking.md`; its interpolation buffer is a model for M7.
