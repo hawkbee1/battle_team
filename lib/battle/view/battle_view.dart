@@ -10,6 +10,7 @@ import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/battle/cubit/battle_entry_cubit.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/widgets/move_panel.dart';
+import 'package:battle_team/battle/widgets/side_panel.dart';
 import 'package:battle_team/battle/widgets/weapon_panel.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
@@ -21,9 +22,6 @@ import 'package:battle_team/l10n/l10n.dart';
 import 'package:battle_team/settings/cubit/settings_cubit.dart';
 import 'package:battle_team/settings/data/key_bindings.dart';
 import 'package:battle_team/settings/view/settings_page.dart';
-import 'package:battle_team/shop/widgets/shop_panel.dart';
-import 'package:battle_team/storage/cubit/storage_cubit.dart';
-import 'package:battle_team/storage/widgets/storage_panel.dart';
 import 'package:battle_team/storage/widgets/store_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -97,8 +95,6 @@ class _BattleViewState extends State<BattleView> {
   late final StreamSubscription<Object?> _shots;
   final _frame = ValueNotifier<int>(0);
   final _focus = FocusNode();
-  bool _storageOpen = false;
-  bool _shopOpen = false;
   final _hidden = <_Overlay>{};
   double _lastScale = 1;
   double _lastRotation = 0;
@@ -202,6 +198,15 @@ class _BattleViewState extends State<BattleView> {
   Future<void> _openSettings() async {
     await SettingsPage.open(context);
     if (mounted) _focus.requestFocus();
+  }
+
+  /// Looks at the place [at] from above: the overview moves there and keeps
+  /// its zoom.
+  void _centreOn(Position at) {
+    final point = worldOf(at);
+    point.y = widget.world.surface.heightAt(point.x, -point.z);
+    _topDown.target = point;
+    _frame.value++;
   }
 
   void _centreNow() =>
@@ -338,40 +343,14 @@ class _BattleViewState extends State<BattleView> {
 
   Widget _panel(Widget child) => _Panel(child: child);
 
-  /// The storage or the shop, no taller than [maxHeight], scrolling inside.
-  Widget _sheet(Widget child, {required double maxHeight}) => ConstrainedBox(
-    constraints: BoxConstraints(maxHeight: math.max(80, maxHeight)),
-    child: _Panel(child: SingleChildScrollView(child: child)),
-  );
-
-  Widget _storage(double maxHeight) => _sheet(
-    StoragePanel(onClose: () => setState(() => _storageOpen = false)),
-    maxHeight: maxHeight,
-  );
-
-  Widget _shop(double maxHeight) =>
-      BlocSelector<BattleCubit, BattleState, UnitView?>(
-        selector: (state) => state.selected,
-        builder: (context, selected) => _sheet(
-          ShopPanel(
-            selected: selected,
-            onClose: () => setState(() => _shopOpen = false),
-          ),
-          maxHeight: maxHeight,
-        ),
-      );
-
-  Widget _unitsPanel({required bool compact}) => _UnitsPanel(
-    compact: compact,
-    onCentre: _centreNow,
-    onStorage: () => setState(() {
-      _storageOpen = !_storageOpen;
-      _shopOpen = false;
-    }),
-    onShop: () => setState(() {
-      _shopOpen = !_shopOpen;
-      _storageOpen = false;
-    }),
+  /// The side panel of the units, the storage and the shop, no taller than
+  /// [maxHeight].
+  Widget _sidePanel(double maxHeight) => _Panel(
+    child: SidePanel(
+      maxHeight: maxHeight,
+      onCentreAll: _centreNow,
+      onCentreUnit: _centreOn,
+    ),
   );
 
   Widget _selectedUnit({required bool compact}) => ValueListenableBuilder(
@@ -387,7 +366,7 @@ class _BattleViewState extends State<BattleView> {
 
   /// A desktop's or a browser's overlays: each floats where there is room.
   Widget _wideOverlays(BuildContext context, String help) {
-    // The storage and the shop stop short of the selected unit panel.
+    // The side panel stops short of the bottom of the screen.
     final height = MediaQuery.sizeOf(context).height;
     return Stack(
       children: [
@@ -399,28 +378,11 @@ class _BattleViewState extends State<BattleView> {
             child: _Header(help: help, compact: false),
           ),
         if (_shows(_Overlay.units))
-          Positioned(right: 12, top: 96, child: _unitsPanel(compact: false)),
-        if (_storageOpen && _shows(_Overlay.units))
           Positioned(
-            left: 12,
+            right: 12,
             top: 96,
             width: 300,
-            child: BlocSelector<BattleCubit, BattleState, bool>(
-              selector: (state) => state.selectedId != null,
-              builder: (context, selected) =>
-                  _storage(height - 96 - (selected ? 200 : 12)),
-            ),
-          ),
-        if (_shopOpen && _shows(_Overlay.units))
-          Positioned(
-            left: 12,
-            top: 96,
-            width: 300,
-            child: BlocSelector<BattleCubit, BattleState, bool>(
-              selector: (state) => state.selectedId != null,
-              builder: (context, selected) =>
-                  _shop(height - 96 - (selected ? 200 : 12)),
-            ),
+            child: _sidePanel(height - 96 - 12),
           ),
         if (_shows(_Overlay.alerts))
           Positioned(
@@ -456,17 +418,14 @@ class _BattleViewState extends State<BattleView> {
     );
   }
 
-  /// A phone's overlays: the status, the units, the alerts and the relics
-  /// stack at the top, and one sheet at the bottom holds the storage, else
-  /// the shop, else the selected unit, each the full width and no taller
-  /// than half the screen.
+  /// A phone's overlays: the status, the side panel (units, storage and shop
+  /// under its tabs), the alerts and the relics stack at the top, and one
+  /// sheet at the bottom holds the selected unit, the full width and no
+  /// taller than half the screen.
   Widget _compactOverlays(BuildContext context, String help) {
-    final maxSheet = MediaQuery.sizeOf(context).height * 0.45;
-    final sheet = _storageOpen && _shows(_Overlay.units)
-        ? _storage(maxSheet)
-        : _shopOpen && _shows(_Overlay.units)
-        ? _shop(maxSheet)
-        : _shows(_Overlay.unit)
+    final screen = MediaQuery.sizeOf(context).height;
+    final maxSheet = screen * 0.45;
+    final sheet = _shows(_Overlay.unit)
         ? ConstrainedBox(
             constraints: BoxConstraints(maxHeight: math.max(80, maxSheet)),
             child: _selectedUnit(compact: true),
@@ -485,7 +444,7 @@ class _BattleViewState extends State<BattleView> {
               if (_shows(_Overlay.units))
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: _unitsPanel(compact: true),
+                  child: _sidePanel(screen * 0.35),
                 ),
               if (_shows(_Overlay.alerts)) ...[
                 Padding(
@@ -714,88 +673,6 @@ final ButtonStyle _denseButton = TextButton.styleFrom(
   visualDensity: VisualDensity.compact,
   padding: const EdgeInsets.symmetric(horizontal: 8),
 );
-
-/// The section's units, deployed or stored: a tap selects one, Storage opens
-/// the storage view (M7 Issue 6), Shop the shop (M7 Issue 7), Centre looks at
-/// the section again. A list on a wide screen; on a phone the units wrap
-/// across the width, so that the panel stays short.
-class _UnitsPanel extends StatelessWidget {
-  const new({
-    required this.compact,
-    required this.onCentre,
-    required this.onStorage,
-    required this.onShop,
-  });
-
-  final bool compact;
-  final VoidCallback onCentre;
-  final VoidCallback onStorage;
-  final VoidCallback onShop;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final cubit = context.watch<BattleCubit>();
-    final units = cubit.state.sectionUnits;
-    final style = compact ? _denseButton : null;
-    final actions = [
-      Text(l10n.battleUnits),
-      TextButton(
-        onPressed: onCentre,
-        style: style,
-        child: Text(l10n.battleCentre),
-      ),
-      TextButton(
-        onPressed: onStorage,
-        style: style,
-        child: BlocSelector<StorageCubit, StorageState, int>(
-          selector: (state) => state.stored.length,
-          builder: (context, stored) => Text(l10n.storageOpen('$stored')),
-        ),
-      ),
-      TextButton(onPressed: onShop, style: style, child: Text(l10n.shopOpen)),
-    ];
-    final rows = [for (final unit in units) _UnitRow(unit: unit, style: style)];
-    return _Panel(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (compact)
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: actions,
-            )
-          else
-            Row(mainAxisSize: MainAxisSize.min, children: actions),
-          if (compact) Wrap(children: rows) else ...rows,
-        ],
-      ),
-    );
-  }
-}
-
-class _UnitRow extends StatelessWidget {
-  const new({required this.unit, required this.style});
-
-  final UnitView unit;
-  final ButtonStyle? style;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final cubit = context.read<BattleCubit>();
-    final stored = unit.private?.place == UnitPlace.stored;
-    return TextButton(
-      onPressed: () => cubit.select(unit.unitId),
-      style: style,
-      child: Text(
-        '${unit.unitType} · '
-        '${stored ? l10n.battleStored : l10n.battleInField}',
-      ),
-    );
-  }
-}
 
 /// The selected unit, its weapon and the answer to the last order, with the
 /// button that sees the battle through the unit's eyes, or goes back above,

@@ -12,9 +12,6 @@
   "battleUnit": "{type} · PV {hp} · PA {ap}",
   "battleOrderAccepted": "{order} accepté",
   "battleOrderRefused": "{order} refusé : {reason}",
-  "battleUnits": "Vos unités",
-  "battleInField": "sur le terrain",
-  "battleStored": "en réserve",
   "battleCentre": "Centrer",
   "battleOrderName": "{order, select, move{déplacement} deploy{déploiement} store{mise en réserve} recall{rappel} fire{tir} fireAtPosition{tir sur une position} fireAimed{tir visé} reload{rechargement} swap{changement d’arme} buy_unit{achat d’unité} buy_weapon{achat d’arme} other{ordre}}",
   "battleFirstPerson": "Vue depuis l'unité",
@@ -42,8 +39,6 @@
   "battleRefusal": "{code, select, out_of_range{Hors de portée} target_not_seen{Aucune cible en vue} no_weapon{Pas d’arme} empty_magazine{Chargeur vide, rechargez} not_loaded{Arme non chargée, rechargez} cost_above_ap_max{Un tir coûte plus de PA que l’unité n’en peut avoir} not_indirect{Cette arme ne tire pas sur une position} position_not_seen{Cette position n’est pas en vue} not_aimed{Cette arme ne se vise pas à la première personne} cannot_hit_flying{Cette arme ne touche pas les cibles aériennes} not_allowed{Cette unité ne peut pas utiliser cette arme} not_in_storage{Cette arme n’est pas en stock} not_at_storage{Pas à côté du lieu de stockage} not_on_field{L’unité n’est pas sur le terrain} unknown_target{Cible inconnue} not_stored{L’unité n’est pas en réserve} is_prisoner{Un prisonnier ne se déploie pas} section_locked{La section est verrouillée} blocked_by_enemy{Un ennemi est près du portail} never_stored{Cette unité n’est jamais mise en réserve} carries_units{Déchargez d’abord les passagers} already_recalled{Déjà rappelée} no_room{Pas de place pour une unité de plus} arrival_blocked{Un ennemi est près du portail} not_enough_money{Pas assez d’argent} test_units_off{Les unités de test ne sont pas permises dans cette bataille} unknown_type{Type d’unité inconnu} not_for_sale{Pas à vendre} no_path{Aucun chemin n’y mène} off_map{C’est hors de la carte} occupied{La place est prise} other{{code}}}",
   "battleHelpFireAtPosition": "Touchez le sol pour y tirer · appuyez à nouveau sur le bouton ou Échap pour annuler",
   "storageOpen": "Réserve ({count})",
-  "storageTitle": "Réserve",
-  "storageClose": "Fermer",
   "storagePortal": "Portail : le QG. Les unités se déploient à côté.",
   "storageDeployCost": "Déployer coûte {ap} PA",
   "storageLocked": "Verrouillée pour {time} : aucune unité ne peut se déployer",
@@ -62,8 +57,6 @@
   "storageNotInSight": "Le portail n’est pas en vue",
   "unitTypeName": "{type, select, soldier{Soldat} engineer{Ingénieur} scout{Éclaireur} medic{Médecin} artillery{Artillerie} radio{Radio} jeep{Jeep} tank{Char} truck{Camion} helicopter{Hélicoptère} boat{Bateau} test_unit{Unité de test} commander{Commandant} other{{type}}}",
   "shopOpen": "Boutique",
-  "shopTitle": "Boutique",
-  "shopClose": "Fermer",
   "shopWaiting": "En attente de la liste de l’hôte…",
   "shopMoney": "Argent : {amount} w€",
   "shopPrice": "{amount} w€",
@@ -184,5 +177,20 @@
   "settingsResetKeys": "Rétablir les commandes par défaut",
   "@settingsResetKeys": {
     "description": "Rend à chaque commande sa touche par défaut"
+  },
+  "sideUnits": "Unités",
+  "@sideUnits": {
+    "description": "Onglet du panneau latéral : les unités de la section sur le terrain"
+  },
+  "unitsEmpty": "Aucune unité sur le terrain",
+  "@unitsEmpty": {
+    "description": "L’onglet Unités quand toutes les unités de la section sont en stockage"
+  },
+  "unitsCentreOn": "Centrer sur {type}",
+  "@unitsCentreOn": {
+    "description": "Info-bulle du bouton qui centre la vue sur une unité",
+    "placeholders": {
+      "type": {}
+    }
   }
 }

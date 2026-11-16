@@ -8,7 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// {@template storage_panel}
-/// The section's storage (M7 Issue 6): the portal and what a deployment
+/// The section's storage (M7 Issue 6), the body of the Storage tab of the side
+/// panel: the portal and what a deployment
 /// costs, the 24-hour lock with the time it has left (HQ-35), the recalls on
 /// their way (HQ-32), the stored units with their type, HP and AP and a
 /// Deploy button each (HQ-33), the prisoners the section holds (HQ-37) and
@@ -24,10 +25,7 @@ import 'package:material_ui/material_ui.dart';
 /// {@endtemplate}
 class StoragePanel extends StatelessWidget {
   /// {@macro storage_panel}
-  const new({required this.onClose, super.key});
-
-  /// Closes the panel.
-  final VoidCallback onClose;
+  const new({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,22 +54,6 @@ class StoragePanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      l10n.storageTitle,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: onClose,
-                    child: Text(l10n.storageClose),
-                  ),
-                ],
-              ),
               Text(
                 state.portal == null
                     ? l10n.storageNotInSight

@@ -8,7 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// {@template shop_panel}
-/// The shop (M7 Issue 7): the section's money, the unit types the host lets
+/// The shop (M7 Issue 7), the body of the Shop tab of the side panel: the
+/// section's money, the unit types the host lets
 /// it buy with their prices (ECO-04, ECO-05), and, for the selected own unit,
 /// the weapons it can use with theirs (COMBAT-26, COMBAT-27). The list is the
 /// host's `Roster`: the app holds no copy of the plan's prices, and the test
@@ -24,10 +25,7 @@ import 'package:material_ui/material_ui.dart';
 /// {@endtemplate}
 class ShopPanel extends StatelessWidget {
   /// {@macro shop_panel}
-  const new({required this.onClose, this.selected, super.key});
-
-  /// Closes the panel.
-  final VoidCallback onClose;
+  const new({this.selected, super.key});
 
   /// The selected unit, when it is one of the section's own: the weapons
   /// shown are the ones it may equip.
@@ -58,19 +56,6 @@ class ShopPanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      l10n.shopTitle,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  TextButton(onPressed: onClose, child: Text(l10n.shopClose)),
-                ],
-              ),
               if (roster == null || section == null)
                 Text(l10n.shopWaiting)
               else ...[

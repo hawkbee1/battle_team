@@ -86,10 +86,8 @@ void main() {
     late MockBattleRepository repository;
     late StreamController<BattleSnapshot> snapshots;
     late StorageCubit cubit;
-    var closed = false;
 
     setUp(() {
-      closed = false;
       repository = MockBattleRepository();
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
       cubit = storageCubit(snapshots.stream, repository: repository);
@@ -132,14 +130,13 @@ void main() {
     }
 
     group(StoragePanel, () {
-      Widget panel() => StoragePanel(onClose: () => closed = true);
+      Widget panel() => const StoragePanel();
 
       testWidgets('HQ-33 lists a stored unit with its cost and deploys it', (
         tester,
       ) async {
         await pump(tester, panel(), snapshot: _snapshot([_stored('s-1')]));
 
-        expect(find.text('Storage'), findsOneWidget);
         expect(find.textContaining('Portal: the HQ'), findsOneWidget);
         expect(find.text('Deploying costs 10 AP'), findsOneWidget);
         expect(find.text('soldier · HP 80/100 · AP 30.0'), findsOneWidget);
@@ -265,6 +262,48 @@ void main() {
         );
       });
 
+      testWidgets('UNIT-39 a field as full as the section cap has no room: '
+          'deploy is off and says why', (tester) async {
+        // Level 1: five units on the field at most.
+        await pump(
+          tester,
+          panel(),
+          snapshot: _snapshot([
+            _stored('s-1'),
+            for (var i = 0; i < 5; i++) _field('f-$i', 100.0 + i),
+          ]),
+        );
+
+        expect(find.text('No room for one more unit'), findsOneWidget);
+        expect(
+          tester
+              .widget<TextButton>(find.widgetWithText(TextButton, 'Deploy'))
+              .onPressed,
+          isNull,
+        );
+      });
+
+      testWidgets('UNIT-39 a field with one place left deploys', (
+        tester,
+      ) async {
+        await pump(
+          tester,
+          panel(),
+          snapshot: _snapshot([
+            _stored('s-1'),
+            for (var i = 0; i < 4; i++) _field('f-$i', 100.0 + i),
+          ]),
+        );
+
+        expect(find.text('No room for one more unit'), findsNothing);
+        expect(
+          tester
+              .widget<TextButton>(find.widgetWithText(TextButton, 'Deploy'))
+              .onPressed,
+          isNotNull,
+        );
+      });
+
       testWidgets('decision 237 an enemy the section does not see shows no '
           "block; the host's refusal shows as the host's", (tester) async {
         when(() => repository.send(any()))
@@ -363,14 +402,6 @@ void main() {
         expect(find.text('The portal is not in sight'), findsOneWidget);
       });
 
-      testWidgets('closes', (tester) async {
-        await pump(tester, panel(), snapshot: _snapshot([_stored('s-1')]));
-
-        await tester.tap(find.text('Close'));
-
-        expect(closed, isTrue);
-      });
-
       testWidgets('is read by a screen reader: headers and labelled buttons', (
         tester,
       ) async {
@@ -389,8 +420,8 @@ void main() {
         );
 
         expect(
-          tester.getSemantics(find.text('Storage')),
-          matchesSemantics(label: 'Storage', isHeader: true),
+          tester.getSemantics(find.text('Prisoners (1)')),
+          matchesSemantics(label: 'Prisoners (1)', isHeader: true),
         );
         expect(find.bySemanticsLabel('Deploy soldier'), findsOneWidget);
         expect(
@@ -422,7 +453,6 @@ void main() {
           locale: const Locale('fr'),
         );
 
-        expect(find.text('Réserve'), findsOneWidget);
         expect(find.text('Déployer'), findsOneWidget);
         expect(find.text('Déployer coûte 10 PA'), findsOneWidget);
         expect(
@@ -431,7 +461,6 @@ void main() {
           ),
           findsOneWidget,
         );
-        expect(find.text('Fermer'), findsOneWidget);
       });
     });
 

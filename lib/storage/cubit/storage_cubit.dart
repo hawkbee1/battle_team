@@ -58,6 +58,7 @@ class StorageCubit extends Cubit<StorageState> {
             .where((hq) => hq.team == team)
             .map((hq) => hq.position)
             .firstOrNull,
+        section: () => section,
         lockedUntil: () => section?.lockedUntil,
         prisoners: section?.prisoners ?? const [],
         recalls: snapshot.recalls,
@@ -123,6 +124,8 @@ class StorageCubit extends Cubit<StorageState> {
       seen: state.units.values,
       time: time,
       lockedUntil: state.lockedUntil,
+      section: state.section,
+      owned: state.sectionUnits,
     );
   }
 

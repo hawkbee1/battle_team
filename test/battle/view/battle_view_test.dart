@@ -9,6 +9,7 @@ import 'package:battle_team/battle/battle.dart';
 import 'package:battle_team/battle/data/map_assets.dart';
 import 'package:battle_team/battle/data/unit_bodies.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
+import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/first_person_camera.dart';
 import 'package:battle_team/battle/world/top_down_camera.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
@@ -288,17 +289,17 @@ void main() {
       await tester.pump();
       expect(find.textContaining('In battle'), findsNothing);
       expect(find.textContaining('Drag to pan'), findsNothing);
-      expect(find.text('Your units'), findsOneWidget);
+      expect(find.text('Units'), findsOneWidget);
       expect(find.byTooltip('Credits'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Hide the units'));
       await tester.pump();
-      expect(find.text('Your units'), findsNothing);
+      expect(find.text('Units'), findsNothing);
 
       await tester.tap(find.byTooltip('Show the status'));
       await tester.pump();
       expect(find.textContaining('Drag to pan'), findsOneWidget);
-      expect(find.text('Your units'), findsNothing);
+      expect(find.text('Units'), findsNothing);
     });
 
     testWidgets('the toolbar is at the bottom on a phone, on the right on '
@@ -414,8 +415,8 @@ void main() {
           await pumpPhone(tester);
 
           final view = tester.getRect(find.text('View from unit'));
-          final unit = tester.getRect(find.textContaining('AP 30.0'));
-          final units = tester.getRect(find.text('Your units'));
+          final unit = tester.getRect(find.textContaining('HP 200 · AP 30.0'));
+          final units = tester.getRect(find.text('Units'));
           // Above the toolbar (56) and the gesture bar (40).
           expect(view.bottom, lessThanOrEqualTo(800 - 56 - 40));
           expect(view.top, lessThan(unit.bottom + 1));
@@ -424,9 +425,8 @@ void main() {
         },
       );
 
-      testWidgets('the storage opens as the bottom sheet, the full width', (
-        tester,
-      ) async {
+      testWidgets('the side panel stacks at the top with its tabs, the unit '
+          'panel stays in the sheet at the bottom', (tester) async {
         when(() => cubit.state).thenReturn(_fromAbove);
         await pumpPhone(tester);
         snapshots.add(
@@ -450,32 +450,25 @@ void main() {
         );
         await tester.runAsync(pumpEventQueue);
         await tester.pump();
-        // The relics strip is at the top, not over the sheet.
-        final strip = tester.getRect(find.textContaining('free'));
-        expect(strip.bottom, lessThan(400));
         expect(find.text('View from unit'), findsOneWidget);
+        // The tab bar is at the top, over the unit's sheet.
+        final tabs = tester.getRect(find.widgetWithText(Tab, 'Units'));
+        expect(tabs.bottom, lessThan(400));
 
         await tester.tap(find.text('Storage (1)'));
         await tester.pump();
         final deploy = tester.getRect(find.text('Deploy'));
-        expect(deploy.top, greaterThan(400));
-        expect(deploy.bottom, lessThanOrEqualTo(800 - 56 - 40));
-        // The sheet holds one thing at a time.
-        expect(find.text('View from unit'), findsNothing);
-
-        await tester.tap(find.text('Close'));
-        await tester.pump();
-        expect(find.text('Deploy'), findsNothing);
+        // No taller than a third of the screen, from the top.
+        expect(deploy.bottom, lessThan(800 * 0.45));
+        // The unit's sheet is still there.
         expect(find.text('View from unit'), findsOneWidget);
 
-        // The shop takes the same sheet.
+        // The shop takes the same panel.
         await tester.tap(find.text('Shop'));
         await tester.pump();
         final shop = tester.getRect(find.text('Waiting for the host’s list…'));
-        expect(shop.top, greaterThan(400));
-        expect(find.text('View from unit'), findsNothing);
-        await tester.tap(find.text('Close'));
-        await tester.pump();
+        expect(shop.bottom, lessThan(800 * 0.45));
+        expect(find.text('Deploy'), findsNothing);
         expect(find.text('View from unit'), findsOneWidget);
       });
     });
@@ -656,16 +649,15 @@ void main() {
       );
       await pump(tester);
 
-      expect(find.textContaining('AP –'), findsOneWidget);
+      expect(find.textContaining('HP 200 · AP –'), findsOneWidget);
       expect(
         find.textContaining('move refused: not_enough_ap'),
         findsOneWidget,
       );
     });
 
-    testWidgets("M7.1 lists the section's units, deployed or stored", (
-      tester,
-    ) async {
+    testWidgets("M7.1 lists the section's units on the field, with their HP "
+        'and AP, and no stored unit', (tester) async {
       when(() => cubit.state).thenReturn(
         _playing.copyWith(
           units: {
@@ -677,15 +669,30 @@ void main() {
       );
       await pump(tester);
 
-      expect(find.textContaining('commander · in the field'), findsOneWidget);
-      expect(find.textContaining('soldier · stored'), findsOneWidget);
-      expect(find.textContaining('soldier · in the field'), findsNothing);
-      // Deploying moved to the storage view (M7.6).
+      expect(find.text('commander · HP 200/200 · AP 30.0'), findsOneWidget);
+      // The stored soldier is in the Storage tab; the enemy is not the
+      // section's.
+      expect(find.textContaining('soldier · HP'), findsNothing);
+      // Deploying is in the storage tab (M7.6).
       expect(find.text('Deploy'), findsNothing);
+      // Each unit on the field can be centred on and stored.
+      expect(find.byTooltip('Centre on commander'), findsOneWidget);
+      expect(find.textContaining('Recall'), findsOneWidget);
     });
 
-    testWidgets('M7.6 the Storage button opens the storage view, where a '
-        'stored unit deploys, and closes it', (tester) async {
+    testWidgets('says so when every unit of the section is stored', (
+      tester,
+    ) async {
+      when(() => cubit.state).thenReturn(
+        _playing.copyWith(units: {'s-1': storedSoldier, 'r-1': redSoldier}),
+      );
+      await pump(tester);
+
+      expect(find.text('No unit on the field'), findsOneWidget);
+    });
+
+    testWidgets('M7.6 the Storage tab shows the storage, where a '
+        'stored unit deploys', (tester) async {
       await pump(tester);
       snapshots.add(
         const BattleSnapshot(
@@ -720,15 +727,13 @@ void main() {
       await tester.pump();
       expect(find.textContaining('deploy accepted'), findsOneWidget);
 
-      await tester.tap(find.text('Close'));
+      await tester.tap(find.widgetWithText(Tab, 'Units'));
       await tester.pump();
       expect(find.text('Deploy'), findsNothing);
     });
 
-    testWidgets('M7.7 the Shop button opens the shop, which lists what the '
-        'host lets the section buy; Storage and Shop take turns', (
-      tester,
-    ) async {
+    testWidgets('M7.7 the Shop tab shows what the host lets the section '
+        'buy; the tabs take turns', (tester) async {
       await pump(tester);
       snapshots.add(
         const BattleSnapshot(
@@ -775,7 +780,7 @@ void main() {
       await tester.pump();
       expect(find.text('unit purchase accepted'), findsOneWidget);
 
-      await tester.tap(find.text('Close'));
+      await tester.tap(find.widgetWithText(Tab, 'Units'));
       await tester.pump();
       expect(find.text('Money: 500 w€'), findsNothing);
     });
@@ -823,7 +828,8 @@ void main() {
           .thenReturn(_playing.copyWith(selectedId: () => 'c-1'));
       await pump(tester);
 
-      expect(find.textContaining('Recall'), findsOneWidget);
+      // One in the Units tab, one on the unit's panel.
+      expect(find.textContaining('Recall'), findsNWidgets(2));
     });
 
     testWidgets(
@@ -835,10 +841,58 @@ void main() {
 
         expect(find.text('commander'), findsOneWidget);
 
-        await tester.tap(find.textContaining('commander · in the field'));
+        await tester.tap(find.text('commander · HP 200/200 · AP 30.0'));
         verify(() => cubit.select('c-1')).called(1);
       },
     );
+
+    testWidgets('the Centre button of a unit looks at that unit and keeps the '
+        'zoom', (tester) async {
+      await pump(tester);
+      final above = world.cameras.first as TopDownCamera
+        ..target = Vector3(900, 0, -900)
+        ..distance = 321;
+
+      await tester.tap(find.byTooltip('Centre on commander'));
+      await tester.pump();
+
+      final at = worldOf(blueCommander.position!);
+      expect(above.target.x, closeTo(at.x, 1e-9));
+      expect(above.target.z, closeTo(at.z, 1e-9));
+      expect(above.distance, 321);
+    });
+
+    testWidgets('a unit that is not on the field has nothing to centre on', (
+      tester,
+    ) async {
+      const carried = UnitView(
+        unitId: 'c-2',
+        unitType: 'jeep',
+        sectionId: 's-blue',
+        team: 'blue',
+        hp: 100,
+        maxHp: 100,
+        private: UnitPrivate(
+          sightRangeM: 60,
+          place: UnitPlace.carried,
+          ap: ApView(value: 10, at: Duration(hours: 1), perHour: 1, max: 30),
+          morale: 100,
+          rounds: 0,
+          xpEarned: 0,
+          xpUnspent: 0,
+        ),
+      );
+      when(() => cubit.state).thenReturn(
+        _playing.copyWith(units: {'c-1': blueCommander, 'c-2': carried}),
+      );
+      await pump(tester);
+
+      final button = tester.widget<IconButton>(
+        find.widgetWithIcon(IconButton, Icons.my_location).last,
+      );
+      expect(button.onPressed, isNull);
+      expect(find.text('jeep · HP 100/100 · AP 30.0'), findsOneWidget);
+    });
 
     testWidgets(
       'decision 5 pans, zooms and turns the top-down view with the mouse, '
@@ -1142,7 +1196,7 @@ void main() {
 
           expect(find.text('View from unit'), findsNothing);
           // The AP between updates stays on the unit panel.
-          expect(find.textContaining('AP 30.0'), findsOneWidget);
+          expect(find.textContaining('HP 200 · AP 30.0'), findsOneWidget);
           expect(find.textContaining('Drag to look'), findsOneWidget);
           expect(find.textContaining('Drag to pan'), findsNothing);
           await tester.tap(find.text('Top-down view'));
@@ -1275,11 +1329,17 @@ void main() {
       expect(world.drawn.keys, isNotEmpty);
       expect(world.drawn.keys.toSet().difference(seen), isEmpty);
       expect(world.drawn.keys.toSet().intersection(hidden), isEmpty);
-      // The list names the section's own units and no other.
+      // The list names the section's own units on the field and no other.
       expect(
-        find.textContaining(RegExp('in the field|stored')),
+        find.textContaining(' · HP '),
         findsNWidgets(
-          fog.units.where((unit) => unit.sectionId == host.sectionId).length,
+          fog.units
+              .where(
+                (unit) =>
+                    unit.sectionId == host.sectionId &&
+                    unit.private?.place != UnitPlace.stored,
+              )
+              .length,
         ),
       );
     });

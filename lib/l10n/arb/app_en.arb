@@ -92,18 +92,6 @@
       }
     }
   },
-  "battleUnits": "Your units",
-  "@battleUnits": {
-    "description": "Heading of the list of the section's units"
-  },
-  "battleInField": "in the field",
-  "@battleInField": {
-    "description": "A unit out on the map"
-  },
-  "battleStored": "stored",
-  "@battleStored": {
-    "description": "A unit kept in storage, not on the map"
-  },
   "battleCentre": "Centre",
   "@battleCentre": {
     "description": "Looks at the section's units again"
@@ -256,14 +244,6 @@
       }
     }
   },
-  "storageTitle": "Storage",
-  "@storageTitle": {
-    "description": "Heading of the storage view"
-  },
-  "storageClose": "Close",
-  "@storageClose": {
-    "description": "Closes the storage view"
-  },
   "storagePortal": "Portal: the HQ. Units deploy next to it.",
   "@storagePortal": {
     "description": "Where stored units are deployed"
@@ -400,14 +380,6 @@
   "shopOpen": "Shop",
   "@shopOpen": {
     "description": "Opens the shop"
-  },
-  "shopTitle": "Shop",
-  "@shopTitle": {
-    "description": "Heading of the shop"
-  },
-  "shopClose": "Close",
-  "@shopClose": {
-    "description": "Closes the shop"
   },
   "shopWaiting": "Waiting for the host’s list…",
   "@shopWaiting": {
@@ -855,5 +827,20 @@
   "settingsResetKeys": "Restore the default commands",
   "@settingsResetKeys": {
     "description": "Gives every command its default key back"
+  },
+  "sideUnits": "Units",
+  "@sideUnits": {
+    "description": "Tab of the side panel: the section's units on the field"
+  },
+  "unitsEmpty": "No unit on the field",
+  "@unitsEmpty": {
+    "description": "The Units tab when every unit of the section is in storage"
+  },
+  "unitsCentreOn": "Centre on {type}",
+  "@unitsCentreOn": {
+    "description": "Tooltip of the button that centres the view on a unit",
+    "placeholders": {
+      "type": {}
+    }
   }
 }

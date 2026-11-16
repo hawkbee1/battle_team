@@ -13,6 +13,7 @@ class StorageState extends Equatable {
     this.units = const {},
     this.sectionId,
     this.portal,
+    this.section,
     this.lockedUntil,
     this.prisoners = const [],
     this.recalls = const {},
@@ -29,6 +30,10 @@ class StorageState extends Equatable {
   /// Where the section stores and deploys: the position of its team's HQ,
   /// once the section sees it.
   final Position? portal;
+
+  /// The section's own state (its XP sets its size cap, UNIT-39), once the
+  /// host's whole view came.
+  final SectionPrivate? section;
 
   /// The end of the section's full storage lock (HQ-35); null without one.
   final Duration? lockedUntil;
@@ -57,12 +62,13 @@ class StorageState extends Equatable {
       if (unit.private?.place == UnitPlace.stored) unit,
   ];
 
-  /// This state with the values given; [lockedUntil], [portal] and [notice]
-  /// are functions so that they can be cleared.
+  /// This state with the values given; [lockedUntil], [portal], [section] and
+  /// [notice] are functions so that they can be cleared.
   StorageState copyWith({
     Map<String, UnitView>? units,
     String? sectionId,
     Position? Function()? portal,
+    SectionPrivate? Function()? section,
     Duration? Function()? lockedUntil,
     List<JoinedUnit>? prisoners,
     Map<String, Duration>? recalls,
@@ -72,6 +78,7 @@ class StorageState extends Equatable {
     units: units ?? this.units,
     sectionId: sectionId ?? this.sectionId,
     portal: portal == null ? this.portal : portal(),
+    section: section == null ? this.section : section(),
     lockedUntil: lockedUntil == null ? this.lockedUntil : lockedUntil(),
     prisoners: prisoners ?? this.prisoners,
     recalls: recalls ?? this.recalls,
@@ -84,6 +91,7 @@ class StorageState extends Equatable {
     units,
     sectionId,
     portal,
+    section,
     lockedUntil,
     prisoners,
     recalls,

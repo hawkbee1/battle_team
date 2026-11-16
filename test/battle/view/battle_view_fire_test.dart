@@ -227,8 +227,9 @@ void main() {
         findsOneWidget,
       );
 
-      // Between the units panel above and the unit's panel below.
-      await tester.tapAt(const Offset(600, 370));
+      // On the ground, clear of the side panel on the right and of the
+      // unit's panel below.
+      await tester.tapAt(const Offset(100, 250));
       await settle(tester);
 
       final order = host.orders.single as FireAtPosition;

@@ -57,10 +57,8 @@ void main() {
     late MockBattleRepository repository;
     late StreamController<BattleSnapshot> snapshots;
     late ShopCubit cubit;
-    var closed = false;
 
     setUp(() {
-      closed = false;
       repository = MockBattleRepository();
       snapshots = StreamController<BattleSnapshot>.broadcast(sync: true);
       cubit = shopCubit(snapshots.stream, repository: repository);
@@ -90,10 +88,7 @@ void main() {
             body: BlocProvider<ShopCubit>.value(
               value: cubit,
               child: SingleChildScrollView(
-                child: ShopPanel(
-                  selected: selected,
-                  onClose: () => closed = true,
-                ),
+                child: ShopPanel(selected: selected),
               ),
             ),
           ),
@@ -121,7 +116,8 @@ void main() {
     ) async {
       await pump(tester, snapshot: _snapshot([blueCommander]));
 
-      expect(find.text('Shop'), findsOneWidget);
+      // The title is the tab's: the panel is the body of the Shop tab.
+      expect(find.text('Shop'), findsNothing);
       expect(find.text('Money: 1,500 w€'), findsOneWidget);
       expect(find.text('Soldier · 100 w€'), findsOneWidget);
       expect(find.text('Radio · 100 w€'), findsOneWidget);
@@ -305,14 +301,6 @@ void main() {
       expect(find.textContaining('Rifle'), findsNothing);
     });
 
-    testWidgets('Close closes the panel', (tester) async {
-      await pump(tester, snapshot: _snapshot([blueCommander]));
-
-      await tester.tap(find.text('Close'));
-
-      expect(closed, isTrue);
-    });
-
     testWidgets('is read by a screen reader: headers and labelled buttons', (
       tester,
     ) async {
@@ -320,8 +308,8 @@ void main() {
       await pump(tester, snapshot: _snapshot([blueCommander], money: 120));
 
       expect(
-        tester.getSemantics(find.text('Shop')),
-        matchesSemantics(label: 'Shop', isHeader: true),
+        tester.getSemantics(find.text('Units')),
+        matchesSemantics(label: 'Units', isHeader: true),
       );
       expect(
         tester.getSemantics(find.bySemanticsLabel('Buy Soldier for 100 w€')),
@@ -360,7 +348,6 @@ void main() {
       final thousand = NumberFormat.decimalPattern('fr').format(1500);
 
       expect(thousand, isNot('1,500'));
-      expect(find.text('Boutique'), findsOneWidget);
       expect(find.text('Argent : 120 w€'), findsOneWidget);
       expect(find.text('Jeep · $thousand w€'), findsOneWidget);
       expect(find.text('Soldat · 100 w€'), findsOneWidget);
