@@ -139,6 +139,25 @@ void main() {
       );
     });
 
+    test('HQ-05 says the player manages the HQ only when the host names '
+        'his account', () async {
+      expect((await play()).managesHq, isFalse);
+      await repository.close();
+
+      host = FakeHost(manager: 'bt-blue');
+      repository = repositoryOf();
+      final managing = repository.snapshots.firstWhere(
+        (snapshot) => snapshot.managesHq,
+      );
+      repository.start();
+      expect(await managing.timeout(const Duration(seconds: 5)), isNotNull);
+      await repository.close();
+
+      host = FakeHost(manager: 'bt-red');
+      repository = repositoryOf();
+      expect((await play()).managesHq, isFalse);
+    });
+
     test('MAP-31 MAP-08 MAP-49 gives the weather, the delta layer and the '
         'countdown as they change', () async {
       final first = await play();

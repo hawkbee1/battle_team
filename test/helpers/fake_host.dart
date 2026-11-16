@@ -191,8 +191,8 @@ const shopRosterWithTestUnit = Roster(
 );
 
 /// A battle's host in memory: it signs the client in as the seat of [view]
-/// (blue by default), sends [view], [roster] then [updates], answers each
-/// command
+/// (blue by default), sends [view], [roster], the [manager] then [updates],
+/// answers each command
 /// ([refusal] refuses them, [silent] leaves them unanswered) and keeps their
 /// orders.
 final class FakeHost implements Transport {
@@ -201,6 +201,7 @@ final class FakeHost implements Transport {
     this.view = blueView,
     this.updates = const [],
     this.roster,
+    this.manager,
     this.accountId = 'bt-blue',
     this.sectionId = 's-blue',
     this.team = 'blue',
@@ -236,6 +237,10 @@ final class FakeHost implements Transport {
   /// What the battle lets the section buy, sent right after the whole view;
   /// none when null.
   final Roster? roster;
+
+  /// The account that manages its team's HQ, sent right after the roster;
+  /// none sent when null.
+  final String? manager;
 
   /// The account, section and team it signs the client in as.
   final String accountId;
@@ -295,6 +300,9 @@ final class FakeHostSocket implements TransportSocket {
         );
         deliver(_host.view);
         if (_host.roster case final roster?) deliver(roster);
+        if (_host.manager case final manager?) {
+          deliver(ManagerNotice(accountId: manager));
+        }
         _host.updates.forEach(deliver);
       case SendCommand(:final requestId, :final command):
         _host.orders.add(command.order);

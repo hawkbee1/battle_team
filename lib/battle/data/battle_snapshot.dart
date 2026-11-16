@@ -25,6 +25,7 @@ class BattleSnapshot extends Equatable {
     this.world = const [],
     this.worldVersion = 0,
     this.hold,
+    this.managesHq = false,
   });
 
   /// The units the section knows, by ID.
@@ -59,6 +60,10 @@ class BattleSnapshot extends Equatable {
   /// COMBAT-27).
   final Roster? roster;
 
+  /// Whether the player manages the HQ of the team, and so moves it (HQ-05,
+  /// HQ-10).
+  final bool managesHq;
+
   /// The player's team, once signed in.
   final String? team;
 
@@ -79,5 +84,6 @@ class BattleSnapshot extends Equatable {
     world,
     worldVersion,
     hold,
+    managesHq,
   ];
 }

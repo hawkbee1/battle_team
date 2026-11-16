@@ -96,7 +96,7 @@
   "@battleCentre": {
     "description": "Looks at the section's units again"
   },
-  "battleOrderName": "{order, select, move{move} deploy{deploy} store{store} recall{recall} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} buy_unit{unit purchase} buy_weapon{weapon purchase} other{order}}",
+  "battleOrderName": "{order, select, move{move} deploy{deploy} store{store} recall{recall} fire{fire} fireAtPosition{fire at position} fireAimed{aimed fire} reload{reload} swap{swap} move_hq{HQ move} buy_unit{unit purchase} buy_weapon{weapon purchase} other{order}}",
   "@battleOrderName": {
     "description": "An order, as a word, in the host's answer to it",
     "placeholders": {
@@ -235,14 +235,21 @@
   "@battleHelpFireAtPosition": {
     "description": "Shown while the next tap on the ground fires"
   },
-  "storageOpen": "Storage ({count})",
+  "storageOpen": "Storage ({stored}/{max})",
   "@storageOpen": {
-    "description": "Opens the storage view; the number of units in storage",
+    "description": "Tab of the side panel: the units in storage, and the most its storage holds",
     "placeholders": {
-      "count": {
-        "type": "String"
+      "stored": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
       }
     }
+  },
+  "storageTab": "Storage",
+  "@storageTab": {
+    "description": "Tab of the side panel: the storage, before the host has said how full it is"
   },
   "storagePortal": "Portal: the HQ. Units deploy next to it.",
   "@storagePortal": {
@@ -830,7 +837,40 @@
   },
   "sideUnits": "Units",
   "@sideUnits": {
-    "description": "Tab of the side panel: the section's units on the field"
+    "description": "Tab of the side panel: the section's units on the field, before the host has said how many there can be"
+  },
+  "sideUnitsCount": "Units ({active}/{max})",
+  "@sideUnitsCount": {
+    "description": "Tab of the side panel: the section's units on the field, and the most it keeps there",
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "unitsHq": "HQ · HP {hp}/{max} · AP {ap}",
+  "@unitsHq": {
+    "description": "The HQ of the player's team in the Units tab: hit points and AP",
+    "placeholders": {
+      "hp": {},
+      "max": {},
+      "ap": {}
+    }
+  },
+  "unitsCentreOnHq": "Centre on the HQ",
+  "@unitsCentreOnHq": {
+    "description": "Tooltip of the button that centres the view on the HQ"
+  },
+  "unitsMoveHq": "Move the HQ",
+  "@unitsMoveHq": {
+    "description": "Button of the HQ manager that arms the next tap on the ground to move the HQ there"
+  },
+  "unitsMoveHqHelp": "Touch the ground to move the HQ there · press the button again or Esc to cancel",
+  "@unitsMoveHqHelp": {
+    "description": "Shown while the next tap on the ground moves the HQ"
   },
   "unitsEmpty": "No unit on the field",
   "@unitsEmpty": {

@@ -60,6 +60,16 @@ class StorageCubit extends Cubit<StorageState> {
             .firstOrNull,
         section: () => section,
         lockedUntil: () => section?.lockedUntil,
+        capacity: () => switch (section) {
+          final own? => preCheck.capacity(
+            owned: [
+              for (final unit in snapshot.units.values)
+                if (unit.sectionId == snapshot.sectionId) unit,
+            ],
+            section: own,
+          ),
+          null => null,
+        },
         prisoners: section?.prisoners ?? const [],
         recalls: snapshot.recalls,
         revision: state.revision + 1,

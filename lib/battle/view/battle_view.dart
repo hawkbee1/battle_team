@@ -254,6 +254,10 @@ class _BattleViewState extends State<BattleView> {
       view.position,
       view.directionAt(at),
     );
+    if (ground != null && state.hqMove) {
+      unawaited(cubit.moveHqTo(positionOf(ground)));
+      return;
+    }
     if (ground != null && state.selected != null) {
       final there = positionOf(ground);
       // From above a move is previewed and confirmed (M7 Issue 8); from a
@@ -304,12 +308,14 @@ class _BattleViewState extends State<BattleView> {
     };
   }
 
-  /// Gives up a previewed move, else firing at a position, else clears the
-  /// selection.
+  /// Gives up a previewed move, else moving the HQ, else firing at a
+  /// position, else clears the selection.
   void _escape() {
     final cubit = context.read<BattleCubit>();
     if (cubit.state.pendingMove != null) {
       cubit.cancelMove();
+    } else if (cubit.state.hqMove) {
+      cubit.toggleHqMove();
     } else if (cubit.state.groundFire) {
       cubit.toggleGroundFire();
     } else {

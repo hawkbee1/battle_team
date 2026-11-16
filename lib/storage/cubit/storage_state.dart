@@ -15,6 +15,7 @@ class StorageState extends Equatable {
     this.portal,
     this.section,
     this.lockedUntil,
+    this.capacity,
     this.prisoners = const [],
     this.recalls = const {},
     this.notice,
@@ -37,6 +38,11 @@ class StorageState extends Equatable {
 
   /// The end of the section's full storage lock (HQ-35); null without one.
   final Duration? lockedUntil;
+
+  /// How full the section is: its units on the field and in storage against
+  /// the maxima of its commander's level (UNIT-39, UNIT-40); null until the
+  /// host's whole view came.
+  final SectionCapacity? capacity;
 
   /// The units of other sections the section holds prisoner (HQ-37).
   final List<JoinedUnit> prisoners;
@@ -62,14 +68,15 @@ class StorageState extends Equatable {
       if (unit.private?.place == UnitPlace.stored) unit,
   ];
 
-  /// This state with the values given; [lockedUntil], [portal], [section] and
-  /// [notice] are functions so that they can be cleared.
+  /// This state with the values given; [lockedUntil], [portal], [section],
+  /// [capacity] and [notice] are functions so that they can be cleared.
   StorageState copyWith({
     Map<String, UnitView>? units,
     String? sectionId,
     Position? Function()? portal,
     SectionPrivate? Function()? section,
     Duration? Function()? lockedUntil,
+    SectionCapacity? Function()? capacity,
     List<JoinedUnit>? prisoners,
     Map<String, Duration>? recalls,
     OrderNotice? Function()? notice,
@@ -80,6 +87,7 @@ class StorageState extends Equatable {
     portal: portal == null ? this.portal : portal(),
     section: section == null ? this.section : section(),
     lockedUntil: lockedUntil == null ? this.lockedUntil : lockedUntil(),
+    capacity: capacity == null ? this.capacity : capacity(),
     prisoners: prisoners ?? this.prisoners,
     recalls: recalls ?? this.recalls,
     notice: notice == null ? this.notice : notice(),
@@ -93,6 +101,7 @@ class StorageState extends Equatable {
     portal,
     section,
     lockedUntil,
+    capacity,
     prisoners,
     recalls,
     notice,

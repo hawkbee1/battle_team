@@ -90,6 +90,7 @@ class BattleCubit extends Cubit<BattleState> {
       storedWeapons: snapshot.section?.storedWeapons,
       team: snapshot.team,
       sectionId: snapshot.sectionId,
+      managesHq: snapshot.managesHq,
       revision: state.revision + 1,
     );
     // The unit whose eyes the player looks through died, was stored or left
@@ -110,6 +111,8 @@ class BattleCubit extends Cubit<BattleState> {
       next.copyWith(
         viewMode: lost ? const TopDownMode() : null,
         targetId: targetGone ? () => null : null,
+        // The role went to someone else: no move of the HQ is armed.
+        hqMove: next.managesHq ? null : false,
         pendingMove: stale ? () => null : null,
         arrivalNote: note == null ? null : () => note,
       ),
@@ -157,6 +160,9 @@ class BattleCubit extends Cubit<BattleState> {
     null => null,
   };
 
+  /// The AP of the HQ now, from its pool [ap].
+  double? hqApNow(ApView ap) => repository.apNow(ap);
+
   /// Selects [unitId] when it is one of the section's units; anything else
   /// clears the selection. Selecting another unit than the one the battle is
   /// seen from goes back to the overview.
@@ -171,6 +177,7 @@ class BattleCubit extends Cubit<BattleState> {
         selectedId: () => selected,
         targetId: () => null,
         groundFire: false,
+        hqMove: false,
         pendingMove: () => null,
         arrivalNote: () => null,
         viewMode: leaves ? const TopDownMode() : null,
@@ -397,7 +404,25 @@ class BattleCubit extends Cubit<BattleState> {
   void toggleGroundFire() {
     final armed = !state.groundFire;
     if (armed && checkFireAtPosition() is PreCheckRefused) return;
-    emit(state.copyWith(groundFire: armed));
+    emit(state.copyWith(groundFire: armed, hqMove: false));
+  }
+
+  /// Arms the next tap on the ground to move the HQ there, or disarms it
+  /// (HQ-10). Only the manager of the HQ arms it; the host checks it all the
+  /// same.
+  void toggleHqMove() {
+    final armed = !state.hqMove;
+    if (armed && !state.managesHq) return;
+    emit(
+      state.copyWith(hqMove: armed, groundFire: false, pendingMove: () => null),
+    );
+  }
+
+  /// Orders the HQ to move to [to] (HQ-10); the host looks for the path.
+  Future<void> moveHqTo(Position to) async {
+    emit(state.copyWith(hqMove: false));
+    if (!state.managesHq) return;
+    await _order('hq', 'move_hq', MoveHq(to: to));
   }
 
   /// Orders the selected unit to fire at the ground position [at] (COMBAT-12).

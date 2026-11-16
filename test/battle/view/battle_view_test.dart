@@ -130,6 +130,8 @@ void main() {
       when(() => cubit.moveSelectedTo(any())).thenAnswer((_) async {});
       when(() => cubit.previewMoveTo(any())).thenAnswer((_) async {});
       when(() => cubit.confirmMove()).thenAnswer((_) async {});
+      when(() => cubit.moveHqTo(any())).thenAnswer((_) async {});
+      when(() => cubit.hqApNow(any())).thenReturn(30);
       // The weapon panel of M7.5 asks the cubit what the buttons may do; these
       // tests are about the view, so nothing may fire.
       when(() => cubit.shots).thenAnswer((_) => const Stream.empty());
@@ -452,10 +454,10 @@ void main() {
         await tester.pump();
         expect(find.text('View from unit'), findsOneWidget);
         // The tab bar is at the top, over the unit's sheet.
-        final tabs = tester.getRect(find.widgetWithText(Tab, 'Units'));
+        final tabs = tester.getRect(find.widgetWithText(Tab, 'Units (1/5)'));
         expect(tabs.bottom, lessThan(400));
 
-        await tester.tap(find.text('Storage (1)'));
+        await tester.tap(find.text('Storage (1/10)'));
         await tester.pump();
         final deploy = tester.getRect(find.text('Deploy'));
         // No taller than a third of the screen, from the top.
@@ -522,6 +524,132 @@ void main() {
 
       verifyNever(() => cubit.moveSelectedTo(any()));
       verifyNever(() => cubit.select(any()));
+    });
+
+    testWidgets('the centre button of a unit selects it, and centres the '
+        'view on it', (tester) async {
+      await pump(tester);
+
+      await tester.tap(find.byTooltip('Centre on commander'));
+
+      verify(() => cubit.select('c-1')).called(1);
+    });
+
+    group('the HQ', () {
+      const hq = HqView(
+        team: 'blue',
+        position: Position(50500, 5500, 3000),
+        hp: 900,
+        maxHp: 1000,
+        ap: ApView(value: 30, at: Duration.zero, perHour: 1, max: 30),
+      );
+      final withHq = _playing.copyWith(hqs: [hq]);
+
+      testWidgets('HQ-14 is in the units tab with its HP and AP, and a '
+          'button that centres the view on it', (tester) async {
+        when(() => cubit.state).thenReturn(withHq);
+        await pump(tester);
+
+        expect(find.text('HQ · HP 900/1000 · AP 30.0'), findsOneWidget);
+        await tester.tap(find.byTooltip('Centre on the HQ'));
+        await tester.pump();
+
+        // Centring on the HQ selects no unit.
+        verifyNever(() => cubit.select(any()));
+      });
+
+      testWidgets('HQ-10 shows the AP of an HQ it has none of as a dash', (
+        tester,
+      ) async {
+        when(() => cubit.state).thenReturn(
+          _playing.copyWith(
+            hqs: [
+              const HqView(
+                team: 'blue',
+                position: Position(50500, 5500, 3000),
+                hp: 900,
+                maxHp: 1000,
+              ),
+            ],
+          ),
+        );
+        await pump(tester);
+
+        expect(find.text('HQ · HP 900/1000 · AP –'), findsOneWidget);
+      });
+
+      testWidgets('HQ-10 only the manager has the button that moves it', (
+        tester,
+      ) async {
+        when(() => cubit.state).thenReturn(withHq);
+        await pump(tester);
+        expect(find.text('Move the HQ'), findsNothing);
+
+        await show(tester, withHq.copyWith(managesHq: true));
+        expect(find.text('Move the HQ'), findsOneWidget);
+
+        await tester.tap(find.text('Move the HQ'));
+        verify(() => cubit.toggleHqMove()).called(1);
+      });
+
+      testWidgets('HQ-10 says what the next tap does while the move is '
+          'armed, and the tap sends it', (tester) async {
+        when(() => cubit.state)
+            .thenReturn(withHq.copyWith(managesHq: true, hqMove: true));
+        await pump(tester);
+        expect(
+          find.textContaining('Touch the ground to move the HQ'),
+          findsOne,
+        );
+
+        await tester.tapAt(const Offset(300, 500));
+
+        final to =
+            verify(() => cubit.moveHqTo(captureAny())).captured.single
+                as Position;
+        expect(to.y, greaterThan(blueCommander.position!.y));
+        verifyNever(() => cubit.previewMoveTo(any()));
+      });
+
+      testWidgets('HQ-10 Escape gives up the move of the HQ before it clears '
+          'the selection', (tester) async {
+        when(() => cubit.state).thenReturn(
+          withHq.copyWith(
+            managesHq: true,
+            hqMove: true,
+            selectedId: () => 'c-1',
+          ),
+        );
+        await pump(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+
+        verify(() => cubit.toggleHqMove()).called(1);
+        verifyNever(() => cubit.select(any()));
+      });
+    });
+
+    testWidgets('UNIT-39 UNIT-40 the tabs say how many units are on the '
+        'field and in storage, and how many there can be', (tester) async {
+      await pump(tester);
+      expect(find.widgetWithText(Tab, 'Units'), findsOneWidget);
+      expect(find.widgetWithText(Tab, 'Storage'), findsOneWidget);
+
+      snapshots.add(
+        const BattleSnapshot(
+          units: {'c-1': blueCommander, 's-1': storedSoldier},
+          hqs: [],
+          relics: [],
+          section: SectionPrivate(money: 0, xp: 0),
+          team: 'blue',
+          sectionId: 's-blue',
+        ),
+      );
+      await tester.runAsync(pumpEventQueue);
+      await tester.pump();
+
+      expect(find.widgetWithText(Tab, 'Units (1/5)'), findsOneWidget);
+      expect(find.widgetWithText(Tab, 'Storage (1/10)'), findsOneWidget);
     });
 
     testWidgets('M7.8 a previewed move is drawn as a line, shows its cost, '
@@ -715,10 +843,10 @@ void main() {
       await tester.runAsync(pumpEventQueue);
       await tester.pump();
 
-      expect(find.text('Storage (1)'), findsOneWidget);
+      expect(find.text('Storage (1/10)'), findsOneWidget);
       expect(find.text('Deploy'), findsNothing);
 
-      await tester.tap(find.text('Storage (1)'));
+      await tester.tap(find.text('Storage (1/10)'));
       await tester.pump();
       expect(find.text('Deploy'), findsOneWidget);
       expect(find.textContaining('Deploying costs 10 AP'), findsOneWidget);
@@ -727,7 +855,7 @@ void main() {
       await tester.pump();
       expect(find.textContaining('deploy accepted'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(Tab, 'Units'));
+      await tester.tap(find.widgetWithText(Tab, 'Units (1/5)'));
       await tester.pump();
       expect(find.text('Deploy'), findsNothing);
     });
@@ -767,7 +895,7 @@ void main() {
         findsOneWidget,
       );
 
-      await tester.tap(find.text('Storage (1)'));
+      await tester.tap(find.text('Storage (1/10)'));
       await tester.pump();
       expect(find.text('Money: 500 w€'), findsNothing);
       expect(find.text('Deploy'), findsOneWidget);
@@ -780,7 +908,7 @@ void main() {
       await tester.pump();
       expect(find.text('unit purchase accepted'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(Tab, 'Units'));
+      await tester.tap(find.widgetWithText(Tab, 'Units (1/5)'));
       await tester.pump();
       expect(find.text('Money: 500 w€'), findsNothing);
     });
@@ -1329,17 +1457,19 @@ void main() {
       expect(world.drawn.keys, isNotEmpty);
       expect(world.drawn.keys.toSet().difference(seen), isEmpty);
       expect(world.drawn.keys.toSet().intersection(hidden), isEmpty);
-      // The list names the section's own units on the field and no other.
+      // The list names the section's own units on the field and no other,
+      // and the HQ of its team.
       expect(
         find.textContaining(' · HP '),
         findsNWidgets(
-          fog.units
-              .where(
-                (unit) =>
-                    unit.sectionId == host.sectionId &&
-                    unit.private?.place != UnitPlace.stored,
-              )
-              .length,
+          1 +
+              fog.units
+                  .where(
+                    (unit) =>
+                        unit.sectionId == host.sectionId &&
+                        unit.private?.place != UnitPlace.stored,
+                  )
+                  .length,
         ),
       );
     });

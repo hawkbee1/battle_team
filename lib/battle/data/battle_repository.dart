@@ -96,6 +96,7 @@ class BattleRepository {
       world: view.world,
       worldVersion: view.worldVersion,
       hold: view.hold,
+      managesHq: seat != null && view.manager == seat.accountId,
     );
   });
 

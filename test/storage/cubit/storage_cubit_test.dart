@@ -110,6 +110,37 @@ void main() {
       expect(cubit.state.revision, 1);
     });
 
+    test('UNIT-39 UNIT-40 follows how full the section is: its units on '
+        'the field and in storage against what its level allows', () {
+      expect(cubit.state.capacity, isNull);
+
+      see([blueCommander, storedSoldier, redSoldier]);
+
+      expect(
+        cubit.state.capacity,
+        const SectionCapacity(
+          active: 1,
+          activeMax: 5,
+          stored: 1,
+          storedMax: 10,
+        ),
+      );
+    });
+
+    test('UNIT-39 no section state yet, no capacity', () {
+      snapshots.add(
+        const BattleSnapshot(
+          units: {'c-1': blueCommander},
+          hqs: [],
+          relics: [],
+          team: 'blue',
+          sectionId: 's-blue',
+        ),
+      );
+
+      expect(cubit.state.capacity, isNull);
+    });
+
     test('M7.6 the portal is its own team HQ, not an enemy one', () {
       see(
         [storedSoldier],

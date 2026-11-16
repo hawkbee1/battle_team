@@ -141,6 +141,8 @@ class BattleState extends Equatable {
     this.selectedId,
     this.targetId,
     this.groundFire = false,
+    this.managesHq = false,
+    this.hqMove = false,
     this.pendingMove,
     this.arrivalNote,
     this.storedWeapons = const [],
@@ -179,6 +181,14 @@ class BattleState extends Equatable {
   /// moving.
   final bool groundFire;
 
+  /// Whether the player manages the HQ of the team, and so moves it (HQ-05,
+  /// HQ-10).
+  final bool managesHq;
+
+  /// Whether the next tap on the ground moves the HQ there (HQ-10) instead of
+  /// the selected unit.
+  final bool hqMove;
+
   /// The move the player previewed and has not confirmed.
   final PendingMove? pendingMove;
 
@@ -200,6 +210,9 @@ class BattleState extends Equatable {
 
   /// Grows with each message of the host.
   final int revision;
+
+  /// The HQ of the player's team, once the section sees it.
+  HqView? get ownHq => hqs.where((hq) => hq.team == team).firstOrNull;
 
   /// The selected unit, while the section sees it.
   UnitView? get selected => units[selectedId];
@@ -249,6 +262,8 @@ class BattleState extends Equatable {
     String? Function()? selectedId,
     String? Function()? targetId,
     bool? groundFire,
+    bool? managesHq,
+    bool? hqMove,
     PendingMove? Function()? pendingMove,
     ArrivalNote? Function()? arrivalNote,
     List<String>? storedWeapons,
@@ -266,6 +281,8 @@ class BattleState extends Equatable {
     selectedId: selectedId == null ? this.selectedId : selectedId(),
     targetId: targetId == null ? this.targetId : targetId(),
     groundFire: groundFire ?? this.groundFire,
+    managesHq: managesHq ?? this.managesHq,
+    hqMove: hqMove ?? this.hqMove,
     pendingMove: pendingMove == null ? this.pendingMove : pendingMove(),
     arrivalNote: arrivalNote == null ? this.arrivalNote : arrivalNote(),
     storedWeapons: storedWeapons ?? this.storedWeapons,
@@ -286,6 +303,8 @@ class BattleState extends Equatable {
     selectedId,
     targetId,
     groundFire,
+    managesHq,
+    hqMove,
     pendingMove,
     arrivalNote,
     storedWeapons,

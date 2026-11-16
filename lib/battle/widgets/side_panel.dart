@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:battle_client/battle_client.dart';
 import 'package:battle_protocol/battle_protocol.dart';
 import 'package:battle_team/battle/cubit/battle_cubit.dart';
 import 'package:battle_team/l10n/l10n.dart';
@@ -26,9 +27,12 @@ enum SideTab {
 /// {@template side_panel}
 /// The side panel of the battle view, one panel with a tab bar: **Units**
 /// (the section's units on the field with their HP and AP, a button to centre
-/// the view on each and one to store it), **Storage** (its stored units, with
-/// the button that deploys each while the section has room on the field) and
-/// **Shop**. The bodies are the panels of the storage (M7 Issue 6) and of the
+/// the view on each, which selects it, and one to store it; and the team's
+/// HQ, with its own centre button and, for its manager only, the button that
+/// moves it), **Storage** (its stored units, with the button that deploys each
+/// while the section has room on the field) and **Shop**. The tabs say how
+/// many units the section has on the field and in storage, and how many it
+/// can. The bodies are the panels of the storage (M7 Issue 6) and of the
 /// shop (M7 Issue 7); this holds no rule, and shows only the section's own
 /// units (HQ-29, decision 237).
 ///
@@ -88,13 +92,39 @@ class _SidePanelState extends State<SidePanel>
               labelPadding: const EdgeInsets.symmetric(horizontal: 4),
               dividerColor: Colors.transparent,
               tabs: [
-                Tab(text: l10n.sideUnits),
                 Tab(
-                  child: BlocSelector<StorageCubit, StorageState, int>(
-                    selector: (state) => state.stored.length,
-                    builder: (context, stored) =>
-                        Text(l10n.storageOpen('$stored')),
-                  ),
+                  child:
+                      BlocSelector<
+                        StorageCubit,
+                        StorageState,
+                        SectionCapacity?
+                      >(
+                        selector: (state) => state.capacity,
+                        builder: (context, capacity) => Text(switch (capacity) {
+                          final full? => l10n.sideUnitsCount(
+                            full.active,
+                            full.activeMax,
+                          ),
+                          null => l10n.sideUnits,
+                        }),
+                      ),
+                ),
+                Tab(
+                  child:
+                      BlocSelector<
+                        StorageCubit,
+                        StorageState,
+                        SectionCapacity?
+                      >(
+                        selector: (state) => state.capacity,
+                        builder: (context, capacity) => Text(switch (capacity) {
+                          final full? => l10n.storageOpen(
+                            full.stored,
+                            full.storedMax,
+                          ),
+                          null => l10n.storageTab,
+                        }),
+                      ),
                 ),
                 Tab(text: l10n.shopOpen),
               ],
@@ -129,7 +159,8 @@ class _SidePanelState extends State<SidePanel>
 }
 
 /// The section's units on the field: a tap on the unit selects it, a button
-/// centres the view on it and another stores it (`StoreButton`).
+/// centres the view on it, and selects it too, and another stores it
+/// (`StoreButton`). Then the HQ of the team (`_HqRow`).
 class _UnitsTab extends StatelessWidget {
   const new({required this.onCentreAll, required this.onCentreUnit});
 
@@ -155,6 +186,18 @@ class _UnitsTab extends StatelessWidget {
                 onPressed: onCentreAll,
                 child: Text(l10n.battleCentre),
               ),
+              if (state.ownHq case final hq?)
+                _HqRow(
+                  hq: hq,
+                  ap: switch (hq.ap) {
+                    final ap? => cubit.hqApNow(ap),
+                    null => null,
+                  },
+                  managed: state.managesHq,
+                  moving: state.hqMove,
+                  onCentre: () => onCentreUnit(hq.position),
+                  onMove: cubit.toggleHqMove,
+                ),
               if (active.isEmpty) Text(l10n.unitsEmpty),
               for (final unit in active)
                 _UnitRow(
@@ -163,7 +206,10 @@ class _UnitsTab extends StatelessWidget {
                   selected: unit.unitId == state.selectedId,
                   onSelect: () => cubit.select(unit.unitId),
                   onCentre: switch (unit.position) {
-                    final at? => () => onCentreUnit(at),
+                    final at? => () {
+                      cubit.select(unit.unitId);
+                      onCentreUnit(at);
+                    },
                     null => null,
                   },
                 ),
@@ -171,6 +217,65 @@ class _UnitsTab extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// The HQ of the player's team: its hit points and AP, a button to centre the
+/// view on it and, for the player who manages it, the one that arms the next
+/// tap on the ground to move it there (HQ-10).
+class _HqRow extends StatelessWidget {
+  const new({
+    required this.hq,
+    required this.ap,
+    required this.managed,
+    required this.moving,
+    required this.onCentre,
+    required this.onMove,
+  });
+
+  final HqView hq;
+  final double? ap;
+  final bool managed;
+  final bool moving;
+  final VoidCallback onCentre;
+  final VoidCallback onMove;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.unitsHq(
+            hq.hp.toStringAsFixed(0),
+            hq.maxHp.toStringAsFixed(0),
+            ap?.toStringAsFixed(1) ?? '–',
+          ),
+        ),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            IconButton(
+              tooltip: l10n.unitsCentreOnHq,
+              onPressed: onCentre,
+              icon: const Icon(Icons.my_location, size: 20),
+            ),
+            if (managed)
+              TextButton(
+                onPressed: onMove,
+                child: Text(
+                  l10n.unitsMoveHq,
+                  style: TextStyle(
+                    fontWeight: moving ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        if (moving) Text(l10n.unitsMoveHqHelp),
+      ],
     );
   }
 }
