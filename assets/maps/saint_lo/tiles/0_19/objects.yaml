@@ -8,7 +8,6 @@ objects:
   - {type: building, cells: [[89, 4877]]}
   - {type: building, cells: [[91, 4874], [92, 4874]]}
   - {type: building, cells: [[132, 4964]]}
-  - {type: building, cells: [[1, 4992], [2, 4992]]}
   - {type: building, cells: [[23, 4928]]}
   - {type: building, cells: [[58, 4934], [59, 4934]]}
   - {type: building, cells: [[67, 4937], [68, 4937]]}
@@ -331,7 +330,6 @@ objects:
   - {type: tree, cells: [[97, 4973]]}
   - {type: tree, cells: [[98, 4973]]}
   - {type: tree, cells: [[99, 4973]]}
-  - {type: tree, cells: [[89, 4974]]}
   - {type: tree, cells: [[90, 4974]]}
   - {type: tree, cells: [[91, 4974]]}
   - {type: tree, cells: [[92, 4974]]}
@@ -342,7 +340,6 @@ objects:
   - {type: tree, cells: [[97, 4974]]}
   - {type: tree, cells: [[98, 4974]]}
   - {type: tree, cells: [[99, 4974]]}
-  - {type: tree, cells: [[89, 4975]]}
   - {type: tree, cells: [[90, 4975]]}
   - {type: tree, cells: [[91, 4975]]}
   - {type: tree, cells: [[92, 4975]]}
@@ -353,7 +350,6 @@ objects:
   - {type: tree, cells: [[97, 4975]]}
   - {type: tree, cells: [[98, 4975]]}
   - {type: tree, cells: [[99, 4975]]}
-  - {type: tree, cells: [[89, 4976]]}
   - {type: tree, cells: [[90, 4976]]}
   - {type: tree, cells: [[91, 4976]]}
   - {type: tree, cells: [[92, 4976]]}
@@ -518,7 +514,6 @@ objects:
   - {type: tree, cells: [[85, 4938]]}
   - {type: tree, cells: [[86, 4938]]}
   - {type: tree, cells: [[77, 4939]]}
-  - {type: tree, cells: [[78, 4939]]}
   - {type: tree, cells: [[79, 4939]]}
   - {type: tree, cells: [[80, 4939]]}
   - {type: tree, cells: [[81, 4939]]}
@@ -532,8 +527,6 @@ objects:
   - {type: tree, cells: [[75, 4940]]}
   - {type: tree, cells: [[76, 4940]]}
   - {type: tree, cells: [[77, 4940]]}
-  - {type: tree, cells: [[78, 4940]]}
-  - {type: tree, cells: [[79, 4940]]}
   - {type: tree, cells: [[80, 4940]]}
   - {type: tree, cells: [[81, 4940]]}
   - {type: tree, cells: [[82, 4940]]}
@@ -552,7 +545,6 @@ objects:
   - {type: tree, cells: [[76, 4941]]}
   - {type: tree, cells: [[77, 4941]]}
   - {type: tree, cells: [[78, 4941]]}
-  - {type: tree, cells: [[79, 4941]]}
   - {type: tree, cells: [[80, 4941]]}
   - {type: tree, cells: [[81, 4941]]}
   - {type: tree, cells: [[82, 4941]]}
@@ -571,7 +563,6 @@ objects:
   - {type: tree, cells: [[76, 4942]]}
   - {type: tree, cells: [[77, 4942]]}
   - {type: tree, cells: [[78, 4942]]}
-  - {type: tree, cells: [[79, 4942]]}
   - {type: tree, cells: [[80, 4942]]}
   - {type: tree, cells: [[81, 4942]]}
   - {type: tree, cells: [[82, 4942]]}
@@ -590,8 +581,6 @@ objects:
   - {type: tree, cells: [[76, 4943]]}
   - {type: tree, cells: [[77, 4943]]}
   - {type: tree, cells: [[78, 4943]]}
-  - {type: tree, cells: [[79, 4943]]}
-  - {type: tree, cells: [[80, 4943]]}
   - {type: tree, cells: [[81, 4943]]}
   - {type: tree, cells: [[82, 4943]]}
   - {type: tree, cells: [[83, 4943]]}
@@ -611,7 +600,6 @@ objects:
   - {type: tree, cells: [[77, 4944]]}
   - {type: tree, cells: [[78, 4944]]}
   - {type: tree, cells: [[79, 4944]]}
-  - {type: tree, cells: [[80, 4944]]}
   - {type: tree, cells: [[81, 4944]]}
   - {type: tree, cells: [[82, 4944]]}
   - {type: tree, cells: [[83, 4944]]}
@@ -630,8 +618,6 @@ objects:
   - {type: tree, cells: [[77, 4945]]}
   - {type: tree, cells: [[78, 4945]]}
   - {type: tree, cells: [[79, 4945]]}
-  - {type: tree, cells: [[80, 4945]]}
-  - {type: tree, cells: [[81, 4945]]}
   - {type: tree, cells: [[82, 4945]]}
   - {type: tree, cells: [[83, 4945]]}
   - {type: tree, cells: [[84, 4945]]}
@@ -651,7 +637,6 @@ objects:
   - {type: tree, cells: [[78, 4946]]}
   - {type: tree, cells: [[79, 4946]]}
   - {type: tree, cells: [[80, 4946]]}
-  - {type: tree, cells: [[81, 4946]]}
   - {type: tree, cells: [[82, 4946]]}
   - {type: tree, cells: [[83, 4946]]}
   - {type: tree, cells: [[84, 4946]]}
@@ -671,7 +656,6 @@ objects:
   - {type: tree, cells: [[78, 4947]]}
   - {type: tree, cells: [[79, 4947]]}
   - {type: tree, cells: [[80, 4947]]}
-  - {type: tree, cells: [[81, 4947]]}
   - {type: tree, cells: [[82, 4947]]}
   - {type: tree, cells: [[83, 4947]]}
   - {type: tree, cells: [[84, 4947]]}
@@ -689,8 +673,6 @@ objects:
   - {type: tree, cells: [[77, 4948]]}
   - {type: tree, cells: [[79, 4948]]}
   - {type: tree, cells: [[80, 4948]]}
-  - {type: tree, cells: [[81, 4948]]}
-  - {type: tree, cells: [[82, 4948]]}
   - {type: tree, cells: [[83, 4948]]}
   - {type: tree, cells: [[84, 4948]]}
   - {type: tree, cells: [[85, 4948]]}
@@ -836,6 +818,9 @@ objects:
   - {type: tree, cells: [[40, 4940]]}
   - {type: tree, cells: [[41, 4940]]}
   - {type: tree, cells: [[40, 4941]]}
+  - {type: building, cells: [[0, 4991], [1, 4991], [2, 4991]]}
+  - {type: building, cells: [[0, 4992], [1, 4992], [2, 4992], [0, 4993], [1, 4993], [2, 4993], [0, 4994], [1, 4994], [2, 4994], [0, 4995], [1, 4995], [2, 4995]]}
+  - {type: building, cells: [[0, 4996], [1, 4996], [2, 4996], [3, 4996], [0, 4997], [1, 4997], [2, 4997], [3, 4997], [0, 4998], [1, 4998], [2, 4998], [3, 4998], [0, 4999], [1, 4999], [2, 4999], [3, 4999]]}
 constructions: []
 links: []
 islands: []

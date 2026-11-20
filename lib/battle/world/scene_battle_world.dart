@@ -10,14 +10,17 @@ import 'package:battle_team/battle/shots/shot_effect.dart';
 import 'package:battle_team/battle/world/battle_camera.dart';
 import 'package:battle_team/battle/world/battle_space.dart';
 import 'package:battle_team/battle/world/battle_world.dart';
+import 'package:battle_team/battle/world/glide.dart';
 import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/ground_streamer.dart';
 import 'package:battle_team/battle/world/live_shots.dart';
+import 'package:battle_team/battle/world/map_edge.dart';
 import 'package:battle_team/battle/world/team_colours.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_instances.dart';
-import 'package:battle_team/battle/world/unit_levels.dart';
 import 'package:battle_team/battle/world/unit_model.dart';
+import 'package:battle_team/battle/world/unit_routes.dart';
+import 'package:battle_team/battle/world/weather_look.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
@@ -26,15 +29,17 @@ import 'package:vector_math/vector_math.dart';
 /// The battle in 3D with flutter_scene, the renderer behind the `BattleWorld`
 /// Strategy: the map's ground, its trees and buildings, and what the section
 /// sees (units, HQs, relics), each unit gliding to where the host put it by
-/// its move's arrival time (decision 236), and the shots it sees for a moment
-/// each (`LiveShots` keeps their lives; this class only draws them). Units are
-/// drawn at their size, as instances of their models (POC: see
+/// its move's arrival time (decision 236) along the way [routes] plans, on
+/// the ground and over the bridges' decks, and the shots it sees for a
+/// moment each (`LiveShots` keeps their lives; this class only draws them).
+/// Units are drawn at their size, as instances of their models (POC: see
 /// `UnitInstances`), each tinted in its team's colour (`teamColor`) and on a
-/// disc with a rim that show from above.
+/// disc with a rim that show from above. Cliffs climb around the map on its
+/// four sides, under a sky and a far haze of the battle's weather.
 /// {@endtemplate}
 class SceneBattleWorld implements BattleWorld {
   /// {@macro scene_battle_world}
-  new(this.map, this.trees, this.unitModels, this.ground)
+  new(this.map, this.trees, this.unitModels, this.ground, this.routes)
     : surface = TerrainSurface(map);
 
   /// The map.
@@ -49,6 +54,9 @@ class SceneBattleWorld implements BattleWorld {
   /// The materials the ground is drawn with, and their textures.
   final GroundMaterials ground;
 
+  /// The ways moving units are drawn going.
+  final UnitRoutes routes;
+
   @override
   final TerrainSurface surface;
 
@@ -56,7 +64,7 @@ class SceneBattleWorld implements BattleWorld {
   /// `Scene.initializeStaticResources()` completed.
   late final Scene scene = Scene();
 
-  final _units = <String, _Glide>{};
+  final _units = <String, _Unit>{};
   final _hqs = <String, (Node, String?)>{};
   final _relics = <String, (Node, String?)>{};
   final _shots = LiveShots();
@@ -77,8 +85,31 @@ class SceneBattleWorld implements BattleWorld {
 
   @override
   Map<String, Vector3> get drawn => {
-    for (final MapEntry(:key, :value) in _units.entries) key: value.at(_clock),
+    for (final MapEntry(:key, :value) in _units.entries) key: _drawnAt(value),
   };
+
+  /// Where [unit] is drawn now: on its route, at the height of what it
+  /// stands on there.
+  Vector3 _drawnAt(_Unit unit) {
+    final at = unit.glide.at(_clock);
+    return at..y = surface.heightAt(at.x, -at.z);
+  }
+
+  /// The points [unit] goes through from [from] to [to], both included.
+  List<Vector3> _route(UnitView unit, Vector3 from, Vector3 to) {
+    final points = routes.route(
+      unitType: unit.unitType,
+      flying: unit.flying,
+      from: positionOf(from),
+      to: positionOf(to),
+    );
+    return [
+      from,
+      for (final point in points.sublist(1, points.length - 1))
+        _onGround(point),
+      to,
+    ];
+  }
 
   /// The ground, the trees and the buildings, as much of them as the eye
   /// needs (POC: see `GroundStreamer`).
@@ -109,17 +140,21 @@ class SceneBattleWorld implements BattleWorld {
       final to = spread[unit.unitId];
       if (to == null) continue;
       to.y = surface.heightAt(to.x, -to.z);
-      final glide = _units[unit.unitId] ??= _Glide(
+      final drawn = _units[unit.unitId] ??= _Unit(
         unit.unitType,
         teamColor(unit.team),
-        to,
+        Glide(to),
       );
-      if (glide.to != to) {
+      if (drawn.glide.to != to) {
         final until = unit.private?.movingUntil;
         final seconds = until != null && battleTime != null
             ? math.max(0, (until - battleTime).inMilliseconds / 1000)
             : 0.5;
-        glide.retarget(to, now: _clock, seconds: seconds.toDouble());
+        drawn.glide.retarget(
+          _route(unit, _drawnAt(drawn), to),
+          now: _clock,
+          seconds: seconds.toDouble(),
+        );
       }
     }
     _selected = selected;
@@ -143,6 +178,59 @@ class SceneBattleWorld implements BattleWorld {
   void useCamera(BattleCamera camera) {
     _camera = camera;
     _insideUnit = camera.insideUnit;
+    _addEdge();
+  }
+
+  bool _edgeAdded = false;
+
+  /// Adds the cliffs around the map to the scene, the first time.
+  void _addEdge() {
+    if (_edgeAdded) return;
+    _edgeAdded = true;
+    final material = PhysicallyBasedMaterial()
+      ..roughnessFactor = 0.95
+      ..doubleSided = true;
+    final node = Node(name: 'map_edge');
+    for (final side in edgeCliffArrays(map)) {
+      node.add(
+        Node(
+          mesh: Mesh(
+            MeshGeometry.fromArrays(
+              positions: side.positions,
+              normals: side.normals,
+              colors: side.colors,
+              indices: side.indices,
+            ),
+            material,
+          ),
+        ),
+      );
+    }
+    scene.add(node);
+  }
+
+  late final GradientSkySource _sky = GradientSkySource(
+    // The sun where the ground's shading puts the light: high in the
+    // north-west.
+    sunDirection: Vector3(-1, 2, 1),
+  );
+
+  @override
+  void showWeather(String? weather) {
+    final look = weatherLookOf(weather);
+    _sky
+      ..zenithColor = vectorOf(look.zenith)
+      ..horizonColor = vectorOf(look.horizon)
+      ..groundColor = vectorOf(look.below)
+      ..sunColor = vectorOf(look.sun);
+    scene.skybox ??= Skybox(_sky);
+    scene.fog
+      ..enabled = true
+      ..mode = FogMode.exponential
+      ..color = vectorOf(look.haze)
+      ..start = WeatherLook.hazeStartM
+      ..density = look.hazeDensity;
+    _streamer.showHaze(look);
   }
 
   @override
@@ -214,15 +302,13 @@ class SceneBattleWorld implements BattleWorld {
     _clock += seconds;
     if (_camera case final camera?) _streamer.update(camera);
     final eye = _camera?.position;
-    for (final MapEntry(key: id, value: glide) in _units.entries) {
-      final at = glide.at(_clock);
-      glide.yaw = headingYaw(glide.from, glide.to, otherwise: glide.yaw);
+    for (final MapEntry(key: id, value: unit) in _units.entries) {
       _instances.place(
         id,
-        unitType: glide.unitType,
-        color: glide.color,
-        at: at,
-        yaw: glide.yaw,
+        unitType: unit.unitType,
+        color: unit.color,
+        at: _drawnAt(unit),
+        yaw: unit.glide.yawAt(_clock),
         eye: eye,
         // The body the eye is inside would fill the view: it is not drawn.
         hidden: id == _insideUnit,
@@ -239,10 +325,10 @@ class SceneBattleWorld implements BattleWorld {
   /// Puts [mark] under the unit [id], or hides it when that unit is not
   /// drawn.
   void _placeMark(Node mark, String? id) {
-    final glide = id == _insideUnit ? null : _units[id];
-    mark.visible = glide != null;
-    if (glide == null) return;
-    mark.localTransform = Matrix4.translation(glide.at(_clock)..y += 0.35);
+    final unit = id == _insideUnit ? null : _units[id];
+    mark.visible = unit != null;
+    if (unit == null) return;
+    mark.localTransform = Matrix4.translation(_drawnAt(unit)..y += 0.35);
   }
 
   /// Fades each shot on screen with its age, and swells its hit mark.
@@ -431,37 +517,13 @@ class _ShotNode {
   final Matrix4 base;
 }
 
-/// A unit gliding from [from] to [to] between two clock times, facing
-/// [yaw].
-class _Glide {
-  new(this.unitType, this.color, Vector3 at)
-    : from = at.clone(),
-      to = at.clone();
+/// A unit drawn: its type, its team's colour, and its glide.
+class _Unit {
+  new(this.unitType, this.color, this.glide);
 
   final String unitType;
   final Vector4 color;
-  double yaw = 0;
-  Vector3 from;
-  Vector3 to;
-  double _start = 0;
-  double _end = 0;
-
-  void retarget(
-    Vector3 target, {
-    required double now,
-    required double seconds,
-  }) {
-    from = at(now);
-    to = target.clone();
-    _start = now;
-    _end = now + seconds;
-  }
-
-  Vector3 at(double now) {
-    if (now >= _end || _end <= _start) return to.clone();
-    final t = (now - _start) / (_end - _start);
-    return from + (to - from) * t;
-  }
+  final Glide glide;
 }
 
 extension<T> on T {

@@ -7,6 +7,10 @@
 //
 // Unlit: the vertex colour is the grey of the slope, the only shading.
 // Double-sided, as the ground was.
+//
+// The weather's haze (lib/battle/world/weather_look.dart) is applied here:
+// flutter_scene's distance fog does not reach an unlit material, so the
+// ground fades by the distance to the eye as the scene's fog fades the rest.
 
 material {
   name: "Ground",
@@ -23,6 +27,12 @@ material {
     // In red, what each cell keeps of its colour under the fog: 1 in sight.
     // White until a fog is shown: no fog.
     { type: sampler2d, name: fog_texture, hint: default_white },
+    // What the far ground fades into, linear RGB (WeatherLook.haze).
+    { type: vec3, name: haze_color, default: [0.58, 0.72, 0.90] },
+    // How far from the eye the haze starts, in metres.
+    { type: float, name: haze_start, default: 1500.0 },
+    // How fast it fades past its start, per metre: 0 never.
+    { type: float, name: haze_density, default: 0.0 },
   ],
 }
 
@@ -31,8 +41,10 @@ fragment {
     highp vec2 uv = GetUV0();
     vec3 ground = texture(terrain_texture, uv).rgb * GetVertexColor().rgb;
     float keeps = texture(fog_texture, uv).r;
-    material.base_color =
-        vec4(mix(material_params.fog_tint, ground, keeps), 1.0);
+    vec3 seen = mix(material_params.fog_tint, ground, keeps);
+    float past = max(0.0, length(v_viewvector) - material_params.haze_start);
+    float haze = 1.0 - exp(-material_params.haze_density * past);
+    material.base_color = vec4(mix(seen, material_params.haze_color, haze), 1.0);
     PrepareMaterial(material);
   }
 }

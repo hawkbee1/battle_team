@@ -14,6 +14,7 @@ import 'package:battle_team/battle/world/building_mesh.dart';
 import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/ground_tiles.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
+import 'package:battle_team/battle/world/weather_look.dart';
 import 'package:battle_team/fog/model/fog_model.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart';
@@ -27,7 +28,8 @@ import 'package:vector_math/vector_math.dart';
 /// a fog change uploads the texture of each page it touches, and no tile is
 /// made again. A chunk of trees draws the model of each tree within
 /// [treeNearM] and a cone for each beyond. The buildings of a chunk are a
-/// few meshes made in code (`buildingArrays`). Meshes are made a few a frame
+/// few meshes made in code (`buildingArrays`), and so are its bridges'
+/// decks. Meshes are made a few a frame
 /// ([tileBuildsPerFrame], [chunkBuildsPerFrame], [treeBuildsPerFrame]), so
 /// moving never stalls a frame, and are dropped once out of the cut or out
 /// of range.
@@ -106,8 +108,21 @@ class GroundStreamer {
       ? const {}
       : objectChunks(map, cells: treeChunkCells);
 
-  late final Set<int> _buildingCells = {
-    for (final chunk in _chunks.values) ...chunk.buildings,
+  // The top of each building, by cell: its roof and its look.
+  late final Map<int, BuildingTop> _buildingTops = buildingTops(
+    buildings: [
+      for (final feature in map.features.features)
+        if (feature.type == 'building')
+          [for (final cell in feature.cells) (cell.x, cell.y)],
+    ],
+    width: map.width,
+    cellSizeM: surface.cell,
+    heightAt: surface.groundAt,
+  );
+  // The deck of each bridge cell, as a building's top: a road on stone.
+  late final Map<int, BuildingTop> _deckTops = {
+    for (final MapEntry(key: cell, value: deck) in surface.decks.entries)
+      cell: (roof: deck, look: bridgeLook),
   };
   // The roofs and the walls take their colours from the vertices.
   // Double-sided, so a building does not depend on the winding flutter_scene
@@ -170,6 +185,18 @@ class GroundStreamer {
       nearTrees: nearTrees,
       farTrees: farTrees,
     );
+  }
+
+  /// Fades the far ground into the haze of [look], past
+  /// `WeatherLook.hazeStartM` from the eye, as the scene's fog fades the
+  /// rest: the ground's material is unlit, which flutter_scene's fog skips.
+  void showHaze(WeatherLook look) {
+    for (final page in ground.pages.values) {
+      page.material.parameters
+        ..setVec3('haze_color', vectorOf(look.haze))
+        ..setFloat('haze_start', WeatherLook.hazeStartM)
+        ..setFloat('haze_density', look.hazeDensity);
+    }
   }
 
   /// Shades the ground by [fog] from now on. The pages it changes take it
@@ -291,22 +318,33 @@ class GroundStreamer {
     return missing.length <= chunkBuildsPerFrame;
   }
 
-  /// The buildings of a chunk, as the meshes of `buildingArrays`: a wall
-  /// only where no building stands next door, in this chunk or another.
+  /// The buildings and the bridges of a chunk, as the meshes of
+  /// `buildingArrays`: a building under the roof of its own, with a wall
+  /// where what stands next door, in this chunk or another, is lower; a
+  /// bridge as a slab of deck.
   Node _makeObjects(ChunkId id, ObjectChunk chunk) {
     final node = Node(name: 'objects_${id.x}_${id.y}');
-    final meshes = buildingArrays(
-      cells: chunk.buildings,
-      width: map.width,
-      cellSizeM: surface.cell,
-      heightAt: surface.heightAt,
-      isBuilding: (x, y) =>
-          x >= 0 &&
-          x < map.width &&
-          y >= 0 &&
-          y < map.depth &&
-          _buildingCells.contains(y * map.width + x),
-    );
+    BuildingTop? Function(int x, int y) topIn(Map<int, BuildingTop> tops) =>
+        (x, y) => x >= 0 && x < map.width && y >= 0 && y < map.depth
+        ? tops[y * map.width + x]
+        : null;
+    final meshes = [
+      ...buildingArrays(
+        cells: chunk.buildings,
+        width: map.width,
+        cellSizeM: surface.cell,
+        heightAt: surface.groundAt,
+        topAt: topIn(_buildingTops),
+      ),
+      ...buildingArrays(
+        cells: chunk.bridges,
+        width: map.width,
+        cellSizeM: surface.cell,
+        heightAt: surface.groundAt,
+        topAt: topIn(_deckTops),
+        slabM: bridgeSlabM,
+      ),
+    ];
     var triangles = 0;
     for (final arrays in meshes) {
       triangles += arrays.indices.length ~/ 3;

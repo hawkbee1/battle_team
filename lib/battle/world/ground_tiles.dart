@@ -342,25 +342,36 @@ GroundTileArrays groundTileArrays(
 typedef ChunkId = ({int x, int y});
 
 /// The objects of a chunk that are drawn: the cells (`y × width + x`) of its
-/// `trees` and of its `buildings`.
-typedef ObjectChunk = ({List<int> trees, List<int> buildings});
+/// `trees`, of its `buildings` and of its `bridges`.
+typedef ObjectChunk = ({
+  List<int> trees,
+  List<int> buildings,
+  List<int> bridges,
+});
 
-/// The trees and buildings of [map] by chunk of [cells] cells, so that only
-/// those near the eye are drawn.
+/// The trees, buildings and bridges (`bridgeTypes`) of [map] by chunk of
+/// [cells] cells, so that only those near the eye are drawn.
 Map<ChunkId, ObjectChunk> objectChunks(
   MapData map, {
   int cells = groundTileQuads,
 }) {
   final chunks = <ChunkId, ObjectChunk>{};
   for (final feature in map.features.features) {
-    final tree = feature.type == 'tree';
-    if (!tree && feature.type != 'building') continue;
+    final type = feature.type;
+    final listOf = switch (type) {
+      'tree' => (ObjectChunk chunk) => chunk.trees,
+      'building' => (ObjectChunk chunk) => chunk.buildings,
+      _ when bridgeTypes.contains(type) => (ObjectChunk chunk) => chunk.bridges,
+      _ => null,
+    };
+    if (listOf == null) continue;
     for (final cell in feature.cells) {
       final chunk = chunks[(x: cell.x ~/ cells, y: cell.y ~/ cells)] ??= (
         trees: [],
         buildings: [],
+        bridges: [],
       );
-      (tree ? chunk.trees : chunk.buildings).add(cell.y * map.width + cell.x);
+      listOf(chunk).add(cell.y * map.width + cell.x);
     }
   }
   return chunks;

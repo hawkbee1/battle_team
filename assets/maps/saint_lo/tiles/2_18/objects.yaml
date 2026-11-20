@@ -660,8 +660,6 @@ objects:
   - {type: tree, cells: [[569, 4618]]}
   - {type: tree, cells: [[568, 4619]]}
   - {type: tree, cells: [[569, 4619]]}
-  - {type: tree, cells: [[567, 4863]]}
-  - {type: tree, cells: [[568, 4863]]}
   - {type: tree, cells: [[569, 4863]]}
   - {type: tree, cells: [[570, 4863]]}
   - {type: tree, cells: [[577, 4755]]}
@@ -713,12 +711,6 @@ objects:
   - {type: tree, cells: [[578, 4762]]}
   - {type: tree, cells: [[579, 4762]]}
   - {type: tree, cells: [[580, 4762]]}
-  - {type: tree, cells: [[581, 4762]]}
-  - {type: tree, cells: [[582, 4762]]}
-  - {type: tree, cells: [[578, 4763]]}
-  - {type: tree, cells: [[579, 4763]]}
-  - {type: tree, cells: [[580, 4763]]}
-  - {type: tree, cells: [[578, 4764]]}
 constructions: []
 links: []
 islands: []

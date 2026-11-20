@@ -938,6 +938,7 @@ objects:
   - {type: tree, cells: [[299, 511]]}
   - {type: tree, cells: [[300, 511]]}
   - {type: tree, cells: [[301, 511]]}
+  - {type: building, cells: [[511, 256]]}
 constructions:
   - {type: reinforced_bridge, cells: [[499, 256], [500, 256], [500, 255]]}
   - {type: bridge, cells: [[349, 452], [348, 452], [348, 453]]}

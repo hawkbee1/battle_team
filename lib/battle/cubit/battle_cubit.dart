@@ -90,6 +90,7 @@ class BattleCubit extends Cubit<BattleState> {
       storedWeapons: snapshot.section?.storedWeapons,
       team: snapshot.team,
       sectionId: snapshot.sectionId,
+      weather: snapshot.weather,
       managesHq: snapshot.managesHq,
       revision: state.revision + 1,
     );

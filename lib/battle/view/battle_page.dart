@@ -16,6 +16,7 @@ import 'package:battle_team/battle/world/ground_material.dart';
 import 'package:battle_team/battle/world/scene_battle_world.dart';
 import 'package:battle_team/battle/world/tree_model.dart';
 import 'package:battle_team/battle/world/unit_model.dart';
+import 'package:battle_team/battle/world/unit_routes.dart';
 import 'package:battle_team/fog/cubit/fog_cubit.dart';
 import 'package:battle_team/fog/data/ground_sight_loader.dart';
 import 'package:battle_team/fog/model/fog_tracker.dart';
@@ -79,12 +80,14 @@ class BattlePage extends StatefulWidget {
   final Future<GroundMaterials> Function(MapData map) loadGround;
 
   /// The 3D world of a map, drawn with the tree models, the unit models and
-  /// the ground's materials.
+  /// the ground's materials, its moving units along the move preview's
+  /// paths.
   final BattleWorld Function(
     MapData map,
     List<TreeModel> trees,
     UnitModels units,
     GroundMaterials ground,
+    UnitRoutes routes,
   )
   worldBuilder;
 
@@ -128,7 +131,13 @@ class _BattlePageState extends State<BattlePage> {
       preCheck: preCheck,
       previewer: previewer,
       sight: sight,
-      world: widget.worldBuilder(map, trees, units, ground),
+      world: widget.worldBuilder(
+        map,
+        trees,
+        units,
+        ground,
+        UnitRoutes(previewer),
+      ),
     );
   }();
 

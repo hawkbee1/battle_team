@@ -65,16 +65,44 @@ const terrainColors = <String, (double, double, double)>{
   'sand': (0.86, 0.80, 0.58),
   'mud': (0.45, 0.38, 0.28),
   'rock': (0.55, 0.54, 0.52),
-  'road': (0.62, 0.58, 0.50),
-  'town_street': (0.50, 0.50, 0.52),
+  'road': (0.36, 0.36, 0.38),
+  'town_street': (0.56, 0.54, 0.50),
   'mountain': (0.48, 0.45, 0.42),
   'river': (0.27, 0.47, 0.75),
   'lake': (0.22, 0.42, 0.70),
 };
 
+/// How far a bridge's deck stands above the highest ground at and around
+/// its cells, in metres.
+const bridgeDeckRiseM = 1.0;
+
+/// The height of the deck over each cell of [map]'s bridges (`y × width +
+/// x`): one flat deck per bridge, [bridgeDeckRiseM] above the highest ground
+/// at its cells and the eight around each, so it reaches over its banks.
+Map<int, double> bridgeDecks(MapData map) {
+  final decks = <int, double>{};
+  for (final feature in map.features.features) {
+    if (!bridgeTypes.contains(feature.type)) continue;
+    var highest = double.negativeInfinity;
+    for (final cell in feature.cells) {
+      for (var y = cell.y - 1; y <= cell.y + 1; y++) {
+        for (var x = cell.x - 1; x <= cell.x + 1; x++) {
+          if (x < 0 || y < 0 || x >= map.width || y >= map.depth) continue;
+          highest = math.max(highest, map.heights[y * map.width + x] * 1.0);
+        }
+      }
+    }
+    for (final cell in feature.cells) {
+      decks[cell.y * map.width + cell.x] = highest + bridgeDeckRiseM;
+    }
+  }
+  return decks;
+}
+
 /// {@template terrain_surface}
-/// The ground of a [map]: its height anywhere, from the heights of its
-/// cells' centres, and where a ray first meets it.
+/// What units stand on in a [map]: the ground, its height anywhere from the
+/// heights of its cells' centres, and the decks of its bridges
+/// ([bridgeDecks]) over the water; and where a ray first meets it.
 /// {@endtemplate}
 class TerrainSurface {
   /// {@macro terrain_surface}
@@ -86,16 +114,34 @@ class TerrainSurface {
   /// The side of a cell, in metres.
   final double cell;
 
+  /// The deck height of each bridge cell (`y × width + x`).
+  late final Map<int, double> decks = bridgeDecks(map);
+
   /// The map's width east to west, in metres.
   double get widthM => map.width * cell;
 
   /// The map's depth north to south, in metres.
   double get depthM => map.depth * cell;
 
-  /// The ground height, in metres, [east] and [south] metres from the map's
-  /// north-west corner: between the four nearest cell centres, and the
-  /// nearest edge's beyond the map.
+  /// The height units stand at, in metres, [east] and [south] metres from
+  /// the map's north-west corner: a bridge's deck over its cells, elsewhere
+  /// the ground between the four nearest cell centres, and the nearest
+  /// edge's beyond the map.
   double heightAt(double east, double south) {
+    if (decks.isNotEmpty) {
+      final x = (east / cell).floor();
+      final y = (south / cell).floor();
+      if (x >= 0 && y >= 0 && x < map.width && y < map.depth) {
+        if (decks[y * map.width + x] case final deck?) return deck;
+      }
+    }
+    return groundAt(east, south);
+  }
+
+  /// The ground's height, in metres, [east] and [south] metres from the
+  /// map's north-west corner, bridges left out: between the four nearest
+  /// cell centres, and the nearest edge's beyond the map.
+  double groundAt(double east, double south) {
     final x = (east / cell - 0.5).clamp(0, map.width - 1).toDouble();
     final y = (south / cell - 0.5).clamp(0, map.depth - 1).toDouble();
     final x0 = x.floor();
@@ -167,11 +213,11 @@ TerrainArrays terrainArrays(MapData map) {
         ..[i * 3 + 2] = -south;
       // The slope from the neighbours: east and north rises.
       final dEast =
-          surface.heightAt(east + cell, south) -
-          surface.heightAt(east - cell, south);
+          surface.groundAt(east + cell, south) -
+          surface.groundAt(east - cell, south);
       final dNorth =
-          surface.heightAt(east, south - cell) -
-          surface.heightAt(east, south + cell);
+          surface.groundAt(east, south - cell) -
+          surface.groundAt(east, south + cell);
       final normal = Vector3(-dEast, 2 * cell, -dNorth)..normalize();
       final shade = 0.55 + 0.45 * math.max(0, normal.dot(light));
       final name = map.spec.terrainIndex[map.terrain[i]];

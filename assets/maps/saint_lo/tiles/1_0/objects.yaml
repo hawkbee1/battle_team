@@ -1,237 +1,44 @@
 objects:
-  - {type: building, cells: [[473, 124]]}
-  - {type: building, cells: [[463, 135]]}
-  - {type: building, cells: [[460, 109]]}
-  - {type: building, cells: [[446, 79]]}
-  - {type: building, cells: [[459, 83], [460, 83]]}
-  - {type: building, cells: [[376, 76], [377, 77]]}
-  - {type: building, cells: [[458, 137]]}
-  - {type: building, cells: [[460, 110], [461, 111]]}
-  - {type: building, cells: [[434, 145], [433, 146]]}
-  - {type: building, cells: [[369, 77], [367, 78], [368, 78]]}
-  - {type: building, cells: [[471, 114]]}
-  - {type: building, cells: [[465, 125], [463, 126]]}
   - {type: building, cells: [[371, 87], [372, 88], [373, 90]]}
-  - {type: building, cells: [[466, 135], [466, 136]]}
   - {type: building, cells: [[491, 206], [492, 206], [493, 206], [494, 206], [495, 206], [491, 207], [492, 207], [493, 207], [494, 207], [495, 207], [491, 208], [492, 208], [493, 208], [494, 208], [495, 208], [491, 209]]}
   - {type: building, cells: [[403, 187], [403, 188]]}
-  - {type: building, cells: [[469, 123], [467, 124]]}
-  - {type: building, cells: [[450, 134]]}
-  - {type: building, cells: [[476, 131]]}
-  - {type: building, cells: [[363, 75], [364, 75]]}
-  - {type: building, cells: [[471, 130], [472, 130], [473, 130], [469, 131], [470, 131], [471, 131], [472, 131]]}
-  - {type: building, cells: [[427, 152]]}
-  - {type: building, cells: [[441, 150]]}
-  - {type: building, cells: [[479, 131], [480, 131], [481, 132], [482, 133]]}
-  - {type: building, cells: [[468, 124], [469, 124]]}
   - {type: building, cells: [[402, 83], [403, 83], [402, 84], [402, 85], [402, 86]]}
-  - {type: building, cells: [[425, 146]]}
-  - {type: building, cells: [[479, 133]]}
   - {type: building, cells: [[489, 209], [490, 209]]}
-  - {type: building, cells: [[457, 135]]}
   - {type: building, cells: [[369, 62], [370, 62], [369, 63], [369, 64], [369, 65], [368, 66], [369, 66], [368, 67], [369, 67], [370, 67], [366, 68], [367, 68], [368, 68], [369, 68], [370, 68], [370, 69]]}
-  - {type: building, cells: [[460, 137]]}
-  - {type: building, cells: [[418, 157]]}
-  - {type: building, cells: [[509, 158]]}
   - {type: building, cells: [[377, 87]]}
-  - {type: building, cells: [[473, 135]]}
-  - {type: building, cells: [[503, 121]]}
-  - {type: building, cells: [[446, 134]]}
   - {type: building, cells: [[488, 209]]}
-  - {type: building, cells: [[362, 78]]}
-  - {type: building, cells: [[509, 157], [510, 157]]}
-  - {type: building, cells: [[374, 77]]}
-  - {type: building, cells: [[466, 125]]}
-  - {type: building, cells: [[459, 105]]}
   - {type: building, cells: [[372, 74]]}
-  - {type: building, cells: [[497, 139]]}
-  - {type: building, cells: [[381, 78]]}
-  - {type: building, cells: [[472, 125]]}
-  - {type: building, cells: [[473, 115]]}
-  - {type: building, cells: [[445, 141], [446, 141]]}
-  - {type: building, cells: [[460, 140]]}
-  - {type: building, cells: [[408, 10]]}
-  - {type: building, cells: [[499, 121]]}
-  - {type: building, cells: [[382, 78]]}
-  - {type: building, cells: [[479, 129]]}
-  - {type: building, cells: [[432, 149]]}
   - {type: building, cells: [[379, 88], [379, 89]]}
-  - {type: building, cells: [[420, 158]]}
-  - {type: building, cells: [[467, 113]]}
-  - {type: building, cells: [[443, 156]]}
   - {type: building, cells: [[476, 118]]}
-  - {type: building, cells: [[460, 103]]}
-  - {type: building, cells: [[498, 140]]}
-  - {type: building, cells: [[477, 122]]}
-  - {type: building, cells: [[445, 79]]}
-  - {type: building, cells: [[481, 128]]}
   - {type: building, cells: [[370, 63], [370, 64]]}
   - {type: building, cells: [[264, 87]]}
   - {type: building, cells: [[264, 88]]}
   - {type: building, cells: [[404, 183]]}
-  - {type: building, cells: [[451, 136]]}
-  - {type: building, cells: [[471, 119]]}
-  - {type: building, cells: [[466, 128]]}
-  - {type: building, cells: [[474, 127]]}
-  - {type: building, cells: [[426, 146]]}
-  - {type: building, cells: [[472, 114]]}
-  - {type: building, cells: [[492, 120]]}
-  - {type: building, cells: [[481, 135]]}
-  - {type: building, cells: [[447, 158]]}
-  - {type: building, cells: [[461, 106]]}
-  - {type: building, cells: [[494, 119]]}
-  - {type: building, cells: [[475, 122]]}
-  - {type: building, cells: [[470, 135]]}
-  - {type: building, cells: [[471, 117]]}
-  - {type: building, cells: [[422, 154]]}
-  - {type: building, cells: [[459, 137]]}
   - {type: building, cells: [[452, 242]]}
-  - {type: building, cells: [[420, 160]]}
-  - {type: building, cells: [[479, 130]]}
-  - {type: building, cells: [[440, 147]]}
   - {type: building, cells: [[492, 204], [493, 204], [494, 204], [495, 204], [492, 205], [493, 205], [494, 205], [495, 205]]}
-  - {type: building, cells: [[445, 131]]}
   - {type: building, cells: [[376, 89], [376, 90]]}
-  - {type: building, cells: [[448, 158]]}
-  - {type: building, cells: [[457, 139]]}
-  - {type: building, cells: [[464, 128]]}
-  - {type: building, cells: [[455, 136]]}
-  - {type: building, cells: [[501, 120]]}
-  - {type: building, cells: [[410, 9]]}
-  - {type: building, cells: [[463, 107]]}
-  - {type: building, cells: [[449, 78]]}
   - {type: building, cells: [[409, 171]]}
   - {type: building, cells: [[370, 60], [370, 61]]}
-  - {type: building, cells: [[469, 136]]}
-  - {type: building, cells: [[359, 76]]}
-  - {type: building, cells: [[471, 115]]}
-  - {type: building, cells: [[434, 149]]}
   - {type: building, cells: [[373, 91]]}
-  - {type: building, cells: [[496, 140], [496, 141]]}
-  - {type: building, cells: [[440, 81], [441, 81]]}
-  - {type: building, cells: [[451, 137]]}
-  - {type: building, cells: [[428, 152]]}
-  - {type: building, cells: [[432, 142]]}
-  - {type: building, cells: [[442, 142]]}
-  - {type: building, cells: [[474, 124]]}
-  - {type: building, cells: [[500, 29]]}
   - {type: building, cells: [[489, 206]]}
   - {type: building, cells: [[374, 89], [375, 89]]}
-  - {type: building, cells: [[476, 202], [477, 202], [476, 203]]}
   - {type: building, cells: [[478, 140]]}
-  - {type: building, cells: [[460, 104]]}
-  - {type: building, cells: [[432, 147]]}
   - {type: building, cells: [[374, 90]]}
-  - {type: building, cells: [[365, 75]]}
-  - {type: building, cells: [[475, 138]]}
-  - {type: building, cells: [[509, 160]]}
-  - {type: building, cells: [[461, 98]]}
-  - {type: building, cells: [[473, 112]]}
   - {type: building, cells: [[488, 207]]}
-  - {type: building, cells: [[464, 135]]}
-  - {type: building, cells: [[445, 134]]}
-  - {type: building, cells: [[377, 79]]}
-  - {type: building, cells: [[499, 29]]}
-  - {type: building, cells: [[464, 133]]}
-  - {type: building, cells: [[455, 135], [456, 135]]}
-  - {type: building, cells: [[481, 207], [480, 208]]}
-  - {type: building, cells: [[463, 133]]}
-  - {type: building, cells: [[472, 119], [473, 119]]}
-  - {type: building, cells: [[466, 126]]}
-  - {type: building, cells: [[433, 149]]}
-  - {type: building, cells: [[428, 153]]}
-  - {type: building, cells: [[474, 121]]}
-  - {type: building, cells: [[479, 135], [477, 136], [478, 136]]}
-  - {type: building, cells: [[375, 78]]}
-  - {type: building, cells: [[466, 133]]}
-  - {type: building, cells: [[470, 117]]}
-  - {type: building, cells: [[419, 159]]}
-  - {type: building, cells: [[469, 125]]}
-  - {type: building, cells: [[421, 157]]}
-  - {type: building, cells: [[509, 159]]}
   - {type: building, cells: [[403, 184]]}
-  - {type: building, cells: [[358, 77]]}
-  - {type: building, cells: [[464, 109]]}
-  - {type: building, cells: [[367, 79]]}
-  - {type: building, cells: [[412, 12]]}
-  - {type: building, cells: [[448, 81]]}
   - {type: building, cells: [[370, 72]]}
   - {type: building, cells: [[465, 119]]}
-  - {type: building, cells: [[469, 126]]}
-  - {type: building, cells: [[468, 113]]}
-  - {type: building, cells: [[473, 120]]}
   - {type: building, cells: [[399, 181], [400, 181]]}
-  - {type: building, cells: [[465, 132]]}
-  - {type: building, cells: [[465, 133]]}
-  - {type: building, cells: [[426, 3], [426, 4]]}
-  - {type: building, cells: [[451, 134]]}
-  - {type: building, cells: [[462, 135]]}
-  - {type: building, cells: [[502, 120]]}
-  - {type: building, cells: [[478, 109]]}
-  - {type: building, cells: [[468, 112]]}
-  - {type: building, cells: [[477, 113]]}
-  - {type: building, cells: [[477, 114]]}
-  - {type: building, cells: [[421, 160]]}
-  - {type: building, cells: [[449, 135]]}
-  - {type: building, cells: [[468, 136]]}
-  - {type: building, cells: [[442, 155]]}
-  - {type: building, cells: [[463, 105]]}
   - {type: building, cells: [[371, 63], [371, 64], [370, 65], [371, 65]]}
-  - {type: building, cells: [[430, 141]]}
   - {type: building, cells: [[480, 129]]}
-  - {type: building, cells: [[430, 148]]}
-  - {type: building, cells: [[465, 127]]}
-  - {type: building, cells: [[438, 147]]}
-  - {type: building, cells: [[430, 150]]}
   - {type: building, cells: [[372, 69], [373, 69], [372, 70], [373, 70]]}
-  - {type: building, cells: [[479, 128]]}
-  - {type: building, cells: [[459, 102], [460, 102]]}
-  - {type: building, cells: [[468, 116]]}
-  - {type: building, cells: [[448, 134]]}
-  - {type: building, cells: [[473, 133]]}
-  - {type: building, cells: [[484, 207], [485, 207]]}
-  - {type: building, cells: [[465, 126]]}
-  - {type: building, cells: [[474, 139]]}
-  - {type: building, cells: [[482, 125], [483, 125]]}
   - {type: building, cells: [[369, 74]]}
-  - {type: building, cells: [[466, 117]]}
   - {type: building, cells: [[375, 84]]}
-  - {type: building, cells: [[487, 121], [485, 122]]}
-  - {type: building, cells: [[472, 121], [473, 121]]}
-  - {type: building, cells: [[358, 72]]}
-  - {type: building, cells: [[510, 242], [509, 243], [508, 244]]}
-  - {type: building, cells: [[480, 127]]}
   - {type: building, cells: [[371, 74]]}
-  - {type: building, cells: [[428, 6], [429, 6], [428, 7], [429, 7]]}
-  - {type: building, cells: [[421, 154]]}
-  - {type: building, cells: [[428, 159], [429, 160]]}
-  - {type: building, cells: [[441, 155]]}
   - {type: building, cells: [[509, 254]]}
-  - {type: building, cells: [[429, 161], [430, 162]]}
-  - {type: building, cells: [[484, 206]]}
-  - {type: building, cells: [[501, 122]]}
-  - {type: building, cells: [[476, 128], [475, 129]]}
-  - {type: building, cells: [[504, 122]]}
-  - {type: building, cells: [[481, 126]]}
   - {type: building, cells: [[508, 254]]}
-  - {type: building, cells: [[478, 204], [479, 204], [477, 205]]}
-  - {type: building, cells: [[471, 134]]}
-  - {type: building, cells: [[468, 114]]}
-  - {type: building, cells: [[411, 11], [411, 12], [412, 14]]}
-  - {type: building, cells: [[370, 76], [371, 76], [370, 77]]}
-  - {type: building, cells: [[432, 141]]}
-  - {type: building, cells: [[447, 134], [447, 135]]}
-  - {type: building, cells: [[451, 133]]}
   - {type: building, cells: [[509, 154]]}
-  - {type: building, cells: [[491, 121]]}
   - {type: building, cells: [[483, 129]]}
-  - {type: building, cells: [[461, 110]]}
-  - {type: building, cells: [[464, 125]]}
-  - {type: building, cells: [[447, 157]]}
-  - {type: building, cells: [[478, 159]]}
-  - {type: building, cells: [[460, 135]]}
-  - {type: building, cells: [[366, 75], [366, 76], [366, 77], [366, 78]]}
-  - {type: building, cells: [[453, 135], [454, 135]]}
   - {type: building, cells: [[278, 19]]}
   - {type: building, cells: [[278, 20], [278, 21]]}
   - {type: building, cells: [[261, 249]]}
@@ -240,17 +47,7 @@ objects:
   - {type: building, cells: [[278, 24]]}
   - {type: building, cells: [[273, 15], [273, 16], [273, 17], [274, 17]]}
   - {type: building, cells: [[270, 12], [271, 12], [272, 12], [270, 13]]}
-  - {type: building, cells: [[472, 146]]}
-  - {type: building, cells: [[473, 140], [474, 140]]}
-  - {type: building, cells: [[422, 152]]}
-  - {type: building, cells: [[381, 79]]}
-  - {type: building, cells: [[360, 73]]}
-  - {type: building, cells: [[442, 82]]}
-  - {type: building, cells: [[438, 78]]}
   - {type: building, cells: [[450, 61]]}
-  - {type: building, cells: [[465, 113]]}
-  - {type: building, cells: [[464, 113]]}
-  - {type: building, cells: [[434, 148]]}
   - {type: building, cells: [[403, 81], [403, 82]]}
   - {type: building, cells: [[372, 73], [373, 73]]}
   - {type: building, cells: [[375, 69], [375, 70], [375, 71]]}
@@ -1697,7 +1494,6 @@ objects:
   - {type: tree, cells: [[421, 57]]}
   - {type: tree, cells: [[422, 57]]}
   - {type: tree, cells: [[423, 57]]}
-  - {type: tree, cells: [[378, 58]]}
   - {type: tree, cells: [[379, 58]]}
   - {type: tree, cells: [[380, 58]]}
   - {type: tree, cells: [[381, 58]]}
@@ -1723,7 +1519,6 @@ objects:
   - {type: tree, cells: [[404, 58]]}
   - {type: tree, cells: [[405, 58]]}
   - {type: tree, cells: [[406, 58]]}
-  - {type: tree, cells: [[378, 59]]}
   - {type: tree, cells: [[379, 59]]}
   - {type: tree, cells: [[380, 59]]}
   - {type: tree, cells: [[381, 59]]}
@@ -1749,29 +1544,20 @@ objects:
   - {type: tree, cells: [[404, 61]]}
   - {type: tree, cells: [[511, 21]]}
   - {type: tree, cells: [[510, 22]]}
-  - {type: tree, cells: [[511, 22]]}
   - {type: tree, cells: [[509, 23]]}
   - {type: tree, cells: [[507, 24]]}
-  - {type: tree, cells: [[508, 24]]}
   - {type: tree, cells: [[506, 25]]}
-  - {type: tree, cells: [[507, 25]]}
   - {type: tree, cells: [[505, 26]]}
   - {type: tree, cells: [[503, 27]]}
-  - {type: tree, cells: [[504, 27]]}
-  - {type: tree, cells: [[503, 28]]}
-  - {type: tree, cells: [[407, 171]]}
-  - {type: tree, cells: [[406, 172]]}
   - {type: tree, cells: [[407, 172]]}
   - {type: tree, cells: [[408, 172]]}
   - {type: tree, cells: [[409, 172]]}
-  - {type: tree, cells: [[404, 173]]}
   - {type: tree, cells: [[405, 173]]}
   - {type: tree, cells: [[406, 173]]}
   - {type: tree, cells: [[407, 173]]}
   - {type: tree, cells: [[408, 173]]}
   - {type: tree, cells: [[409, 173]]}
   - {type: tree, cells: [[410, 173]]}
-  - {type: tree, cells: [[403, 174]]}
   - {type: tree, cells: [[404, 174]]}
   - {type: tree, cells: [[405, 174]]}
   - {type: tree, cells: [[406, 174]]}
@@ -1790,7 +1576,6 @@ objects:
   - {type: tree, cells: [[409, 175]]}
   - {type: tree, cells: [[410, 175]]}
   - {type: tree, cells: [[411, 175]]}
-  - {type: tree, cells: [[400, 176]]}
   - {type: tree, cells: [[401, 176]]}
   - {type: tree, cells: [[402, 176]]}
   - {type: tree, cells: [[403, 176]]}
@@ -1801,7 +1586,6 @@ objects:
   - {type: tree, cells: [[408, 176]]}
   - {type: tree, cells: [[409, 176]]}
   - {type: tree, cells: [[410, 176]]}
-  - {type: tree, cells: [[399, 177]]}
   - {type: tree, cells: [[400, 177]]}
   - {type: tree, cells: [[401, 177]]}
   - {type: tree, cells: [[402, 177]]}
@@ -1828,7 +1612,6 @@ objects:
   - {type: tree, cells: [[402, 179]]}
   - {type: tree, cells: [[403, 179]]}
   - {type: tree, cells: [[409, 179]]}
-  - {type: tree, cells: [[410, 179]]}
   - {type: tree, cells: [[401, 180]]}
   - {type: tree, cells: [[402, 180]]}
   - {type: tree, cells: [[409, 180]]}
@@ -1840,7 +1623,6 @@ objects:
   - {type: tree, cells: [[504, 151]]}
   - {type: tree, cells: [[505, 151]]}
   - {type: tree, cells: [[506, 151]]}
-  - {type: tree, cells: [[507, 151]]}
   - {type: tree, cells: [[500, 152]]}
   - {type: tree, cells: [[501, 152]]}
   - {type: tree, cells: [[502, 152]]}
@@ -1849,7 +1631,6 @@ objects:
   - {type: tree, cells: [[505, 152]]}
   - {type: tree, cells: [[506, 152]]}
   - {type: tree, cells: [[507, 152]]}
-  - {type: tree, cells: [[508, 152]]}
   - {type: tree, cells: [[497, 153]]}
   - {type: tree, cells: [[498, 153]]}
   - {type: tree, cells: [[499, 153]]}
@@ -1862,7 +1643,6 @@ objects:
   - {type: tree, cells: [[506, 153]]}
   - {type: tree, cells: [[507, 153]]}
   - {type: tree, cells: [[508, 153]]}
-  - {type: tree, cells: [[509, 153]]}
   - {type: tree, cells: [[495, 154]]}
   - {type: tree, cells: [[496, 154]]}
   - {type: tree, cells: [[497, 154]]}
@@ -1951,17 +1731,14 @@ objects:
   - {type: tree, cells: [[480, 162]]}
   - {type: tree, cells: [[481, 162]]}
   - {type: tree, cells: [[482, 162]]}
-  - {type: tree, cells: [[479, 163]]}
   - {type: tree, cells: [[480, 163]]}
   - {type: tree, cells: [[388, 83]]}
   - {type: tree, cells: [[389, 83]]}
   - {type: tree, cells: [[390, 83]]}
-  - {type: tree, cells: [[391, 83]]}
   - {type: tree, cells: [[389, 84]]}
   - {type: tree, cells: [[390, 84]]}
   - {type: tree, cells: [[391, 84]]}
   - {type: tree, cells: [[392, 84]]}
-  - {type: tree, cells: [[393, 84]]}
   - {type: tree, cells: [[389, 85]]}
   - {type: tree, cells: [[390, 85]]}
   - {type: tree, cells: [[391, 85]]}
@@ -2021,26 +1798,11 @@ objects:
   - {type: tree, cells: [[506, 249]]}
   - {type: tree, cells: [[506, 250]]}
   - {type: tree, cells: [[506, 251]]}
-  - {type: tree, cells: [[507, 251]]}
-  - {type: tree, cells: [[505, 252]]}
-  - {type: tree, cells: [[506, 252]]}
-  - {type: tree, cells: [[507, 252]]}
   - {type: tree, cells: [[508, 252]]}
   - {type: tree, cells: [[507, 253]]}
-  - {type: tree, cells: [[482, 134]]}
-  - {type: tree, cells: [[483, 134]]}
-  - {type: tree, cells: [[484, 135]]}
-  - {type: tree, cells: [[485, 136]]}
-  - {type: tree, cells: [[486, 136]]}
-  - {type: tree, cells: [[486, 137]]}
-  - {type: tree, cells: [[487, 137]]}
   - {type: tree, cells: [[487, 138]]}
-  - {type: tree, cells: [[488, 138]]}
   - {type: tree, cells: [[488, 139]]}
-  - {type: tree, cells: [[489, 139]]}
-  - {type: tree, cells: [[490, 139]]}
   - {type: tree, cells: [[490, 140]]}
-  - {type: tree, cells: [[491, 140]]}
   - {type: tree, cells: [[358, 16]]}
   - {type: tree, cells: [[358, 17]]}
   - {type: tree, cells: [[357, 18]]}
@@ -2073,6 +1835,354 @@ objects:
   - {type: tree, cells: [[359, 25]]}
   - {type: tree, cells: [[360, 25]]}
   - {type: tree, cells: [[361, 25]]}
+  - {type: building, cells: [[353, 0]]}
+  - {type: building, cells: [[424, 1], [425, 1], [426, 1], [427, 1], [424, 2], [425, 2], [426, 2], [427, 2], [425, 3], [426, 3], [427, 3]]}
+  - {type: building, cells: [[354, 2], [354, 3]]}
+  - {type: building, cells: [[411, 2], [411, 3]]}
+  - {type: building, cells: [[354, 4], [355, 4], [355, 5], [355, 6], [355, 7]]}
+  - {type: building, cells: [[411, 4]]}
+  - {type: building, cells: [[425, 4], [426, 4], [427, 4], [425, 5], [426, 5], [427, 5], [426, 6], [427, 6], [427, 7]]}
+  - {type: building, cells: [[428, 5], [428, 6], [429, 6], [430, 6], [431, 6], [428, 7], [429, 7], [430, 7], [431, 7]]}
+  - {type: building, cells: [[412, 6], [412, 7]]}
+  - {type: building, cells: [[356, 7]]}
+  - {type: building, cells: [[408, 7], [409, 7], [410, 7], [411, 7]]}
+  - {type: building, cells: [[356, 8], [356, 9], [357, 9], [357, 10], [357, 11]]}
+  - {type: building, cells: [[408, 8], [409, 8], [410, 8], [411, 8], [408, 9], [409, 9], [410, 9], [411, 9], [408, 10], [409, 10], [410, 10], [411, 10], [408, 11], [409, 11], [410, 11], [411, 11]]}
+  - {type: building, cells: [[412, 8], [412, 9], [412, 10], [412, 11], [413, 11]]}
+  - {type: building, cells: [[427, 8], [427, 9]]}
+  - {type: building, cells: [[428, 8], [429, 8], [430, 8], [431, 8], [428, 9], [429, 9], [430, 9], [431, 9]]}
+  - {type: building, cells: [[357, 12], [358, 12], [358, 13], [358, 14], [359, 14], [358, 15], [359, 15]]}
+  - {type: building, cells: [[408, 12], [409, 12], [410, 12], [411, 12], [408, 13], [409, 13], [410, 13], [411, 13], [408, 14], [409, 14], [410, 14], [411, 14], [408, 15], [409, 15], [410, 15], [411, 15]]}
+  - {type: building, cells: [[412, 12], [413, 12], [414, 12], [412, 13], [413, 13], [414, 13], [412, 14], [413, 14], [412, 15]]}
+  - {type: building, cells: [[359, 16], [359, 17]]}
+  - {type: building, cells: [[360, 17], [360, 18], [360, 19], [361, 19]]}
+  - {type: building, cells: [[360, 20], [361, 20], [361, 21], [362, 21], [361, 22], [362, 22], [362, 23]]}
+  - {type: building, cells: [[362, 24], [363, 24], [362, 25], [363, 25], [363, 26], [363, 27]]}
+  - {type: building, cells: [[364, 26], [364, 27]]}
+  - {type: building, cells: [[501, 27]]}
+  - {type: building, cells: [[364, 28], [364, 29], [365, 29], [364, 30], [365, 30], [365, 31], [366, 31]]}
+  - {type: building, cells: [[500, 28], [501, 28], [502, 28], [500, 29], [501, 29], [500, 30]]}
+  - {type: building, cells: [[499, 29], [499, 30], [499, 31]]}
+  - {type: building, cells: [[365, 32], [366, 32], [365, 33], [366, 33], [366, 34], [367, 34], [366, 35], [367, 35]]}
+  - {type: building, cells: [[367, 36], [367, 37], [367, 38]]}
+  - {type: building, cells: [[368, 36], [368, 37], [368, 38], [369, 38], [368, 39], [369, 39]]}
+  - {type: building, cells: [[368, 40], [369, 40], [369, 41], [370, 41], [369, 42], [370, 42], [369, 43], [370, 43], [371, 43]]}
+  - {type: building, cells: [[370, 44], [371, 44], [370, 45], [371, 45], [371, 46], [371, 47]]}
+  - {type: building, cells: [[372, 46], [372, 47]]}
+  - {type: building, cells: [[371, 48]]}
+  - {type: building, cells: [[372, 48], [372, 49], [373, 49], [372, 50], [373, 50], [373, 51], [374, 51]]}
+  - {type: building, cells: [[373, 52], [374, 52], [373, 53], [374, 53], [374, 54], [375, 54], [374, 55], [375, 55]]}
+  - {type: building, cells: [[375, 56], [375, 57], [375, 58]]}
+  - {type: building, cells: [[376, 57], [376, 58], [376, 59], [377, 59]]}
+  - {type: building, cells: [[376, 60], [377, 60], [377, 61], [378, 61], [377, 62], [378, 62], [377, 63], [378, 63], [379, 63]]}
+  - {type: building, cells: [[378, 64], [379, 64], [378, 65], [379, 65], [379, 66], [379, 67]]}
+  - {type: building, cells: [[380, 65], [380, 66], [380, 67]]}
+  - {type: building, cells: [[379, 68]]}
+  - {type: building, cells: [[380, 68], [381, 68], [380, 69], [381, 69], [380, 70], [381, 70], [382, 70], [381, 71], [382, 71]]}
+  - {type: building, cells: [[358, 72], [357, 73], [358, 73], [359, 73], [357, 74], [358, 74], [359, 74], [359, 75]]}
+  - {type: building, cells: [[381, 72], [382, 72], [381, 73], [382, 73], [383, 73], [382, 74], [383, 74], [382, 75], [383, 75]]}
+  - {type: building, cells: [[360, 73], [360, 74], [361, 74], [360, 75]]}
+  - {type: building, cells: [[465, 74], [464, 75], [465, 75], [466, 75]]}
+  - {type: building, cells: [[363, 75]]}
+  - {type: building, cells: [[364, 75], [365, 75], [366, 75], [367, 75]]}
+  - {type: building, cells: [[384, 75]]}
+  - {type: building, cells: [[463, 75]]}
+  - {type: building, cells: [[359, 76], [358, 77], [359, 77]]}
+  - {type: building, cells: [[362, 76], [363, 76], [361, 77], [362, 77], [363, 77], [361, 78], [362, 78], [363, 78], [362, 79], [363, 79]]}
+  - {type: building, cells: [[364, 76], [365, 76], [366, 76], [367, 76], [364, 77], [365, 77], [366, 77], [367, 77], [364, 78], [365, 78], [366, 78], [367, 78], [364, 79], [365, 79], [366, 79], [367, 79]]}
+  - {type: building, cells: [[368, 76], [369, 76], [370, 76], [371, 76], [368, 77], [369, 77], [370, 77], [371, 77], [368, 78], [369, 78], [370, 78], [371, 78], [368, 79], [369, 79], [370, 79], [371, 79]]}
+  - {type: building, cells: [[376, 76], [377, 76], [378, 76], [379, 76], [377, 77], [378, 77], [379, 77], [379, 78]]}
+  - {type: building, cells: [[380, 76], [383, 76], [380, 77], [381, 77], [382, 77], [383, 77], [380, 78], [381, 78], [382, 78], [383, 78], [380, 79], [381, 79], [382, 79], [383, 79]]}
+  - {type: building, cells: [[384, 76], [384, 77], [384, 78], [385, 78], [384, 79], [385, 79]]}
+  - {type: building, cells: [[438, 76], [439, 76], [437, 77], [438, 77], [439, 77], [437, 78], [438, 78], [439, 78], [437, 79], [438, 79], [439, 79]]}
+  - {type: building, cells: [[440, 76], [441, 76], [442, 76], [440, 77], [441, 77], [442, 77], [440, 78], [441, 78], [442, 78], [440, 79], [441, 79], [442, 79], [443, 79]]}
+  - {type: building, cells: [[462, 76], [463, 76], [460, 77], [461, 77], [462, 77], [463, 77], [460, 78], [461, 78], [462, 78], [460, 79], [461, 79]]}
+  - {type: building, cells: [[464, 76], [465, 76], [466, 76], [464, 77]]}
+  - {type: building, cells: [[372, 77], [373, 77], [374, 77], [372, 78], [373, 78], [374, 78], [375, 78], [372, 79], [373, 79], [374, 79], [375, 79]]}
+  - {type: building, cells: [[448, 77], [449, 77], [448, 78], [449, 78], [450, 78], [448, 79], [449, 79], [450, 79]]}
+  - {type: building, cells: [[444, 78], [445, 78], [446, 78], [447, 78], [444, 79], [445, 79], [446, 79], [447, 79]]}
+  - {type: building, cells: [[458, 78], [459, 78], [459, 79]]}
+  - {type: building, cells: [[376, 79], [377, 79]]}
+  - {type: building, cells: [[363, 80]]}
+  - {type: building, cells: [[364, 80], [365, 80], [366, 80], [367, 80], [364, 81], [365, 81], [366, 81], [367, 81], [365, 82], [366, 82], [367, 82], [366, 83]]}
+  - {type: building, cells: [[368, 80], [369, 80], [370, 80], [371, 80], [368, 81], [369, 81], [370, 81], [368, 82]]}
+  - {type: building, cells: [[372, 80], [373, 80], [374, 80], [375, 80], [374, 81]]}
+  - {type: building, cells: [[381, 80], [382, 80], [383, 80], [383, 81]]}
+  - {type: building, cells: [[384, 80], [385, 80], [384, 81], [385, 81], [386, 81]]}
+  - {type: building, cells: [[438, 80], [439, 80], [438, 81], [439, 81], [438, 82], [439, 82]]}
+  - {type: building, cells: [[440, 80], [441, 80], [442, 80], [443, 80], [440, 81], [441, 81], [442, 81], [443, 81], [440, 82], [441, 82], [442, 82], [443, 82]]}
+  - {type: building, cells: [[444, 80], [445, 80], [446, 80], [447, 80], [444, 81], [445, 81], [446, 81], [447, 81], [444, 82], [445, 82], [446, 82]]}
+  - {type: building, cells: [[448, 80], [449, 80], [450, 80], [451, 80], [448, 81], [449, 81], [450, 81]]}
+  - {type: building, cells: [[459, 80], [459, 81], [458, 82], [459, 82], [458, 83], [459, 83]]}
+  - {type: building, cells: [[460, 80], [460, 81], [461, 81], [460, 82], [461, 82], [460, 83], [461, 83], [462, 83]]}
+  - {type: building, cells: [[386, 83]]}
+  - {type: building, cells: [[386, 84], [387, 84], [386, 85], [387, 85], [387, 86], [387, 87]]}
+  - {type: building, cells: [[457, 84], [458, 84], [459, 84], [458, 85], [459, 85], [459, 86]]}
+  - {type: building, cells: [[460, 84], [461, 84], [462, 84], [460, 85], [461, 85], [462, 85], [460, 86], [461, 86], [460, 87], [461, 87]]}
+  - {type: building, cells: [[388, 87]]}
+  - {type: building, cells: [[388, 88], [388, 89], [389, 89], [389, 90], [389, 91]]}
+  - {type: building, cells: [[389, 92], [390, 92], [390, 93], [390, 94], [391, 94], [391, 95]]}
+  - {type: building, cells: [[391, 96], [391, 97]]}
+  - {type: building, cells: [[392, 96], [392, 97], [392, 98], [392, 99], [393, 99]]}
+  - {type: building, cells: [[460, 98], [461, 98], [460, 99], [461, 99], [462, 99]]}
+  - {type: building, cells: [[393, 100], [393, 101], [394, 101], [393, 102], [394, 102], [394, 103]]}
+  - {type: building, cells: [[458, 100], [459, 100], [457, 101], [458, 101], [459, 101], [456, 102], [457, 102], [458, 102], [459, 102], [456, 103], [457, 103], [458, 103], [459, 103]]}
+  - {type: building, cells: [[460, 100], [461, 100], [460, 101], [461, 101], [462, 101], [460, 102], [461, 102], [462, 102], [460, 103], [461, 103], [462, 103], [463, 103]]}
+  - {type: building, cells: [[455, 102], [454, 103], [455, 103]]}
+  - {type: building, cells: [[394, 104], [395, 104], [395, 105], [395, 106], [395, 107]]}
+  - {type: building, cells: [[455, 104]]}
+  - {type: building, cells: [[456, 104], [457, 104], [458, 104], [459, 104], [457, 105], [458, 105], [459, 105], [459, 106]]}
+  - {type: building, cells: [[460, 104], [461, 104], [462, 104], [463, 104], [460, 105], [461, 105], [462, 105], [463, 105], [460, 106], [461, 106], [462, 106], [463, 106], [461, 107], [462, 107], [463, 107]]}
+  - {type: building, cells: [[396, 106], [396, 107]]}
+  - {type: building, cells: [[464, 106], [464, 107]]}
+  - {type: building, cells: [[396, 108], [396, 109], [397, 109], [397, 110], [397, 111], [398, 111]]}
+  - {type: building, cells: [[458, 108], [459, 108], [459, 109]]}
+  - {type: building, cells: [[462, 108], [463, 108]]}
+  - {type: building, cells: [[464, 108], [464, 109], [465, 109]]}
+  - {type: building, cells: [[478, 108], [479, 108], [476, 109], [477, 109], [478, 109], [479, 109], [476, 110], [477, 110], [478, 110], [479, 110], [476, 111], [477, 111], [478, 111], [479, 111]]}
+  - {type: building, cells: [[460, 109], [460, 110], [461, 110], [462, 110], [460, 111], [461, 111], [462, 111]]}
+  - {type: building, cells: [[474, 109], [475, 109], [473, 110], [474, 110], [475, 110], [472, 111], [473, 111], [474, 111], [475, 111]]}
+  - {type: building, cells: [[469, 110]]}
+  - {type: building, cells: [[459, 111]]}
+  - {type: building, cells: [[480, 111]]}
+  - {type: building, cells: [[397, 112], [398, 112], [398, 113], [398, 114], [399, 114], [399, 115]]}
+  - {type: building, cells: [[460, 112]]}
+  - {type: building, cells: [[464, 112], [465, 112], [466, 112], [467, 112], [464, 113], [465, 113], [466, 113], [467, 113], [464, 114], [465, 114], [466, 114], [467, 114], [464, 115], [465, 115], [466, 115], [467, 115]]}
+  - {type: building, cells: [[468, 112], [468, 113], [468, 114], [468, 115]]}
+  - {type: building, cells: [[471, 112], [470, 113], [471, 113], [470, 114], [471, 114], [470, 115], [471, 115]]}
+  - {type: building, cells: [[472, 112], [473, 112], [474, 112], [475, 112], [472, 113], [473, 113], [474, 113], [475, 113], [472, 114], [473, 114], [474, 114], [475, 114], [472, 115], [473, 115], [474, 115], [475, 115]]}
+  - {type: building, cells: [[476, 112], [477, 112], [478, 112], [479, 112], [476, 113], [477, 113], [478, 113], [479, 113], [476, 114], [477, 114], [478, 114], [479, 114], [476, 115], [477, 115], [478, 115], [479, 115]]}
+  - {type: building, cells: [[480, 112], [480, 113], [481, 113], [480, 114], [481, 114], [480, 115], [481, 115]]}
+  - {type: building, cells: [[462, 113], [463, 113], [461, 114], [462, 114], [463, 114], [460, 115], [461, 115], [462, 115], [463, 115]]}
+  - {type: building, cells: [[459, 115]]}
+  - {type: building, cells: [[399, 116]]}
+  - {type: building, cells: [[400, 116], [400, 117], [400, 118], [401, 118], [401, 119]]}
+  - {type: building, cells: [[458, 116], [459, 116], [459, 117], [459, 118]]}
+  - {type: building, cells: [[460, 116], [461, 116], [462, 116], [460, 117]]}
+  - {type: building, cells: [[465, 116], [466, 116], [467, 116], [465, 117], [466, 117], [467, 117], [465, 118], [466, 118], [467, 118], [466, 119], [467, 119]]}
+  - {type: building, cells: [[468, 116], [468, 117], [468, 118], [468, 119]]}
+  - {type: building, cells: [[470, 116], [471, 116], [470, 117], [471, 117], [470, 118], [471, 118], [470, 119], [471, 119]]}
+  - {type: building, cells: [[472, 116], [473, 116], [474, 116], [475, 116], [472, 117], [473, 117], [474, 117], [475, 117], [472, 118], [473, 118], [474, 118], [475, 118], [472, 119], [473, 119], [474, 119], [475, 119]]}
+  - {type: building, cells: [[476, 116], [477, 116], [478, 116]]}
+  - {type: building, cells: [[487, 117], [485, 118], [486, 118], [487, 118], [484, 119], [485, 119], [486, 119], [487, 119]]}
+  - {type: building, cells: [[493, 117], [494, 117], [492, 118], [493, 118], [494, 118], [492, 119], [493, 119], [494, 119], [495, 119]]}
+  - {type: building, cells: [[505, 118], [506, 118], [504, 119], [505, 119], [506, 119], [507, 119]]}
+  - {type: building, cells: [[476, 119]]}
+  - {type: building, cells: [[503, 119]]}
+  - {type: building, cells: [[401, 120], [402, 120], [402, 121], [402, 122], [403, 122], [403, 123]]}
+  - {type: building, cells: [[466, 120], [467, 120], [466, 121], [467, 121], [467, 122], [467, 123]]}
+  - {type: building, cells: [[468, 120], [468, 121], [469, 121], [468, 122], [469, 122], [468, 123], [469, 123]]}
+  - {type: building, cells: [[471, 120], [471, 121], [471, 122], [471, 123]]}
+  - {type: building, cells: [[472, 120], [473, 120], [474, 120], [475, 120], [472, 121], [473, 121], [474, 121], [475, 121], [472, 122], [473, 122], [474, 122], [475, 122], [472, 123], [473, 123], [474, 123], [475, 123]]}
+  - {type: building, cells: [[476, 120], [476, 121], [476, 122], [477, 122], [476, 123], [477, 123]]}
+  - {type: building, cells: [[484, 120], [485, 120], [486, 120], [487, 120], [485, 121], [486, 121], [487, 121], [485, 122], [486, 122]]}
+  - {type: building, cells: [[488, 120], [488, 121]]}
+  - {type: building, cells: [[491, 120], [490, 121], [491, 121]]}
+  - {type: building, cells: [[492, 120], [493, 120], [494, 120], [495, 120], [492, 121], [493, 121]]}
+  - {type: building, cells: [[500, 120], [501, 120], [502, 120], [503, 120], [500, 121], [501, 121], [502, 121], [503, 121], [500, 122], [501, 122], [502, 122], [503, 122], [500, 123], [501, 123], [502, 123]]}
+  - {type: building, cells: [[504, 120], [505, 120], [506, 120], [507, 120], [504, 121], [505, 121], [506, 121], [507, 121], [504, 122]]}
+  - {type: building, cells: [[498, 121], [499, 121], [496, 122], [497, 122], [498, 122], [499, 122], [496, 123], [497, 123], [498, 123], [499, 123]]}
+  - {type: building, cells: [[482, 123], [483, 123]]}
+  - {type: building, cells: [[403, 124]]}
+  - {type: building, cells: [[404, 124], [404, 125], [405, 125], [404, 126], [405, 126], [405, 127], [406, 127]]}
+  - {type: building, cells: [[467, 124], [464, 125], [465, 125], [466, 125], [467, 125], [464, 126], [465, 126], [466, 126], [467, 126], [464, 127], [465, 127], [466, 127], [467, 127]]}
+  - {type: building, cells: [[468, 124], [469, 124], [468, 125], [469, 125], [470, 125], [468, 126], [469, 126], [470, 126], [468, 127], [469, 127], [470, 127], [471, 127]]}
+  - {type: building, cells: [[472, 124], [473, 124], [474, 124], [475, 124], [472, 125], [473, 125], [474, 125], [475, 125], [473, 126], [474, 126], [475, 126], [473, 127], [474, 127], [475, 127]]}
+  - {type: building, cells: [[476, 124], [477, 124], [476, 125], [477, 125], [476, 126], [476, 127], [477, 127]]}
+  - {type: building, cells: [[480, 124]]}
+  - {type: building, cells: [[496, 124], [497, 124], [498, 124], [499, 124]]}
+  - {type: building, cells: [[479, 125]]}
+  - {type: building, cells: [[482, 125], [483, 125], [481, 126], [482, 126], [483, 126], [480, 127], [481, 127], [482, 127]]}
+  - {type: building, cells: [[462, 126], [463, 126], [463, 127]]}
+  - {type: building, cells: [[478, 126]]}
+  - {type: building, cells: [[405, 128], [406, 128], [406, 129], [407, 129], [407, 130], [407, 131]]}
+  - {type: building, cells: [[464, 128], [465, 128], [466, 128], [467, 128], [464, 129], [465, 129], [466, 129], [467, 129], [464, 130], [465, 130], [466, 130], [467, 130], [465, 131], [466, 131], [467, 131]]}
+  - {type: building, cells: [[468, 128], [469, 128], [470, 128], [471, 128], [468, 129], [469, 129], [470, 129], [471, 129], [468, 130], [469, 130], [470, 130], [471, 130], [468, 131], [469, 131], [470, 131], [471, 131]]}
+  - {type: building, cells: [[474, 128], [475, 128], [475, 129]]}
+  - {type: building, cells: [[476, 128]]}
+  - {type: building, cells: [[479, 128], [478, 129], [479, 129], [477, 130], [478, 130], [479, 130], [476, 131], [477, 131], [478, 131], [479, 131]]}
+  - {type: building, cells: [[480, 128], [481, 128]]}
+  - {type: building, cells: [[443, 129]]}
+  - {type: building, cells: [[444, 129], [445, 129], [446, 129], [447, 129], [444, 130], [445, 130], [446, 130], [447, 130], [445, 131], [446, 131], [447, 131]]}
+  - {type: building, cells: [[472, 129], [472, 130], [473, 130], [472, 131], [473, 131]]}
+  - {type: building, cells: [[408, 130], [408, 131]]}
+  - {type: building, cells: [[448, 130], [449, 130], [448, 131], [449, 131]]}
+  - {type: building, cells: [[451, 130]]}
+  - {type: building, cells: [[480, 131]]}
+  - {type: building, cells: [[408, 132], [409, 132], [409, 133], [409, 134], [410, 134], [410, 135], [411, 135]]}
+  - {type: building, cells: [[446, 132], [447, 132], [445, 133], [446, 133], [447, 133], [445, 134], [446, 134], [447, 134], [446, 135], [447, 135]]}
+  - {type: building, cells: [[448, 132], [449, 132], [450, 132], [448, 133], [449, 133], [450, 133], [451, 133], [448, 134], [449, 134], [450, 134], [451, 134], [448, 135], [449, 135]]}
+  - {type: building, cells: [[465, 132], [466, 132], [467, 132], [464, 133], [465, 133], [466, 133], [467, 133]]}
+  - {type: building, cells: [[468, 132], [469, 132], [470, 132], [471, 132], [468, 133], [469, 133]]}
+  - {type: building, cells: [[481, 132]]}
+  - {type: building, cells: [[453, 133]]}
+  - {type: building, cells: [[461, 133], [462, 133], [463, 133]]}
+  - {type: building, cells: [[473, 133], [474, 133], [472, 134], [473, 134], [474, 134], [472, 135], [473, 135], [474, 135]]}
+  - {type: building, cells: [[476, 133], [477, 133], [478, 133], [479, 133], [476, 134], [477, 134], [478, 134], [479, 134], [477, 135], [478, 135], [479, 135]]}
+  - {type: building, cells: [[482, 133]]}
+  - {type: building, cells: [[471, 134], [468, 135], [469, 135], [470, 135], [471, 135]]}
+  - {type: building, cells: [[480, 134], [480, 135], [481, 135], [482, 135]]}
+  - {type: building, cells: [[453, 135], [454, 135], [455, 135]]}
+  - {type: building, cells: [[456, 135], [457, 135], [458, 135], [459, 135]]}
+  - {type: building, cells: [[460, 135], [461, 135], [462, 135], [463, 135]]}
+  - {type: building, cells: [[464, 135], [465, 135], [466, 135], [467, 135]]}
+  - {type: building, cells: [[411, 136], [411, 137]]}
+  - {type: building, cells: [[446, 136], [447, 136]]}
+  - {type: building, cells: [[451, 136], [449, 137], [450, 137], [451, 137], [448, 138], [449, 138], [450, 138], [451, 138], [448, 139]]}
+  - {type: building, cells: [[452, 136], [453, 136], [454, 136], [455, 136], [452, 137], [453, 137], [454, 137], [455, 137]]}
+  - {type: building, cells: [[456, 136], [457, 136], [458, 136], [459, 136], [456, 137], [457, 137], [458, 137], [459, 137], [456, 138], [457, 138], [458, 138], [459, 138], [456, 139], [457, 139], [458, 139], [459, 139]]}
+  - {type: building, cells: [[460, 136], [461, 136], [462, 136], [463, 136], [460, 137], [461, 137], [462, 137], [463, 137], [460, 138], [461, 138], [462, 138], [463, 138], [460, 139]]}
+  - {type: building, cells: [[464, 136], [465, 136], [466, 136], [467, 136], [464, 137], [465, 137], [466, 137], [467, 137], [464, 138]]}
+  - {type: building, cells: [[468, 136], [469, 136], [470, 136], [471, 136], [468, 137], [469, 137], [470, 137], [468, 138], [469, 138], [470, 138], [471, 138], [469, 139], [470, 139], [471, 139]]}
+  - {type: building, cells: [[473, 136], [474, 136], [475, 136], [474, 137], [475, 137], [474, 138], [475, 138], [473, 139], [474, 139], [475, 139]]}
+  - {type: building, cells: [[477, 136], [478, 136], [479, 136], [477, 137], [478, 137], [479, 137], [478, 138], [479, 138], [478, 139], [479, 139]]}
+  - {type: building, cells: [[480, 136], [481, 136], [482, 136], [483, 136], [480, 137], [481, 137], [482, 137], [480, 138]]}
+  - {type: building, cells: [[412, 137], [412, 138], [413, 138], [413, 139], [414, 139]]}
+  - {type: building, cells: [[497, 137], [496, 138], [497, 138], [498, 138], [496, 139], [497, 139], [498, 139], [499, 139]]}
+  - {type: building, cells: [[447, 138], [445, 139], [446, 139], [447, 139]]}
+  - {type: building, cells: [[430, 139], [431, 139]]}
+  - {type: building, cells: [[476, 139]]}
+  - {type: building, cells: [[495, 139]]}
+  - {type: building, cells: [[414, 140], [414, 141], [415, 141], [415, 142]]}
+  - {type: building, cells: [[430, 140], [431, 140], [429, 141], [430, 141], [431, 141], [429, 142], [430, 142], [431, 142], [428, 143], [429, 143], [430, 143], [431, 143]]}
+  - {type: building, cells: [[432, 140], [433, 140], [434, 140], [435, 140], [432, 141], [433, 141], [434, 141], [435, 141], [432, 142], [433, 142], [434, 142], [435, 142], [432, 143], [433, 143], [434, 143], [435, 143]]}
+  - {type: building, cells: [[436, 140], [437, 140], [436, 141], [437, 141], [436, 142], [436, 143]]}
+  - {type: building, cells: [[439, 140], [439, 141], [439, 142], [438, 143], [439, 143]]}
+  - {type: building, cells: [[440, 140], [441, 140], [442, 140], [443, 140], [440, 141], [441, 141], [442, 141], [443, 141], [440, 142], [441, 142], [442, 142], [443, 142], [440, 143], [441, 143], [442, 143], [443, 143]]}
+  - {type: building, cells: [[444, 140], [445, 140], [446, 140], [447, 140], [444, 141], [445, 141], [446, 141], [447, 141], [444, 142], [445, 142], [446, 142], [447, 142], [444, 143], [445, 143], [446, 143]]}
+  - {type: building, cells: [[456, 140], [457, 140], [458, 140], [459, 140], [456, 141], [457, 141], [458, 141], [459, 141]]}
+  - {type: building, cells: [[460, 140], [460, 141]]}
+  - {type: building, cells: [[469, 140]]}
+  - {type: building, cells: [[473, 140], [474, 140], [475, 140], [473, 141], [474, 141], [475, 141]]}
+  - {type: building, cells: [[476, 140], [476, 141]]}
+  - {type: building, cells: [[494, 140], [495, 140], [494, 141], [495, 141]]}
+  - {type: building, cells: [[496, 140], [497, 140], [498, 140], [496, 141], [497, 141], [497, 142]]}
+  - {type: building, cells: [[416, 142]]}
+  - {type: building, cells: [[426, 142], [425, 143], [426, 143], [427, 143]]}
+  - {type: building, cells: [[417, 144]]}
+  - {type: building, cells: [[424, 144], [425, 144], [426, 144], [427, 144], [424, 145], [425, 145], [426, 145], [427, 145], [424, 146], [425, 146], [426, 146], [427, 146], [424, 147], [425, 147], [426, 147], [427, 147]]}
+  - {type: building, cells: [[428, 144], [429, 144], [430, 144], [431, 144], [428, 145], [429, 145], [430, 145], [431, 145], [428, 146], [429, 146], [430, 146], [431, 146], [428, 147], [429, 147], [430, 147], [431, 147]]}
+  - {type: building, cells: [[432, 144], [433, 144], [434, 144], [435, 144], [432, 145], [433, 145], [434, 145], [435, 145], [432, 146], [433, 146], [434, 146], [432, 147]]}
+  - {type: building, cells: [[438, 144], [439, 144], [437, 145], [438, 145], [439, 145], [437, 146], [438, 146], [439, 146], [436, 147], [437, 147], [438, 147], [439, 147]]}
+  - {type: building, cells: [[440, 144], [441, 144], [442, 144], [443, 144], [440, 145], [441, 145], [442, 145], [443, 145], [440, 146], [441, 146], [442, 146], [443, 146], [440, 147], [441, 147]]}
+  - {type: building, cells: [[444, 144], [445, 144], [446, 144], [444, 145], [445, 145], [446, 145], [444, 146], [445, 146], [446, 146], [444, 147], [445, 147]]}
+  - {type: building, cells: [[418, 145]]}
+  - {type: building, cells: [[423, 145], [422, 146], [423, 146], [422, 147], [423, 147]]}
+  - {type: building, cells: [[470, 145], [471, 145], [470, 146], [471, 146], [470, 147], [471, 147]]}
+  - {type: building, cells: [[472, 145], [473, 145], [472, 146], [473, 146], [472, 147], [473, 147]]}
+  - {type: building, cells: [[419, 146], [419, 147]]}
+  - {type: building, cells: [[420, 147]]}
+  - {type: building, cells: [[420, 148], [421, 148], [422, 148], [423, 148], [421, 149], [422, 149], [423, 149], [422, 150], [423, 150], [423, 151]]}
+  - {type: building, cells: [[424, 148], [425, 148], [426, 148], [427, 148], [424, 149], [425, 149], [426, 149], [427, 149], [424, 150], [425, 150], [426, 150], [424, 151]]}
+  - {type: building, cells: [[428, 148], [429, 148], [430, 148], [428, 149]]}
+  - {type: building, cells: [[434, 148], [432, 149], [433, 149], [434, 149], [435, 149], [432, 150], [433, 150], [434, 150], [435, 150], [432, 151], [433, 151], [434, 151], [435, 151]]}
+  - {type: building, cells: [[437, 148], [438, 148], [439, 148], [437, 149], [438, 149], [439, 149], [438, 150], [439, 150], [439, 151]]}
+  - {type: building, cells: [[440, 148], [440, 149], [441, 149], [440, 150], [441, 150], [442, 150], [440, 151], [441, 151], [442, 151]]}
+  - {type: building, cells: [[470, 148], [471, 148], [471, 149], [471, 150]]}
+  - {type: building, cells: [[472, 148], [473, 148], [474, 148], [472, 149], [473, 149], [474, 149], [472, 150], [473, 150]]}
+  - {type: building, cells: [[430, 150], [431, 150], [428, 151], [429, 151], [430, 151], [431, 151]]}
+  - {type: building, cells: [[420, 151], [421, 151]]}
+  - {type: building, cells: [[436, 151]]}
+  - {type: building, cells: [[419, 152], [418, 153], [419, 153], [419, 154], [419, 155]]}
+  - {type: building, cells: [[420, 152], [421, 152], [422, 152], [420, 153], [421, 153], [422, 153], [423, 153], [420, 154], [421, 154], [422, 154], [423, 154], [420, 155]]}
+  - {type: building, cells: [[424, 152], [425, 152], [426, 152], [427, 152], [424, 153], [425, 153], [426, 153], [427, 153], [424, 154], [425, 154], [426, 154], [427, 154], [424, 155], [425, 155], [426, 155], [427, 155]]}
+  - {type: building, cells: [[428, 152], [429, 152], [430, 152], [431, 152], [428, 153], [429, 153], [430, 153], [431, 153], [428, 154], [430, 154], [431, 154], [428, 155]]}
+  - {type: building, cells: [[432, 152], [433, 152], [434, 152], [435, 152], [432, 153], [433, 153], [434, 153], [435, 153], [433, 154], [434, 154], [435, 154], [434, 155], [435, 155]]}
+  - {type: building, cells: [[436, 152], [437, 152], [436, 153], [437, 153], [438, 153], [439, 153], [436, 154], [437, 154], [438, 154], [439, 154], [436, 155], [437, 155], [438, 155]]}
+  - {type: building, cells: [[441, 152]]}
+  - {type: building, cells: [[440, 154], [440, 155], [441, 155], [442, 155]]}
+  - {type: building, cells: [[419, 156]]}
+  - {type: building, cells: [[422, 156], [421, 157], [422, 157], [423, 157], [420, 158], [421, 158], [422, 158], [423, 158], [420, 159], [421, 159], [422, 159], [423, 159]]}
+  - {type: building, cells: [[425, 156], [426, 156], [427, 156], [426, 157], [427, 157], [427, 158]]}
+  - {type: building, cells: [[428, 156], [429, 156], [428, 157], [429, 157], [430, 157], [428, 158], [429, 158], [430, 158], [431, 158], [428, 159], [429, 159], [430, 159], [431, 159]]}
+  - {type: building, cells: [[435, 156]]}
+  - {type: building, cells: [[436, 156], [437, 156], [436, 157]]}
+  - {type: building, cells: [[441, 156], [442, 156], [443, 156], [442, 157], [443, 157]]}
+  - {type: building, cells: [[444, 156], [444, 157], [445, 157], [446, 157], [447, 157], [446, 158], [447, 158]]}
+  - {type: building, cells: [[477, 156], [478, 156], [477, 157], [478, 157], [477, 158], [478, 158], [479, 158], [478, 159], [479, 159]]}
+  - {type: building, cells: [[416, 157], [417, 157], [418, 157], [416, 158], [417, 158]]}
+  - {type: building, cells: [[448, 157], [449, 157], [450, 157], [451, 157], [448, 158], [449, 158], [450, 158], [448, 159], [449, 159], [450, 159]]}
+  - {type: building, cells: [[509, 157], [510, 157], [511, 157], [509, 158], [510, 158], [511, 158], [508, 159], [509, 159], [510, 159], [511, 159]]}
+  - {type: building, cells: [[424, 158], [424, 159]]}
+  - {type: building, cells: [[419, 159]]}
+  - {type: building, cells: [[432, 159]]}
+  - {type: building, cells: [[480, 159]]}
+  - {type: building, cells: [[420, 160], [421, 160], [422, 160], [421, 161]]}
+  - {type: building, cells: [[428, 160], [429, 160], [430, 160], [431, 160], [429, 161], [430, 161], [431, 161], [430, 162], [431, 162], [431, 163]]}
+  - {type: building, cells: [[432, 160], [433, 160], [432, 161], [433, 161], [434, 161], [432, 162], [434, 162], [435, 162], [435, 163]]}
+  - {type: building, cells: [[478, 160], [479, 160]]}
+  - {type: building, cells: [[480, 160]]}
+  - {type: building, cells: [[508, 160], [509, 160], [510, 160], [511, 160], [510, 161], [511, 161], [510, 162], [511, 162]]}
+  - {type: building, cells: [[436, 163]]}
+  - {type: building, cells: [[436, 164], [437, 164], [437, 165], [438, 165], [438, 166], [439, 166], [439, 167]]}
+  - {type: building, cells: [[440, 167]]}
+  - {type: building, cells: [[440, 168], [441, 168], [441, 169], [442, 169], [442, 170], [443, 170], [443, 171]]}
+  - {type: building, cells: [[444, 171], [445, 171]]}
+  - {type: building, cells: [[444, 172], [445, 172], [446, 172], [445, 173], [446, 173], [447, 173], [446, 174], [447, 174], [447, 175]]}
+  - {type: building, cells: [[448, 174], [448, 175], [449, 175]]}
+  - {type: building, cells: [[448, 176], [449, 176], [450, 176], [449, 177], [450, 177], [451, 177], [450, 178], [451, 178]]}
+  - {type: building, cells: [[452, 178], [452, 179], [453, 179]]}
+  - {type: building, cells: [[453, 180], [454, 180], [454, 181], [455, 181], [455, 182]]}
+  - {type: building, cells: [[456, 182], [456, 183], [457, 183]]}
+  - {type: building, cells: [[457, 184], [458, 184], [458, 185]]}
+  - {type: building, cells: [[459, 186]]}
+  - {type: building, cells: [[460, 187]]}
+  - {type: building, cells: [[461, 188]]}
+  - {type: building, cells: [[462, 189]]}
+  - {type: building, cells: [[463, 190]]}
+  - {type: building, cells: [[464, 191]]}
+  - {type: building, cells: [[464, 192], [465, 192], [465, 193], [466, 193], [466, 194], [467, 194], [467, 195]]}
+  - {type: building, cells: [[468, 196]]}
+  - {type: building, cells: [[469, 197]]}
+  - {type: building, cells: [[470, 198]]}
+  - {type: building, cells: [[471, 199]]}
+  - {type: building, cells: [[472, 200], [475, 200], [472, 201], [473, 201], [474, 201], [475, 201], [473, 202], [474, 202], [475, 202], [474, 203], [475, 203]]}
+  - {type: building, cells: [[476, 200], [478, 200], [479, 200], [476, 201], [477, 201], [478, 201], [479, 201], [476, 202], [477, 202], [478, 202], [479, 202], [476, 203], [477, 203], [478, 203], [479, 203]]}
+  - {type: building, cells: [[480, 201], [480, 202], [481, 202], [480, 203], [481, 203]]}
+  - {type: building, cells: [[475, 204]]}
+  - {type: building, cells: [[476, 204], [477, 204], [478, 204], [479, 204], [476, 205], [477, 205], [478, 205], [479, 205], [477, 206], [478, 206], [479, 206], [477, 207], [478, 207], [479, 207]]}
+  - {type: building, cells: [[480, 204], [481, 204], [482, 204], [480, 205], [481, 205], [482, 205], [483, 205], [480, 206], [481, 206], [482, 206], [483, 206], [480, 207], [481, 207], [482, 207], [483, 207]]}
+  - {type: building, cells: [[484, 206], [484, 207], [485, 207]]}
+  - {type: building, cells: [[478, 208], [479, 208], [479, 209]]}
+  - {type: building, cells: [[480, 208], [481, 208], [482, 208], [483, 208], [480, 209], [481, 209], [482, 209], [483, 209], [480, 210], [481, 210], [482, 210], [483, 210], [481, 211], [482, 211], [483, 211]]}
+  - {type: building, cells: [[484, 208], [485, 208], [484, 209], [485, 209], [484, 210], [485, 210], [484, 211]]}
+  - {type: building, cells: [[481, 212], [482, 212], [483, 212], [482, 213], [483, 213], [483, 214], [483, 215]]}
+  - {type: building, cells: [[484, 212], [484, 213], [484, 214], [484, 215]]}
+  - {type: building, cells: [[484, 216], [485, 216], [485, 217]]}
+  - {type: building, cells: [[486, 218], [486, 219], [487, 219]]}
+  - {type: building, cells: [[487, 220]]}
+  - {type: building, cells: [[488, 221]]}
+  - {type: building, cells: [[489, 222], [489, 223], [490, 223]]}
+  - {type: building, cells: [[494, 223], [495, 223]]}
+  - {type: building, cells: [[490, 224]]}
+  - {type: building, cells: [[493, 224], [494, 224], [495, 224], [494, 225], [495, 225], [495, 226]]}
+  - {type: building, cells: [[496, 224], [496, 225]]}
+  - {type: building, cells: [[491, 225]]}
+  - {type: building, cells: [[492, 226], [492, 227], [493, 227]]}
+  - {type: building, cells: [[493, 228]]}
+  - {type: building, cells: [[494, 229]]}
+  - {type: building, cells: [[495, 230], [495, 231]]}
+  - {type: building, cells: [[496, 231]]}
+  - {type: building, cells: [[496, 232]]}
+  - {type: building, cells: [[497, 233], [497, 234], [498, 234], [498, 235]]}
+  - {type: building, cells: [[499, 236], [499, 237]]}
+  - {type: building, cells: [[500, 237], [500, 238]]}
+  - {type: building, cells: [[501, 239]]}
+  - {type: building, cells: [[508, 239], [509, 239]]}
+  - {type: building, cells: [[501, 240]]}
+  - {type: building, cells: [[507, 240], [506, 241], [507, 241], [506, 242], [507, 242], [507, 243]]}
+  - {type: building, cells: [[508, 240], [509, 240], [510, 240], [508, 241], [509, 241], [510, 241], [511, 241], [508, 242], [509, 242], [510, 242], [511, 242], [508, 243], [509, 243], [510, 243], [511, 243]]}
+  - {type: building, cells: [[502, 241]]}
+  - {type: building, cells: [[503, 242], [503, 243]]}
+  - {type: building, cells: [[504, 243]]}
+  - {type: building, cells: [[504, 244]]}
+  - {type: building, cells: [[508, 244], [509, 244], [510, 244], [511, 244], [509, 245], [510, 245], [511, 245], [510, 246], [511, 246], [511, 247]]}
+  - {type: building, cells: [[505, 245], [505, 246], [506, 246], [506, 247]]}
+  - {type: building, cells: [[506, 248], [507, 248], [507, 249], [507, 250]]}
+  - {type: building, cells: [[508, 249], [508, 250]]}
+  - {type: building, cells: [[509, 252], [509, 253], [510, 253], [510, 254]]}
+  - {type: building, cells: [[511, 252]]}
+  - {type: building, cells: [[511, 255]]}
 constructions:
   - {type: bridge, cells: [[411, 167], [411, 166], [412, 166]]}
 links: []

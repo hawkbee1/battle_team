@@ -36,6 +36,7 @@ This is the to-do / done list of the spec phase. Tick a question when it is deci
 - [x] **Q-MAP-26** Where is a moving unit while it moves, for what others see of it? → decision 236 (at its destination from the start of its move; the client shows it moving there; following units along their paths on the host is planned for later, milestone M8)
 - [ ] **Q-MAP-27** Does a section know which team a unit it sees belongs to (an ally's or an enemy's), and is the team of each section public? Assumed (M6.7): yes, a unit seen shows its team, as a hit already shows whether it was friendly fire; the host sends each unit it shows with its section's team.
 - [x] **Q-MAP-28** Can two units stand on the same cell? → decision 240 (one unit per place, the place being the hit volume; width per cell and per bridge; friend and enemy both solid, airborne units above; refusal only for a seen blocker, a stop short of an unseen one). Host work: M8 topic 6.
+- [ ] **Q-MAP-29** A map from real data builds its towns up into blocks of buildings, up to 4 × 4 cells each (the designer's ask of 2026-11-20). Does a block have the hit points of one building, or more with its size, and what is left when it is destroyed? Assumed: one building's hit points whatever its size, and destroyed it frees all its cells, as any building.
 
 ## Units and progression (20)
 - [x] **Q-UNIT-01** Concrete unit list per category with base stats and capabilities. → decisions 60, 61 (stats are placeholders, tuned in playtests)

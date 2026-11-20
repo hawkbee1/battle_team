@@ -54,6 +54,11 @@ abstract interface class BattleWorld {
   /// (decision 237).
   void showFog(FogModel fog);
 
+  /// Shows the sky and the haze of [weather], a key of `terrain.yaml`
+  /// `weather` (MAP-31); clear while it is null. Called when the weather
+  /// changes, not every frame. The look only: what units see is the host's.
+  void showWeather(String? weather);
+
   /// Moves on by [seconds].
   void tick(double seconds);
 }

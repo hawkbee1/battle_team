@@ -100,6 +100,49 @@ void main() {
     });
   });
 
+  group('bridgeDecks', () {
+    test("puts each bridge's cells under one deck, a metre above the highest "
+        'ground at and around them', () {
+      // The 1 km map's bridges: one of four cells, one of three.
+      final decks = bridgeDecks(map);
+
+      expect(decks, hasLength(7));
+      final first = [
+        for (final (x, y) in [(30, 14), (30, 15), (31, 15), (32, 15)])
+          decks[y * map.width + x],
+      ];
+      expect(first.toSet(), hasLength(1));
+      var highest = 0;
+      for (var y = 13; y <= 16; y++) {
+        for (var x = 29; x <= 33; x++) {
+          final inside =
+              (x - 30).abs() <= 1 && (y - 14).abs() <= 1 ||
+              (x - 30).abs() <= 1 && (y - 15).abs() <= 1 ||
+              (x - 31).abs() <= 1 && (y - 15).abs() <= 1 ||
+              (x - 32).abs() <= 1 && (y - 15).abs() <= 1;
+          if (inside && map.heights[y * map.width + x] > highest) {
+            highest = map.heights[y * map.width + x];
+          }
+        }
+      }
+      expect(first.first, highest + bridgeDeckRiseM);
+    });
+
+    test('units stand on the deck over a bridge, on the ground beside '
+        'it', () {
+      final deck = surface.decks[15 * map.width + 31]!;
+
+      expect(surface.heightAt(315, 155), deck);
+      expect(
+        surface.heightAt(315, 155),
+        greaterThan(surface.groundAt(315, 155)),
+      );
+      expect(surface.heightAt(315, 175), surface.groundAt(315, 175));
+      // Off the map, the nearest edge's ground.
+      expect(surface.heightAt(-5, 155), surface.groundAt(-5, 155));
+    });
+  });
+
   group('terrainArrays', () {
     test('has a coloured vertex per cell and two triangles per square', () {
       final arrays = terrainArrays(map);

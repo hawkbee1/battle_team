@@ -125,6 +125,10 @@ class _BattleViewState extends State<BattleView> {
     super.dispose();
   }
 
+  // The weather last shown: the world is told only when it changes.
+  String? _weather;
+  bool _weatherShown = false;
+
   void _show(BattleState state, {bool centreOnUnits = false}) {
     widget.world.show(
       units: state.units.values,
@@ -135,6 +139,11 @@ class _BattleViewState extends State<BattleView> {
       battleTime: context.read<BattleCubit>().battleTime,
     );
     widget.world.showPath(state.pendingMove?.points);
+    if (state.weather != _weather || !_weatherShown) {
+      _weatherShown = true;
+      _weather = state.weather;
+      widget.world.showWeather(_weather);
+    }
     if (centreOnUnits) _centreOnSection(state);
   }
 

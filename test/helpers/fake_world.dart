@@ -92,6 +92,12 @@ class FakeWorld implements BattleWorld {
     fogs.add(fog);
   }
 
+  /// Every call of `showWeather`, in order.
+  final weathers = <String?>[];
+
+  @override
+  void showWeather(String? weather) => weathers.add(weather);
+
   @override
   void tick(double seconds) => this.seconds += seconds;
 }

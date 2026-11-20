@@ -75,7 +75,6 @@ objects:
   - {type: building, cells: [[892, 3986], [893, 3986]]}
   - {type: building, cells: [[834, 3901], [835, 3901], [836, 3901], [837, 3901], [832, 3902], [833, 3902], [834, 3902], [835, 3902], [836, 3902], [837, 3902], [838, 3902], [833, 3903], [834, 3903], [835, 3903], [836, 3903], [837, 3903], [838, 3903], [834, 3904], [835, 3904], [836, 3904], [834, 3905], [835, 3905]]}
   - {type: building, cells: [[790, 3974], [789, 3975]]}
-  - {type: building, cells: [[833, 3888], [833, 3889], [833, 3890], [835, 3890]]}
   - {type: building, cells: [[796, 3913]]}
   - {type: building, cells: [[905, 3847]]}
   - {type: building, cells: [[841, 3906], [842, 3907], [843, 3908]]}
@@ -91,13 +90,9 @@ objects:
   - {type: building, cells: [[863, 3952]]}
   - {type: building, cells: [[866, 3888], [867, 3888], [866, 3889], [867, 3889], [868, 3890]]}
   - {type: building, cells: [[953, 3974], [954, 3974]]}
-  - {type: building, cells: [[831, 3893], [830, 3894]]}
   - {type: building, cells: [[969, 3841], [970, 3841], [971, 3841]]}
-  - {type: building, cells: [[830, 3882], [831, 3882], [829, 3883], [830, 3883]]}
   - {type: building, cells: [[905, 3977]]}
-  - {type: building, cells: [[769, 3871]]}
   - {type: building, cells: [[785, 3916]]}
-  - {type: building, cells: [[834, 3881]]}
   - {type: building, cells: [[985, 3932], [986, 3934]]}
   - {type: building, cells: [[796, 3910]]}
   - {type: building, cells: [[824, 3840]]}
@@ -114,10 +109,8 @@ objects:
   - {type: building, cells: [[965, 3863]]}
   - {type: building, cells: [[977, 3966]]}
   - {type: building, cells: [[864, 3893]]}
-  - {type: building, cells: [[829, 3894]]}
   - {type: building, cells: [[902, 3850]]}
   - {type: building, cells: [[792, 3855]]}
-  - {type: building, cells: [[837, 3887]]}
   - {type: building, cells: [[787, 3854], [788, 3854]]}
   - {type: building, cells: [[791, 3974]]}
   - {type: building, cells: [[971, 3944]]}
@@ -125,7 +118,6 @@ objects:
   - {type: building, cells: [[895, 3974]]}
   - {type: building, cells: [[899, 3971]]}
   - {type: building, cells: [[959, 3943]]}
-  - {type: building, cells: [[829, 3879], [829, 3880]]}
   - {type: building, cells: [[948, 3938]]}
   - {type: building, cells: [[817, 3989]]}
   - {type: building, cells: [[843, 3967]]}
@@ -145,7 +137,6 @@ objects:
   - {type: building, cells: [[842, 3896], [843, 3896]]}
   - {type: building, cells: [[953, 3986]]}
   - {type: building, cells: [[893, 3985]]}
-  - {type: building, cells: [[829, 3891]]}
   - {type: building, cells: [[950, 3861]]}
   - {type: building, cells: [[966, 3869]]}
   - {type: building, cells: [[771, 3848], [772, 3848]]}
@@ -167,7 +158,6 @@ objects:
   - {type: building, cells: [[835, 3911]]}
   - {type: building, cells: [[953, 3981]]}
   - {type: building, cells: [[955, 3940]]}
-  - {type: building, cells: [[772, 3875]]}
   - {type: building, cells: [[864, 3953]]}
   - {type: building, cells: [[842, 3967]]}
   - {type: building, cells: [[960, 3860]]}
@@ -176,7 +166,6 @@ objects:
   - {type: building, cells: [[785, 3976]]}
   - {type: building, cells: [[877, 3960]]}
   - {type: building, cells: [[892, 3965]]}
-  - {type: building, cells: [[837, 3883]]}
   - {type: building, cells: [[788, 3915]]}
   - {type: building, cells: [[795, 3914]]}
   - {type: building, cells: [[962, 3938]]}
@@ -188,7 +177,6 @@ objects:
   - {type: building, cells: [[952, 3981]]}
   - {type: building, cells: [[906, 3863], [907, 3863]]}
   - {type: building, cells: [[971, 3941]]}
-  - {type: building, cells: [[770, 3875]]}
   - {type: building, cells: [[833, 3971]]}
   - {type: building, cells: [[787, 3900]]}
   - {type: building, cells: [[835, 3974]]}
@@ -207,7 +195,6 @@ objects:
   - {type: building, cells: [[913, 3981]]}
   - {type: building, cells: [[840, 3909]]}
   - {type: building, cells: [[793, 3851]]}
-  - {type: building, cells: [[831, 3894]]}
   - {type: building, cells: [[889, 3964]]}
   - {type: building, cells: [[773, 3887], [773, 3888], [773, 3889]]}
   - {type: building, cells: [[775, 3907]]}
@@ -225,12 +212,9 @@ objects:
   - {type: building, cells: [[784, 3852]]}
   - {type: building, cells: [[781, 3845]]}
   - {type: building, cells: [[771, 3881]]}
-  - {type: building, cells: [[770, 3869]]}
-  - {type: building, cells: [[830, 3881]]}
   - {type: building, cells: [[942, 3965]]}
   - {type: building, cells: [[938, 3962]]}
   - {type: building, cells: [[878, 3961], [879, 3961]]}
-  - {type: building, cells: [[832, 3881]]}
   - {type: building, cells: [[907, 3864]]}
   - {type: building, cells: [[942, 3964]]}
   - {type: building, cells: [[888, 3964]]}
@@ -259,7 +243,6 @@ objects:
   - {type: building, cells: [[816, 3990]]}
   - {type: building, cells: [[864, 3954]]}
   - {type: building, cells: [[811, 3992]]}
-  - {type: building, cells: [[829, 3890]]}
   - {type: building, cells: [[970, 3942]]}
   - {type: building, cells: [[868, 3889]]}
   - {type: building, cells: [[945, 3859]]}
@@ -267,7 +250,6 @@ objects:
   - {type: building, cells: [[974, 3936], [975, 3936], [973, 3937]]}
   - {type: building, cells: [[835, 3850]]}
   - {type: building, cells: [[958, 3940], [958, 3941]]}
-  - {type: building, cells: [[768, 3869]]}
   - {type: building, cells: [[806, 3862]]}
   - {type: building, cells: [[890, 3959], [890, 3960]]}
   - {type: building, cells: [[832, 3911]]}
@@ -1815,11 +1797,6 @@ objects:
   - {type: tree, cells: [[992, 4026]]}
   - {type: tree, cells: [[993, 4026]]}
   - {type: tree, cells: [[994, 4026]]}
-  - {type: tree, cells: [[995, 4026]]}
-  - {type: tree, cells: [[996, 4026]]}
-  - {type: tree, cells: [[997, 4026]]}
-  - {type: tree, cells: [[998, 4026]]}
-  - {type: tree, cells: [[999, 4026]]}
   - {type: tree, cells: [[853, 4027]]}
   - {type: tree, cells: [[854, 4027]]}
   - {type: tree, cells: [[855, 4027]]}
@@ -1864,13 +1841,6 @@ objects:
   - {type: tree, cells: [[986, 4027]]}
   - {type: tree, cells: [[987, 4027]]}
   - {type: tree, cells: [[988, 4027]]}
-  - {type: tree, cells: [[989, 4027]]}
-  - {type: tree, cells: [[990, 4027]]}
-  - {type: tree, cells: [[991, 4027]]}
-  - {type: tree, cells: [[992, 4027]]}
-  - {type: tree, cells: [[993, 4027]]}
-  - {type: tree, cells: [[994, 4027]]}
-  - {type: tree, cells: [[995, 4027]]}
   - {type: tree, cells: [[996, 4027]]}
   - {type: tree, cells: [[997, 4027]]}
   - {type: tree, cells: [[998, 4027]]}
@@ -1919,13 +1889,6 @@ objects:
   - {type: tree, cells: [[980, 4028]]}
   - {type: tree, cells: [[981, 4028]]}
   - {type: tree, cells: [[982, 4028]]}
-  - {type: tree, cells: [[983, 4028]]}
-  - {type: tree, cells: [[984, 4028]]}
-  - {type: tree, cells: [[985, 4028]]}
-  - {type: tree, cells: [[986, 4028]]}
-  - {type: tree, cells: [[987, 4028]]}
-  - {type: tree, cells: [[988, 4028]]}
-  - {type: tree, cells: [[989, 4028]]}
   - {type: tree, cells: [[990, 4028]]}
   - {type: tree, cells: [[991, 4028]]}
   - {type: tree, cells: [[992, 4028]]}
@@ -1981,12 +1944,6 @@ objects:
   - {type: tree, cells: [[907, 4029]]}
   - {type: tree, cells: [[908, 4029]]}
   - {type: tree, cells: [[909, 4029]]}
-  - {type: tree, cells: [[978, 4029]]}
-  - {type: tree, cells: [[979, 4029]]}
-  - {type: tree, cells: [[980, 4029]]}
-  - {type: tree, cells: [[981, 4029]]}
-  - {type: tree, cells: [[982, 4029]]}
-  - {type: tree, cells: [[983, 4029]]}
   - {type: tree, cells: [[984, 4029]]}
   - {type: tree, cells: [[985, 4029]]}
   - {type: tree, cells: [[986, 4029]]}
@@ -2045,12 +2002,6 @@ objects:
   - {type: tree, cells: [[908, 4030]]}
   - {type: tree, cells: [[909, 4030]]}
   - {type: tree, cells: [[910, 4030]]}
-  - {type: tree, cells: [[911, 4030]]}
-  - {type: tree, cells: [[973, 4030]]}
-  - {type: tree, cells: [[974, 4030]]}
-  - {type: tree, cells: [[975, 4030]]}
-  - {type: tree, cells: [[976, 4030]]}
-  - {type: tree, cells: [[977, 4030]]}
   - {type: tree, cells: [[978, 4030]]}
   - {type: tree, cells: [[979, 4030]]}
   - {type: tree, cells: [[980, 4030]]}
@@ -2105,13 +2056,6 @@ objects:
   - {type: tree, cells: [[909, 4031]]}
   - {type: tree, cells: [[910, 4031]]}
   - {type: tree, cells: [[911, 4031]]}
-  - {type: tree, cells: [[912, 4031]]}
-  - {type: tree, cells: [[967, 4031]]}
-  - {type: tree, cells: [[968, 4031]]}
-  - {type: tree, cells: [[969, 4031]]}
-  - {type: tree, cells: [[970, 4031]]}
-  - {type: tree, cells: [[971, 4031]]}
-  - {type: tree, cells: [[972, 4031]]}
   - {type: tree, cells: [[973, 4031]]}
   - {type: tree, cells: [[974, 4031]]}
   - {type: tree, cells: [[975, 4031]]}
@@ -2166,13 +2110,8 @@ objects:
   - {type: tree, cells: [[909, 4032]]}
   - {type: tree, cells: [[910, 4032]]}
   - {type: tree, cells: [[911, 4032]]}
-  - {type: tree, cells: [[912, 4032]]}
   - {type: tree, cells: [[962, 4032]]}
   - {type: tree, cells: [[963, 4032]]}
-  - {type: tree, cells: [[964, 4032]]}
-  - {type: tree, cells: [[965, 4032]]}
-  - {type: tree, cells: [[966, 4032]]}
-  - {type: tree, cells: [[967, 4032]]}
   - {type: tree, cells: [[968, 4032]]}
   - {type: tree, cells: [[969, 4032]]}
   - {type: tree, cells: [[970, 4032]]}
@@ -2231,16 +2170,10 @@ objects:
   - {type: tree, cells: [[909, 4033]]}
   - {type: tree, cells: [[910, 4033]]}
   - {type: tree, cells: [[911, 4033]]}
-  - {type: tree, cells: [[912, 4033]]}
-  - {type: tree, cells: [[913, 4033]]}
   - {type: tree, cells: [[957, 4033]]}
   - {type: tree, cells: [[958, 4033]]}
   - {type: tree, cells: [[959, 4033]]}
   - {type: tree, cells: [[960, 4033]]}
-  - {type: tree, cells: [[961, 4033]]}
-  - {type: tree, cells: [[962, 4033]]}
-  - {type: tree, cells: [[963, 4033]]}
-  - {type: tree, cells: [[964, 4033]]}
   - {type: tree, cells: [[965, 4033]]}
   - {type: tree, cells: [[966, 4033]]}
   - {type: tree, cells: [[967, 4033]]}
@@ -2276,8 +2209,6 @@ objects:
   - {type: tree, cells: [[997, 4033]]}
   - {type: tree, cells: [[998, 4033]]}
   - {type: tree, cells: [[999, 4033]]}
-  - {type: tree, cells: [[853, 4034]]}
-  - {type: tree, cells: [[854, 4034]]}
   - {type: tree, cells: [[855, 4034]]}
   - {type: tree, cells: [[856, 4034]]}
   - {type: tree, cells: [[857, 4034]]}
@@ -2302,18 +2233,12 @@ objects:
   - {type: tree, cells: [[910, 4034]]}
   - {type: tree, cells: [[911, 4034]]}
   - {type: tree, cells: [[912, 4034]]}
-  - {type: tree, cells: [[913, 4034]]}
   - {type: tree, cells: [[951, 4034]]}
   - {type: tree, cells: [[952, 4034]]}
   - {type: tree, cells: [[953, 4034]]}
   - {type: tree, cells: [[954, 4034]]}
   - {type: tree, cells: [[955, 4034]]}
   - {type: tree, cells: [[956, 4034]]}
-  - {type: tree, cells: [[957, 4034]]}
-  - {type: tree, cells: [[958, 4034]]}
-  - {type: tree, cells: [[959, 4034]]}
-  - {type: tree, cells: [[960, 4034]]}
-  - {type: tree, cells: [[961, 4034]]}
   - {type: tree, cells: [[962, 4034]]}
   - {type: tree, cells: [[963, 4034]]}
   - {type: tree, cells: [[964, 4034]]}
@@ -2354,8 +2279,6 @@ objects:
   - {type: tree, cells: [[999, 4034]]}
   - {type: tree, cells: [[852, 4035]]}
   - {type: tree, cells: [[853, 4035]]}
-  - {type: tree, cells: [[854, 4035]]}
-  - {type: tree, cells: [[855, 4035]]}
   - {type: tree, cells: [[856, 4035]]}
   - {type: tree, cells: [[857, 4035]]}
   - {type: tree, cells: [[858, 4035]]}
@@ -2381,7 +2304,6 @@ objects:
   - {type: tree, cells: [[911, 4035]]}
   - {type: tree, cells: [[912, 4035]]}
   - {type: tree, cells: [[913, 4035]]}
-  - {type: tree, cells: [[914, 4035]]}
   - {type: tree, cells: [[946, 4035]]}
   - {type: tree, cells: [[947, 4035]]}
   - {type: tree, cells: [[948, 4035]]}
@@ -2390,10 +2312,6 @@ objects:
   - {type: tree, cells: [[951, 4035]]}
   - {type: tree, cells: [[952, 4035]]}
   - {type: tree, cells: [[953, 4035]]}
-  - {type: tree, cells: [[954, 4035]]}
-  - {type: tree, cells: [[955, 4035]]}
-  - {type: tree, cells: [[956, 4035]]}
-  - {type: tree, cells: [[957, 4035]]}
   - {type: tree, cells: [[958, 4035]]}
   - {type: tree, cells: [[959, 4035]]}
   - {type: tree, cells: [[960, 4035]]}
@@ -2440,8 +2358,6 @@ objects:
   - {type: tree, cells: [[852, 4036]]}
   - {type: tree, cells: [[853, 4036]]}
   - {type: tree, cells: [[854, 4036]]}
-  - {type: tree, cells: [[855, 4036]]}
-  - {type: tree, cells: [[856, 4036]]}
   - {type: tree, cells: [[857, 4036]]}
   - {type: tree, cells: [[858, 4036]]}
   - {type: tree, cells: [[859, 4036]]}
@@ -2468,8 +2384,6 @@ objects:
   - {type: tree, cells: [[911, 4036]]}
   - {type: tree, cells: [[912, 4036]]}
   - {type: tree, cells: [[913, 4036]]}
-  - {type: tree, cells: [[914, 4036]]}
-  - {type: tree, cells: [[915, 4036]]}
   - {type: tree, cells: [[940, 4036]]}
   - {type: tree, cells: [[941, 4036]]}
   - {type: tree, cells: [[942, 4036]]}
@@ -2480,11 +2394,6 @@ objects:
   - {type: tree, cells: [[947, 4036]]}
   - {type: tree, cells: [[948, 4036]]}
   - {type: tree, cells: [[949, 4036]]}
-  - {type: tree, cells: [[950, 4036]]}
-  - {type: tree, cells: [[951, 4036]]}
-  - {type: tree, cells: [[952, 4036]]}
-  - {type: tree, cells: [[953, 4036]]}
-  - {type: tree, cells: [[954, 4036]]}
   - {type: tree, cells: [[955, 4036]]}
   - {type: tree, cells: [[956, 4036]]}
   - {type: tree, cells: [[957, 4036]]}
@@ -2535,9 +2444,6 @@ objects:
   - {type: tree, cells: [[853, 4037]]}
   - {type: tree, cells: [[854, 4037]]}
   - {type: tree, cells: [[855, 4037]]}
-  - {type: tree, cells: [[856, 4037]]}
-  - {type: tree, cells: [[857, 4037]]}
-  - {type: tree, cells: [[858, 4037]]}
   - {type: tree, cells: [[859, 4037]]}
   - {type: tree, cells: [[860, 4037]]}
   - {type: tree, cells: [[861, 4037]]}
@@ -2563,7 +2469,6 @@ objects:
   - {type: tree, cells: [[912, 4037]]}
   - {type: tree, cells: [[913, 4037]]}
   - {type: tree, cells: [[914, 4037]]}
-  - {type: tree, cells: [[915, 4037]]}
   - {type: tree, cells: [[916, 4037]]}
   - {type: tree, cells: [[917, 4037]]}
   - {type: tree, cells: [[934, 4037]]}
@@ -2579,10 +2484,6 @@ objects:
   - {type: tree, cells: [[944, 4037]]}
   - {type: tree, cells: [[945, 4037]]}
   - {type: tree, cells: [[946, 4037]]}
-  - {type: tree, cells: [[947, 4037]]}
-  - {type: tree, cells: [[948, 4037]]}
-  - {type: tree, cells: [[949, 4037]]}
-  - {type: tree, cells: [[950, 4037]]}
   - {type: tree, cells: [[951, 4037]]}
   - {type: tree, cells: [[952, 4037]]}
   - {type: tree, cells: [[953, 4037]]}
@@ -2640,8 +2541,6 @@ objects:
   - {type: tree, cells: [[855, 4038]]}
   - {type: tree, cells: [[856, 4038]]}
   - {type: tree, cells: [[857, 4038]]}
-  - {type: tree, cells: [[858, 4038]]}
-  - {type: tree, cells: [[859, 4038]]}
   - {type: tree, cells: [[860, 4038]]}
   - {type: tree, cells: [[861, 4038]]}
   - {type: tree, cells: [[862, 4038]]}
@@ -2664,8 +2563,6 @@ objects:
   - {type: tree, cells: [[912, 4038]]}
   - {type: tree, cells: [[913, 4038]]}
   - {type: tree, cells: [[914, 4038]]}
-  - {type: tree, cells: [[915, 4038]]}
-  - {type: tree, cells: [[916, 4038]]}
   - {type: tree, cells: [[917, 4038]]}
   - {type: tree, cells: [[918, 4038]]}
   - {type: tree, cells: [[919, 4038]]}
@@ -2685,11 +2582,6 @@ objects:
   - {type: tree, cells: [[940, 4038]]}
   - {type: tree, cells: [[941, 4038]]}
   - {type: tree, cells: [[942, 4038]]}
-  - {type: tree, cells: [[943, 4038]]}
-  - {type: tree, cells: [[944, 4038]]}
-  - {type: tree, cells: [[945, 4038]]}
-  - {type: tree, cells: [[946, 4038]]}
-  - {type: tree, cells: [[947, 4038]]}
   - {type: tree, cells: [[948, 4038]]}
   - {type: tree, cells: [[949, 4038]]}
   - {type: tree, cells: [[950, 4038]]}
@@ -2752,9 +2644,6 @@ objects:
   - {type: tree, cells: [[856, 4039]]}
   - {type: tree, cells: [[857, 4039]]}
   - {type: tree, cells: [[858, 4039]]}
-  - {type: tree, cells: [[859, 4039]]}
-  - {type: tree, cells: [[860, 4039]]}
-  - {type: tree, cells: [[861, 4039]]}
   - {type: tree, cells: [[862, 4039]]}
   - {type: tree, cells: [[863, 4039]]}
   - {type: tree, cells: [[864, 4039]]}
@@ -2774,7 +2663,6 @@ objects:
   - {type: tree, cells: [[913, 4039]]}
   - {type: tree, cells: [[914, 4039]]}
   - {type: tree, cells: [[915, 4039]]}
-  - {type: tree, cells: [[916, 4039]]}
   - {type: tree, cells: [[917, 4039]]}
   - {type: tree, cells: [[918, 4039]]}
   - {type: tree, cells: [[919, 4039]]}
@@ -2798,10 +2686,6 @@ objects:
   - {type: tree, cells: [[937, 4039]]}
   - {type: tree, cells: [[938, 4039]]}
   - {type: tree, cells: [[939, 4039]]}
-  - {type: tree, cells: [[940, 4039]]}
-  - {type: tree, cells: [[941, 4039]]}
-  - {type: tree, cells: [[942, 4039]]}
-  - {type: tree, cells: [[943, 4039]]}
   - {type: tree, cells: [[944, 4039]]}
   - {type: tree, cells: [[945, 4039]]}
   - {type: tree, cells: [[946, 4039]]}
@@ -2846,7 +2730,6 @@ objects:
   - {type: tree, cells: [[985, 4039]]}
   - {type: tree, cells: [[986, 4039]]}
   - {type: tree, cells: [[987, 4039]]}
-  - {type: tree, cells: [[988, 4039]]}
   - {type: tree, cells: [[989, 4039]]}
   - {type: tree, cells: [[990, 4039]]}
   - {type: tree, cells: [[991, 4039]]}
@@ -2871,8 +2754,6 @@ objects:
   - {type: tree, cells: [[858, 4040]]}
   - {type: tree, cells: [[859, 4040]]}
   - {type: tree, cells: [[860, 4040]]}
-  - {type: tree, cells: [[861, 4040]]}
-  - {type: tree, cells: [[862, 4040]]}
   - {type: tree, cells: [[863, 4040]]}
   - {type: tree, cells: [[864, 4040]]}
   - {type: tree, cells: [[865, 4040]]}
@@ -2889,8 +2770,6 @@ objects:
   - {type: tree, cells: [[913, 4040]]}
   - {type: tree, cells: [[914, 4040]]}
   - {type: tree, cells: [[915, 4040]]}
-  - {type: tree, cells: [[916, 4040]]}
-  - {type: tree, cells: [[917, 4040]]}
   - {type: tree, cells: [[918, 4040]]}
   - {type: tree, cells: [[919, 4040]]}
   - {type: tree, cells: [[920, 4040]]}
@@ -2911,9 +2790,6 @@ objects:
   - {type: tree, cells: [[935, 4040]]}
   - {type: tree, cells: [[936, 4040]]}
   - {type: tree, cells: [[937, 4040]]}
-  - {type: tree, cells: [[938, 4040]]}
-  - {type: tree, cells: [[939, 4040]]}
-  - {type: tree, cells: [[940, 4040]]}
   - {type: tree, cells: [[941, 4040]]}
   - {type: tree, cells: [[942, 4040]]}
   - {type: tree, cells: [[943, 4040]]}
@@ -2974,8 +2850,6 @@ objects:
   - {type: tree, cells: [[859, 4041]]}
   - {type: tree, cells: [[860, 4041]]}
   - {type: tree, cells: [[861, 4041]]}
-  - {type: tree, cells: [[862, 4041]]}
-  - {type: tree, cells: [[863, 4041]]}
   - {type: tree, cells: [[864, 4041]]}
   - {type: tree, cells: [[865, 4041]]}
   - {type: tree, cells: [[904, 4041]]}
@@ -2991,7 +2865,6 @@ objects:
   - {type: tree, cells: [[914, 4041]]}
   - {type: tree, cells: [[915, 4041]]}
   - {type: tree, cells: [[916, 4041]]}
-  - {type: tree, cells: [[917, 4041]]}
   - {type: tree, cells: [[918, 4041]]}
   - {type: tree, cells: [[919, 4041]]}
   - {type: tree, cells: [[920, 4041]]}
@@ -3010,9 +2883,6 @@ objects:
   - {type: tree, cells: [[933, 4041]]}
   - {type: tree, cells: [[934, 4041]]}
   - {type: tree, cells: [[935, 4041]]}
-  - {type: tree, cells: [[936, 4041]]}
-  - {type: tree, cells: [[937, 4041]]}
-  - {type: tree, cells: [[938, 4041]]}
   - {type: tree, cells: [[939, 4041]]}
   - {type: tree, cells: [[940, 4041]]}
   - {type: tree, cells: [[941, 4041]]}
@@ -3069,8 +2939,6 @@ objects:
   - {type: tree, cells: [[860, 4042]]}
   - {type: tree, cells: [[861, 4042]]}
   - {type: tree, cells: [[862, 4042]]}
-  - {type: tree, cells: [[863, 4042]]}
-  - {type: tree, cells: [[864, 4042]]}
   - {type: tree, cells: [[905, 4042]]}
   - {type: tree, cells: [[906, 4042]]}
   - {type: tree, cells: [[907, 4042]]}
@@ -3083,7 +2951,6 @@ objects:
   - {type: tree, cells: [[914, 4042]]}
   - {type: tree, cells: [[915, 4042]]}
   - {type: tree, cells: [[916, 4042]]}
-  - {type: tree, cells: [[917, 4042]]}
   - {type: tree, cells: [[918, 4042]]}
   - {type: tree, cells: [[919, 4042]]}
   - {type: tree, cells: [[920, 4042]]}
@@ -3099,10 +2966,6 @@ objects:
   - {type: tree, cells: [[930, 4042]]}
   - {type: tree, cells: [[931, 4042]]}
   - {type: tree, cells: [[932, 4042]]}
-  - {type: tree, cells: [[933, 4042]]}
-  - {type: tree, cells: [[934, 4042]]}
-  - {type: tree, cells: [[935, 4042]]}
-  - {type: tree, cells: [[936, 4042]]}
   - {type: tree, cells: [[937, 4042]]}
   - {type: tree, cells: [[938, 4042]]}
   - {type: tree, cells: [[939, 4042]]}
@@ -3173,8 +3036,6 @@ objects:
   - {type: tree, cells: [[914, 4043]]}
   - {type: tree, cells: [[915, 4043]]}
   - {type: tree, cells: [[916, 4043]]}
-  - {type: tree, cells: [[917, 4043]]}
-  - {type: tree, cells: [[918, 4043]]}
   - {type: tree, cells: [[919, 4043]]}
   - {type: tree, cells: [[920, 4043]]}
   - {type: tree, cells: [[921, 4043]]}
@@ -3187,9 +3048,6 @@ objects:
   - {type: tree, cells: [[928, 4043]]}
   - {type: tree, cells: [[929, 4043]]}
   - {type: tree, cells: [[930, 4043]]}
-  - {type: tree, cells: [[931, 4043]]}
-  - {type: tree, cells: [[932, 4043]]}
-  - {type: tree, cells: [[933, 4043]]}
   - {type: tree, cells: [[934, 4043]]}
   - {type: tree, cells: [[935, 4043]]}
   - {type: tree, cells: [[936, 4043]]}
@@ -3260,7 +3118,6 @@ objects:
   - {type: tree, cells: [[915, 4044]]}
   - {type: tree, cells: [[916, 4044]]}
   - {type: tree, cells: [[917, 4044]]}
-  - {type: tree, cells: [[918, 4044]]}
   - {type: tree, cells: [[919, 4044]]}
   - {type: tree, cells: [[920, 4044]]}
   - {type: tree, cells: [[921, 4044]]}
@@ -3269,11 +3126,6 @@ objects:
   - {type: tree, cells: [[924, 4044]]}
   - {type: tree, cells: [[925, 4044]]}
   - {type: tree, cells: [[926, 4044]]}
-  - {type: tree, cells: [[927, 4044]]}
-  - {type: tree, cells: [[928, 4044]]}
-  - {type: tree, cells: [[929, 4044]]}
-  - {type: tree, cells: [[930, 4044]]}
-  - {type: tree, cells: [[931, 4044]]}
   - {type: tree, cells: [[932, 4044]]}
   - {type: tree, cells: [[933, 4044]]}
   - {type: tree, cells: [[934, 4044]]}
@@ -3339,14 +3191,12 @@ objects:
   - {type: tree, cells: [[915, 4045]]}
   - {type: tree, cells: [[916, 4045]]}
   - {type: tree, cells: [[917, 4045]]}
-  - {type: tree, cells: [[918, 4045]]}
   - {type: tree, cells: [[919, 4045]]}
   - {type: tree, cells: [[920, 4045]]}
   - {type: tree, cells: [[923, 4045]]}
   - {type: tree, cells: [[924, 4045]]}
   - {type: tree, cells: [[925, 4045]]}
   - {type: tree, cells: [[926, 4045]]}
-  - {type: tree, cells: [[927, 4045]]}
   - {type: tree, cells: [[928, 4045]]}
   - {type: tree, cells: [[929, 4045]]}
   - {type: tree, cells: [[930, 4045]]}
@@ -3407,7 +3257,6 @@ objects:
   - {type: tree, cells: [[915, 4046]]}
   - {type: tree, cells: [[916, 4046]]}
   - {type: tree, cells: [[917, 4046]]}
-  - {type: tree, cells: [[918, 4046]]}
   - {type: tree, cells: [[924, 4046]]}
   - {type: tree, cells: [[925, 4046]]}
   - {type: tree, cells: [[926, 4046]]}
@@ -5746,7 +5595,6 @@ objects:
   - {type: tree, cells: [[992, 3863]]}
   - {type: tree, cells: [[993, 3863]]}
   - {type: tree, cells: [[994, 3863]]}
-  - {type: tree, cells: [[995, 3863]]}
   - {type: tree, cells: [[989, 3864]]}
   - {type: tree, cells: [[990, 3864]]}
   - {type: tree, cells: [[991, 3864]]}
@@ -5795,26 +5643,21 @@ objects:
   - {type: tree, cells: [[982, 3874]]}
   - {type: tree, cells: [[971, 3998]]}
   - {type: tree, cells: [[972, 3998]]}
-  - {type: tree, cells: [[973, 3998]]}
   - {type: tree, cells: [[974, 3998]]}
   - {type: tree, cells: [[970, 3999]]}
   - {type: tree, cells: [[971, 3999]]}
   - {type: tree, cells: [[972, 3999]]}
-  - {type: tree, cells: [[973, 3999]]}
   - {type: tree, cells: [[974, 3999]]}
   - {type: tree, cells: [[969, 4000]]}
   - {type: tree, cells: [[970, 4000]]}
   - {type: tree, cells: [[971, 4000]]}
   - {type: tree, cells: [[972, 4000]]}
-  - {type: tree, cells: [[973, 4000]]}
   - {type: tree, cells: [[974, 4000]]}
   - {type: tree, cells: [[959, 4001]]}
   - {type: tree, cells: [[968, 4001]]}
   - {type: tree, cells: [[969, 4001]]}
   - {type: tree, cells: [[970, 4001]]}
   - {type: tree, cells: [[971, 4001]]}
-  - {type: tree, cells: [[972, 4001]]}
-  - {type: tree, cells: [[973, 4001]]}
   - {type: tree, cells: [[974, 4001]]}
   - {type: tree, cells: [[957, 4002]]}
   - {type: tree, cells: [[958, 4002]]}
@@ -5824,7 +5667,6 @@ objects:
   - {type: tree, cells: [[969, 4002]]}
   - {type: tree, cells: [[970, 4002]]}
   - {type: tree, cells: [[971, 4002]]}
-  - {type: tree, cells: [[972, 4002]]}
   - {type: tree, cells: [[973, 4002]]}
   - {type: tree, cells: [[974, 4002]]}
   - {type: tree, cells: [[956, 4003]]}
@@ -5837,7 +5679,6 @@ objects:
   - {type: tree, cells: [[969, 4003]]}
   - {type: tree, cells: [[970, 4003]]}
   - {type: tree, cells: [[971, 4003]]}
-  - {type: tree, cells: [[972, 4003]]}
   - {type: tree, cells: [[973, 4003]]}
   - {type: tree, cells: [[974, 4003]]}
   - {type: tree, cells: [[975, 4003]]}
@@ -5853,7 +5694,6 @@ objects:
   - {type: tree, cells: [[969, 4004]]}
   - {type: tree, cells: [[970, 4004]]}
   - {type: tree, cells: [[971, 4004]]}
-  - {type: tree, cells: [[972, 4004]]}
   - {type: tree, cells: [[973, 4004]]}
   - {type: tree, cells: [[974, 4004]]}
   - {type: tree, cells: [[975, 4004]]}
@@ -5868,7 +5708,6 @@ objects:
   - {type: tree, cells: [[969, 4005]]}
   - {type: tree, cells: [[970, 4005]]}
   - {type: tree, cells: [[971, 4005]]}
-  - {type: tree, cells: [[972, 4005]]}
   - {type: tree, cells: [[973, 4005]]}
   - {type: tree, cells: [[974, 4005]]}
   - {type: tree, cells: [[975, 4005]]}
@@ -5884,7 +5723,6 @@ objects:
   - {type: tree, cells: [[969, 4006]]}
   - {type: tree, cells: [[970, 4006]]}
   - {type: tree, cells: [[971, 4006]]}
-  - {type: tree, cells: [[972, 4006]]}
   - {type: tree, cells: [[973, 4006]]}
   - {type: tree, cells: [[974, 4006]]}
   - {type: tree, cells: [[975, 4006]]}
@@ -5899,7 +5737,6 @@ objects:
   - {type: tree, cells: [[964, 4007]]}
   - {type: tree, cells: [[970, 4007]]}
   - {type: tree, cells: [[971, 4007]]}
-  - {type: tree, cells: [[972, 4007]]}
   - {type: tree, cells: [[973, 4007]]}
   - {type: tree, cells: [[974, 4007]]}
   - {type: tree, cells: [[975, 4007]]}
@@ -5914,8 +5751,6 @@ objects:
   - {type: tree, cells: [[965, 4008]]}
   - {type: tree, cells: [[970, 4008]]}
   - {type: tree, cells: [[971, 4008]]}
-  - {type: tree, cells: [[972, 4008]]}
-  - {type: tree, cells: [[973, 4008]]}
   - {type: tree, cells: [[974, 4008]]}
   - {type: tree, cells: [[975, 4008]]}
   - {type: tree, cells: [[958, 4009]]}
@@ -5929,7 +5764,6 @@ objects:
   - {type: tree, cells: [[970, 4009]]}
   - {type: tree, cells: [[971, 4009]]}
   - {type: tree, cells: [[972, 4009]]}
-  - {type: tree, cells: [[973, 4009]]}
   - {type: tree, cells: [[974, 4009]]}
   - {type: tree, cells: [[975, 4009]]}
   - {type: tree, cells: [[976, 4009]]}
@@ -5943,7 +5777,6 @@ objects:
   - {type: tree, cells: [[966, 4010]]}
   - {type: tree, cells: [[971, 4010]]}
   - {type: tree, cells: [[972, 4010]]}
-  - {type: tree, cells: [[973, 4010]]}
   - {type: tree, cells: [[974, 4010]]}
   - {type: tree, cells: [[975, 4010]]}
   - {type: tree, cells: [[976, 4010]]}
@@ -5958,7 +5791,6 @@ objects:
   - {type: tree, cells: [[967, 4011]]}
   - {type: tree, cells: [[971, 4011]]}
   - {type: tree, cells: [[972, 4011]]}
-  - {type: tree, cells: [[973, 4011]]}
   - {type: tree, cells: [[974, 4011]]}
   - {type: tree, cells: [[975, 4011]]}
   - {type: tree, cells: [[976, 4011]]}
@@ -5971,8 +5803,6 @@ objects:
   - {type: tree, cells: [[966, 4012]]}
   - {type: tree, cells: [[967, 4012]]}
   - {type: tree, cells: [[972, 4012]]}
-  - {type: tree, cells: [[973, 4012]]}
-  - {type: tree, cells: [[974, 4012]]}
   - {type: tree, cells: [[975, 4012]]}
   - {type: tree, cells: [[976, 4012]]}
   - {type: tree, cells: [[960, 4013]]}
@@ -5986,7 +5816,6 @@ objects:
   - {type: tree, cells: [[968, 4013]]}
   - {type: tree, cells: [[972, 4013]]}
   - {type: tree, cells: [[973, 4013]]}
-  - {type: tree, cells: [[974, 4013]]}
   - {type: tree, cells: [[975, 4013]]}
   - {type: tree, cells: [[976, 4013]]}
   - {type: tree, cells: [[961, 4014]]}
@@ -6000,7 +5829,6 @@ objects:
   - {type: tree, cells: [[969, 4014]]}
   - {type: tree, cells: [[972, 4014]]}
   - {type: tree, cells: [[973, 4014]]}
-  - {type: tree, cells: [[974, 4014]]}
   - {type: tree, cells: [[975, 4014]]}
   - {type: tree, cells: [[976, 4014]]}
   - {type: tree, cells: [[977, 4014]]}
@@ -6017,7 +5845,6 @@ objects:
   - {type: tree, cells: [[971, 4015]]}
   - {type: tree, cells: [[972, 4015]]}
   - {type: tree, cells: [[973, 4015]]}
-  - {type: tree, cells: [[974, 4015]]}
   - {type: tree, cells: [[975, 4015]]}
   - {type: tree, cells: [[976, 4015]]}
   - {type: tree, cells: [[962, 4016]]}
@@ -6032,7 +5859,6 @@ objects:
   - {type: tree, cells: [[971, 4016]]}
   - {type: tree, cells: [[972, 4016]]}
   - {type: tree, cells: [[973, 4016]]}
-  - {type: tree, cells: [[974, 4016]]}
   - {type: tree, cells: [[962, 4017]]}
   - {type: tree, cells: [[963, 4017]]}
   - {type: tree, cells: [[964, 4017]]}
@@ -6435,7 +6261,6 @@ objects:
   - {type: tree, cells: [[789, 4056]]}
   - {type: tree, cells: [[790, 4056]]}
   - {type: tree, cells: [[791, 4056]]}
-  - {type: tree, cells: [[792, 4056]]}
   - {type: tree, cells: [[782, 4057]]}
   - {type: tree, cells: [[783, 4057]]}
   - {type: tree, cells: [[784, 4057]]}
@@ -6449,7 +6274,6 @@ objects:
   - {type: tree, cells: [[785, 4058]]}
   - {type: tree, cells: [[789, 4058]]}
   - {type: tree, cells: [[790, 4058]]}
-  - {type: tree, cells: [[791, 4058]]}
   - {type: tree, cells: [[789, 4059]]}
   - {type: tree, cells: [[790, 4059]]}
   - {type: tree, cells: [[789, 4060]]}
@@ -6935,6 +6759,44 @@ objects:
   - {type: tree, cells: [[770, 3873]]}
   - {type: tree, cells: [[771, 3873]]}
   - {type: tree, cells: [[772, 3873]]}
+  - {type: building, cells: [[768, 3849], [769, 3849], [768, 3850], [769, 3850], [770, 3850], [768, 3851], [769, 3851], [770, 3851]]}
+  - {type: building, cells: [[768, 3852], [769, 3852], [770, 3852]]}
+  - {type: building, cells: [[768, 3856], [768, 3857]]}
+  - {type: building, cells: [[768, 3863]]}
+  - {type: building, cells: [[768, 3864], [768, 3865], [768, 3866], [769, 3866], [768, 3867], [769, 3867]]}
+  - {type: building, cells: [[768, 3868], [769, 3868], [768, 3869], [769, 3869], [770, 3869], [768, 3870], [768, 3871], [769, 3871]]}
+  - {type: building, cells: [[768, 3872], [769, 3872], [770, 3872]]}
+  - {type: building, cells: [[768, 3874], [768, 3875], [769, 3875], [770, 3875], [771, 3875]]}
+  - {type: building, cells: [[772, 3875]]}
+  - {type: building, cells: [[768, 3876]]}
+  - {type: building, cells: [[771, 3876], [770, 3877], [771, 3877], [769, 3878], [770, 3878], [768, 3879], [769, 3879]]}
+  - {type: building, cells: [[772, 3876]]}
+  - {type: building, cells: [[830, 3878], [831, 3878], [828, 3879], [829, 3879], [830, 3879], [831, 3879]]}
+  - {type: building, cells: [[832, 3879]]}
+  - {type: building, cells: [[768, 3880]]}
+  - {type: building, cells: [[826, 3880], [827, 3880], [825, 3881], [826, 3881], [827, 3881], [827, 3882], [827, 3883]]}
+  - {type: building, cells: [[828, 3880], [829, 3880], [830, 3880], [831, 3880], [828, 3881], [829, 3881], [830, 3881], [831, 3881], [828, 3882], [829, 3882], [830, 3882], [831, 3882], [828, 3883], [829, 3883], [830, 3883], [831, 3883]]}
+  - {type: building, cells: [[832, 3880], [834, 3880], [835, 3880], [832, 3881], [833, 3881], [834, 3881], [835, 3881], [832, 3882], [833, 3882], [834, 3882], [835, 3882], [832, 3883], [833, 3883], [834, 3883], [835, 3883]]}
+  - {type: building, cells: [[836, 3880], [836, 3881], [836, 3882], [836, 3883], [837, 3883]]}
+  - {type: building, cells: [[825, 3883]]}
+  - {type: building, cells: [[840, 3883], [841, 3883]]}
+  - {type: building, cells: [[828, 3884], [829, 3884], [830, 3884], [831, 3884], [829, 3885], [830, 3885], [831, 3885], [830, 3886], [831, 3886], [830, 3887]]}
+  - {type: building, cells: [[832, 3884], [833, 3884], [834, 3884], [835, 3884], [832, 3885], [833, 3885], [834, 3885], [835, 3885], [832, 3886], [833, 3886]]}
+  - {type: building, cells: [[836, 3884], [837, 3884], [838, 3884], [839, 3884], [836, 3885]]}
+  - {type: building, cells: [[827, 3886]]}
+  - {type: building, cells: [[838, 3886], [839, 3886], [836, 3887], [837, 3887], [838, 3887], [839, 3887]]}
+  - {type: building, cells: [[840, 3886], [840, 3887]]}
+  - {type: building, cells: [[828, 3887]]}
+  - {type: building, cells: [[835, 3887]]}
+  - {type: building, cells: [[832, 3888], [833, 3888], [834, 3888], [835, 3888], [832, 3889], [833, 3889], [834, 3889], [835, 3889], [832, 3890], [833, 3890], [834, 3890], [835, 3890], [833, 3891], [834, 3891]]}
+  - {type: building, cells: [[836, 3888], [837, 3888], [838, 3888], [839, 3888], [836, 3889], [837, 3889], [838, 3889], [839, 3889], [836, 3890], [837, 3890], [838, 3890]]}
+  - {type: building, cells: [[840, 3888], [840, 3889], [841, 3889]]}
+  - {type: building, cells: [[827, 3889], [825, 3890], [826, 3890], [827, 3890], [825, 3891], [826, 3891], [827, 3891]]}
+  - {type: building, cells: [[828, 3889], [829, 3889], [828, 3890], [829, 3890], [828, 3891], [829, 3891], [830, 3891]]}
+  - {type: building, cells: [[831, 3889]]}
+  - {type: building, cells: [[826, 3892], [827, 3892], [826, 3893], [827, 3893], [827, 3894], [827, 3895]]}
+  - {type: building, cells: [[828, 3892], [829, 3892], [830, 3892], [831, 3892], [828, 3893], [829, 3893], [830, 3893], [831, 3893], [828, 3894], [829, 3894], [830, 3894], [831, 3894], [828, 3895], [829, 3895], [830, 3895], [831, 3895]]}
+  - {type: building, cells: [[832, 3894]]}
 constructions:
   - {type: reinforced_bridge, cells: [[771, 3854], [770, 3854], [770, 3855], [770, 3856]]}
   - {type: bridge, cells: [[801, 3885], [802, 3885]]}

@@ -58,7 +58,7 @@ void main() {
             loadTrees: (_) async => const [TreeModel(parts: [], baseY: 0)],
             loadUnits: (_) async => const UnitModels(),
             loadGround: (_) async => const GroundMaterials({}),
-            worldBuilder: (map, _, _, _) => FakeWorld(map),
+            worldBuilder: (map, _, _, _, _) => FakeWorld(map),
             sceneBuilder: (_, _, _, _) => const SizedBox.expand(),
           ),
         ),

@@ -138,6 +138,7 @@ class BattleState extends Equatable {
     this.relics = const [],
     this.team,
     this.sectionId,
+    this.weather,
     this.selectedId,
     this.targetId,
     this.groundFire = false,
@@ -169,6 +170,10 @@ class BattleState extends Equatable {
 
   /// The player's section.
   final String? sectionId;
+
+  /// The battle's weather, a key of `terrain.yaml` `weather` (MAP-31); null
+  /// until the host's whole view came.
+  final String? weather;
 
   /// The selected unit, one of the section's.
   final String? selectedId;
@@ -259,6 +264,7 @@ class BattleState extends Equatable {
     List<RelicView>? relics,
     String? team,
     String? sectionId,
+    String? weather,
     String? Function()? selectedId,
     String? Function()? targetId,
     bool? groundFire,
@@ -278,6 +284,7 @@ class BattleState extends Equatable {
     relics: relics ?? this.relics,
     team: team ?? this.team,
     sectionId: sectionId ?? this.sectionId,
+    weather: weather ?? this.weather,
     selectedId: selectedId == null ? this.selectedId : selectedId(),
     targetId: targetId == null ? this.targetId : targetId(),
     groundFire: groundFire ?? this.groundFire,
@@ -300,6 +307,7 @@ class BattleState extends Equatable {
     relics,
     team,
     sectionId,
+    weather,
     selectedId,
     targetId,
     groundFire,

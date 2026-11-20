@@ -6,19 +6,27 @@ const width = 10;
 
 int at(int x, int y) => y * width + x;
 
+/// Each of [cells] a building of its own, its roof 6 m above the ground at
+/// its centre, in the first look.
 List<BuildingArrays> build(
   List<int> cells, {
   double Function(double east, double south)? heightAt,
+  double? slabM,
   int maxVertices = 24000,
-}) => buildingArrays(
-  cells: cells,
-  width: width,
-  cellSizeM: 10,
-  heightAt: heightAt ?? (east, south) => 0,
-  isBuilding: (x, y) =>
-      x >= 0 && x < width && y >= 0 && cells.contains(at(x, y)),
-  maxVertices: maxVertices,
-);
+}) {
+  final ground = heightAt ?? (east, south) => 0;
+  return buildingArrays(
+    cells: cells,
+    width: width,
+    cellSizeM: 10,
+    heightAt: ground,
+    topAt: (x, y) => x >= 0 && x < width && y >= 0 && cells.contains(at(x, y))
+        ? (roof: ground(x * 10 + 5, y * 10 + 5) + 6, look: buildingLooks.first)
+        : null,
+    slabM: slabM,
+    maxVertices: maxVertices,
+  );
+}
 
 Vector3 vertex(BuildingArrays mesh, int index) => Vector3(
   mesh.positions[index * 3],
@@ -84,15 +92,15 @@ void main() {
       final mesh = build([at(0, 0)]).single;
 
       expect(mesh.colors.sublist(0, 4), [
-        closeTo(buildingRoofColor.$1, 1e-6),
-        closeTo(buildingRoofColor.$2, 1e-6),
-        closeTo(buildingRoofColor.$3, 1e-6),
+        closeTo(buildingLooks.first.roof.$1, 1e-6),
+        closeTo(buildingLooks.first.roof.$2, 1e-6),
+        closeTo(buildingLooks.first.roof.$3, 1e-6),
         1,
       ]);
       expect(mesh.colors.sublist(16, 20), [
-        closeTo(buildingWallColor.$1, 1e-6),
-        closeTo(buildingWallColor.$2, 1e-6),
-        closeTo(buildingWallColor.$3, 1e-6),
+        closeTo(buildingLooks.first.walls.$1, 1e-6),
+        closeTo(buildingLooks.first.walls.$2, 1e-6),
+        closeTo(buildingLooks.first.walls.$3, 1e-6),
         1,
       ]);
     });
@@ -153,13 +161,64 @@ void main() {
         for (var v = 0; v < 20; v++)
           if (mesh.normals[v * 3] == 1) vertex(mesh, v).y,
       ];
-      expect(east.reduce((a, b) => a < b ? a : b), 2);
+      expect(east.reduce((a, b) => a < b ? a : b), 2.5);
     });
 
     test('a building at the edge of the map has all its walls', () {
       final mesh = build([at(0, 0)]).single;
 
       expect(mesh.indices, hasLength(10 * 3));
+    });
+
+    test('between two buildings of different heights, a wall steps down '
+        'from the higher roof to the lower one', () {
+      final mesh = buildingArrays(
+        cells: [at(2, 3), at(3, 3)],
+        width: width,
+        cellSizeM: 10,
+        heightAt: (east, south) => 0,
+        topAt: (x, y) => switch ((x, y)) {
+          (2, 3) => (roof: 14.0, look: buildingLooks[0]),
+          (3, 3) => (roof: 8.0, look: buildingLooks[1]),
+          _ => null,
+        },
+      ).single;
+
+      final steps = <double>{
+        for (var v = 0; v < mesh.normals.length ~/ 3; v++)
+          if (mesh.normals[v * 3] == 1 && vertex(mesh, v).x == 30)
+            vertex(mesh, v).y,
+      };
+      expect(steps, {14, 8});
+      // The step is a wall of the higher building.
+      for (var v = 0; v < mesh.normals.length ~/ 3; v++) {
+        if (mesh.normals[v * 3] == 1 && vertex(mesh, v).x == 30) {
+          expect(mesh.colors[v * 4], closeTo(buildingLooks[0].walls.$1, 1e-6));
+        }
+      }
+    });
+
+    test('a slab, a bridge deck, is that thick, with an underside', () {
+      final mesh = build([at(2, 3), at(3, 3)], slabM: 1.5).single;
+
+      expect(quadsFacing(mesh, Vector3(0, -1, 0)), 2);
+      final ys = {
+        for (var v = 0; v < mesh.positions.length ~/ 3; v++) vertex(mesh, v).y,
+      };
+      expect(ys, {6, 4.5});
+    });
+
+    test('a cell no building stands on draws nothing', () {
+      final mesh = buildingArrays(
+        cells: [at(2, 3), at(5, 5)],
+        width: width,
+        cellSizeM: 10,
+        heightAt: (east, south) => 0,
+        topAt: (x, y) =>
+            (x, y) == (2, 3) ? (roof: 6.0, look: buildingLooks[0]) : null,
+      ).single;
+
+      expect(mesh.positions, hasLength(20 * 3));
     });
 
     test('buildings past the most vertices go to another mesh', () {
@@ -176,6 +235,65 @@ void main() {
           isTrue,
         );
       }
+    });
+  });
+
+  group('buildingTops', () {
+    test('a building has one flat roof over all its cells, its height above '
+        'the highest ground at their centres, and one look', () {
+      final tops = buildingTops(
+        buildings: [
+          [(2, 3), (3, 3), (2, 4)],
+          [(7, 7)],
+        ],
+        width: width,
+        cellSizeM: 10,
+        // The ground rises 1 m every 10 m to the east.
+        heightAt: (east, south) => east / 10,
+      );
+
+      expect(tops.keys, {at(2, 3), at(3, 3), at(2, 4), at(7, 7)});
+      final block = tops[at(2, 3)]!;
+      expect(tops[at(3, 3)], same(block));
+      expect(tops[at(2, 4)], same(block));
+      final seed = buildingSeed(2, 3);
+      expect(block.roof, 3.5 + buildingHeightM(3, seed));
+      expect(block.look, buildingLooks[seed % buildingLooks.length]);
+      expect(
+        tops[at(7, 7)]!.roof,
+        7.5 + buildingHeightM(1, buildingSeed(7, 7)),
+      );
+    });
+
+    test('a building without cells has no top', () {
+      expect(
+        buildingTops(
+          buildings: [[]],
+          width: width,
+          cellSizeM: 10,
+          heightAt: (east, south) => 0,
+        ),
+        isEmpty,
+      );
+    });
+
+    test('a house is 5 to 8 m tall, a block of three cells or more 8, 11 or '
+        '14 m', () {
+      final houses = {
+        for (var seed = 0; seed < 20; seed++) buildingHeightM(1, seed),
+      };
+      expect(houses, {5, 6, 7, 8});
+      expect(buildingHeightM(2, 3), 8);
+      final blocks = {
+        for (var seed = 0; seed < 20; seed++) buildingHeightM(16, seed),
+      };
+      expect(blocks, {8, 11, 14});
+    });
+
+    test('the same building always gets the same seed', () {
+      expect(buildingSeed(499, 1830), buildingSeed(499, 1830));
+      expect(buildingSeed(499, 1830), isNot(buildingSeed(1830, 499)));
+      expect(buildingSeed(999, 4999), greaterThanOrEqualTo(0));
     });
   });
 }

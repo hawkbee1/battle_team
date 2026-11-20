@@ -50,8 +50,8 @@ void main() {
 
       expect(pixels.length, 4 * 3 * 4);
       // Row 1 of the map is the road, the page's first row.
-      expect(pixels.sublist(0, 4), [158, 148, 128, 255]);
-      expect(pixels.sublist(3 * 4, 4 * 4), [158, 148, 128, 255]);
+      expect(pixels.sublist(0, 4), [92, 92, 97, 255]);
+      expect(pixels.sublist(3 * 4, 4 * 4), [92, 92, 97, 255]);
       // Row 2 is grass.
       expect(pixels.sublist(4 * 4, 5 * 4), [120, 158, 79, 255]);
       expect(pixels.sublist(11 * 4), [120, 158, 79, 255]);

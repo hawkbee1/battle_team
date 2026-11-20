@@ -292,7 +292,8 @@ void main() {
   });
 
   group('objectChunks', () {
-    test('groups the trees and buildings by chunk, and nothing else', () {
+    test('groups the trees, buildings and bridges by chunk, and nothing '
+        'else', () {
       final map = mapOf(
         200,
         100,
@@ -312,6 +313,11 @@ void main() {
             type: 'wall',
             cells: [CellRef(5, 5)],
           ),
+          MapFeature(
+            kind: FeatureKind.construction,
+            type: 'reinforced_bridge',
+            cells: [CellRef(70, 3), CellRef(71, 3)],
+          ),
         ],
       );
 
@@ -320,6 +326,8 @@ void main() {
       expect(chunks.keys, [(x: 0, y: 0), (x: 1, y: 0), (x: 2, y: 1)]);
       expect(chunks[(x: 0, y: 0)]!.trees, [2 * 200 + 1, 63 * 200 + 63]);
       expect(chunks[(x: 1, y: 0)]!.trees, [2 * 200 + 64]);
+      expect(chunks[(x: 1, y: 0)]!.bridges, [3 * 200 + 70, 3 * 200 + 71]);
+      expect(chunks[(x: 0, y: 0)]!.bridges, isEmpty);
       expect(chunks[(x: 2, y: 1)]!.buildings, [70 * 200 + 130]);
       expect(chunks[(x: 2, y: 1)]!.trees, isEmpty);
     });

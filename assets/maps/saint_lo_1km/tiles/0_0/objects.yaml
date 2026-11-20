@@ -186,7 +186,6 @@ objects:
   - {type: tree, cells: [[31, 0]]}
   - {type: tree, cells: [[32, 0]]}
   - {type: tree, cells: [[33, 0]]}
-  - {type: tree, cells: [[34, 0]]}
   - {type: tree, cells: [[21, 1]]}
   - {type: tree, cells: [[22, 1]]}
   - {type: tree, cells: [[23, 1]]}
@@ -200,7 +199,6 @@ objects:
   - {type: tree, cells: [[31, 1]]}
   - {type: tree, cells: [[32, 1]]}
   - {type: tree, cells: [[33, 1]]}
-  - {type: tree, cells: [[34, 1]]}
   - {type: tree, cells: [[21, 2]]}
   - {type: tree, cells: [[22, 2]]}
   - {type: tree, cells: [[23, 2]]}
@@ -213,7 +211,6 @@ objects:
   - {type: tree, cells: [[30, 2]]}
   - {type: tree, cells: [[31, 2]]}
   - {type: tree, cells: [[32, 2]]}
-  - {type: tree, cells: [[33, 2]]}
   - {type: tree, cells: [[21, 3]]}
   - {type: tree, cells: [[22, 3]]}
   - {type: tree, cells: [[23, 3]]}
@@ -226,7 +223,6 @@ objects:
   - {type: tree, cells: [[30, 3]]}
   - {type: tree, cells: [[31, 3]]}
   - {type: tree, cells: [[32, 3]]}
-  - {type: tree, cells: [[33, 3]]}
   - {type: tree, cells: [[21, 4]]}
   - {type: tree, cells: [[22, 4]]}
   - {type: tree, cells: [[23, 4]]}
@@ -238,7 +234,6 @@ objects:
   - {type: tree, cells: [[29, 4]]}
   - {type: tree, cells: [[30, 4]]}
   - {type: tree, cells: [[31, 4]]}
-  - {type: tree, cells: [[32, 4]]}
   - {type: tree, cells: [[22, 5]]}
   - {type: tree, cells: [[23, 5]]}
   - {type: tree, cells: [[24, 5]]}
@@ -249,7 +244,6 @@ objects:
   - {type: tree, cells: [[29, 5]]}
   - {type: tree, cells: [[30, 5]]}
   - {type: tree, cells: [[31, 5]]}
-  - {type: tree, cells: [[32, 5]]}
   - {type: tree, cells: [[22, 6]]}
   - {type: tree, cells: [[23, 6]]}
   - {type: tree, cells: [[24, 6]]}
@@ -259,7 +253,6 @@ objects:
   - {type: tree, cells: [[28, 6]]}
   - {type: tree, cells: [[29, 6]]}
   - {type: tree, cells: [[30, 6]]}
-  - {type: tree, cells: [[31, 6]]}
   - {type: tree, cells: [[22, 7]]}
   - {type: tree, cells: [[23, 7]]}
   - {type: tree, cells: [[24, 7]]}
@@ -269,7 +262,6 @@ objects:
   - {type: tree, cells: [[28, 7]]}
   - {type: tree, cells: [[29, 7]]}
   - {type: tree, cells: [[30, 7]]}
-  - {type: tree, cells: [[31, 7]]}
   - {type: tree, cells: [[22, 8]]}
   - {type: tree, cells: [[23, 8]]}
   - {type: tree, cells: [[24, 8]]}
@@ -278,7 +270,6 @@ objects:
   - {type: tree, cells: [[27, 8]]}
   - {type: tree, cells: [[28, 8]]}
   - {type: tree, cells: [[29, 8]]}
-  - {type: tree, cells: [[30, 8]]}
   - {type: tree, cells: [[22, 9]]}
   - {type: tree, cells: [[23, 9]]}
   - {type: tree, cells: [[24, 9]]}
@@ -287,7 +278,6 @@ objects:
   - {type: tree, cells: [[27, 9]]}
   - {type: tree, cells: [[28, 9]]}
   - {type: tree, cells: [[29, 9]]}
-  - {type: tree, cells: [[30, 9]]}
   - {type: tree, cells: [[14, 10]]}
   - {type: tree, cells: [[15, 10]]}
   - {type: tree, cells: [[16, 10]]}
@@ -303,7 +293,6 @@ objects:
   - {type: tree, cells: [[26, 10]]}
   - {type: tree, cells: [[27, 10]]}
   - {type: tree, cells: [[28, 10]]}
-  - {type: tree, cells: [[29, 10]]}
   - {type: tree, cells: [[14, 11]]}
   - {type: tree, cells: [[15, 11]]}
   - {type: tree, cells: [[16, 11]]}
@@ -332,7 +321,6 @@ objects:
   - {type: tree, cells: [[25, 12]]}
   - {type: tree, cells: [[26, 12]]}
   - {type: tree, cells: [[27, 12]]}
-  - {type: tree, cells: [[28, 12]]}
   - {type: tree, cells: [[13, 13]]}
   - {type: tree, cells: [[17, 13]]}
   - {type: tree, cells: [[18, 13]]}
@@ -356,7 +344,6 @@ objects:
   - {type: tree, cells: [[24, 14]]}
   - {type: tree, cells: [[25, 14]]}
   - {type: tree, cells: [[26, 14]]}
-  - {type: tree, cells: [[27, 14]]}
   - {type: tree, cells: [[13, 15]]}
   - {type: tree, cells: [[14, 15]]}
   - {type: tree, cells: [[15, 15]]}
@@ -446,7 +433,6 @@ objects:
   - {type: tree, cells: [[20, 21]]}
   - {type: tree, cells: [[21, 21]]}
   - {type: tree, cells: [[22, 21]]}
-  - {type: tree, cells: [[23, 21]]}
   - {type: tree, cells: [[12, 22]]}
   - {type: tree, cells: [[13, 22]]}
   - {type: tree, cells: [[14, 22]]}
@@ -1638,27 +1624,11 @@ objects:
   - {type: tree, cells: [[82, 25]]}
   - {type: tree, cells: [[83, 25]]}
   - {type: tree, cells: [[84, 25]]}
-  - {type: tree, cells: [[85, 25]]}
-  - {type: tree, cells: [[86, 25]]}
-  - {type: tree, cells: [[87, 25]]}
-  - {type: tree, cells: [[88, 25]]}
-  - {type: tree, cells: [[89, 25]]}
-  - {type: tree, cells: [[90, 25]]}
-  - {type: tree, cells: [[91, 25]]}
-  - {type: tree, cells: [[92, 25]]}
-  - {type: tree, cells: [[93, 25]]}
-  - {type: tree, cells: [[94, 25]]}
   - {type: tree, cells: [[95, 25]]}
   - {type: tree, cells: [[96, 25]]}
   - {type: tree, cells: [[97, 25]]}
   - {type: tree, cells: [[98, 25]]}
   - {type: tree, cells: [[99, 25]]}
-  - {type: tree, cells: [[80, 26]]}
-  - {type: tree, cells: [[81, 26]]}
-  - {type: tree, cells: [[82, 26]]}
-  - {type: tree, cells: [[83, 26]]}
-  - {type: tree, cells: [[84, 26]]}
-  - {type: tree, cells: [[85, 26]]}
   - {type: tree, cells: [[86, 26]]}
   - {type: tree, cells: [[87, 26]]}
   - {type: tree, cells: [[88, 26]]}
@@ -1667,8 +1637,6 @@ objects:
   - {type: tree, cells: [[91, 26]]}
   - {type: tree, cells: [[92, 26]]}
   - {type: tree, cells: [[93, 26]]}
-  - {type: tree, cells: [[94, 26]]}
-  - {type: tree, cells: [[95, 26]]}
   - {type: tree, cells: [[96, 26]]}
   - {type: tree, cells: [[97, 26]]}
   - {type: tree, cells: [[78, 27]]}
