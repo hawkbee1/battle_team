@@ -74,6 +74,12 @@ FogModel? _update(
   worldVersion: version,
 );
 
+/// A hill 30 m high on the fourth cell of a row of 30 cells.
+final String _hill = [
+  for (var x = 0; x < 30; x++)
+    if (x == 3) '30' else '0',
+].join(' ');
+
 Set<int> _litColumns(FogModel fog, {int y = 0}) => {
   for (var x = 0; x < fog.width; x++)
     if (fog.isLit(x, y)) x,
@@ -236,6 +242,106 @@ void main() {
       expect(_litColumns(open), hasLength(8));
       expect(_litColumns(built), {0, 1, 2});
       expect(_litColumns(destroyed), hasLength(8));
+    });
+
+    test('MAP-07 a crater dug within reach is applied on top of the layer: '
+        'the hill dug away stops blocking, while a unit that moved sees from '
+        'where it is; a crater out of reach changes nothing', () {
+      final tracker = testTracker(
+        sight: testSight(map: _row('g' * 30, heights: _hill)),
+      );
+      final hill = CraterDug(
+        at: Position.metres(35, 5, 0),
+        radiusM: 6,
+        depthM: 30,
+      );
+      // Range 100 m, and up to 150 m more from height: 25 cells.
+      final far = CraterDug(
+        at: Position.metres(295, 5, 0),
+        radiusM: 4,
+        depthM: 3,
+      );
+      final scout = _own('u-1', x: 0, range: 100);
+
+      final blocked = _update(tracker, [scout, _own('u-2', x: 20, range: 10)])!;
+      final dug = _update(
+        tracker,
+        [scout, _own('u-2', x: 22, range: 10)],
+        world: [hill],
+        version: 1,
+      )!;
+      final again = _update(
+        tracker,
+        [scout, _own('u-2', x: 22, range: 10)],
+        world: [hill, far],
+        version: 2,
+      );
+
+      expect(_litColumns(blocked), {0, 1, 2, 3, 19, 20, 21});
+      expect(_litColumns(dug), {for (var x = 0; x <= 10; x++) x, 21, 22, 23});
+      expect(dug.levelOf(20, 0), FogLevel.seen);
+      expect(again, isNull);
+      expect(tracker.model, same(dug));
+    });
+
+    test('MAP-08 a layer the host sends whole again, after a resync, is '
+        'applied anew on the map as built', () {
+      final tracker = testTracker(sight: testSight(map: _row('g' * 10)));
+      final units = [_own('u-1', x: 0, range: 100)];
+      StructureBuilt wall(int x) => StructureBuilt(
+        siteId: 'w-$x',
+        structure: 'wall',
+        cells: [Cell(x, 0)],
+      );
+
+      final walled = _update(tracker, units, world: [wall(2)], version: 1)!;
+      // The same layer, as a resync sends it: the same events, new.
+      final same = _update(tracker, units, world: [wall(2)], version: 2);
+      final other = _update(tracker, units, world: [wall(5)], version: 3)!;
+
+      expect(_litColumns(walled), {0, 1, 2});
+      expect(same, isNull);
+      expect(_litColumns(other), {0, 1, 2, 3, 4, 5});
+    });
+
+    test('MAP-29 a cell stays lit while one of the units sees it', () {
+      final tracker = testTracker(sight: testSight(map: _row('g' * 20)));
+      final a = _own('u-1', x: 0, range: 30);
+      final b = _own('u-2', x: 2, range: 30);
+
+      final both = _update(tracker, [a, b])!;
+      final left = _update(tracker, [b]);
+      final moved = _update(tracker, [_own('u-2', x: 12, range: 30)])!;
+
+      expect(_litColumns(both), {0, 1, 2, 3, 4, 5});
+      expect(left, isNull);
+      expect(_litColumns(moved), {9, 10, 11, 12, 13, 14, 15});
+      expect(moved.levelOf(0, 0), FogLevel.seen);
+    });
+
+    test('damage, and a bridge built, change the layer but nothing a sight '
+        'line reads: nothing is computed again', () {
+      final tracker = testTracker(sight: testSight(map: _row('g' * 10)));
+      final units = [_own('u-1', x: 0)];
+
+      _update(tracker, units);
+
+      expect(
+        _update(
+          tracker,
+          units,
+          world: [
+            const ObjectDamaged(object: 'wall', cells: [Cell(2, 0)], hp: 10),
+            const StructureBuilt(
+              siteId: 'b-1',
+              structure: 'bridge',
+              cells: [Cell(3, 0)],
+            ),
+          ],
+          version: 1,
+        ),
+        isNull,
+      );
     });
 
     test('a unit of a type the data does not know, or off the map, lights '

@@ -19,7 +19,7 @@ void main() {
     });
 
     test('MAP-27 the cells in sight now are lit', () {
-      final fog = _dark().lighting([0, 5, 11]);
+      final fog = _dark().lighting(lit: [0, 5, 11]);
 
       expect(fog.isLit(0, 0), isTrue);
       expect(fog.isLit(1, 1), isTrue);
@@ -30,8 +30,8 @@ void main() {
 
     test('MAP-33 a cell seen once and out of sight differs from one never '
         'seen, and stays so', () {
-      final once = _dark().lighting([5]);
-      final later = once.lighting([0]).lighting([]);
+      final once = _dark().lighting(lit: [5]);
+      final later = once.lighting(lit: [0], dimmed: [5]).lighting(dimmed: [0]);
 
       expect(once.levelOf(1, 1), FogLevel.lit);
       expect(later.levelOf(1, 1), FogLevel.seen);
@@ -43,36 +43,38 @@ void main() {
     });
 
     test('MAP-33 a cell seen again is lit again', () {
-      final fog = _dark().lighting([5]).lighting([]).lighting([5]);
+      final fog = _dark()
+          .lighting(lit: [5])
+          .lighting(dimmed: [5])
+          .lighting(lit: [5]);
 
       expect(fog.levelOf(1, 1), FogLevel.lit);
     });
 
     test('a model is immutable: lighting makes another', () {
       final fog = _dark();
-      final next = fog.lighting([5]);
+      final next = fog.lighting(lit: [5]);
 
       expect(fog.litCount, 0);
       expect(next.litCount, 1);
       expect(next, isNot(equals(fog)));
-      expect(next, equals(_dark().lighting([5])));
+      expect(next, equals(_dark().lighting(lit: [5])));
     });
 
-    test(
-      'a cell off the map is never seen, and lighting it changes nothing',
-      () {
-        final fog = _dark().lighting([-1, 99, 5]);
+    test('a cell off the map is never seen, and lighting or dimming it '
+        'changes nothing; dimming a cell out of sight leaves it as it was', () {
+      final fog = _dark().lighting(lit: [-1, 99, 5], dimmed: [-1, 99, 6]);
 
-        expect(fog.levelOf(-1, 0), FogLevel.never);
-        expect(fog.levelOf(0, -1), FogLevel.never);
-        expect(fog.levelOf(4, 0), FogLevel.never);
-        expect(fog.levelOf(0, 3), FogLevel.never);
-        expect(fog.litCount, 1);
-      },
-    );
+      expect(fog.levelOf(-1, 0), FogLevel.never);
+      expect(fog.levelOf(0, -1), FogLevel.never);
+      expect(fog.levelOf(4, 0), FogLevel.never);
+      expect(fog.levelOf(0, 3), FogLevel.never);
+      expect(fog.levelOf(2, 1), FogLevel.never);
+      expect(fog.litCount, 1);
+    });
 
     test('MAP-27 a position in metres is in the cell it falls in', () {
-      final fog = _dark().lighting([5]);
+      final fog = _dark().lighting(lit: [5]);
 
       expect(fog.levelAt(15, 15), FogLevel.lit);
       expect(fog.levelAt(9.9, 0), FogLevel.never);
@@ -80,7 +82,7 @@ void main() {
     });
 
     test('the levels are a view that cannot be changed', () {
-      final fog = _dark().lighting([5]);
+      final fog = _dark().lighting(lit: [5]);
 
       expect(fog.levels, hasLength(12));
       expect(fog.levels[5], FogLevel.lit.index);

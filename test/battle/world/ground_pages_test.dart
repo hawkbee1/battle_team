@@ -86,7 +86,9 @@ void main() {
 
     test('is the red byte of each of its cells, north-west first', () {
       // Cells (2, 1) and (5, 3) seen, then only (2, 1) in sight.
-      final fog = dark().lighting([1 * 8 + 2, 3 * 8 + 5]).lighting([1 * 8 + 2]);
+      final fog = dark()
+          .lighting(lit: [1 * 8 + 2, 3 * 8 + 5])
+          .lighting(dimmed: [3 * 8 + 5]);
       final into = Uint8List(100);
 
       final pixels = fogPagePixels(fog, page, into);
@@ -103,24 +105,24 @@ void main() {
     });
 
     test('changed only when a cell of the page changed', () {
-      final before = dark().lighting([1 * 8 + 2]);
+      final before = dark().lighting(lit: [1 * 8 + 2]);
 
       expect(fogPageChanged(before, before, page), isFalse);
       // A cell lit outside the page: west of it, and north of it.
       expect(
-        fogPageChanged(before, before.lighting([1 * 8 + 2, 1 * 8 + 1]), page),
+        fogPageChanged(before, before.lighting(lit: [1 * 8 + 1]), page),
         isFalse,
       );
-      expect(
-        fogPageChanged(before, before.lighting([1 * 8 + 2, 3]), page),
-        isFalse,
-      );
+      expect(fogPageChanged(before, before.lighting(lit: [3]), page), isFalse);
       // Its last cell lit, and its first one out of sight.
       expect(
-        fogPageChanged(before, before.lighting([1 * 8 + 2, 3 * 8 + 5]), page),
+        fogPageChanged(before, before.lighting(lit: [3 * 8 + 5]), page),
         isTrue,
       );
-      expect(fogPageChanged(before, before.lighting([]), page), isTrue);
+      expect(
+        fogPageChanged(before, before.lighting(dimmed: [1 * 8 + 2]), page),
+        isTrue,
+      );
     });
   });
 }

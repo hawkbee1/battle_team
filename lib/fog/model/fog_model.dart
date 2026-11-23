@@ -70,13 +70,19 @@ final class FogModel extends Equatable {
   int get litCount =>
       _levels.where((level) => level == FogLevel.lit.index).length;
 
-  /// This model once the cells [lit] (`y × width + x`) are the ones in
-  /// sight: the others that were lit become seen once, and nothing seen is
-  /// ever forgotten. Cells off the map are ignored.
-  FogModel lighting(Iterable<int> lit) {
+  /// This model once the cells [lit] came into sight and the cells [dimmed]
+  /// left it (`y × width + x`): a cell that leaves sight is seen once, and
+  /// nothing seen is ever forgotten. Cells off the map, and a dimmed cell
+  /// that was not in sight, are ignored.
+  FogModel lighting({
+    Iterable<int> lit = const [],
+    Iterable<int> dimmed = const [],
+  }) {
     final next = Uint8List.fromList(_levels);
-    for (var i = 0; i < next.length; i++) {
-      if (next[i] == FogLevel.lit.index) next[i] = FogLevel.seen.index;
+    for (final cell in dimmed) {
+      if (cell >= 0 && cell < next.length && next[cell] == FogLevel.lit.index) {
+        next[cell] = FogLevel.seen.index;
+      }
     }
     for (final cell in lit) {
       if (cell >= 0 && cell < next.length) next[cell] = FogLevel.lit.index;

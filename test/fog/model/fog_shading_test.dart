@@ -20,7 +20,7 @@ void main() {
         width: 3,
         depth: 1,
         cellSizeM: 10,
-      ).lighting([1]).lighting([0]);
+      ).lighting(lit: [1]).lighting(lit: [0], dimmed: [1]);
 
       final shaded = fogShadedColors(_ground(), fog);
 
