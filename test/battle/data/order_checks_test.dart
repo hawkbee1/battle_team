@@ -42,9 +42,9 @@ void main() {
       expect(plan, isA<MovePreview>());
       final move = plan as MovePreview;
       // The commander's cell is the first of the path, the destination's the
-      // last: 30 m east on a 10 m grid.
-      expect(move.cells.first, const Cell(50, 5));
-      expect(move.cells.last, const Cell(53, 5));
+      // last: 30 m east on a 2 m grid.
+      expect(move.cells.first, const Cell(252, 27));
+      expect(move.cells.last, const Cell(267, 27));
       expect(move.lengthM, closeTo(30, 1e-6));
       expect(move.costAp, greaterThan(0));
       expect(move.points.first.x, closeTo(505, 1e-6));

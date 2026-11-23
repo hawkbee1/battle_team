@@ -88,7 +88,7 @@ Map<int, double> bridgeDecks(MapData map) {
       for (var y = cell.y - 1; y <= cell.y + 1; y++) {
         for (var x = cell.x - 1; x <= cell.x + 1; x++) {
           if (x < 0 || y < 0 || x >= map.width || y >= map.depth) continue;
-          highest = math.max(highest, map.heights[y * map.width + x] * 1.0);
+          highest = math.max(highest, map.heightM(y * map.width + x));
         }
       }
     }
@@ -150,7 +150,7 @@ class TerrainSurface {
     final y1 = math.min(y0 + 1, map.depth - 1);
     final fx = x - x0;
     final fy = y - y0;
-    double h(int cx, int cy) => map.heights[cy * map.width + cx].toDouble();
+    double h(int cx, int cy) => map.heightM(cy * map.width + cx);
     final north = h(x0, y0) * (1 - fx) + h(x1, y0) * fx;
     final south_ = h(x0, y1) * (1 - fx) + h(x1, y1) * fx;
     return north * (1 - fy) + south_ * fy;
@@ -206,7 +206,7 @@ TerrainArrays terrainArrays(MapData map) {
       final i = y * width + x;
       final east = (x + 0.5) * cell;
       final south = (y + 0.5) * cell;
-      final height = map.heights[i].toDouble();
+      final height = map.heightM(i);
       positions
         ..[i * 3] = east
         ..[i * 3 + 1] = height

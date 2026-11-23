@@ -76,10 +76,12 @@ void main() {
     });
 
     test('gives the height of a cell at its centre, and between cells', () {
-      final h0 = map.heights[0].toDouble();
-      final h1 = map.heights[1].toDouble();
-      expect(surface.heightAt(5, 5), h0);
-      expect(surface.heightAt(10, 5), closeTo((h0 + h1) / 2, 1e-9));
+      final h0 = map.heightM(0);
+      final h1 = map.heightM(1);
+      // Cells of 2 m, heights in steps of 0.1 m.
+      expect(h0, closeTo(map.heights[0] / 10, 1e-9));
+      expect(surface.heightAt(1, 1), h0);
+      expect(surface.heightAt(2, 1), closeTo((h0 + h1) / 2, 1e-9));
       // Beyond the map, the nearest edge's.
       expect(surface.heightAt(-50, -50), h0);
     });
@@ -103,43 +105,44 @@ void main() {
   group('bridgeDecks', () {
     test("puts each bridge's cells under one deck, a metre above the highest "
         'ground at and around them', () {
-      // The 1 km map's bridges: one of four cells, one of three.
+      // The 1 km map's bridges: one of 19 cells, one of 15.
       final decks = bridgeDecks(map);
+      final bridge = map.features.features.firstWhere(
+        (feature) => feature.type == 'bridge',
+      );
 
-      expect(decks, hasLength(7));
-      final first = [
-        for (final (x, y) in [(30, 14), (30, 15), (31, 15), (32, 15)])
-          decks[y * map.width + x],
-      ];
-      expect(first.toSet(), hasLength(1));
-      var highest = 0;
-      for (var y = 13; y <= 16; y++) {
-        for (var x = 29; x <= 33; x++) {
-          final inside =
-              (x - 30).abs() <= 1 && (y - 14).abs() <= 1 ||
-              (x - 30).abs() <= 1 && (y - 15).abs() <= 1 ||
-              (x - 31).abs() <= 1 && (y - 15).abs() <= 1 ||
-              (x - 32).abs() <= 1 && (y - 15).abs() <= 1;
-          if (inside && map.heights[y * map.width + x] > highest) {
-            highest = map.heights[y * map.width + x];
+      expect(decks, hasLength(34));
+      expect(bridge.cells, hasLength(19));
+      final first = {
+        for (final cell in bridge.cells) decks[cell.y * map.width + cell.x],
+      };
+      expect(first, hasLength(1));
+      var highest = double.negativeInfinity;
+      for (final cell in bridge.cells) {
+        for (var y = cell.y - 1; y <= cell.y + 1; y++) {
+          for (var x = cell.x - 1; x <= cell.x + 1; x++) {
+            if (map.heightM(y * map.width + x) > highest) {
+              highest = map.heightM(y * map.width + x);
+            }
           }
         }
       }
-      expect(first.first, highest + bridgeDeckRiseM);
+      expect(first.single, highest + bridgeDeckRiseM);
     });
 
     test('units stand on the deck over a bridge, on the ground beside '
         'it', () {
-      final deck = surface.decks[15 * map.width + 31]!;
+      // Cell (153, 75), of the first bridge; (153, 78) beside it.
+      final deck = surface.decks[75 * map.width + 153]!;
 
-      expect(surface.heightAt(315, 155), deck);
+      expect(surface.heightAt(307, 151), deck);
       expect(
-        surface.heightAt(315, 155),
-        greaterThan(surface.groundAt(315, 155)),
+        surface.heightAt(307, 151),
+        greaterThan(surface.groundAt(307, 151)),
       );
-      expect(surface.heightAt(315, 175), surface.groundAt(315, 175));
+      expect(surface.heightAt(307, 157), surface.groundAt(307, 157));
       // Off the map, the nearest edge's ground.
-      expect(surface.heightAt(-5, 155), surface.groundAt(-5, 155));
+      expect(surface.heightAt(-5, 151), surface.groundAt(-5, 151));
     });
   });
 
@@ -147,10 +150,12 @@ void main() {
     test('has a coloured vertex per cell and two triangles per square', () {
       final arrays = terrainArrays(map);
 
-      expect(arrays.positions.length, 100 * 100 * 3);
-      expect(arrays.colors.length, 100 * 100 * 4);
-      expect(arrays.indices.length, 99 * 99 * 6);
-      expect(arrays.positions.sublist(0, 3), [5, map.heights[0], -5]);
+      expect(arrays.positions.length, 500 * 500 * 3);
+      expect(arrays.colors.length, 500 * 500 * 4);
+      expect(arrays.indices.length, 499 * 499 * 6);
+      expect(arrays.positions[0], 1);
+      expect(arrays.positions[1], closeTo(map.heightM(0), 1e-4));
+      expect(arrays.positions[2], -1);
       expect(arrays.colors[3], 1);
     });
 

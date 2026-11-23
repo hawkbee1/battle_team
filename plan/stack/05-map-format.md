@@ -14,8 +14,8 @@ Status: **confirmed** (designer, 2026-11-01; milestone M2, Issue 5). Rules: MAP-
 3. **Option 2 cut into fixed tiles**, each with its heights, terrain and objects. Lets the client load only the tiles near the camera, and lets a world change touch one tile.
 
 ## Choice
-**Option 3.** Cell size **10 m** (a proposal: it gives 5 million cells on a 10 × 50 km map). Tiles of **256 × 256 cells** (2.56 km square). Per tile:
-- `heights`: 16-bit image, one value per cell, in metres above a fixed base;
+**Option 3.** Cell size **10 m** (a proposal: it gives 5 million cells on a 10 × 50 km map); a map may set smaller cells (decision 241: `saint_lo_1km` has 2 m). Tiles of **256 × 256 cells** (2.56 km square). Per tile:
+- `heights`: 16-bit image, one value per cell, in steps of the map's `height_step_m` (1 m unless it says; 0.1 m for cells of 2 m, where a whole metre between two cells is a 27° slope) above a fixed base;
 - `terrain`: indexed image, one terrain type per cell, from `data/terrain.yaml`;
 - `objects.yaml`: trees, buildings, walls, roads, bridges, ladders, floating islands, each with its armour type from `data/combat.yaml`.
 

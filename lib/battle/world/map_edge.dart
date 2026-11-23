@@ -42,7 +42,7 @@ List<CliffArrays> edgeCliffArrays(
   double rimM = 3000,
 }) {
   final cell = map.spec.cellSizeM;
-  double height(int x, int y) => map.heights[y * map.width + x].toDouble();
+  double height(int x, int y) => map.heightM(y * map.width + x);
   final west = cell / 2;
   final east = (map.width - 0.5) * cell;
   final north = cell / 2;

@@ -58,6 +58,9 @@ flutter:
     # on screen (the battle's credits).
     - assets/maps/saint_lo_1km/
     - assets/maps/saint_lo_1km/tiles/0_0/
+    - assets/maps/saint_lo_1km/tiles/0_1/
+    - assets/maps/saint_lo_1km/tiles/1_0/
+    - assets/maps/saint_lo_1km/tiles/1_1/
     - assets/maps/saint_lo/
     - assets/maps/saint_lo/tiles/0_0/
     - assets/maps/saint_lo/tiles/0_1/

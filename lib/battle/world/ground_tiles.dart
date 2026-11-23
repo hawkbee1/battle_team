@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:battle_map/battle_map.dart';
+import 'package:battle_pathfinding/battle_pathfinding.dart' show CellRef;
 import 'package:vector_math/vector_math.dart';
 
 /// The quads along the side of a ground tile, at every level: a tile's mesh
@@ -263,10 +264,9 @@ GroundTileArrays groundTileArrays(
   final colors = Float32List(count * 4);
   final light = Vector3(-1, 2, 1)..normalize();
 
-  double height(int x, int y) => map
-      .heights[y.clamp(0, map.depth - 1) * map.width +
-          x.clamp(0, map.width - 1)]
-      .toDouble();
+  double height(int x, int y) => map.heightM(
+    y.clamp(0, map.depth - 1) * map.width + x.clamp(0, map.width - 1),
+  );
 
   for (var j = 0; j < rows; j++) {
     for (var i = 0; i < cols; i++) {
@@ -341,40 +341,77 @@ GroundTileArrays groundTileArrays(
 /// cells wide unless said otherwise.
 typedef ChunkId = ({int x, int y});
 
-/// The objects of a chunk that are drawn: the cells (`y × width + x`) of its
-/// `trees`, of its `buildings` and of its `bridges`.
+/// Where a tree is drawn: one per tree object, at its `cell` (`y × width +
+/// x`), the one nearest its middle, moved within the square of `side` cells
+/// it spans (1 for a tree on one cell; a map of small cells groups the
+/// cells of a tree a few metres across).
+typedef TreeSpot = ({int cell, int side});
+
+/// The objects of a chunk that are drawn: its `trees`, and the cells
+/// (`y × width + x`) of its `buildings` and of its `bridges`.
 typedef ObjectChunk = ({
-  List<int> trees,
+  List<TreeSpot> trees,
   List<int> buildings,
   List<int> bridges,
 });
 
 /// The trees, buildings and bridges (`bridgeTypes`) of [map] by chunk of
-/// [cells] cells, so that only those near the eye are drawn.
+/// [cells] cells, so that only those near the eye are drawn: a tree in the
+/// chunk of its spot's cell.
 Map<ChunkId, ObjectChunk> objectChunks(
   MapData map, {
   int cells = groundTileQuads,
 }) {
   final chunks = <ChunkId, ObjectChunk>{};
+  ObjectChunk chunkOf(CellRef cell) =>
+      chunks[(x: cell.x ~/ cells, y: cell.y ~/ cells)] ??= (
+        trees: [],
+        buildings: [],
+        bridges: [],
+      );
   for (final feature in map.features.features) {
     final type = feature.type;
+    if (type == 'tree') {
+      final (spot, side) = _treeSpot(feature.cells);
+      chunkOf(spot).trees.add((cell: spot.y * map.width + spot.x, side: side));
+      continue;
+    }
     final listOf = switch (type) {
-      'tree' => (ObjectChunk chunk) => chunk.trees,
       'building' => (ObjectChunk chunk) => chunk.buildings,
       _ when bridgeTypes.contains(type) => (ObjectChunk chunk) => chunk.bridges,
       _ => null,
     };
     if (listOf == null) continue;
     for (final cell in feature.cells) {
-      final chunk = chunks[(x: cell.x ~/ cells, y: cell.y ~/ cells)] ??= (
-        trees: [],
-        buildings: [],
-        bridges: [],
-      );
-      listOf(chunk).add(cell.y * map.width + cell.x);
+      listOf(chunkOf(cell)).add(cell.y * map.width + cell.x);
     }
   }
   return chunks;
+}
+
+/// The cell of [cells] nearest their middle, the first of them on a tie,
+/// and the side in cells of the square they span.
+(CellRef, int) _treeSpot(List<CellRef> cells) {
+  var east = 0.0;
+  var south = 0.0;
+  var x0 = cells.first.x;
+  var x1 = x0;
+  var y0 = cells.first.y;
+  var y1 = y0;
+  for (final cell in cells) {
+    east += cell.x;
+    south += cell.y;
+    x0 = math.min(x0, cell.x);
+    x1 = math.max(x1, cell.x);
+    y0 = math.min(y0, cell.y);
+    y1 = math.max(y1, cell.y);
+  }
+  east /= cells.length;
+  south /= cells.length;
+  double away(CellRef cell) =>
+      math.pow(cell.x - east, 2) + math.pow(cell.y - south, 2).toDouble();
+  final spot = cells.reduce((a, b) => away(b) < away(a) ? b : a);
+  return (spot, math.max(x1 - x0, y1 - y0) + 1);
 }
 
 /// The cells of the chunk [id] in [grid], for chunks of [cells] cells.
@@ -477,11 +514,11 @@ treeConeArrays({int sides = 6}) {
 }
 
 /// How the tree of the map cell [cell] is drawn, so that a forest is not a
-/// grid of copies: moved `east` and `south` within its cell (a fraction of
-/// the cell), turned by `yaw` radians, scaled by `scale`, and of the model
-/// `kind` picks (a fraction of the list of models, under 1). The same for a
-/// cell every time. Only the drawing varies; the battle keeps the tree at
-/// its cell.
+/// grid of copies: moved `east` and `south` within its square (a fraction
+/// of the square's side), turned by `yaw` radians, scaled by `scale`, and of
+/// the model `kind` picks (a fraction of the list of models, under 1). The
+/// same for a cell every time. Only the drawing varies; the battle keeps the
+/// tree at its cells.
 ({double east, double south, double yaw, double scale, double kind}) treeLook(
   int cell,
 ) {

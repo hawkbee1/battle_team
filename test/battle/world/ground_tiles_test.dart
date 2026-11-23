@@ -301,7 +301,17 @@ void main() {
           MapFeature(
             kind: FeatureKind.object,
             type: 'tree',
-            cells: [CellRef(1, 2), CellRef(63, 63), CellRef(64, 2)],
+            cells: [CellRef(1, 2)],
+          ),
+          MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [CellRef(63, 63)],
+          ),
+          MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [CellRef(64, 2)],
           ),
           MapFeature(
             kind: FeatureKind.object,
@@ -324,12 +334,46 @@ void main() {
       final chunks = objectChunks(map);
 
       expect(chunks.keys, [(x: 0, y: 0), (x: 1, y: 0), (x: 2, y: 1)]);
-      expect(chunks[(x: 0, y: 0)]!.trees, [2 * 200 + 1, 63 * 200 + 63]);
-      expect(chunks[(x: 1, y: 0)]!.trees, [2 * 200 + 64]);
+      expect(chunks[(x: 0, y: 0)]!.trees, [
+        (cell: 2 * 200 + 1, side: 1),
+        (cell: 63 * 200 + 63, side: 1),
+      ]);
+      expect(chunks[(x: 1, y: 0)]!.trees, [(cell: 2 * 200 + 64, side: 1)]);
       expect(chunks[(x: 1, y: 0)]!.bridges, [3 * 200 + 70, 3 * 200 + 71]);
       expect(chunks[(x: 0, y: 0)]!.bridges, isEmpty);
       expect(chunks[(x: 2, y: 1)]!.buildings, [70 * 200 + 130]);
       expect(chunks[(x: 2, y: 1)]!.trees, isEmpty);
+    });
+
+    test('a tree of several cells is drawn once, at the cell nearest its '
+        'middle, the first on a tie, in the chunk of that cell, moved within '
+        'the square it spans', () {
+      final map = mapOf(
+        200,
+        100,
+        features: [
+          // A block of 5 × 5 cells across two chunks: its middle in the second.
+          MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [
+              for (var y = 10; y < 15; y++)
+                for (var x = 62; x < 67; x++) CellRef(x, y),
+            ],
+          ),
+          // Two cells of a hedge, as near the middle one as the other.
+          const MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [CellRef(3, 40), CellRef(4, 40)],
+          ),
+        ],
+      );
+
+      final chunks = objectChunks(map);
+
+      expect(chunks[(x: 1, y: 0)]!.trees, [(cell: 12 * 200 + 64, side: 5)]);
+      expect(chunks[(x: 0, y: 0)]!.trees, [(cell: 40 * 200 + 3, side: 2)]);
     });
 
     test("a chunk covers its own cells, cut at the map's edge", () {
@@ -354,7 +398,17 @@ void main() {
           MapFeature(
             kind: FeatureKind.object,
             type: 'tree',
-            cells: [CellRef(1, 2), CellRef(15, 15), CellRef(16, 2)],
+            cells: [CellRef(1, 2)],
+          ),
+          MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [CellRef(15, 15)],
+          ),
+          MapFeature(
+            kind: FeatureKind.object,
+            type: 'tree',
+            cells: [CellRef(16, 2)],
           ),
         ],
       );
@@ -362,7 +416,10 @@ void main() {
       final chunks = objectChunks(map, cells: 16);
 
       expect(chunks.keys, [(x: 0, y: 0), (x: 1, y: 0)]);
-      expect(chunks[(x: 0, y: 0)]!.trees, [2 * 200 + 1, 15 * 200 + 15]);
+      expect(chunks[(x: 0, y: 0)]!.trees.map((tree) => tree.cell), [
+        2 * 200 + 1,
+        15 * 200 + 15,
+      ]);
     });
 
     test('chunkCells covers the cells asked', () {
@@ -488,7 +545,7 @@ void main() {
   });
 
   group('treeLook', () {
-    test('is the same for a cell every time, and stays in its cell', () {
+    test('is the same for a cell every time, and stays in its square', () {
       for (final cell in [0, 1, 4999999, 123456]) {
         final look = treeLook(cell);
 

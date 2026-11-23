@@ -65,14 +65,17 @@ void main() {
       );
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 200)),
-      );
-      await tester.pump();
-      await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 200)),
-      );
-      await tester.pump();
+      // The map of 2 m cells takes a moment to load.
+      for (
+        var wait = 0;
+        wait < 100 && find.textContaining('In battle').evaluate().isEmpty;
+        wait++
+      ) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 100)),
+        );
+        await tester.pump();
+      }
 
       expect(find.textContaining('In battle'), findsOneWidget);
       verify(apiClient.createJwt).called(1);

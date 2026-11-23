@@ -417,24 +417,25 @@ class GroundStreamer {
     missing.sort((a, b) => a.$1.compareTo(b.$1));
     for (final (_, id, level) in missing.take(treeBuildsPerFrame)) {
       final live = _trees[id] ??= _LiveTrees(level);
-      final cells = _treeChunks[id]!.trees;
+      final spots = _treeChunks[id]!.trees;
       if (level == .near) {
-        live.near = _makeNearTrees(id, cells)..also(scene.add);
+        live.near = _makeNearTrees(id, spots)..also(scene.add);
         live.far?.visible = false;
       } else {
-        live.far = _makeFarTrees(id, cells)..also(scene.add);
+        live.far = _makeFarTrees(id, spots)..also(scene.add);
       }
     }
     return missing.length <= treeBuildsPerFrame;
   }
 
-  /// The model of the tree of [cell], and where it stands: the transform
+  /// The model of the tree at [spot], and where it stands: the transform
   /// from the model's frame to the world.
-  (TreeModel, Matrix4) _treeAt(int cell) {
+  (TreeModel, Matrix4) _treeAt(TreeSpot spot) {
+    final (:cell, :side) = spot;
     final look = treeLook(cell);
     final model = trees[(look.kind * trees.length).floor()];
-    final east = (cell % map.width + 0.5 + look.east) * surface.cell;
-    final south = (cell ~/ map.width + 0.5 + look.south) * surface.cell;
+    final east = (cell % map.width + 0.5 + look.east * side) * surface.cell;
+    final south = (cell ~/ map.width + 0.5 + look.south * side) * surface.cell;
     final scale = model.metresPerUnit * look.scale;
     return (
       model,
@@ -453,10 +454,10 @@ class GroundStreamer {
 
   /// The trees of a chunk as their models: one instanced mesh per part of
   /// each model.
-  Node _makeNearTrees(ChunkId id, List<int> cells) {
+  Node _makeNearTrees(ChunkId id, List<TreeSpot> spots) {
     final meshes = <TreePart, InstancedMesh>{};
-    for (final cell in cells) {
-      final (model, foot) = _treeAt(cell);
+    for (final spot in spots) {
+      final (model, foot) = _treeAt(spot);
       for (final part in model.parts) {
         (meshes[part] ??= InstancedMesh(
           geometry: part.geometry,
@@ -473,13 +474,13 @@ class GroundStreamer {
 
   /// The trees of a chunk as cones, in one instanced mesh: each cone as
   /// tall and as wide as its tree, in the colour of its leaves.
-  Node _makeFarTrees(ChunkId id, List<int> cells) {
+  Node _makeFarTrees(ChunkId id, List<TreeSpot> spots) {
     final cones = InstancedMesh(
       geometry: _coneGeometry,
       material: _coneMaterial,
     );
-    for (final cell in cells) {
-      final (model, foot) = _treeAt(cell);
+    for (final spot in spots) {
+      final (model, foot) = _treeAt(spot);
       final (red, green, blue) = model.leaves;
       cones.addInstance(
         foot.multiplied(
