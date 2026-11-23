@@ -95,13 +95,17 @@ class SceneBattleWorld implements BattleWorld {
     return at..y = surface.heightAt(at.x, -at.z);
   }
 
-  /// The points [unit] goes through from [from] to [to], both included.
-  List<Vector3> _route(UnitView unit, Vector3 from, Vector3 to) {
+  /// The points [unit] goes through from where it is drawn, [from], to
+  /// [to], both included: by the path from the host's last position of it,
+  /// [was], to its new one. A move the player confirmed was searched from
+  /// and to the same cells by its preview, whose answer the planner keeps:
+  /// the start of the glide does not search it again.
+  List<Vector3> _route(UnitView unit, Position was, Vector3 from, Vector3 to) {
     final points = routes.route(
       unitType: unit.unitType,
       flying: unit.flying,
-      from: positionOf(from),
-      to: positionOf(to),
+      from: was,
+      to: unit.position!,
     );
     return [
       from,
@@ -140,10 +144,13 @@ class SceneBattleWorld implements BattleWorld {
       final to = spread[unit.unitId];
       if (to == null) continue;
       to.y = surface.heightAt(to.x, -to.z);
+      // Only units with a position are spread.
+      final position = unit.position!;
       final drawn = _units[unit.unitId] ??= _Unit(
         unit.unitType,
         teamColor(unit.team),
         Glide(to),
+        position,
       );
       if (drawn.glide.to != to) {
         final until = unit.private?.movingUntil;
@@ -151,11 +158,12 @@ class SceneBattleWorld implements BattleWorld {
             ? math.max(0, (until - battleTime).inMilliseconds / 1000)
             : 0.5;
         drawn.glide.retarget(
-          _route(unit, _drawnAt(drawn), to),
+          _route(unit, drawn.at, _drawnAt(drawn), to),
           now: _clock,
           seconds: seconds.toDouble(),
         );
       }
+      drawn.at = position;
     }
     _selected = selected;
     _target = target;
@@ -517,13 +525,15 @@ class _ShotNode {
   final Matrix4 base;
 }
 
-/// A unit drawn: its type, its team's colour, and its glide.
+/// A unit drawn: its type, its team's colour, its glide, and where the host
+/// had it last.
 class _Unit {
-  new(this.unitType, this.color, this.glide);
+  new(this.unitType, this.color, this.glide, this.at);
 
   final String unitType;
   final Vector4 color;
   final Glide glide;
+  Position at;
 }
 
 extension<T> on T {

@@ -25,7 +25,8 @@ typedef _Sight = ({
 /// `battle_rules`' vision over the map's heights through [GroundSight], for
 /// display only (stack decision 8). It computes again only for a unit that
 /// moved or whose range changed, and for all of them when the weather or the
-/// delta layer changes (a wall built, a crater dug).
+/// delta layer changes (a wall built, a crater dug); a message of the host
+/// that changes none of them costs next to nothing.
 ///
 /// Nothing of any other unit feeds it (decision 237): a unit without private
 /// state, a hit the section did not see, an enemy that left sight are not its
@@ -73,7 +74,7 @@ final class FogTracker {
       _sight = _base.withWorld(world);
       _cache.clear();
     }
-    final lit = <int>{};
+    var changed = false;
     final present = <String>{};
     for (final unit in units) {
       final sight = _sightOf(unit, weather);
@@ -89,12 +90,15 @@ final class FogTracker {
           weather: weather,
         );
         _cache[unit.unitId] = (sight, seen);
-        lit.addAll(seen);
-      } else {
-        lit.addAll(cached.$2);
+        changed = true;
       }
     }
+    final had = _cache.length;
     _cache.removeWhere((id, _) => !present.contains(id));
+    // No sight computed again and none gone: the ground lit is the same, and
+    // gathering it costs tens of thousands of cells.
+    if (!changed && _cache.length == had) return null;
+    final lit = {for (final (_, seen) in _cache.values) ...seen};
     if (lit.length == _lit.length && lit.containsAll(_lit)) return null;
     _lit = lit;
     return _model = _model.lighting(lit);
